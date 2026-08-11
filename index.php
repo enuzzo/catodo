@@ -150,6 +150,7 @@ if ($authed) {
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#0C0D0B">
 <title>CATODO</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><rect width='4' height='28' x='0' fill='%23BFBFBF'/><rect width='4' height='28' x='4' fill='%23BFBF00'/><rect width='4' height='28' x='8' fill='%2300BFBF'/><rect width='4' height='28' x='12' fill='%2300BF00'/><rect width='4' height='28' x='16' fill='%23BF00BF'/><rect width='4' height='28' x='20' fill='%23BF0000'/><rect width='4' height='28' x='24' fill='%230000BF'/></svg>">
 <style>
 :root{
   --ebu-white:#BFBFBF; --ebu-yellow:#BFBF00; --ebu-cyan:#00BFBF; --ebu-green:#00BF00;
@@ -166,6 +167,7 @@ body{background:var(--glass);color:var(--ink);font-family:var(--sans);font-size:
   -webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 input{font:inherit;color:inherit}
+input::placeholder{color:var(--dim)}
 .fringe{text-shadow:1.2px 0 0 rgba(224,85,69,.75), -1.2px 0 0 rgba(63,214,214,.7)}
 .barStrip{display:flex;gap:2px;width:126px;height:11px;margin:0 auto 17px}
 .barStrip i{flex:1}
@@ -176,14 +178,14 @@ input{font:inherit;color:inherit}
 .barStrip i:nth-child(5){background:var(--ebu-magenta)}
 .barStrip i:nth-child(6){background:var(--ebu-red)}
 .barStrip i:nth-child(7){background:var(--ebu-blue)}
-#gate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:20px;max-width:360px}
+#gate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:20px;max-width:360px}
 h1{font-size:15px;font-weight:800;letter-spacing:.46em;text-indent:.46em;text-align:center}
 .sub{font-size:10.5px;letter-spacing:.24em;color:var(--dim);margin-top:10px;text-align:center}
 .sub.bad{color:var(--c-red);letter-spacing:.1em;max-width:360px;line-height:1.6}
 form{display:flex;flex-direction:column;gap:12px;width:100%}
 input[type=text],input[type=password]{height:var(--tap);border:1px solid var(--line);border-radius:var(--r);
   background:var(--cabinet);font-family:var(--mono);font-size:18px;padding:0 16px;width:100%}
-input[type=text]:focus,input[type=password]:focus{outline:2px solid var(--c-amber)}
+input[type=text]:focus,input[type=password]:focus{border-color:var(--c-amber)}
 button[type=submit]{height:var(--tap);border:1px solid var(--line);border-radius:var(--r);background:var(--cabinet);
   font-family:var(--mono);font-size:15px;letter-spacing:.1em;transition:background .07s,color .07s,border-color .07s}
 button[type=submit]:active{background:var(--c-amber);border-color:var(--c-amber);color:#000}
