@@ -3,9 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test:pin": "node test-pin.mjs"
+    "test:pin": "node test-pin.mjs",
+    "gen:htpasswd": "node gen-htpasswd.mjs"
   },
   "devDependencies": {
+    "bcryptjs": "^3.0.3",
     "jsdom": "^30.0.1"
   }
 }

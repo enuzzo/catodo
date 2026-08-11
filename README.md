@@ -108,17 +108,26 @@ build command: (vuoto)     output directory: /
 
 Esce un `https://catodo-xxx.pages.dev`. Se preferisci, ci punti un sottodominio tuo.
 
-### Passo 3: protezione seria
+### Passo 3: protezione vera
 
-Il PIN nella pagina e comodita, non sicurezza: chi apre il sorgente lo legge. Va benissimo per tenere fuori chi ci capita sopra, ma la barriera vera si mette prima:
+Il PIN nella pagina e comodita, non sicurezza: chi apre il sorgente lo legge in cinque secondi. Tiene fuori chi ci capita sopra per caso, non un attacco vero. Dato che il deploy e su hosting FTP classico, la barriera vera e HTTP Basic Auth via `.htaccess`:
+
+```
+HTPASSWD_USER e HTPASSWD_PASSWORD in .env, poi:
+node gen-htpasswd.mjs
+```
+
+Carica `.htaccess`, `.htpasswd` e `robots.txt` sull FTP insieme al sito. Da quel momento il browser chiede utente e password prima ancora di mostrare la pagina, PIN compreso.
+
+**Percorso di aggiornamento futuro.** Se il dominio passa un giorno su Cloudflare, la protezione migliore diventa Cloudflare Access con policy sulla mail:
 
 ```
 Cloudflare > Zero Trust > Access > Applications > Add > Self-hosted
-dominio: catodo-xxx.pages.dev
+dominio: catodo.netmilk.dev
 policy: Allow > Emails > la tua mail
 ```
 
-Gratis fino a 50 utenti. Chiede un codice via mail al primo accesso e poi tiene la sessione per il periodo che imposti: metti 30 giorni e in auto non lo rivedi quasi mai. Alternativa piu spiccia: policy su intervallo IP, o direttamente `Cloudflare Access Service Token`.
+Gratis fino a 50 utenti, nessuna password nel repo, sessione lunga a piacere. Non necessario adesso: la Basic Auth gia protegge il sito.
 
 ### Passo 4: il proxy
 

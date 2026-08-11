@@ -17,7 +17,7 @@
 
 // Solo questo dominio puo usare il proxy. Evita che diventi un open proxy pubblico.
 // Metti l origine reale del tuo CATODO. "*" solo per i test.
-const ALLOW_ORIGIN = "*";
+const ALLOW_ORIGIN = "https://catodo.netmilk.dev";
 
 // Blocca tutto cio che non e un host di streaming plausibile.
 const DENY_HOSTS = [
