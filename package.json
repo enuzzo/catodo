@@ -1,0 +1,11 @@
+{
+  "name": "catodo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:pin": "node test-pin.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^30.0.1"
+  }
+}
