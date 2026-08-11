@@ -194,10 +194,10 @@ header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;op
 .sbtn.del:active{border-color:var(--c-red);color:var(--c-red)}
 
 .addRow{display:flex;gap:9px;margin-bottom:9px}
-.addRow input{flex:1;height:54px;background:var(--cabinet);border:1px solid var(--line);border-radius:var(--r);
+.addRow input{flex:1;height:var(--tap);background:var(--cabinet);border:1px solid var(--line);border-radius:var(--r);
   padding:0 14px;font-family:var(--mono);font-size:12.5px;outline:none;min-width:0}
 .addRow input:focus{border-color:var(--c-amber)}
-.addRow button{height:54px;padding:0 22px;border:1px solid var(--c-amber);border-radius:var(--r);
+.addRow button{height:var(--tap);padding:0 22px;border:1px solid var(--c-amber);border-radius:var(--r);
   background:var(--c-amber);color:#000;font-family:var(--mono);font-size:11px;letter-spacing:.12em;
   text-indent:.12em;font-weight:800}
 .addRow button.ghost{background:none;color:var(--dim);border-color:var(--line);font-weight:400}
@@ -239,7 +239,9 @@ video.fill{object-fit:cover}
   repeating-linear-gradient(to right,rgba(255,60,60,.055) 0 1px,rgba(60,255,60,.055) 1px 2px,rgba(60,60,255,.055) 2px 3px),
   radial-gradient(125% 105% at 50% 50%,transparent 52%,rgba(0,0,0,.55) 100%)}
 #tapzone{position:absolute;inset:0;z-index:4}
-#osd{position:absolute;top:96px;left:16px;z-index:5;display:flex;opacity:0;transform:translateY(-6px);
+/* Clear of the top bar: its buttons end at 86px, so anything above roughly
+   100px would be drawn behind the close and star buttons and never seen. */
+#osd{position:absolute;top:110px;left:16px;z-index:5;display:flex;opacity:0;transform:translateY(-6px);
   transition:opacity .18s,transform .18s;pointer-events:none}
 #osd.up{opacity:1;transform:none}
 #osd .k{background:var(--c);color:#000;font-family:var(--mono);font-size:38px;font-weight:800;
@@ -312,7 +314,7 @@ video.fill{object-fit:cover}
   transition:transform .14s,background .14s}
 .sw.on{border-color:var(--c-amber)}
 .sw.on::after{transform:translateX(24px);background:var(--c-amber)}
-.card input[type=text]{width:100%;height:48px;background:var(--glass);border:1px solid var(--line);
+.card input[type=text]{width:100%;height:var(--tap);background:var(--glass);border:1px solid var(--line);
   border-radius:var(--r);padding:0 13px;font-family:var(--mono);font-size:13px;outline:none;margin-top:9px}
 .card input[type=text]:focus{border-color:var(--c-amber)}
 .card .foot{display:flex;gap:10px;margin-top:24px}
@@ -1175,7 +1177,7 @@ function renderGrid(){
   head.className = "gridHead";
   head.innerHTML = '<span class="tag"></span><h2></h2><span class="cnt mono"></span>';
   head.querySelector("h2").textContent = title;
-  head.querySelector(".cnt").textContent = VIEW.length + " CHANNELS";
+  head.querySelector(".cnt").textContent = (VIEW.total || VIEW.length) + " CHANNELS";
   el.grid.appendChild(head);
 
   if (!VIEW.length){
@@ -1187,7 +1189,7 @@ function renderGrid(){
       const cta = document.createElement("div");
       cta.className = "cta";
       const b = document.createElement("button");
-      b.className = "hbtn"; b.style.height = "56px"; b.style.padding = "0 26px";
+      b.className = "hbtn"; b.style.height = "var(--tap)"; b.style.padding = "0 26px";
       b.textContent = "OPEN SOURCES"; b.onclick = openSources;
       cta.appendChild(b); e.appendChild(cta);
     } else {
@@ -1558,7 +1560,10 @@ function syncTeslaLink(){
   const u = ($("#inSite").value || "").trim();
   $("#outSite").value = u ? "https://www.youtube.com/redirect?q=" + encodeURIComponent(u) : "";
 }
-let resetArmed = false, resetT = null;
+/* Arming happens on the first tap, the wipe on the second. armedAt guards the
+   first 400 ms: a fast accidental double tap on a touchscreen would otherwise
+   fire both handlers and erase everything in one gesture. */
+let resetArmed = false, resetT = null, resetArmedAt = 0;
 function disarmReset(){
   resetArmed = false;
   clearTimeout(resetT);
@@ -1578,12 +1583,14 @@ $("#cfgOk").onclick = () => { disarmReset(); el.sheet.classList.add("hide"); ren
 el.cfgReset.onclick = () => {
   if (!resetArmed){
     resetArmed = true;
+    resetArmedAt = Date.now();
     el.cfgReset.textContent = "TAP AGAIN TO ERASE";
     el.cfgReset.classList.add("armed");
     clearTimeout(resetT);
     resetT = setTimeout(disarmReset, 4000);
     return;
   }
+  if (Date.now() - resetArmedAt < 400) return;
   disarmReset();
   store.wipe();
   S.sources = []; S.favs = new Set(); S.recent = []; S.proxy = ""; S.site = ""; S.fx = false; S.cat = "";

@@ -150,7 +150,11 @@ Workers & Pages > Create > Worker
 paste worker.js > Deploy
 ```
 
-Then in `worker.js` set `ALLOW_ORIGIN` to your real domain instead of `*`. The worker checks the request's `Origin` header (falling back to `Referer` when `Origin` is absent) against `ALLOW_ORIGIN` server side and returns 403 otherwise, so this is a real restriction, not just the CORS response header the browser can choose to ignore: without it, anyone who finds the worker's URL gets a free proxy at your expense. Remember `worker.js` runs on Cloudflare and is deployed by pasting the file into the dashboard, so editing the file in the repo changes nothing live until you paste and deploy it again.
+Then in `worker.js` set `ALLOW_ORIGIN` to your real domain instead of `*`. The worker checks the request's `Origin` header (falling back to `Referer` when `Origin` is absent) against `ALLOW_ORIGIN` server side and returns 403 otherwise. That is worth doing, and it is more than the CORS response header alone, which browsers honor and everything else ignores.
+
+Be honest with yourself about how far it goes, though. It stops a page on someone else's site from quietly using your proxy, and it stops the casual case of the URL being pasted around. It does not stop anyone who actually tries: `Origin` and `Referer` are ordinary headers and curl will send whatever you tell it to. Real protection would be a shared secret in the query string that only your CATODO knows. That is the next step if the proxy ever gets abused, and it is not worth the setup before then.
+
+Remember `worker.js` runs on Cloudflare and is deployed by pasting the file into the dashboard, so editing the file in the repo changes nothing live until you paste and deploy it again.
 Copy the worker's address into Catodo's settings. From that point on channels marked `HTTP` become openable and the ones that gave a CORS error start.
 
 ### Step 5: the lists

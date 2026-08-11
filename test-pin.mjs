@@ -16,7 +16,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 async function loadHtml(){
   const raw = await readFile(HTML_PATH, "utf8");
-  return raw.replace(/<script src="https:\/\/cdn\.jsdelivr\.net\/npm\/hls\.js[^"]*"><\/script>\s*/, "");
+  return raw.replace(/<script src="https:\/\/cdn\.jsdelivr\.net\/npm\/hls\.js[\s\S]*?<\/script>\s*/, "");
 }
 
 function overridePin(html, literal){

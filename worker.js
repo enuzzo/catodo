@@ -16,13 +16,20 @@
  */
 
 // Server side check: a request is rejected unless its Origin header (or, when
-// Origin is absent, its Referer header) matches ALLOW_ORIGIN. That is what
-// actually stops the proxy from being usable by anyone who finds the URL.
-// The Access-Control-Allow-Origin response header set in cors() below only
-// tells browsers what they are allowed to read, it does nothing against curl
-// or any other client that ignores CORS, which is why it cannot do this job
-// alone. Put the real origin of your CATODO here. "*" only for testing, and
-// only on this constant: with "*" the check below allows every origin.
+// Origin is absent, its Referer header) matches ALLOW_ORIGIN. The
+// Access-Control-Allow-Origin response header set in cors() below only tells
+// browsers what they may read: it does nothing against curl or any other
+// client that ignores CORS, which is why it cannot do this job alone.
+//
+// Be clear about how far this goes. It stops a browser on someone else's site
+// from using the proxy, and it stops the casual case of somebody pasting the
+// worker URL around. It does NOT stop a determined person: Origin and Referer
+// are just headers, and anyone can send whatever they like with curl. The next
+// step up, if this proxy ever gets abused, is a shared secret in the query
+// string that only your CATODO knows.
+//
+// Put the real origin of your CATODO here. "*" disables the check entirely and
+// is for local testing only: it leaves the proxy open to everyone.
 const ALLOW_ORIGIN = "https://catodo.netmilk.dev";
 
 // Blocks anything that is not a plausible streaming host.
@@ -182,6 +189,8 @@ function bad(msg, status = 400) {
  * present, or neither matches, the request is not allowed.
  */
 function originAllowed(request) {
+  if (ALLOW_ORIGIN === "*") return true;
+
   const origin = request.headers.get("origin");
   if (origin !== null) return origin === ALLOW_ORIGIN;
 

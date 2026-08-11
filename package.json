@@ -7,6 +7,7 @@
     "gen:htpasswd": "node gen-htpasswd.mjs"
   },
   "devDependencies": {
+    "basic-ftp": "^6.2.0",
     "bcryptjs": "^3.0.3",
     "jsdom": "^30.0.1"
   }
