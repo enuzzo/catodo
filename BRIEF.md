@@ -1,90 +1,92 @@
-# CATODO: brief operativo
+# CATODO: operating brief
 
-Questa cartella contiene un progetto finito e funzionante. Non riscriverlo, non introdurre framework,
-non aggiungere un passaggio di build. Ci sono quattro incarichi precisi, in fondo.
+This folder contains a finished, working project. Do not rewrite it, do not introduce a framework,
+do not add a build step. There are four precise tasks, at the bottom.
 
 ---
 
-## Che cosa e
+## What it is
 
-Un ricevitore IPTV privato che gira dentro il browser della Tesla, a veicolo fermo.
-Un solo file HTML, nessun backend, nessuna dipendenza a parte hls.js da CDN.
-Lo usa una persona sola, il proprietario dell auto.
+A private IPTV receiver that runs inside the Tesla browser, while the vehicle is parked.
+A single HTML file, no backend, no dependency other than hls.js from a CDN.
+Used by one person only, the car's owner.
 
-I canali arrivano dalla playlist pubblica `Free-TV/IPTV`, che raccoglie solo emittenti
-dichiarate free-to-air. Nessun flusso e ospitato qui: la pagina punta agli stessi URL
-che useresti in VLC.
+The channels come from the public `Free-TV/IPTV` playlist, which only collects stations
+declared free to air. No stream is hosted here: the page points to the same URLs
+you would use in VLC.
 
-### Vincoli tecnici da rispettare
+### Technical constraints to respect
 
-Sono la ragione per cui il codice e fatto cosi. Non "modernizzarlo".
+They are the reason the code is built this way. Do not "modernize" it.
 
-- **Il browser Tesla e Chromium 88.** User agent `Tesla/<firmware>`. Niente `:has()`,
-  niente container queries, niente sintassi oltre ES2016. Se aggiungi codice, resta in quel
-  perimetro o rompi il bersaglio.
-- **Niente HLS nativo.** Chromium ha il demuxer HLS solo dalla 142. Serve per forza
-  hls.js su Media Source Extensions. Non sostituirlo con Video.js o Shaka: sono piu pesanti
-  e girano comunque su hls.js.
-- **CORS e mixed content sono il problema vero.** hls.js scarica manifest, varianti, segmenti
-  e chiavi via XHR: ogni richiesta e cross-origin. Un flusso che va in VLC puo non andare nel
-  browser. In piu 109 canali del sottoinsieme utile sono in `http://` e una pagina https li
-  blocca. Per questo esiste `worker.js`.
-- **Tutto deve essere leggibile e toccabile da fermi in auto.** Target minimo 72 px,
-  niente stati hover, contrasto alto.
-- **Nella lingua dell interfaccia e in qualunque testo scritto: mai trattini lunghi o medi.**
-  Usa virgole, parentesi, due punti o trattini corti. Vale anche per commenti, README e
-  messaggi di commit.
+- **The Tesla browser is Chromium 88.** User agent `Tesla/<firmware>`. No `:has()`,
+  no container queries, no syntax beyond ES2016. If you add code, stay within that
+  perimeter or you break the target.
+- **No native HLS.** Chromium only has the HLS demuxer from 142. hls.js on Media Source Extensions
+  is required. Do not replace it with Video.js or Shaka: they are heavier
+  and still run on top of hls.js anyway.
+- **CORS and mixed content are the real problem.** hls.js downloads manifests, variants, segments
+  and keys via XHR: every request is cross-origin. A stream that plays in VLC may not play in the
+  browser. On top of that, 109 channels in the useful subset are on `http://` and an https page
+  blocks them. This is why `worker.js` exists.
+- **Everything must be readable and tappable while stationary in the car.** 72 px minimum target,
+  no hover states, high contrast.
+- **In the interface language and in any written text: never long or medium dashes.**
+  Use commas, parentheses, colons or short hyphens. This also applies to comments, README and
+  commit messages.
 
-### Identita
+### Identity
 
-Il nome viene dal tubo a raggi catodici. Le sette barre colore EBU sono il sistema:
-ogni categoria di canali prende una barra e se la tiene ovunque (colonna, scheda, numero a
-video, filo sopra la barra di sintonia). Il fondo e `#0C0D0B`, il verde-nero caldo del vetro
-di un tubo spento. Se tocchi la grafica, resta dentro questo sistema.
+The name comes from the cathode ray tube. The seven EBU color bars are the system:
+each channel category takes a bar and keeps it everywhere (column, card, on screen
+number, thread above the tuning bar). The background is `#0C0D0B`, the warm green-black of the glass
+of a switched off tube. If you touch the graphics, stay within this system.
 
-### File
+### Files
 
 ```
-index.html           il player. Autosufficiente, arriva senza nessuna lista dentro.
-worker.js            proxy Cloudflare per CORS, mixed content e hotlink. NON va sull FTP.
-check-playlist.mjs   diagnosi locale di una lista M3U. Stampa a schermo, non scrive file.
-README.md            documentazione completa, leggila prima di toccare qualsiasi cosa
+app.html              the player. Self contained, arrives with no list inside. Served only through index.php.
+index.php              login gate: checks username and password against .htpasswd, then streams app.html
+worker.js              Cloudflare proxy for CORS, mixed content and hotlinking. Does NOT go on the FTP.
+check-playlist.mjs     local diagnosis of an M3U list. Prints to screen, does not write files.
+README.md              full documentation, read it before touching anything
 ```
 
 ---
 
-## Regola di fondo: CATODO non distribuisce niente
+## Baseline rule: CATODO does not distribute anything
 
-Questa e la scelta architetturale piu importante del progetto e non va annullata per comodita.
+This is the project's most important architectural choice and it must not be undone for convenience.
 
-Il prodotto arriva **vuoto**. Non contiene liste, non ospita flussi, non fa da tramite. Le
-liste M3U le carica chi lo usa, da URL o da file, e restano nel suo browser. La schermata
-sorgenti rimanda a progetti indipendenti di terzi, ma sono collegamenti, non contenuti.
+The product arrives **empty**. It does not contain lists, does not host streams, does not act as an
+intermediary. The M3U lists are loaded by whoever uses it, from a URL or from a file, and stay in
+their browser. The sources screen points to independent third party projects, but those are
+links, not content.
 
-Concretamente, mentre lavori:
+Concretely, while working:
 
-- **Non reintrodurre `channels.json`**, ne alcun altro file di canali dentro il repo. Una copia
-  filtrata di una playlist pubblica resta una ridistribuzione, anche se la fonte e pubblica.
-- **Non aggiungere sorgenti precaricate** in `CFG.directory` che si carichino da sole al primo
-  avvio. Quell elenco descrive dove cercare, e l utente decide.
-- **Non mettere in cache le liste lato server** ne dentro il Worker. Il Worker inoltra e basta.
-- `check-playlist.mjs` e uno strumento di diagnosi locale: stampa a schermo e non deve mai
-  scrivere file di canali destinati al repo o all FTP.
-- Se una modifica ti sembra comoda ma finisce col far distribuire contenuti al progetto,
-  fermati e chiedi.
+- **Do not reintroduce `channels.json`**, or any other channel file inside the repo. A filtered
+  copy of a public playlist is still a redistribution, even if the source is public.
+- **Do not add preloaded sources** in `CFG.directory` that load themselves on first
+  launch. That list describes where to look, and the user decides.
+- **Do not cache the lists server side**, not even inside the Worker. The Worker just forwards.
+- `check-playlist.mjs` is a local diagnostic tool: it prints to screen and must never
+  write channel files meant for the repo or the FTP.
+- If a change seems convenient but ends up making the project distribute content,
+  stop and ask.
 
-Il ragionamento completo sta in `README.md`, sezione 7.
+The full reasoning is in `README.md`, section 7.
 
 ---
 
-## Incarico 1: git e GitHub
+## Task 1: git and GitHub
 
-Inizializza il repo e pubblicalo su GitHub **privato**.
+Initialize the repo and publish it to a **private** GitHub repo.
 
-**Ordine obbligatorio.** Scrivi `.gitignore` **prima** del primo `git add`. Se una credenziale
-finisce anche in un solo commit, resta nella cronologia per sempre e va riscritta la storia.
+**Mandatory order.** Write `.gitignore` **before** the first `git add`. If a credential
+ends up in even a single commit, it stays in the history forever and the history must be rewritten.
 
-`.gitignore` deve coprire almeno:
+`.gitignore` must cover at least:
 
 ```
 .env
@@ -96,128 +98,128 @@ node_modules/
 deploy/
 ```
 
-Poi: init, primo commit, repo privato su GitHub via `gh repo create`, push.
-Nome suggerito: `catodo`. Descrizione: ricevitore IPTV privato per il browser Tesla.
+Then: init, first commit, private repo on GitHub via `gh repo create`, push.
+Suggested name: `catodo`. Description: private IPTV receiver for the Tesla browser.
 
-Prima di pubblicare, verifica con `git log -p` che nel diff non compaiano host, utenti o
-password. Se il repo era gia stato inizializzato altrove, controlla anche quello.
+Before publishing, check with `git log -p` that no hosts, users or
+passwords appear in the diff. If the repo was already initialized elsewhere, check that too.
 
 ---
 
-## Incarico 2: deploy via FTP
+## Task 2: deploy via FTP
 
-Il sito va su un hosting classico raggiungibile in FTP.
+The site goes on classic hosting reachable via FTP.
 
-**Prepara `.env.example`** (questo si, versionato) con i nomi delle variabili e nessun valore:
+**Prepare `.env.example`** (this one is versioned) with the variable names and no values:
 
 ```
 FTP_HOST=
 FTP_PORT=21
 FTP_USER=
 FTP_PASSWORD=
-FTP_SECURE=true          # FTPS. Metti false solo se l hosting non lo supporta
-FTP_REMOTE_DIR=/         # cartella di destinazione sul server
-SITE_URL=                # indirizzo pubblico, serve per il link schermo intero Tesla
+FTP_SECURE=true          # FTPS. Set to false only if the hosting does not support it
+FTP_REMOTE_DIR=/         # destination folder on the server
+SITE_URL=                # public address, needed for the Tesla full screen link
 ```
 
-**Poi crea `.env`** con le stesse chiavi vuote, gia ignorato da git, e **dimmi esplicitamente
-di riempirlo io**. Non inventare valori, non chiedermeli in chat, non scriverli da nessuna
-altra parte.
+**Then create `.env`** with the same empty keys, already ignored by git, and **explicitly tell me
+to fill it in myself**. Do not make up values, do not ask me for them in chat, do not write them
+anywhere else.
 
-**Scrivi `deploy.mjs`**, coerente con `check-playlist.mjs` che c e gia (Node, ESM, nessun
-transpiler). Usa `basic-ftp`. Requisiti:
+**Write `deploy.mjs`**, consistent with `check-playlist.mjs` which already exists (Node, ESM, no
+transpiler). Use `basic-ftp`. Requirements:
 
-- carica **solo** `index.html`, `.htaccess`, `robots.txt`
-- non caricare mai `.env`, `worker.js`, `check-playlist.mjs`, `node_modules`, `.git`
-- se `FTP_SECURE=true` usa FTPS esplicito, e fallisci con un messaggio chiaro se il server
-  non lo offre, invece di ripiegare in chiaro senza dirlo
-- verifica che tutte le variabili esistano prima di connettersi, e spiega quale manca
-- stampa cosa ha caricato e quanti byte
-- aggiungi lo script in `package.json` come `npm run deploy`
+- upload **only** `app.html`, `index.php`, `.htaccess`, `robots.txt`
+- never upload `.env`, `worker.js`, `check-playlist.mjs`, `node_modules`, `.git`
+- if `FTP_SECURE=true` use explicit FTPS, and fail with a clear message if the server
+  does not offer it, instead of silently falling back to plain text
+- verify that all the variables exist before connecting, and explain which one is missing
+- print what it uploaded and how many bytes
+- add the script to `package.json` as `npm run deploy`
 
-Nel README, aggiungi una sezione breve sul deploy. Segnala per iscritto che **FTP semplice
-manda le credenziali in chiaro** e che se l hosting offre SFTP o FTPS va usato quello.
+In the README, add a short section on the deploy. State in writing that **plain FTP
+sends credentials in the clear** and that if the hosting offers SFTP or FTPS, that should be used instead.
 
 ---
 
-## Incarico 3: il PIN non funziona, e so perche
+## Task 3: the PIN does not work, and I know why
 
-Il proprietario riferisce che il codice corretto viene rifiutato. Ho gia isolato la causa
-eseguendo la pagina in jsdom su dieci scenari. **Non ripartire da zero con l indagine.**
+The owner reports that the correct code is being rejected. I have already isolated the cause
+by running the page in jsdom across ten scenarios. **Do not restart the investigation from scratch.**
 
-Risultati: il flusso funziona con il PIN di default, da tastierino, da tastiera fisica, con
-digitazione rapida, con conferma OK, con PIN a sei cifre e aperto da `file://`.
-Fallisce in due casi, entrambi provocati dalla modifica di quella riga:
+Results: the flow works with the default PIN, from the keypad, from a physical keyboard, with
+fast typing, with an OK confirmation, with a six digit PIN and opened from `file://`.
+It fails in two cases, both caused by changing that line:
 
-1. **`pin: 0712`** (numero con zero iniziale, senza virgolette)
-   Genera `SyntaxError: Octal literals are not allowed in strict mode`. L intero script muore
-   al parsing, quindi la pagina resta ferma sulla cartolina di prova e non risponde a niente.
-2. **`pin: "1957 "`** (spazio finale, tipico da copia e incolla)
-   Nessun errore, nessun avviso: il confronto non torna mai e il codice giusto viene sempre
-   rifiutato. Questo e il sintomo descritto.
+1. **`pin: 0712`** (a number with a leading zero, without quotes)
+   Generates `SyntaxError: Octal literals are not allowed in strict mode`. The entire script dies
+   at parsing, so the page stays stuck on the test card and does not respond to anything.
+2. **`pin: "1957 "`** (a trailing space, typical from copy and paste)
+   No error, no warning: the comparison never matches and the correct code is always
+   rejected. This is the symptom described.
 
-**Il difetto vero non e il valore, e il confronto.** In `index.html`, dentro `buildGate()`:
+**The real defect is not the value, it is the comparison.** In `app.html`, inside `buildGate()`:
 
 ```js
 const submit = () => {
   if (buf === String(CFG.pin)) { ... }
 ```
 
-Rendilo tollerante e non silenzioso:
+Make it tolerant and not silent:
 
-- normalizza entrambi i lati con `String(...).trim()`
-- all avvio, valida `CFG.pin`: se contiene caratteri non numerici o e vuoto, mostra un
-  messaggio esplicito nella schermata di accesso invece di rifiutare in silenzio, perche
-  il tastierino puo produrre solo cifre e un PIN non digitabile e un vicolo cieco
-- il numero di pallini deve seguire la lunghezza reale del PIN, non essere fisso a quattro
-- nel commento accanto a `pin:` scrivi che il valore va **sempre fra virgolette**
+- normalize both sides with `String(...).trim()`
+- on startup, validate `CFG.pin`: if it contains non numeric characters or is empty, show an
+  explicit message on the access screen instead of silently rejecting, because
+  the keypad can only produce digits and a PIN you cannot type is a dead end
+- the number of dots must follow the PIN's actual length, not be fixed at four
+- in the comment next to `pin:` state that the value must **always be in quotes**
 
-Verifica il risultato con un test automatico, non a occhio: c e gia il precedente in
-`check-playlist.mjs` di script Node autonomi. Copri almeno i due casi qui sopra.
+Verify the result with an automated test, not by eye: there is already a precedent in
+`check-playlist.mjs` for standalone Node scripts. Cover at least the two cases above.
 
 ---
 
-## Incarico 4: la sicurezza, fatta sul serio
+## Task 4: security, done for real
 
-Va detto chiaramente e va scritto nel README: **un PIN dentro un file HTML pubblico non e
-protezione.** Chiunque apra il sorgente lo legge in cinque secondi. Il repo e privato, ma il
-sito no: e quello che conta.
+It must be stated clearly and written in the README: **a PIN inside a public HTML file is not
+protection.** Anyone who opens the source reads it in five seconds. The repo is private, but the
+site is not: that is what matters.
 
-Il PIN resta, ma cambia ruolo: diventa la schermata di blocco che impedisce a un passeggero
-di finirci dentro toccando lo schermo dell auto. La barriera vera si mette davanti.
+The PIN stays, but its role changes: it becomes the lock screen that keeps a passenger
+from ending up inside by tapping the car's screen. The real barrier goes in front of it.
 
-**Dato che il deploy e su FTP, la soluzione giusta e HTTP Basic Auth via `.htaccess`.**
+**Since the deploy is on FTP, the right solution is HTTP Basic Auth via `.htaccess`.**
 
-- genera `.htaccess` e `.htpasswd` (bcrypt, non crypt)
-- `.htpasswd` fuori dalla document root se l hosting lo permette, altrimenti dentro ma con
-  accesso negato via `<Files>`
-- il file di password non va in git: aggiungilo a `.gitignore` e fornisci invece un piccolo
-  comando che lo genera dalle variabili in `.env`
-- verifica prima che l hosting sia Apache con `AllowOverride` attivo. Se e nginx, il file
-  non ha alcun effetto e va detto invece di lasciarlo li a dare falsa sicurezza
-- forza https e aggiungi `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`,
+- generate `.htaccess` and `.htpasswd` (bcrypt, not crypt)
+- keep `.htpasswd` outside the document root if the hosting allows it, otherwise inside it but with
+  access denied via `<Files>`
+- the password file does not go into git: add it to `.gitignore` and instead provide a small
+  command that generates it from the variables in `.env`
+- first verify that the hosting is Apache with `AllowOverride` enabled. If it is nginx, the file
+  has no effect and that must be stated instead of leaving it there to give false security
+- force https and add `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`,
   `Referrer-Policy: no-referrer`
-- aggiungi `robots.txt` con `Disallow: /`, in aggiunta al meta `noindex` gia presente
+- add `robots.txt` with `Disallow: /`, in addition to the `noindex` meta tag already present
 
-**Altre due cose da sistemare:**
+**Two more things to fix:**
 
-- In `worker.js` la costante `ALLOW_ORIGIN` e a `*`. Va portata al dominio reale del sito,
-  altrimenti chiunque scopra l indirizzo del worker ha un proxy aperto gratuito a spese del
-  proprietario. Prendi il valore da `SITE_URL`.
-- Se in futuro il dominio passa su Cloudflare, la protezione migliore diventa Cloudflare
-  Access con policy sulla mail: gratis fino a 50 utenti, sessione lunga a piacere, nessuna
-  password nel repo. Annotalo nel README come percorso di aggiornamento, non farlo adesso.
+- In `worker.js` the `ALLOW_ORIGIN` constant is set to `*`. It must be set to the site's real
+  domain, otherwise anyone who finds the worker's address gets a free open proxy at the
+  owner's expense. Take the value from `SITE_URL`.
+- If the domain moves to Cloudflare in the future, the better protection becomes Cloudflare
+  Access with a policy on email addresses: free up to 50 users, session as long as you like, no
+  password in the repo. Note it in the README as an upgrade path, do not do it now.
 
 ---
 
-## Come voglio il lavoro
+## How I want the work done
 
-Procedi in quest ordine: `.gitignore` e repo, poi il bug del PIN, poi sicurezza, poi deploy.
-Fai un commit separato e leggibile per ogni incarico.
+Proceed in this order: `.gitignore` and repo, then the PIN bug, then security, then deploy.
+Make a separate, readable commit for each task.
 
-Prima di dichiarare finito: apri `index.html` in un browser vero, entra col PIN, carica una lista dalla
-schermata sorgenti, apri un canale, zappa avanti e indietro, chiudi. Se una di queste cose non funziona, il
-lavoro non e finito.
+Before declaring it done: open `app.html` in a real browser, sign in with the PIN, load a list from the
+sources screen, open a channel, zap forward and back, close it. If any of these things does not work, the
+work is not done.
 
-Fermati e chiedi prima di: cambiare il motore di riproduzione, aggiungere dipendenze runtime,
-toccare la palette o la struttura dell interfaccia, eseguire un deploy vero.
+Stop and ask before: changing the playback engine, adding runtime dependencies,
+touching the palette or the interface structure, running a real deploy.

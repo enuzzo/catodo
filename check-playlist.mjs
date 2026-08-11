@@ -1,16 +1,16 @@
 /**
- * CATODO: diagnosi lista
+ * CATODO: playlist diagnosis
  *
- * Prende una lista M3U e dice quali canali funzioneranno davvero dentro un browser.
- * E la domanda a cui nessun altro strumento risponde: VLC apre tutto, il browser no.
+ * Takes an M3U list and tells you which channels will actually work inside a browser.
+ * It is the question no other tool answers: VLC opens everything, the browser does not.
  *
- *   node check-playlist.mjs <url-o-percorso>
- *   node check-playlist.mjs <url> --deep      prova anche a scaricare i manifest
- *   node check-playlist.mjs <url> --csv       tabella da aprire in un foglio
+ *   node check-playlist.mjs <url-or-path>
+ *   node check-playlist.mjs <url> --deep      also tries to download the manifests
+ *   node check-playlist.mjs <url> --csv       table to open in a spreadsheet
  *
- * NON scrive nessun file di canali e non va usato per generare liste da pubblicare.
- * CATODO non distribuisce playlist: questo serve solo a capire, sulla tua lista,
- * cosa vale la pena tenere.
+ * Does NOT write any channel file and must not be used to generate lists for publishing.
+ * CATODO does not distribute playlists: this only helps you understand, for your own list,
+ * what is worth keeping.
  */
 
 import { readFile } from "node:fs/promises";
@@ -20,12 +20,12 @@ const DEEP = process.argv.includes("--deep");
 const CSV = process.argv.includes("--csv");
 
 if (!arg) {
-  console.error("uso: node check-playlist.mjs <url-o-percorso> [--deep] [--csv]");
+  console.error("usage: node check-playlist.mjs <url-or-path> [--deep] [--csv]");
   process.exit(1);
 }
 
 const kind = u => {
-  if (!u) return "vuoto";
+  if (!u) return "empty";
   if (/youtube\.com|youtu\.be/i.test(u)) return "youtube";
   if (/twitch\.tv/i.test(u)) return "twitch";
   if (/dailymotion/i.test(u)) return "dailymotion";
@@ -57,7 +57,7 @@ function parse(text) {
   return out;
 }
 
-/** Il browser ha bisogno di due cose che VLC non guarda nemmeno: CORS e https. */
+/** The browser needs two things VLC does not even look at: CORS and https. */
 async function probe(c) {
   const ac = new AbortController();
   const t = setTimeout(() => ac.abort(), 8000);
@@ -72,13 +72,13 @@ async function probe(c) {
     const body = await r.text();
     return {
       status: r.status,
-      cors: acao ? (acao === "*" ? "aperto" : acao) : "assente",
+      cors: acao ? (acao === "*" ? "open" : acao) : "missing",
       m3u: body.includes("#EXTM3U") || body.includes("#EXTINF"),
-      verdict: !r.ok ? "morto" : !acao ? "CORS assente, serve il proxy" : "ok"
+      verdict: !r.ok ? "dead" : !acao ? "CORS missing, needs the proxy" : "ok"
     };
   } catch (e) {
     clearTimeout(t);
-    return { status: 0, cors: "-", m3u: false, verdict: e.name === "AbortError" ? "scaduto" : "irraggiungibile" };
+    return { status: 0, cors: "-", m3u: false, verdict: e.name === "AbortError" ? "timed out" : "unreachable" };
   }
 }
 
@@ -98,13 +98,13 @@ const list = all.filter(c => !seen.has(c.url) && seen.add(c.url));
 const byKind = {};
 list.forEach(c => byKind[c.kind] = (byKind[c.kind] || 0) + 1);
 
-console.log("\nlista:      " + arg);
-console.log("voci:       " + all.length + "  (uniche: " + list.length + ")");
+console.log("\nlist:       " + arg);
+console.log("entries:    " + all.length + "  (unique: " + list.length + ")");
 console.log("");
-console.log("apribili dal browser cosi come sono:  " + (byKind.hls || 0));
-console.log("recuperabili solo con il proxy (http): " + (byKind.http || 0));
+console.log("openable directly by the browser:      " + (byKind.hls || 0));
+console.log("recoverable only with the proxy (http): " + (byKind.http || 0));
 const lost = list.length - (byKind.hls || 0) - (byKind.http || 0);
-console.log("non apribili in nessun caso:           " + lost +
+console.log("not openable under any circumstances:   " + lost +
   "   " + Object.entries(byKind).filter(([k]) => k !== "hls" && k !== "http")
     .map(([k, n]) => k + " " + n).join(", "));
 
@@ -115,7 +115,7 @@ list.forEach(c => {
   if (c.kind === "hls") groups[c.group].ok++;
   if (c.kind === "http") groups[c.group].http++;
 });
-console.log("\ngruppo                              totali   browser   solo-proxy");
+console.log("\ngroup                                total    browser   proxy-only");
 console.log("-".repeat(68));
 Object.entries(groups).sort((a, b) => b[1].tot - a[1].tot).slice(0, 25)
   .forEach(([g, v]) => console.log(
@@ -123,13 +123,13 @@ Object.entries(groups).sort((a, b) => b[1].tot - a[1].tot).slice(0, 25)
   ));
 
 if (!DEEP) {
-  console.log("\nQuesta e solo l analisi degli indirizzi. Con --deep provo anche a scaricare");
-  console.log("i manifest e ti dico quali rispondono e quali mandano gli header CORS.");
+  console.log("\nThis is only the address analysis. With --deep I also try to download");
+  console.log("the manifests and tell you which ones respond and which send CORS headers.");
   process.exit(0);
 }
 
 const targets = list.filter(c => c.kind === "hls");
-console.log("\nverifico " + targets.length + " manifest, ci vuole qualche minuto...\n");
+console.log("\nchecking " + targets.length + " manifests, this will take a few minutes...\n");
 const rows = [];
 const BATCH = 10;
 for (let i = 0; i < targets.length; i += BATCH) {
@@ -141,21 +141,21 @@ for (let i = 0; i < targets.length; i += BATCH) {
 
 const ok = rows.filter(r => r.verdict === "ok");
 const needProxy = rows.filter(r => /CORS/.test(r.verdict));
-const dead = rows.filter(r => r.verdict === "morto" || r.verdict === "irraggiungibile" || r.verdict === "scaduto");
+const dead = rows.filter(r => r.verdict === "dead" || r.verdict === "unreachable" || r.verdict === "timed out");
 
-console.log("\n\nrisultato reale");
+console.log("\n\nreal result");
 console.log("-".repeat(68));
-console.log("partono nel browser senza proxy:  " + ok.length);
-console.log("servono il proxy per via dei CORS: " + needProxy.length);
-console.log("non rispondono:                    " + dead.length);
+console.log("start in the browser without a proxy: " + ok.length);
+console.log("need the proxy because of CORS:        " + needProxy.length);
+console.log("do not respond:                        " + dead.length);
 
 if (CSV) {
-  console.log("\nnome,gruppo,esito,stato,cors,url");
+  console.log("\nname,group,result,status,cors,url");
   rows.forEach(r => console.log(
     [r.name, r.group, r.verdict, r.status, r.cors, r.url].map(x => '"' + String(x).replace(/"/g, '""') + '"').join(",")
   ));
 } else if (dead.length) {
-  console.log("\nprimi canali morti:");
+  console.log("\nfirst dead channels:");
   dead.slice(0, 15).forEach(r => console.log("  " + r.name.slice(0, 40).padEnd(42) + r.verdict));
-  console.log("\nAggiungi --csv per la tabella completa.");
+  console.log("\nAdd --csv for the full table.");
 }

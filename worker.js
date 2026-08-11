@@ -1,34 +1,34 @@
 /**
  * CATODO PROXY
- * Cloudflare Worker: sistema i tre motivi per cui un flusso IPTV non parte in un browser.
+ * Cloudflare Worker: fixes the three reasons an IPTV stream does not start in a browser.
  *
- *   1. CORS       il server dello stream non manda Access-Control-Allow-Origin
- *   2. http       la pagina e in https, il segmento in http, Chromium blocca (mixed content)
- *   3. hotlink    il server pretende un Referer o uno User-Agent preciso
+ *   1. CORS       the stream server does not send Access-Control-Allow-Origin
+ *   2. http       the page is https, the segment is http, Chromium blocks it (mixed content)
+ *   3. hotlink    the server requires a specific Referer or User-Agent
  *
  * Deploy:
  *   dash.cloudflare.com > Workers & Pages > Create > Worker
- *   incolla questo file, Deploy
- *   copia l URL (es. https://catodo-proxy.tuonome.workers.dev) nelle impostazioni di Catodo
+ *   paste this file, Deploy
+ *   copy the URL (e.g. https://catodo-proxy.yourname.workers.dev) into Catodo's settings
  *
- * Uso:
- *   https://tuo-worker.workers.dev/?url=<url-encodato>
+ * Usage:
+ *   https://your-worker.workers.dev/?url=<url-encoded>
  */
 
-// Solo questo dominio puo usare il proxy. Evita che diventi un open proxy pubblico.
-// Metti l origine reale del tuo CATODO. "*" solo per i test.
+// Only this domain can use the proxy. Prevents it from becoming a public open proxy.
+// Put the real origin of your CATODO here. "*" only for testing.
 const ALLOW_ORIGIN = "https://catodo.netmilk.dev";
 
-// Blocca tutto cio che non e un host di streaming plausibile.
+// Blocks anything that is not a plausible streaming host.
 const DENY_HOSTS = [
   /^localhost$/i, /^127\./, /^10\./, /^192\.168\./, /^172\.(1[6-9]|2\d|3[01])\./,
   /^169\.254\./, /\.internal$/i, /metadata/i
 ];
 
-// Regole per host che pretendono header specifici.
-// Aggiungi qui quando un canale da 403 ma funziona nel browser normale.
+// Rules for hosts that require specific headers.
+// Add one here when a channel returns 403 but works in a normal browser.
 const RULES = {
-  // "esempio.com": { Referer: "https://esempio.com/", Origin: "https://esempio.com" },
+  // "example.com": { Referer: "https://example.com/", Origin: "https://example.com" },
 };
 
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
@@ -42,17 +42,17 @@ export default {
 
     const target = here.searchParams.get("url");
     if (!target) {
-      return new Response("CATODO PROXY. Uso: /?url=<url-encodato>", {
+      return new Response("CATODO PROXY. Usage: /?url=<url-encoded>", {
         status: 400, headers: cors({ "content-type": "text/plain; charset=utf-8" })
       });
     }
 
     let up;
-    try { up = new URL(target); } catch { return bad("URL non valido"); }
-    if (!/^https?:$/.test(up.protocol)) return bad("Solo http e https");
-    if (DENY_HOSTS.some(re => re.test(up.hostname))) return bad("Host non consentito");
+    try { up = new URL(target); } catch { return bad("Invalid URL"); }
+    if (!/^https?:$/.test(up.protocol)) return bad("Only http and https");
+    if (DENY_HOSTS.some(re => re.test(up.hostname))) return bad("Host not allowed");
 
-    // header di uscita
+    // outgoing headers
     const out = new Headers({
       "user-agent": UA,
       "accept": "*/*",
@@ -62,7 +62,7 @@ export default {
     if (rule) for (const [k, v] of Object.entries(rule)) out.set(k, v);
     else out.set("referer", up.origin + "/");
 
-    // range passthrough, serve ai segmenti
+    // range passthrough, needed for segments
     const range = request.headers.get("range");
     if (range) out.set("range", range);
 
@@ -70,7 +70,7 @@ export default {
     try {
       res = await fetch(up.toString(), { headers: out, redirect: "follow", cf: { cacheTtl: 0 } });
     } catch (e) {
-      return bad("Origine irraggiungibile: " + e.message, 502);
+      return bad("Origin unreachable: " + e.message, 502);
     }
 
     const ct = (res.headers.get("content-type") || "").toLowerCase();
@@ -78,8 +78,8 @@ export default {
       ct.includes("mpegurl") ||
       /\.m3u8?(\?|$)/i.test(up.pathname + up.search);
 
-    // Le playlist vanno riscritte: ogni segmento, ogni variante e ogni chiave
-    // deve ripassare dal proxy, altrimenti il browser riparte con il problema CORS.
+    // Playlists must be rewritten: every segment, every variant and every key
+    // must go back through the proxy, otherwise the browser hits the CORS problem again.
     if (isPlaylist) {
       const text = await res.text();
       const body = rewrite(text, res.url || up.toString(), here.origin + here.pathname);
@@ -92,7 +92,7 @@ export default {
       });
     }
 
-    // Segmenti e chiavi: passano cosi come sono, con i CORS aggiunti.
+    // Segments and keys: pass through as they are, with CORS added.
     const h = cors({
       "content-type": res.headers.get("content-type") || "application/octet-stream",
       "cache-control": "public, max-age=8"
@@ -107,7 +107,7 @@ export default {
   }
 };
 
-/** Riscrive tutti gli URL di una playlist HLS in modo che passino dal proxy. */
+/** Rewrites every URL in an HLS playlist so it goes through the proxy. */
 function rewrite(text, baseUrl, proxyPath) {
   const base = new URL(baseUrl);
   const wrap = raw => {
@@ -120,12 +120,12 @@ function rewrite(text, baseUrl, proxyPath) {
     const t = line.trim();
     if (!t) return line;
 
-    // URI dentro gli attributi: chiavi AES, tracce audio, sottotitoli, mappe init
+    // URIs inside attributes: AES keys, audio tracks, subtitles, init maps
     if (t.startsWith("#")) {
       return line.replace(/URI="([^"]+)"/g, (_, u) => 'URI="' + wrap(u) + '"');
     }
 
-    // riga nuda: variante o segmento
+    // bare line: variant or segment
     return wrap(t);
   }).join("\n");
 }

@@ -1,253 +1,257 @@
 # CATODO
 
-Ricevitore IPTV privato per il browser della Tesla. Un file HTML, zero framework, zero backend.
+Private IPTV receiver for the Tesla browser. One HTML file, zero frameworks, zero backend.
 
-Sorgente canali: `Free-TV/IPTV`, playlist di soli canali dichiarati free-to-air.
-Nessun flusso viene ospitato qui: la pagina punta agli stessi URL pubblici che useresti in VLC.
+Channel source: `Free-TV/IPTV`, a playlist of channels declared free to air only.
+No stream is hosted here: the page points to the same public URLs you would use in VLC.
 
 ---
 
-## 1. Cosa ho verificato prima di scrivere il codice
+## 1. What I checked before writing the code
 
-### Il browser della Tesla
+### The Tesla browser
 
-E Chromium, non Safari. Gli user agent raccolti mostrano `Chromium/88` con suffisso `Tesla/<versione firmware>`.
-Due conseguenze pratiche:
+It is Chromium, not Safari. The user agents collected show `Chromium/88` with a `Tesla/<firmware version>` suffix.
+Two practical consequences:
 
-- **Niente HLS nativo.** Chromium ha aggiunto il demuxer HLS solo dalla versione 142. Su un motore 88 il tag `<video src="...m3u8">` non fa nulla. Serve per forza una libreria su Media Source Extensions.
-- **Motore vecchio.** Niente `container queries`, niente `:has()`, prudenza con la sintassi moderna. Il codice qui dentro sta su ES2016 e CSS che gira dal 2020.
+- **No native HLS.** Chromium only added the HLS demuxer from version 142. On an 88 engine the tag `<video src="...m3u8">` does nothing. A library on Media Source Extensions is required.
+- **Old engine.** No `container queries`, no `:has()`, caution with modern syntax. The code in here sits on ES2016 and CSS that has worked since 2020.
 
-### Il player
+### The player
 
-Ho guardato hls.js, Video.js, Shaka Player, Vidstack, Plyr e mpegts.js.
+I looked at hls.js, Video.js, Shaka Player, Vidstack, Plyr and mpegts.js.
 
-| | verdetto |
+| | verdict |
 |---|---|
-| **hls.js** | **scelto.** E il motore che sta sotto quasi tutti gli altri. Nessuna UI da combattere, controllo diretto sugli errori, bundle ~90 KB gzip. Requisito unico: MSE con mime `video/MP4`, che il Chromium 88 della Tesla ha. |
-| Video.js | ottimo per VOD brandizzato, ma trascina un tema pesante e usa comunque hls.js sotto. Peso inutile sulla SIM dell auto. |
-| Shaka Player | eccellente su DASH e DRM. Qui non serve DRM e il bundle e piu grosso. |
-| Vidstack, Plyr | UI belle ma pensate per mouse e desktop. I target touch sono troppo piccoli per uno schermo d auto. |
-| mpegts.js | serve solo per i flussi `.ts` grezzi: nella playlist sono 7 canali su 1930. Non vale la dipendenza. |
+| **hls.js** | **chosen.** It is the engine underneath almost all the others. No UI to fight, direct control over errors, ~90 KB gzip bundle. Only requirement: MSE with `video/MP4` mime, which the Tesla's Chromium 88 has. |
+| Video.js | great for branded VOD, but drags in a heavy theme and still uses hls.js underneath. Useless weight on the car's SIM. |
+| Shaka Player | excellent on DASH and DRM. No DRM is needed here and the bundle is bigger. |
+| Vidstack, Plyr | nice UI but designed for mouse and desktop. The touch targets are too small for a car screen. |
+| mpegts.js | only needed for raw `.ts` streams: in the playlist that is 7 channels out of 1930. Not worth the dependency. |
 
-Gestione errori: il player prova due volte in rete, due volte a recuperare il decoder, poi passa al canale successivo. In auto, con la copertura che va e viene, questo e quello che fa la differenza tra "funziona" e "non funziona".
+Error handling: the player retries twice over the network, twice to recover the decoder, then moves to the next channel. In a car, with coverage coming and going, this is what makes the difference between "it works" and "it does not work".
 
-### Lo schermo intero
+### Full screen
 
-Il browser Tesla occupa due terzi dello schermo e la Fullscreen API non lo allarga: allarga il video dentro quella finestra.
-Il metodo che la comunita usa da anni (Channels DVR lo documenta ufficialmente, e ABetterTheater e Fullscreen Hub sono costruiti sopra) e passare da un redirect YouTube: il sistema apre la webview dell app YouTube, che e a schermo pieno, e poi la reindirizza al tuo sito.
+The Tesla browser occupies two thirds of the screen and the Fullscreen API does not expand it: it expands the video inside that window.
+The method the community has used for years (Channels DVR documents it officially, and ABetterTheater and Fullscreen Hub are built on top of it) is to go through a YouTube redirect: the system opens the YouTube app's webview, which is full screen, and then redirects it to your site.
 
 ```
-https://www.youtube.com/redirect?q=https://tuo-catodo.pages.dev
+https://www.youtube.com/redirect?q=https://your-catodo.pages.dev
 ```
 
-Nell auto: incolla, tocca "vai al sito", salva come segnalibro. Il campo nelle impostazioni di Catodo ti genera questo link gia pronto.
-Nota onesta: e un comportamento non documentato, alcuni firmware lo hanno bloccato e poi ripristinato. Se un giorno smette, il player funziona lo stesso, solo in finestra.
+In the car: paste, tap "go to site", save as a bookmark. The field in Catodo's settings generates this link ready made for you.
+Honest note: this is undocumented behavior, some firmware versions have blocked it and then restored it. If it stops working one day, the player still works, just in a window.
 
-### I due muri veri: CORS e mixed content
+### The two real walls: CORS and mixed content
 
-Sono la ragione per cui la maggior parte dei player IPTV nel browser "non va", e nessuno lo spiega.
+They are the reason most IPTV players in the browser "do not work", and nobody explains it.
 
-1. **CORS.** hls.js scarica il manifest, ogni variante, ogni segmento e ogni chiave AES via XHR. Ognuna di quelle richieste e cross-origin e il browser la blocca se il server non manda `Access-Control-Allow-Origin`. Sistemare solo il manifest non basta: la riproduzione parte e muore al primo segmento. Un flusso che va in VLC puo benissimo non andare nel browser: VLC di CORS non sa nulla.
-2. **Mixed content.** Nella playlist ci sono 257 canali su `http://`. Una pagina servita in https non puo caricarli, Chromium li blocca e basta. Nel sottoinsieme che ti interessa sono 109.
+1. **CORS.** hls.js downloads the manifest, every variant, every segment and every AES key via XHR. Each of those requests is cross-origin and the browser blocks it if the server does not send `Access-Control-Allow-Origin`. Fixing only the manifest is not enough: playback starts and dies at the first segment. A stream that plays in VLC may well not play in the browser: VLC knows nothing about CORS.
+2. **Mixed content.** The playlist has 257 channels on `http://`. A page served over https cannot load them, Chromium just blocks them. In the subset you care about, that is 109.
 
-Entrambi si risolvono con lo stesso pezzo: `worker.js`, un Cloudflare Worker che rifa la richiesta lato server, aggiunge gli header CORS, riscrive la playlist perche anche i segmenti ripassino da li, e chiude il salto http verso https. Gratis fino a 100.000 richieste al giorno.
+Both are solved with the same piece: `worker.js`, a Cloudflare Worker that redoes the request server side, adds the CORS headers, rewrites the playlist so the segments also go back through it, and closes the http to https gap. Free up to 100,000 requests a day.
 
-### Cosa aspettarsi da una lista pubblica
+### What to expect from a public list
 
-Passando la lista Free-TV in `check-playlist.mjs`: 1930 voci, 1918 uniche.
-1576 aprono nel browser cosi come sono, 257 sono in `http` e servono il proxy,
-85 non apriranno mai (72 YouTube, 6 RTMP, 4 Twitch, 3 Dailymotion).
+Running the Free-TV list through `check-playlist.mjs`: 1930 entries, 1918 unique.
+1576 open directly in the browser as they are, 257 are on `http` and need the proxy,
+85 will never open (72 YouTube, 6 RTMP, 4 Twitch, 3 Dailymotion).
 
-Vale per qualunque lista: circa un canale su sette non e utilizzabile in un browser,
-e il numero non c entra con la qualita della fonte. E il motivo per cui `check-playlist.mjs`
-esiste.
+This holds for any list: roughly one channel in seven is not usable in a browser,
+and the number has nothing to do with the quality of the source. That is the reason `check-playlist.mjs`
+exists.
 
-Due cose da tenere a mente quando scegli:
+Two things to keep in mind when choosing:
 
-- **Geoblocco.** Molti canali nazionali guardano l indirizzo IP. In auto la SIM Tesla puo darti
-  un indirizzo italiano o svizzero a seconda della rete agganciata, e lo stesso canale si comporta
-  in modo diverso da un giorno all altro.
-- **Provenienza.** In qualunque lista pubblica possono finire flussi che non arrivano dal
-  broadcaster ma da pannelli di rivendita. Si riconoscono: indirizzi IP nudi con porte alte,
-  percorsi tipo `/utente/password/12345`. Non sono free-to-air, e vanno tolti.
+- **Geoblocking.** Many national channels look at the IP address. In the car the Tesla SIM can give you
+  an Italian or Swiss address depending on the network it latches onto, and the same channel behaves
+  differently from one day to the next.
+- **Provenance.** Any public list can end up with streams that do not come from the
+  broadcaster but from resale panels. They are recognizable: bare IP addresses with high ports,
+  paths like `/user/password/12345`. They are not free to air, and should be removed.
 
 ---
 
-## 2. File
+## 2. Files
 
 ```
-index.html           il player. Arriva senza nessuna lista dentro.
-worker.js            proxy Cloudflare per CORS, mixed content e hotlink. Non va sull FTP.
-check-playlist.mjs   diagnostica: dice quali canali di una tua lista apriranno nel browser
-README.md            questo file
-BRIEF.md             incarichi aperti, per chi ci lavora
+app.html              the player. Arrives with no list inside. Served only through index.php.
+index.php              login gate: checks username and password against .htpasswd, then streams app.html
+worker.js              Cloudflare proxy for CORS, mixed content and hotlinking. Does not go on the FTP.
+check-playlist.mjs     diagnostics: tells you which channels of your list will open in the browser
+gen-htpasswd.mjs       generates .htpasswd (bcrypt) from HTPASSWD_USER/HTPASSWD_PASSWORD in .env
+test-pin.mjs           automated test for the PIN gate
+.htaccess              blocks direct access to app.html and forces the login through index.php
+README.md              this file
+BRIEF.md               open tasks, for whoever works on this
 ```
 
 ---
 
-## 3. Messa in strada
+## 3. Getting it on the road
 
-### Passo 1: il PIN
+### Step 1: the PIN
 
-In `index.html`, riga ~660:
+In `app.html`, around line 490:
 
 ```js
 const CFG = {
-  pin: "1957",     // cambialo
+  pin: "1984",     // change it
 ```
 
-### Passo 2: repo privata + Cloudflare Pages
+### Step 2: private repo + Cloudflare Pages
 
-GitHub Pages da repo privata richiede un piano a pagamento. Cloudflare Pages no, ed e anche piu vicino come rete.
+GitHub Pages from a private repo requires a paid plan. Cloudflare Pages does not, and it is also closer as a network.
 
 ```
-repo privata su GitHub, push dei file
+private repo on GitHub, push the files
 dash.cloudflare.com > Workers & Pages > Create > Pages > Connect to Git
-build command: (vuoto)     output directory: /
+build command: (empty)     output directory: /
 ```
 
-Esce un `https://catodo-xxx.pages.dev`. Se preferisci, ci punti un sottodominio tuo.
+You get a `https://catodo-xxx.pages.dev`. If you prefer, you can point your own subdomain at it.
 
-### Passo 3: protezione vera
+### Step 3: real protection
 
-Il PIN nella pagina e comodita, non sicurezza: chi apre il sorgente lo legge in cinque secondi. Tiene fuori chi ci capita sopra per caso, non un attacco vero. Dato che il deploy e su hosting FTP classico, la barriera vera e HTTP Basic Auth via `.htaccess`:
+The PIN in the page is convenience, not security: anyone who opens the source reads it in five seconds. It keeps out those who stumble onto it by chance, not a real attack. Since the deploy is on classic FTP hosting, the real barrier is HTTP Basic Auth via `.htaccess`:
 
 ```
-HTPASSWD_USER e HTPASSWD_PASSWORD in .env, poi:
+HTPASSWD_USER and HTPASSWD_PASSWORD in .env, then:
 node gen-htpasswd.mjs
 ```
 
-Carica `.htaccess`, `.htpasswd` e `robots.txt` sull FTP insieme al sito. Da quel momento il browser chiede utente e password prima ancora di mostrare la pagina, PIN compreso.
+Upload `.htaccess`, `.htpasswd` and `robots.txt` to the FTP along with the site. From that point on the browser asks for a username and password before it even shows the page, PIN included.
 
-**Percorso di aggiornamento futuro.** Se il dominio passa un giorno su Cloudflare, la protezione migliore diventa Cloudflare Access con policy sulla mail:
+**Future upgrade path.** If the domain one day moves to Cloudflare, the better protection becomes Cloudflare Access with a policy on email addresses:
 
 ```
 Cloudflare > Zero Trust > Access > Applications > Add > Self-hosted
-dominio: catodo.netmilk.dev
-policy: Allow > Emails > la tua mail
+domain: catodo.netmilk.dev
+policy: Allow > Emails > your email
 ```
 
-Gratis fino a 50 utenti, nessuna password nel repo, sessione lunga a piacere. Non necessario adesso: la Basic Auth gia protegge il sito.
+Free up to 50 users, no password in the repo, session as long as you like. Not necessary now: Basic Auth already protects the site.
 
-### Passo 4: il proxy
+### Step 4: the proxy
 
 ```
 Workers & Pages > Create > Worker
-incolla worker.js > Deploy
+paste worker.js > Deploy
 ```
 
-Poi in `worker.js` metti `ALLOW_ORIGIN` sul tuo dominio reale invece di `*`, altrimenti chiunque scopra l URL ha un proxy gratis.
-Copia l indirizzo del worker nelle impostazioni di Catodo. Da quel momento i canali marcati `HTTP` diventano apribili e quelli che davano errore CORS partono.
+Then in `worker.js` set `ALLOW_ORIGIN` to your real domain instead of `*`, otherwise anyone who finds out the URL gets a free proxy.
+Copy the worker's address into Catodo's settings. From that point on channels marked `HTTP` become openable and the ones that gave a CORS error start.
 
-### Passo 5: le liste
+### Step 5: the lists
 
-Non ce ne sono da preparare. Al primo avvio CATODO apre la schermata sorgenti e ti chiede
-di caricarne una. Dentro trovi un elenco ragionato di progetti pubblici indipendenti da cui
-partire, con un pulsante che ti riempie il campo. Le liste vengono scaricate dal browser
-direttamente dal loro server e messe in cache locale per dodici ore.
+There is nothing to prepare. On first launch CATODO opens the sources screen and asks you
+to load one. Inside you will find a curated list of independent public projects to
+start from, with a button that fills the field for you. The lists are downloaded by the browser
+directly from their server and cached locally for twelve hours.
 
-Per capire cosa vale la pena tenere in una lista, prima di caricarla:
+To understand what is worth keeping in a list, before loading it:
 
 ```
-node check-playlist.mjs https://.../lista.m3u
-node check-playlist.mjs https://.../lista.m3u --deep --csv
+node check-playlist.mjs https://.../list.m3u
+node check-playlist.mjs https://.../list.m3u --deep --csv
 ```
 
-Ti dice quanti canali apriranno nel browser cosi come sono, quanti servono il proxy e quanti
-sono irrecuperabili. Con `--deep` scarica davvero i manifest e verifica gli header CORS.
+It tells you how many channels will open in the browser as they are, how many need the proxy and how many
+are unrecoverable. With `--deep` it actually downloads the manifests and checks the CORS headers.
 
-### Passo 6: in macchina
+### Step 6: in the car
 
-1. Parcheggiata. Il video parte solo in P.
-2. Browser, incolla il link YouTube redirect generato dalle impostazioni.
-3. "Vai al sito", poi segnalibro.
-4. PIN, categoria, canale.
+1. Parked. The video only starts while stationary.
+2. Browser, paste the YouTube redirect link generated in the settings.
+3. "Go to site", then bookmark it.
+4. PIN, category, channel.
 
 ---
 
-## 4. Identita
+## 4. Identity
 
-Il nome viene dal tubo a raggi catodici. Tutto il resto scende da li.
+The name comes from the cathode ray tube. Everything else follows from that.
 
-**Le barre colore EBU.** Sette valori normati (bianco, giallo, ciano, verde, magenta, rosso, blu) usati come sistema, non come decoro: ogni categoria di canali prende una barra e se la tiene ovunque, nella colonna, nel bordo della scheda, nel numero a video, nel filo sopra la barra di sintonia. Italia verde, Svizzera rossa, film magenta, news ciano. Il colore ti dice dove sei prima che tu legga.
+**The EBU color bars.** Seven standardized values (white, yellow, cyan, green, magenta, red, blue) used as a system, not as decoration: each channel category takes a bar and keeps it everywhere, in the column, in the card's border, in the on screen number, in the thread above the tuning bar. Italy green, Switzerland red, movies magenta, news cyan. The color tells you where you are before you read it.
 
-**Il fondo non e nero.** E `#0C0D0B`, il verde-nero caldo del vetro di un tubo spento. E il bianco non e bianco, e `#F0EBE1`. Un televisore acceso di notte non ha mai avuto un nero puro.
+**The background is not black.** It is `#0C0D0B`, the warm green-black of the glass of a switched off tube. And the white is not white, it is `#F0EBE1`. A television turned on at night has never had a pure black.
 
-**La cartolina di prova.** All apertura le sette barre calano una dopo l altra, il logotipo compare sulla fascia nera, poi tutto collassa. Dura poco piu di un secondo e si salta toccando lo schermo.
+**The test card.** On opening, the seven bars drop one after another, the logotype appears on the black band, then everything collapses. It lasts a bit over a second and can be skipped by tapping the screen.
 
-**Lo spegnimento.** Quando chiudi un canale l immagine si schiaccia in una riga orizzontale, sbianca e sparisce in un punto. E il comportamento fisico dell oggetto da cui il software prende il nome, e costa quattro keyframe CSS.
+**The power off.** When you close a channel the image squashes into a horizontal line, whitens and disappears into a point. It is the physical behavior of the object the software takes its name from, and it costs four CSS keyframes.
 
-**L errore di convergenza.** Il logotipo ha un filo di rosso a destra e di ciano a sinistra, come un tubo mal registrato. Solo il logotipo, mai il testo corrente.
+**The convergence error.** The logotype has a thread of red on the right and cyan on the left, like a poorly aligned tube. Only the logotype, never the current text.
 
-**L effetto catodico** e spento di default e si accende dal tasto durante la visione o dalle impostazioni: righe di scansione, maschera fosfori RGB e vignettatura. Bello, ma toglie nitidezza davvero, quindi la scelta resta tua ogni volta.
+**The cathode effect** is off by default and turns on from the button while watching or from the settings: scan lines, RGB phosphor mask and vignetting. Nice, but it really does reduce sharpness, so the choice is always yours.
 
-**L orologio in testata** e in formato Televideo (`MAR 11 AGO 17:42`), che in auto serve piu di quanto sembri.
+**The clock in the header** is in Televideo format (`TUE 11 AUG 17:42`), which in the car is more useful than it sounds.
 
-## 5. Come e fatta l interfaccia
+## 5. How the interface is built
 
-Non e una griglia stile Netflix, e un sintonizzatore. La differenza conta perche in auto non stai sfogliando un catalogo: stai zappando.
+It is not a Netflix style grid, it is a tuner. The difference matters because in the car you are not browsing a catalog: you are channel surfing.
 
-- **Barra di sintonia in basso.** Numero canale su blocco pieno del colore della categoria, nome, risoluzione reale negoziata da hls.js e un indicatore di segnale che legge la stima di banda vera, rosso quando sei sotto. Su LTE ballerino vedi il problema prima di subirlo.
-- **Numero a video.** Quando zappi compare in alto a sinistra il numero su fondo colorato e il nome del canale, per due secondi e mezzo. E l OSD dei televisori degli anni Novanta e fa esattamente il lavoro che faceva allora.
-- **Paddle `◀ CH` e `CH ▶` da 112 px.** Zapping ciclico dentro la categoria corrente, salta da solo i canali non riproducibili e riparte dall inizio in fondo alla lista. Si toccano senza guardare.
-- **Target minimo 72 px** ovunque, perche uno schermo da 15 pollici a mezzo metro con il dito non e un mouse.
-- **Overlay che spariscono** dopo 4 secondi, un tocco li richiama.
-- **Adatta / riempi**, perche il 15,4" della Highland e piu largo del 16:9 e certi canali SD sono in 4:3.
-- **Qualita limitata alla finestra** attiva di default: non scarica 1080p per riempire mezzo schermo. Sulla SIM dell auto e la voce di consumo piu grossa.
-- **Canali non apribili** marcati `HTTP`, `YT`, `RTMP` invece che nascosti in silenzio, cosi sai perche mancano.
+- **Tuning bar at the bottom.** Channel number on a solid block of the category color, name, real resolution negotiated by hls.js and a signal indicator that reads the real bandwidth estimate, red when you are below it. On a shaky LTE connection you see the problem before you suffer it.
+- **On screen number.** When you zap, the number appears in the top left on a colored background along with the channel name, for two and a half seconds. It is the OSD of nineties televisions and does exactly the job it did back then.
+- **`◀ CH` and `CH ▶` paddles at 112 px.** Cyclic zapping within the current category, automatically skips unplayable channels and starts over from the beginning at the end of the list. They can be tapped without looking.
+- **72 px minimum target** everywhere, because a 15 inch screen half a meter away with your finger is not a mouse.
+- **Overlays that disappear** after 4 seconds, a tap brings them back.
+- **Fit / fill**, because the Highland's 15.4" is wider than 16:9 and some SD channels are in 4:3.
+- **Quality limited to window size** on by default: it does not download 1080p to fill half a screen. On the car's SIM it is the biggest source of data usage.
+- **Unplayable channels** marked `HTTP`, `YT`, `RTMP` instead of hidden silently, so you know why they are missing.
 
-Preferiti e cronologia stanno in `localStorage` con fallback in memoria: se il browser blocca lo storage la pagina non si rompe, perde solo la memoria tra una sessione e l altra.
+Favorites and history live in `localStorage` with an in memory fallback: if the browser blocks storage the page does not break, it only loses memory between one session and the next.
 
 ---
 
-## 6. Se qualcosa non parte
+## 6. If something does not start
 
-| sintomo | causa | cosa fare |
+| symptom | cause | what to do |
 |---|---|---|
-| `FLUSSO BLOCCATO (CORS O OFFLINE)` | il server non manda gli header CORS | attiva il proxy |
-| il canale ha il badge `HTTP` | mixed content | attiva il proxy |
-| errore 403 solo su un canale | hotlink protection | aggiungi l host in `RULES` dentro `worker.js` con Referer e Origin giusti |
-| `CODEC NON SUPPORTATO` | il flusso e HEVC o AC-3 | non risolvibile lato browser, e una mancanza del decoder |
-| canale con badge `GEO` che non parte | geoblocco sull IP della SIM | dipende da dove ti trova la rete Tesla |
-| tutto nero ma l audio va | raro sui Chromium vecchi | tocca "riempi schermo", forza un ridisegno |
-| la lista non si carica | GitHub raw irraggiungibile | `channels.json` locale copre questo caso |
+| `STREAM BLOCKED (CORS OR OFFLINE)` | the server does not send the CORS headers | turn on the proxy |
+| the channel has the `HTTP` badge | mixed content | turn on the proxy |
+| 403 error on just one channel | hotlink protection | add the host to `RULES` inside `worker.js` with the right Referer and Origin |
+| `CODEC NOT SUPPORTED` | the stream is HEVC or AC-3 | not fixable on the browser side, it is a decoder gap |
+| channel with the `GEO` badge that does not start | geoblocking on the SIM's IP | depends on where the Tesla network finds you |
+| everything black but the audio works | rare on older Chromium builds | tap "fill screen", it forces a redraw |
+| the list does not load | GitHub raw unreachable | a local `channels.json` covers this case |
 
 ---
 
-## 7. La posizione legale
+## 7. The legal position
 
-Non sono un avvocato e questo non e un parere legale. Ma l architettura e stata scelta per
-tenere il progetto dalla parte semplice della questione, e vale la pena capire perche.
+I am not a lawyer and this is not legal advice. But the architecture was chosen to
+keep the project on the simple side of the question, and it is worth understanding why.
 
-**CATODO e un lettore, non un catalogo.** Non contiene liste, non ospita flussi, non fa da
-tramite fra chi guarda e chi trasmette. E la stessa categoria di VLC, Kodi o IPTVnator:
-software neutro, che diventa utile solo quando l utente gli da un contenuto suo.
+**CATODO is a player, not a catalog.** It does not contain lists, does not host streams, does not act as an
+intermediary between whoever watches and whoever broadcasts. It is the same category as VLC, Kodi or IPTVnator:
+neutral software, which only becomes useful once the user gives it its own content.
 
-**Non ridistribuiamo niente.** La prima versione di questo progetto includeva una copia
-filtrata della playlist Free-TV dentro il repo. Anche se il file a monte e pubblico, quella
-copia era comunque una ridistribuzione: una scelta che il progetto a monte fa in proprio e
-si assume, e che tu non hai motivo di ereditare. Ora quel file non esiste piu. La lista la
-scarica il browser di chi usa l app, direttamente dal server di chi la pubblica.
+**We do not redistribute anything.** The first version of this project included a filtered copy
+of the Free-TV playlist inside the repo. Even though the upstream file is public, that
+copy was still a redistribution: a choice the upstream project makes for itself and
+takes responsibility for, one you have no reason to inherit. Now that file no longer exists. The
+list is downloaded by the browser of whoever uses the app, directly from the server of whoever publishes it.
 
-**Sui collegamenti.** La schermata sorgenti rimanda a progetti indipendenti e mostra sia la
-pagina del progetto sia l indirizzo della lista. Un punto di attenzione onesto: la Corte di
-giustizia europea, nel caso GS Media del 2016, ha stabilito che collegare a contenuti non
-autorizzati puo essere rilevante quando chi collega lo fa a scopo di lucro o sapendo che il
-contenuto e illecito. Tre ragioni per cui qui la posizione e comoda: il sito e privato e
-senza scopo di lucro, i progetti elencati dichiarano entrambi di raccogliere solo flussi resi
-pubblici dai titolari dei diritti, e il testo in fondo alla schermata dice chiaramente che
-CATODO non verifica ne garantisce quel che c e dall altra parte.
+**On the links.** The sources screen points to independent projects and shows both the
+project's page and the list's address. One honest point of attention: the European Court of
+Justice, in the 2016 GS Media case, ruled that linking to unauthorized content
+can be relevant when whoever links does so for profit or knowing the
+content is unlawful. Three reasons why the position here is comfortable: the site is private and
+without profit motive, the listed projects both state they only collect streams made
+public by the rights holders, and the text at the bottom of the screen clearly states that
+CATODO does not verify or guarantee what is on the other side.
 
-**Cosa resta in capo a te.** Caricare solo liste che hai diritto di guardare. In pratica:
-canali diffusi gratuitamente dalle emittenti. Se una lista pubblica contiene flussi che
-arrivano da pannelli di rivendita invece che dal broadcaster, non e free-to-air: toglila o
-non usare quella fonte. `check-playlist.mjs` ti aiuta a vederli.
+**What remains your responsibility.** Load only lists you have the right to watch. In practice:
+channels broadcast free of charge by their stations. If a public list contains streams that
+come from resale panels instead of the broadcaster, it is not free to air: remove it or
+do not use that source. `check-playlist.mjs` helps you spot them.
 
-**Sul contesto.** Tu risiedi in Italia e lavori in Svizzera, quindi valgono le regole italiane
-per l uso e quelle del paese di hosting per il sito. In Italia AGCOM ha poteri molto incisivi
-sui servizi che diffondono contenuti, ma quelli riguardano chi distribuisce: una pagina privata
-protetta da password, per uso personale, senza contenuti propri, e un altro pianeta. Il fatto
-che sia dietro autenticazione e con `noindex` non e solo igiene, e parte della posizione.
+**On the context.** You live in Italy and work in Switzerland, so Italian rules apply
+for use and the hosting country's rules apply for the site. In Italy AGCOM has very sharp powers
+over services that distribute content, but those concern whoever distributes: a private page,
+password protected, for personal use, with no content of its own, is a different planet. The fact
+that it sits behind authentication and with `noindex` is not just hygiene, it is part of the position.
 
-Infine: il browser della Tesla riproduce video solo a veicolo fermo, che e esattamente il modo
-in cui questa cosa va usata.
+Finally: the Tesla browser only plays video while the vehicle is parked, which is exactly the way
+this thing is meant to be used.

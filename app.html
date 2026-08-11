@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -11,8 +11,8 @@
 <style>
 /* ==========================================================================
    CATODO
-   Lettore, non catalogo. Nasce vuoto: le liste le carica chi lo usa.
-   Identita dalle sette barre colore EBU, usate come codifica delle categorie.
+   A player, not a catalog. Starts empty: playlists are loaded by whoever uses it.
+   Identity from the seven EBU color bars, used as category coding.
    ========================================================================== */
 :root{
   --ebu-white:#BFBFBF; --ebu-yellow:#BFBF00; --ebu-cyan:#00BFBF; --ebu-green:#00BF00;
@@ -54,7 +54,7 @@ a{color:var(--c-cyan);text-decoration:none}
 .barStrip i:nth-child(6){background:var(--ebu-red)}
 .barStrip i:nth-child(7){background:var(--ebu-blue)}
 
-/* ---------- CARTOLINA DI PROVA ---------- */
+/* ---------- TEST CARD ---------- */
 #testcard{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;background:#000}
 #testcard .bars{flex:1;display:flex;gap:0}
 #testcard .bars i{flex:1;transform:scaleY(0);transform-origin:top;animation:barDrop .34s cubic-bezier(.2,.7,.3,1) forwards}
@@ -74,7 +74,7 @@ a{color:var(--c-cyan);text-decoration:none}
 #testcard.out{animation:tcOut .42s cubic-bezier(.6,0,.9,.2) forwards}
 @keyframes tcOut{to{transform:scaleY(.004);filter:brightness(3.4);opacity:0}}
 
-/* ---------- ACCESSO ---------- */
+/* ---------- ACCESS ---------- */
 #gate{position:fixed;inset:0;z-index:100;background:var(--glass);display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:26px;padding:20px}
 .miniBars{width:126px;height:11px;margin:0 auto 17px}
@@ -92,7 +92,7 @@ a{color:var(--c-cyan);text-decoration:none}
 .pad button.ghost{font-size:15px;letter-spacing:.1em;color:var(--dim);background:transparent}
 #gateNote{font-size:11px;color:var(--dim);max-width:340px;text-align:center;line-height:1.6}
 
-/* ---------- TELAIO ---------- */
+/* ---------- CHASSIS ---------- */
 #shell{display:flex;flex-direction:column;height:100%}
 header{display:flex;align-items:center;gap:12px;height:64px;flex:0 0 64px;padding:0 14px;
   background:var(--cabinet);position:relative}
@@ -117,7 +117,7 @@ header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;op
 .hbtn.on{border-color:var(--c-amber);color:var(--c-amber)}
 #body{display:flex;flex:1;min-height:0}
 
-/* ---------- CATEGORIE ---------- */
+/* ---------- CATEGORIES ---------- */
 #rail{width:var(--rail);flex:0 0 var(--rail);border-right:1px solid var(--line);background:var(--cabinet);
   overflow-y:auto;overscroll-behavior:contain;padding:6px 0 26px}
 .railHead{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--dim);padding:15px 16px 7px}
@@ -132,7 +132,7 @@ header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;op
 .cNum{font-family:var(--mono);font-size:11px;color:var(--dim)}
 .cat.on .cNum{color:var(--cc)}
 
-/* ---------- GRIGLIA ---------- */
+/* ---------- GRID ---------- */
 #grid{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:16px 16px 40px}
 .gridHead{display:flex;align-items:center;gap:12px;padding:2px 2px 16px}
 .gridHead .tag{width:11px;height:22px;background:var(--c);flex:0 0 11px}
@@ -163,7 +163,7 @@ header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;op
 .empty b{display:block;color:var(--ink);font-size:17px;margin-bottom:10px;font-weight:600}
 .empty .cta{margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 
-/* ---------- SORGENTI ---------- */
+/* ---------- SOURCES ---------- */
 #srcview{position:fixed;inset:0;z-index:70;background:var(--glass);display:flex;flex-direction:column}
 #srcview .top{display:flex;align-items:center;gap:12px;height:64px;flex:0 0 64px;padding:0 14px;
   background:var(--cabinet);border-bottom:1px solid var(--line)}
@@ -209,7 +209,7 @@ header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;op
   color:var(--dim);line-height:1.7}
 .legal b{color:var(--ink);display:block;margin-bottom:8px;font-size:13.5px}
 
-/* ---------- RIPRODUZIONE ---------- */
+/* ---------- PLAYBACK ---------- */
 #player{position:fixed;inset:0;z-index:60;background:#000;display:flex;flex-direction:column}
 #stage{flex:1;position:relative;min-height:0;background:#000;overflow:hidden}
 #tube{position:absolute;inset:0;transform-origin:center center}
@@ -254,7 +254,7 @@ video.fill{object-fit:cover}
 .ibtn.on{color:var(--c-amber);border-color:var(--c-amber)}
 .ibtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
-/* ---------- BARRA DI SINTONIA ---------- */
+/* ---------- TUNING BAR ---------- */
 #tuner{flex:0 0 auto;display:flex;background:var(--cabinet);position:relative;transition:opacity .22s,transform .22s}
 #tuner::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--c)}
 #tuner.away{opacity:0;transform:translateY(100%);pointer-events:none}
@@ -281,7 +281,7 @@ video.fill{object-fit:cover}
 .meter i.l1{background:var(--c-red)}.meter i.l2{background:var(--c-yellow)}
 .meter i.l3{background:var(--c-green)}.meter i.l4{background:var(--c-cyan)}
 
-/* ---------- IMPOSTAZIONI ---------- */
+/* ---------- SETTINGS ---------- */
 #sheet{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.76);display:flex;align-items:center;
   justify-content:center;padding:22px}
 .card{width:min(560px,100%);max-height:88vh;overflow-y:auto;background:var(--cabinet);
@@ -334,73 +334,73 @@ video.fill{object-fit:cover}
 
 <div id="testcard">
   <div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-  <div class="band"><b class="fringe">CATODO</b><span id="tcLine">RICEVITORE PRIVATO</span></div>
+  <div class="band"><b class="fringe">CATODO</b><span id="tcLine">PRIVATE RECEIVER</span></div>
 </div>
 
 <div id="gate" class="hide">
   <div>
     <div class="miniBars barStrip"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <h1 class="fringe">CATODO</h1>
-    <div class="sub mono" id="gateSub">INSERISCI IL CODICE</div>
+    <div class="sub mono" id="gateSub">ENTER THE CODE</div>
   </div>
   <div class="pinDots" id="dots"></div>
   <div class="pad" id="pad"></div>
-  <div id="gateNote">Il codice tiene fuori i curiosi, non gli attacchi. La protezione vera si mette davanti al sito.</div>
+  <div id="gateNote">The code keeps out the curious, not attacks. Real protection goes in front of the site.</div>
 </div>
 
 <div id="shell" class="hide">
   <header>
     <div class="wordmark"><b class="fringe">CATODO</b><span id="wmCount" class="mono">- - - -</span></div>
     <div class="searchWrap">
-      <input id="q" type="search" placeholder="Cerca un canale" autocomplete="off" spellcheck="false">
+      <input id="q" type="search" placeholder="Search for a channel" autocomplete="off" spellcheck="false">
       <button class="clr hide" id="qclr">&#10005;</button>
     </div>
     <div class="spacer"></div>
     <div id="clk" class="mono"></div>
-    <button class="hbtn" id="btnSrc"><span class="txt">SORGENTI</span><span class="mono" id="srcCount">0</span></button>
-    <button class="hbtn" id="btnCfg"><span class="txt">IMPOSTAZIONI</span><span class="mono">&#9881;</span></button>
+    <button class="hbtn" id="btnSrc"><span class="txt">SOURCES</span><span class="mono" id="srcCount">0</span></button>
+    <button class="hbtn" id="btnCfg"><span class="txt">SETTINGS</span><span class="mono">&#9881;</span></button>
   </header>
   <div id="body"><nav id="rail"></nav><main id="grid"></main></div>
 </div>
 
-<!-- ============ SORGENTI ============ -->
+<!-- ============ SOURCES ============ -->
 <div id="srcview" class="hide">
   <div class="top">
     <button class="sbtn" id="srcBack"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-    <h2>SORGENTI</h2>
+    <h2>SOURCES</h2>
   </div>
   <div class="scroll"><div class="inner">
 
-    <div class="sect">LE TUE LISTE</div>
+    <div class="sect">YOUR LISTS</div>
     <div id="srcList"></div>
 
-    <div class="sect">AGGIUNGI</div>
+    <div class="sect">ADD</div>
     <div class="addRow">
-      <input type="text" id="srcUrl" placeholder="https://.../lista.m3u" autocomplete="off" spellcheck="false">
-      <button id="srcAdd">CARICA</button>
+      <input type="text" id="srcUrl" placeholder="https://.../list.m3u" autocomplete="off" spellcheck="false">
+      <button id="srcAdd">LOAD</button>
     </div>
     <div class="addRow">
-      <button class="ghost" id="srcFileBtn" style="flex:1">OPPURE SCEGLI UN FILE .M3U DAL DISPOSITIVO</button>
+      <button class="ghost" id="srcFileBtn" style="flex:1">OR CHOOSE AN .M3U FILE FROM YOUR DEVICE</button>
     </div>
     <input type="file" id="srcFile" accept=".m3u,.m3u8,audio/x-mpegurl,application/x-mpegurl,text/plain" multiple class="hide">
 
-    <div class="sect">DOVE TROVARE LE LISTE</div>
+    <div class="sect">WHERE TO FIND LISTS</div>
     <div id="dirList"></div>
 
     <div class="legal">
-      <b>CATODO non distribuisce canali.</b>
-      Questo e un lettore vuoto: non contiene liste, non ospita flussi, non fa da tramite. I collegamenti
-      qui sopra portano a progetti indipendenti di terzi, che CATODO non gestisce, non verifica e non
-      garantisce. Quando carichi una lista, la scarichi tu dal suo server e resta solo sul tuo dispositivo.
-      Usa esclusivamente contenuti che hai il diritto di guardare, tipicamente canali diffusi
-      gratuitamente dalle emittenti. Il rispetto delle regole di ogni fonte e delle leggi del tuo paese
-      resta una tua responsabilita.
+      <b>CATODO does not distribute channels.</b>
+      This is an empty player: it does not contain lists, does not host streams, does not act as an intermediary. The links
+      above lead to independent third party projects, which CATODO does not manage, does not verify and does not
+      guarantee. When you load a list, you download it yourself from its server and it stays only on your device.
+      Use only content you have the right to watch, typically channels broadcast
+      free of charge by the stations that air them. Following each source's rules and the laws of your country
+      remains your own responsibility.
     </div>
 
   </div></div>
 </div>
 
-<!-- ============ RIPRODUZIONE ============ -->
+<!-- ============ PLAYBACK ============ -->
 <div id="player" class="hide">
   <div id="stage">
     <div id="tube"><video id="v" playsinline webkit-playsinline preload="none"></video><div id="fx"></div></div>
@@ -417,7 +417,7 @@ video.fill{object-fit:cover}
     </div>
     <div id="status" class="hide">
       <div class="spin" id="statusSpin"></div>
-      <div id="statusTxt" class="mono">SINTONIA</div>
+      <div id="statusTxt" class="mono">TUNING</div>
       <div id="statusAct" class="hide"></div>
     </div>
   </div>
@@ -427,7 +427,7 @@ video.fill{object-fit:cover}
       <div class="chno mono" id="rNo">00</div>
       <div class="meta">
         <div class="t1" id="rName">- - -</div>
-        <div class="t2"><span class="dot" id="rDot"></span><span id="rState">IN ATTESA</span>
+        <div class="t2"><span class="dot" id="rDot"></span><span id="rState">STANDBY</span>
           <span id="rCat"></span><span id="rRes"></span></div>
       </div>
       <div class="meter" id="rMeter"><i></i><i></i><i></i><i></i></div>
@@ -436,39 +436,39 @@ video.fill{object-fit:cover}
   </div>
 </div>
 
-<!-- ============ IMPOSTAZIONI ============ -->
+<!-- ============ SETTINGS ============ -->
 <div id="sheet" class="hide">
   <div class="card">
     <div class="cardTop barStrip"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-    <h3>IMPOSTAZIONI</h3>
+    <h3>SETTINGS</h3>
     <div class="row">
-      <div class="rl"><b>Effetto catodico</b><span>Righe di scansione e maschera fosfori sul video. Bello da vedere, ma toglie nitidezza.</span></div>
+      <div class="rl"><b>Cathode effect</b><span>Scan lines and phosphor mask over the video. Nice to look at, but reduces sharpness.</span></div>
       <button class="sw" id="swFx"></button>
     </div>
     <div class="row">
-      <div class="rl"><b>Qualita limitata alla finestra</b><span>Non scarica 1080p per riempire mezzo schermo. Meno dati sulla SIM dell auto.</span></div>
+      <div class="rl"><b>Quality limited to window size</b><span>Does not download 1080p to fill half a screen. Less data on the car's SIM.</span></div>
       <button class="sw on" id="swCap"></button>
     </div>
     <div class="row">
-      <div class="rl"><b>Nascondi canali non riproducibili</b><span>YouTube, Twitch, RTMP e i flussi http senza proxy: il browser non li apre.</span></div>
+      <div class="rl"><b>Hide unplayable channels</b><span>YouTube, Twitch, RTMP and http streams without a proxy: the browser cannot open them.</span></div>
       <button class="sw on" id="swHide"></button>
     </div>
     <div class="row">
-      <div class="rl"><b>Salta canale morto</b><span>Dopo due errori passa al successivo invece di restare fermo.</span></div>
+      <div class="rl"><b>Skip dead channel</b><span>After two errors, moves to the next one instead of staying stuck.</span></div>
       <button class="sw on" id="swSkip"></button>
     </div>
     <div class="row" style="display:block">
-      <div class="rl"><b>Proxy CORS</b><span>URL del tuo Cloudflare Worker. Serve per le liste e i flussi che il browser blocca, e per quelli in http.</span></div>
-      <input type="text" id="inProxy" placeholder="https://catodo-proxy.tuonome.workers.dev/" autocomplete="off" spellcheck="false">
+      <div class="rl"><b>CORS proxy</b><span>URL of your Cloudflare Worker. Needed for lists and streams the browser blocks, and for http ones.</span></div>
+      <input type="text" id="inProxy" placeholder="https://catodo-proxy.yourname.workers.dev/" autocomplete="off" spellcheck="false">
     </div>
     <div class="row" style="display:block">
-      <div class="rl"><b>Schermo intero Tesla</b><span>Il browser Tesla resta a due terzi di schermo. Passando da un redirect YouTube si apre a pieno schermo. Salva il link generato come segnalibro nell auto.</span></div>
-      <input type="text" id="inSite" placeholder="https://catodo.tuodominio.ch" autocomplete="off" spellcheck="false">
+      <div class="rl"><b>Tesla full screen</b><span>The Tesla browser stays at two thirds of the screen. Going through a YouTube redirect opens it full screen. Save the generated link as a bookmark in the car.</span></div>
+      <input type="text" id="inSite" placeholder="https://catodo.yourdomain.ch" autocomplete="off" spellcheck="false">
       <input type="text" id="outSite" readonly>
     </div>
     <div class="foot">
-      <button id="cfgReset">AZZERA DATI</button>
-      <button class="pri" id="cfgOk">FATTO</button>
+      <button id="cfgReset">RESET DATA</button>
+      <button class="pri" id="cfgOk">DONE</button>
     </div>
     <div class="note" id="storeNote"></div>
   </div>
@@ -481,59 +481,59 @@ video.fill{object-fit:cover}
 "use strict";
 
 /* ================================================================
-   CONFIGURAZIONE
-   Il PIN va SEMPRE fra virgolette. Senza, uno zero iniziale
-   viene letto come numero ottale e lo script non parte affatto.
+   CONFIGURATION
+   The PIN must ALWAYS be in quotes. Without them, a leading zero
+   is read as an octal number and the script does not start at all.
    ================================================================ */
 const CFG = {
   pin: "1984",
   cacheHours: 12,
 
-  /* Indirizzi di progetti indipendenti, non gestiti da CATODO.
-     Sono collegamenti, non contenuti: la lista la scarica il browser di chi usa l app. */
+  /* Addresses of independent projects, not managed by CATODO.
+     They are links, not content: the browser of whoever uses the app downloads the list. */
   directory: [
     {
       name: "Free-TV / IPTV",
-      what: "Curata a mano, solo emittenti dichiarate gratuite: niente canali a pagamento, niente adulti. Poche voci ma quasi tutte in HD. Buon punto di partenza per Italia e Svizzera.",
+      what: "Curated by hand, only stations declared free: no pay channels, no adult content. Few entries but almost all in HD. Good starting point for Italy and Switzerland.",
       project: "https://github.com/Free-TV/IPTV",
       url: "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8"
     },
     {
-      name: "iptv-org, solo Italia",
-      what: "Indice pubblico molto piu grande, diviso per paese. Il progetto dichiara di raccogliere solo collegamenti a flussi resi pubblici dai titolari dei diritti.",
+      name: "iptv-org, Italy only",
+      what: "A much larger public index, split by country. The project states it only collects links to streams made public by the rights holders.",
       project: "https://github.com/iptv-org/iptv",
       url: "https://iptv-org.github.io/iptv/countries/it.m3u"
     },
     {
-      name: "iptv-org, solo Svizzera",
-      what: "Stesso progetto, elenco svizzero. Utile di qua dal confine, dove la SIM dell auto puo darti un indirizzo elvetico.",
+      name: "iptv-org, Switzerland only",
+      what: "Same project, the Swiss list. Useful on this side of the border, where the car's SIM may give you a Swiss address.",
       project: "https://github.com/iptv-org/iptv",
       url: "https://iptv-org.github.io/iptv/countries/ch.m3u"
     },
     {
-      name: "iptv-org, indice completo",
-      what: "Tutto il mondo in un file solo. Diverse migliaia di voci: pesante da caricare in auto, meglio partire da un elenco per paese.",
+      name: "iptv-org, full index",
+      what: "The whole world in a single file. Several thousand entries: heavy to load in the car, better to start from a per country list.",
       project: "https://github.com/iptv-org/iptv",
       url: "https://iptv-org.github.io/iptv/index.m3u"
     },
     {
       name: "awesome-iptv",
-      what: "Non e una lista di canali ma un elenco ragionato di risorse, strumenti e altri progetti. Da qui si arriva a tutto il resto.",
+      what: "Not a channel list but a curated list of resources, tools and other projects. From here you can reach everything else.",
       project: "https://github.com/iptv-org/awesome-iptv",
       url: ""
     }
   ],
 
-  /* ordine preferito dei gruppi, se presenti. Tutto il resto viene dopo, per numerosita. */
+  /* preferred order of the groups, if present. Everything else comes after, by count. */
   order: ["Italy","Italia","Switzerland","Svizzera","VOD Italy","News","Documentaries (EN)",
           "Business","Weather","France","Germany","Austria","UK","Spain","Portugal",
           "Ireland","Netherlands","Belgium","USA"],
   label: {
-    "Italy":"Italia","Switzerland":"Svizzera","VOD Italy":"Film e serie IT","News":"News",
-    "Documentaries (EN)":"Documentari","Business":"Economia","Weather":"Meteo","France":"Francia",
-    "Germany":"Germania","Austria":"Austria","UK":"Regno Unito","Spain":"Spagna",
-    "Portugal":"Portogallo","Ireland":"Irlanda","Netherlands":"Paesi Bassi","Belgium":"Belgio",
-    "USA":"Stati Uniti","Undefined":"Senza gruppo"
+    "Italy":"Italy","Switzerland":"Switzerland","VOD Italy":"Movies & shows (IT)","News":"News",
+    "Documentaries (EN)":"Documentaries","Business":"Business","Weather":"Weather","France":"France",
+    "Germany":"Germany","Austria":"Austria","UK":"United Kingdom","Spain":"Spain",
+    "Portugal":"Portugal","Ireland":"Ireland","Netherlands":"Netherlands","Belgium":"Belgium",
+    "USA":"USA","Undefined":"No group"
   }
 };
 
@@ -551,7 +551,7 @@ function hueOf(g){
 }
 
 /* ================================================================
-   MEMORIA
+   STORAGE
    ================================================================ */
 const mem = {};
 const STORAGE_OK = (() => {
@@ -620,8 +620,8 @@ function toast(msg){
   toastT = setTimeout(()=>el.toast.classList.remove("up"), 2600);
 }
 
-const GG = ["DOM","LUN","MAR","MER","GIO","VEN","SAB"];
-const MM = ["GEN","FEB","MAR","APR","MAG","GIU","LUG","AGO","SET","OTT","NOV","DIC"];
+const GG = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+const MM = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 function tick(){
   const d = new Date();
   el.clk.textContent = GG[d.getDay()] + " " + String(d.getDate()).padStart(2,"0") + " " + MM[d.getMonth()]
@@ -630,10 +630,10 @@ function tick(){
 tick(); setInterval(tick, 20000);
 
 /* ================================================================
-   CARTOLINA DI PROVA
+   TEST CARD
    ================================================================ */
 (function testcard(){
-  el.tcLine.textContent = "RICEVITORE PRIVATO   " + new Date().getFullYear();
+  el.tcLine.textContent = "PRIVATE RECEIVER   " + new Date().getFullYear();
   let done = false;
   const go = () => {
     if (done) return;
@@ -646,7 +646,7 @@ tick(); setInterval(tick, 20000);
 })();
 
 /* ================================================================
-   ACCESSO
+   ACCESS
    ================================================================ */
 (function buildGate(){
   const PIN = String(CFG.pin == null ? "" : CFG.pin).trim();
@@ -655,8 +655,8 @@ tick(); setInterval(tick, 20000);
   if (!valid){
     el.gateSub.className = "sub bad";
     el.gateSub.textContent = PIN
-      ? "Il codice impostato contiene caratteri che il tastierino non puo produrre. Correggi CFG.pin: solo cifre, da 1 a 8, sempre fra virgolette."
-      : "Nessun codice impostato. Apri index.html e scrivi CFG.pin fra virgolette.";
+      ? "The configured code contains characters the keypad cannot produce. Fix CFG.pin: digits only, from 1 to 8, always in quotes."
+      : "No code set. Open app.html and write CFG.pin in quotes.";
     el.pad.classList.add("hide");
     return;
   }
@@ -683,12 +683,12 @@ tick(); setInterval(tick, 20000);
     if (buf.length === PIN.length) setTimeout(submit, 130);
   };
 
-  ["1","2","3","4","5","6","7","8","9","CANC","0","OK"].forEach(k=>{
+  ["1","2","3","4","5","6","7","8","9","DEL","0","OK"].forEach(k=>{
     const b = document.createElement("button");
     b.textContent = k;
-    if (k === "CANC" || k === "OK") b.className = "ghost";
+    if (k === "DEL" || k === "OK") b.className = "ghost";
     b.onclick = () => {
-      if (k === "CANC"){ buf = buf.slice(0,-1); paint(false); }
+      if (k === "DEL"){ buf = buf.slice(0,-1); paint(false); }
       else if (k === "OK") submit();
       else digit(k);
     };
@@ -704,8 +704,8 @@ tick(); setInterval(tick, 20000);
 })();
 
 /* ================================================================
-   SORGENTI
-   Nessuna lista e inclusa nel prodotto. Le carica chi lo usa.
+   SOURCES
+   No list is included in the product. It is loaded by whoever uses it.
    ================================================================ */
 let ALL = [], VIEW = [];
 
@@ -735,7 +735,7 @@ function parseM3U(text){
     const line = lines[i];
     const raw  = (line.split(",").slice(1).join(",") || "").trim();
     out.push({
-      name:  raw.replace(/[\u24C8\u24BC\u24CE\u24C9]/g,"").replace(/\s+/g," ").trim() || "Senza nome",
+      name:  raw.replace(/[\u24C8\u24BC\u24CE\u24C9]/g,"").replace(/\s+/g," ").trim() || "No name",
       group: attr(line,"group-title") || attr(line,"tvg-country") || "Undefined",
       logo:  attr(line,"tvg-logo"),
       url,
@@ -759,11 +759,11 @@ async function fetchPlaylist(url){
       const r = await fetch(a, {cache:"no-cache"});
       if (!r.ok){ last = "HTTP " + r.status; continue; }
       const t = await r.text();
-      if (!t.includes("#EXTM3U") && !t.includes("#EXTINF")){ last = "non sembra un file M3U"; continue; }
+      if (!t.includes("#EXTM3U") && !t.includes("#EXTINF")){ last = "does not look like an M3U file"; continue; }
       return t;
-    } catch(e){ last = "bloccata dal browser (CORS) o irraggiungibile"; }
+    } catch(e){ last = "blocked by the browser (CORS) or unreachable"; }
   }
-  throw new Error(last || "non raggiungibile");
+  throw new Error(last || "unreachable");
 }
 
 function saveSources(){
@@ -782,18 +782,18 @@ async function loadSource(src, force){
     return cached.ch;
   }
   if (src.kind === "file"){
-    src.err = "file non piu in memoria, ricaricalo";
+    src.err = "file no longer in storage, reload it";
     src.count = 0;
     return [];
   }
 
   try {
     const ch = parseM3U(await fetchPlaylist(src.url));
-    if (!ch.length) throw new Error("nessun canale trovato");
+    if (!ch.length) throw new Error("no channels found");
     src.count = ch.length;
     src.err = "";
     src.ts = Date.now();
-    if (!store.set(key, {ts: Date.now(), ch})) src.warn = "cache non salvata";
+    if (!store.set(key, {ts: Date.now(), ch})) src.warn = "cache not saved";
     return ch;
   } catch(e){
     src.err = e.message;
@@ -823,15 +823,15 @@ async function loadAll(force){
 async function addUrlSource(url){
   url = url.trim();
   if (!url) return;
-  if (!/^https?:\/\//i.test(url)) return toast("SERVE UN INDIRIZZO CHE INIZIA CON HTTP");
-  if (S.sources.some(s => s.url === url)) return toast("QUESTA LISTA C E GIA");
+  if (!/^https?:\/\//i.test(url)) return toast("AN ADDRESS STARTING WITH HTTP IS NEEDED");
+  if (S.sources.some(s => s.url === url)) return toast("THIS LIST IS ALREADY THERE");
 
   const src = {id:newId(), kind:"url", url, name:nameFromUrl(url)};
-  toast("SCARICO LA LISTA");
+  toast("DOWNLOADING THE LIST");
   const ch = await loadSource(src, true);
   if (!ch.length){
-    toast((src.err || "lista vuota").toUpperCase());
-    if (!S.proxy && /CORS/i.test(src.err || "")) toast("PROVA A IMPOSTARE IL PROXY");
+    toast((src.err || "empty list").toUpperCase());
+    if (!S.proxy && /CORS/i.test(src.err || "")) toast("TRY SETTING THE PROXY");
     return;
   }
   S.sources.push(src);
@@ -839,7 +839,7 @@ async function addUrlSource(url){
   el.srcUrl.value = "";
   renderSources();
   await refreshAfterSourceChange();
-  toast(ch.length + " CANALI AGGIUNTI");
+  toast(ch.length + " CHANNELS ADDED");
 }
 
 function nameFromUrl(u){
@@ -854,18 +854,18 @@ function addFileSource(file){
   const rd = new FileReader();
   rd.onload = async () => {
     const ch = parseM3U(String(rd.result));
-    if (!ch.length) return toast("NESSUN CANALE IN " + file.name.toUpperCase());
+    if (!ch.length) return toast("NO CHANNELS IN " + file.name.toUpperCase());
     const src = {id:newId(), kind:"file", url:"", name:file.name, count:ch.length, ts:Date.now()};
     if (!store.set("ch:"+src.id, {ts:Date.now(), ch})){
-      toast("MEMORIA PIENA: IL FILE NON RESTA SALVATO");
+      toast("STORAGE FULL: THE FILE WILL NOT STAY SAVED");
     }
     S.sources.push(src);
     saveSources();
     renderSources();
     await refreshAfterSourceChange();
-    toast(ch.length + " CANALI DA " + file.name.toUpperCase());
+    toast(ch.length + " CHANNELS FROM " + file.name.toUpperCase());
   };
-  rd.onerror = () => toast("NON RIESCO A LEGGERE IL FILE");
+  rd.onerror = () => toast("CANNOT READ THE FILE");
   rd.readAsText(file);
 }
 
@@ -885,13 +885,13 @@ async function refreshAfterSourceChange(){
 }
 
 function ago(ts){
-  if (!ts) return "mai aggiornata";
+  if (!ts) return "never updated";
   const m = Math.round((Date.now() - ts) / 60000);
-  if (m < 1) return "aggiornata ora";
-  if (m < 60) return "aggiornata " + m + " min fa";
+  if (m < 1) return "updated now";
+  if (m < 60) return "updated " + m + " min ago";
   const h = Math.round(m/60);
-  if (h < 48) return "aggiornata " + h + " h fa";
-  return "aggiornata " + Math.round(h/24) + " giorni fa";
+  if (h < 48) return "updated " + h + " h ago";
+  return "updated " + Math.round(h/24) + " days ago";
 }
 
 function renderSources(){
@@ -900,27 +900,27 @@ function renderSources(){
 
   if (!S.sources.length){
     el.srcList.innerHTML = '<div class="empty" style="padding:26px 0;text-align:left">' +
-      '<b>Nessuna lista caricata</b>CATODO arriva vuoto, di proposito: non contiene canali e non ne distribuisce. ' +
-      'Incolla l indirizzo di una lista M3U, oppure scegli un file dal dispositivo. Qui sotto trovi dove cercarne.</div>';
+      '<b>No list loaded</b>CATODO arrives empty, on purpose: it does not contain channels and does not distribute any. ' +
+      'Paste the address of an M3U list, or choose a file from your device. Below you will find where to look for one.</div>';
   }
 
   S.sources.forEach((s, i) => {
     const d = document.createElement("div");
     d.className = "srcItem";
     d.style.setProperty("--sc", HUE[CYCLE[i % CYCLE.length]]);
-    const sub = s.err ? s.err : (s.count || 0) + " canali  ·  " + ago(s.ts) + (s.kind === "file" ? "  ·  file locale" : "");
+    const sub = s.err ? s.err : (s.count || 0) + " channels  ·  " + ago(s.ts) + (s.kind === "file" ? "  ·  local file" : "");
     d.innerHTML = '<div class="info"><b></b><span class="' + (s.err ? "err" : "") + '"></span></div>';
     d.querySelector("b").textContent = s.name;
     d.querySelector("span").textContent = sub;
 
     if (s.kind === "url"){
       const r = document.createElement("button");
-      r.className = "sbtn"; r.title = "Aggiorna"; r.innerHTML = "&#8635;";
-      r.onclick = async () => { toast("AGGIORNO"); await loadSource(s, true); renderSources(); await refreshAfterSourceChange(); toast("FATTO"); };
+      r.className = "sbtn"; r.title = "Refresh"; r.innerHTML = "&#8635;";
+      r.onclick = async () => { toast("UPDATING"); await loadSource(s, true); renderSources(); await refreshAfterSourceChange(); toast("DONE"); };
       d.appendChild(r);
     }
     const x = document.createElement("button");
-    x.className = "sbtn del"; x.title = "Rimuovi"; x.innerHTML = "&#10005;";
+    x.className = "sbtn del"; x.title = "Remove"; x.innerHTML = "&#10005;";
     x.onclick = () => removeSource(s.id);
     d.appendChild(x);
     el.srcList.appendChild(d);
@@ -941,12 +941,12 @@ function renderDirectory(){
     d.querySelector("code").textContent = entry.url || "";
     if (entry.url){
       const u = document.createElement("button");
-      u.className = "use"; u.textContent = "USA QUESTA";
+      u.className = "use"; u.textContent = "USE THIS";
       u.onclick = () => {
         el.srcUrl.value = entry.url;
         el.srcUrl.scrollIntoView({block:"center"});
         el.srcUrl.focus();
-        toast("INDIRIZZO PRONTO: TOCCA CARICA");
+        toast("ADDRESS READY: TAP LOAD");
       };
       d.appendChild(u);
     }
@@ -966,22 +966,22 @@ $("#srcFileBtn").onclick = () => el.srcFile.click();
 el.srcFile.onchange = e => { [...e.target.files].forEach(addFileSource); e.target.value = ""; };
 
 /* ================================================================
-   AVVIO
+   STARTUP
    ================================================================ */
 async function boot(){
   el.shell.classList.remove("hide");
   renderDirectory();
   el.srcCount.textContent = S.sources.length;
   el.storeNote.textContent = STORAGE_OK
-    ? "Preferiti, liste e impostazioni restano su questo dispositivo. Non escono di qui."
-    : "Questo browser blocca la memoria locale: liste e preferiti valgono solo per questa sessione.";
+    ? "Favorites, lists and settings stay on this device. They do not leave it."
+    : "This browser blocks local storage: lists and favorites are only valid for this session.";
 
   if (!S.sources.length){
     renderRail(); renderGrid();
     openSources();
     return;
   }
-  el.grid.innerHTML = '<div class="empty"><b>Carico le liste</b>Un momento.</div>';
+  el.grid.innerHTML = '<div class="empty"><b>Loading lists</b>One moment.</div>';
   await loadAll(false);
   if (!S.cat || !ALL.some(c => c.group === S.cat)){
     const g = groupCounts();
@@ -1031,11 +1031,11 @@ function renderRail(){
     frag.appendChild(b);
   };
 
-  head("PERSONALI");
-  item("__fav", "Preferiti", S.favs.size);
-  item("__recent", "Visti di recente", S.recent.length);
+  head("PERSONAL");
+  item("__fav", "Favorites", S.favs.size);
+  item("__recent", "Recently watched", S.recent.length);
   if (list.length){
-    head("GRUPPI");
+    head("GROUPS");
     list.forEach(g => item(g, CFG.label[g] || g, counts[g]));
   }
   el.rail.innerHTML = "";
@@ -1062,10 +1062,10 @@ function currentSet(){
 
 function renderGrid(){
   VIEW = currentSet();
-  const title = S.query ? 'Risultati per "' + S.query + '"'
-    : S.cat === "__fav" ? "Preferiti"
-    : S.cat === "__recent" ? "Visti di recente"
-    : (CFG.label[S.cat] || S.cat || "Canali");
+  const title = S.query ? 'Results for "' + S.query + '"'
+    : S.cat === "__fav" ? "Favorites"
+    : S.cat === "__recent" ? "Recently watched"
+    : (CFG.label[S.cat] || S.cat || "Channels");
   document.documentElement.style.setProperty("--c", hueOf(S.query ? "__recent" : S.cat));
 
   el.grid.innerHTML = "";
@@ -1073,27 +1073,27 @@ function renderGrid(){
   head.className = "gridHead";
   head.innerHTML = '<span class="tag"></span><h2></h2><span class="cnt mono"></span>';
   head.querySelector("h2").textContent = title;
-  head.querySelector(".cnt").textContent = VIEW.length + " CANALI";
+  head.querySelector(".cnt").textContent = VIEW.length + " CHANNELS";
   el.grid.appendChild(head);
 
   if (!VIEW.length){
     const e = document.createElement("div");
     e.className = "empty";
     if (!S.sources.length){
-      e.innerHTML = "<b>Nessuna lista caricata</b>CATODO non contiene canali. Carica una lista M3U tua, " +
-        "oppure parti da uno dei progetti pubblici elencati nella schermata sorgenti.";
+      e.innerHTML = "<b>No list loaded</b>CATODO does not contain channels. Load your own M3U list, " +
+        "or start from one of the public projects listed in the sources screen.";
       const cta = document.createElement("div");
       cta.className = "cta";
       const b = document.createElement("button");
       b.className = "hbtn"; b.style.height = "56px"; b.style.padding = "0 26px";
-      b.textContent = "APRI SORGENTI"; b.onclick = openSources;
+      b.textContent = "OPEN SOURCES"; b.onclick = openSources;
       cta.appendChild(b); e.appendChild(cta);
     } else {
       e.innerHTML = S.cat === "__fav"
-        ? "<b>Nessun preferito</b>Apri un canale e tocca la stella in alto a sinistra."
+        ? "<b>No favorites</b>Open a channel and tap the star in the top left."
         : S.cat === "__recent"
-        ? "<b>Nessuna cronologia</b>Gli ultimi venti canali aperti finiscono qui."
-        : "<b>Niente da mostrare</b>Prova a togliere il filtro dei canali non riproducibili nelle impostazioni.";
+        ? "<b>No history</b>The last twenty channels opened end up here."
+        : "<b>Nothing to show</b>Try turning off the unplayable channels filter in settings.";
     }
     el.grid.appendChild(e);
     return;
@@ -1130,7 +1130,7 @@ function makeTile(c, i){
   if (w) bg.innerHTML += '<span class="bdg warn">' + w.toUpperCase() + '</span>';
 
   b.onclick = () => {
-    if (!playable(c)) return toast(c.kind === "insecure" ? "FLUSSO HTTP: SERVE IL PROXY" : "NON APRIBILE DAL BROWSER");
+    if (!playable(c)) return toast(c.kind === "insecure" ? "HTTP STREAM: PROXY NEEDED" : "CANNOT BE OPENED BY THE BROWSER");
     tune(VIEW.indexOf(c));
   };
   return b;
@@ -1150,7 +1150,7 @@ el.q.addEventListener("input", () => {
 el.qclr.onclick = () => { el.q.value=""; S.query=""; el.qclr.classList.add("hide"); renderGrid(); };
 
 /* ================================================================
-   RIPRODUZIONE
+   PLAYBACK
    ================================================================ */
 let hls = null, NOW = null, NOWi = -1, fails = 0, hideT = null, osdT = null;
 
@@ -1206,7 +1206,7 @@ function tune(i){
   el.rRes.textContent  = "";
   el.pFav.classList.toggle("on", S.favs.has(NOW.url));
   el.rDot.classList.remove("live");
-  el.rState.textContent = "SINTONIA";
+  el.rState.textContent = "TUNING";
   meter(0);
   remember(NOW.url);
   attach(proxied(NOW.url));
@@ -1215,11 +1215,11 @@ function tune(i){
 
 function attach(src){
   detach();
-  setStatus("SINTONIA", "load");
+  setStatus("TUNING", "load");
   const v = el.v;
   if (!window.Hls || !Hls.isSupported()){
     if (v.canPlayType("application/vnd.apple.mpegurl")){ v.src = src; v.play().catch(()=>{}); return; }
-    setStatus("QUESTO BROWSER NON SUPPORTA HLS", "err");
+    setStatus("THIS BROWSER DOES NOT SUPPORT HLS", "err");
     return;
   }
   hls = new Hls({
@@ -1231,8 +1231,8 @@ function attach(src){
   });
   hls.on(Hls.Events.MANIFEST_PARSED, () => {
     el.v.play().catch(() => {
-      setStatus("TOCCA PER AVVIARE", null);
-      statusButtons([["AVVIA", () => { el.v.play().catch(()=>{}); setStatus(null); }]]);
+      setStatus("TAP TO START", null);
+      statusButtons([["START", () => { el.v.play().catch(()=>{}); setStatus(null); }]]);
     });
   });
   hls.on(Hls.Events.LEVEL_SWITCHED, (_, d) => {
@@ -1243,13 +1243,13 @@ function attach(src){
     if (!d.fatal) return;
     if (d.type === Hls.ErrorTypes.NETWORK_ERROR){
       fails++;
-      if (fails <= 2){ setStatus("RIPROVO " + fails + "/2", "load"); hls.startLoad(); return; }
-      dead(d.details === "manifestLoadError" && !S.proxy ? "FLUSSO BLOCCATO (CORS O OFFLINE)" : "FLUSSO NON RAGGIUNGIBILE");
+      if (fails <= 2){ setStatus("RETRYING " + fails + "/2", "load"); hls.startLoad(); return; }
+      dead(d.details === "manifestLoadError" && !S.proxy ? "STREAM BLOCKED (CORS OR OFFLINE)" : "STREAM UNREACHABLE");
     } else if (d.type === Hls.ErrorTypes.MEDIA_ERROR){
       fails++;
-      if (fails <= 2){ setStatus("RECUPERO VIDEO", "load"); hls.recoverMediaError(); return; }
-      dead("CODEC NON SUPPORTATO");
-    } else dead("ERRORE DI RIPRODUZIONE");
+      if (fails <= 2){ setStatus("RECOVERING VIDEO", "load"); hls.recoverMediaError(); return; }
+      dead("CODEC NOT SUPPORTED");
+    } else dead("PLAYBACK ERROR");
   });
   hls.loadSource(src);
   hls.attachMedia(v);
@@ -1257,13 +1257,13 @@ function attach(src){
 
 function dead(msg){
   detach();
-  el.rState.textContent = "ERRORE";
+  el.rState.textContent = "ERROR";
   el.rDot.classList.remove("live");
   meter(1, true);
   setStatus(msg, "err");
-  const acts = [["RIPROVA", () => attach(proxied(NOW.url))]];
+  const acts = [["RETRY", () => attach(proxied(NOW.url))]];
   if (!S.proxy) acts.push(["PROXY", () => { shut(); openCfg(); }]);
-  acts.push(["SUCCESSIVO", () => zap(1)]);
+  acts.push(["NEXT", () => zap(1)]);
   statusButtons(acts);
   if (S.skip) setTimeout(() => { if (el.statusTxt.classList.contains("err")) zap(1); }, 4200);
 }
@@ -1302,12 +1302,12 @@ function remember(u){
 
 el.v.addEventListener("playing", () => {
   setStatus(null);
-  el.rState.textContent = "IN ONDA";
+  el.rState.textContent = "ON AIR";
   el.rDot.classList.add("live");
   fails = 0; autohide();
 });
 el.v.addEventListener("waiting", () => {
-  el.rState.textContent = "BUFFER";
+  el.rState.textContent = "BUFFERING";
   el.rDot.classList.remove("live");
 });
 setInterval(() => {
@@ -1338,7 +1338,7 @@ el.pFav.onclick = () => {
   if (S.favs.has(NOW.url)) S.favs.delete(NOW.url); else S.favs.add(NOW.url);
   store.set("favs", [...S.favs]);
   el.pFav.classList.toggle("on", S.favs.has(NOW.url));
-  toast(S.favs.has(NOW.url) ? "AGGIUNTO AI PREFERITI" : "TOLTO DAI PREFERITI");
+  toast(S.favs.has(NOW.url) ? "ADDED TO FAVORITES" : "REMOVED FROM FAVORITES");
   showChrome();
 };
 function setFx(on){
@@ -1347,11 +1347,11 @@ function setFx(on){
   el.pFx.classList.toggle("on", on);
   $("#swFx").classList.toggle("on", on);
 }
-el.pFx.onclick  = () => { setFx(!S.fx); toast(S.fx ? "EFFETTO CATODICO" : "IMMAGINE PULITA"); showChrome(); };
+el.pFx.onclick  = () => { setFx(!S.fx); toast(S.fx ? "CATHODE EFFECT" : "CLEAN IMAGE"); showChrome(); };
 el.pFit.onclick = () => {
   el.v.classList.toggle("fill");
   el.pFit.classList.toggle("on", el.v.classList.contains("fill"));
-  toast(el.v.classList.contains("fill") ? "RIEMPI SCHERMO" : "ADATTA");
+  toast(el.v.classList.contains("fill") ? "FILL SCREEN" : "FIT");
   showChrome();
 };
 el.pMute.onclick = () => {
@@ -1382,7 +1382,7 @@ document.addEventListener("visibilitychange", () => {
 });
 
 /* ================================================================
-   IMPOSTAZIONI
+   SETTINGS
    ================================================================ */
 function applyStoredUI(){
   setFx(S.fx);
@@ -1405,14 +1405,14 @@ $("#swHide").onclick = e => { S.hide = !S.hide; store.set("hide", S.hide); e.cur
 $("#swSkip").onclick = e => { S.skip = !S.skip; store.set("skip", S.skip); e.currentTarget.classList.toggle("on", S.skip); };
 $("#inProxy").oninput = e => { S.proxy = e.target.value.trim(); store.set("proxy", S.proxy); };
 $("#inSite").oninput  = e => { S.site  = e.target.value.trim(); store.set("site", S.site); syncTeslaLink(); };
-$("#outSite").onclick = e => { e.target.select(); toast("COPIA E SALVA COME SEGNALIBRO"); };
+$("#outSite").onclick = e => { e.target.select(); toast("COPY AND SAVE AS A BOOKMARK"); };
 $("#cfgOk").onclick = () => { el.sheet.classList.add("hide"); renderRail(); renderGrid(); };
 $("#cfgReset").onclick = () => {
   store.wipe();
   S.sources = []; S.favs = new Set(); S.recent = []; S.proxy = ""; S.site = ""; S.fx = false; S.cat = "";
   ALL = [];
   applyStoredUI(); renderSources(); renderRail(); renderGrid();
-  toast("DATI LOCALI AZZERATI");
+  toast("LOCAL DATA RESET");
 };
 el.sheet.onclick = e => { if (e.target === el.sheet) $("#cfgOk").click(); };
 applyStoredUI();

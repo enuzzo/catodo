@@ -1,10 +1,10 @@
 /**
- * CATODO: test del gate PIN
+ * CATODO: PIN gate test
  *
- * Carica index.html in jsdom e verifica i casi che hanno causato il bug
- * originale (numero ottale non quotato, spazio finale da copia e incolla),
- * piu il comportamento base del gate. Stampa PASS/FAIL per ogni caso ed
- * esce con codice diverso da zero se qualcosa fallisce.
+ * Loads app.html in jsdom and verifies the cases that caused the original
+ * bug (unquoted octal number, trailing space from copy and paste),
+ * plus the gate's basic behavior. Prints PASS/FAIL for each case and
+ * exits with a nonzero code if something fails.
  *
  *   node test-pin.mjs
  */
@@ -42,7 +42,7 @@ function pressDigits(dom, digits){
   const buttons = [...dom.window.document.querySelectorAll("#pad button")];
   for (const ch of digits){
     const btn = buttons.find(b => b.textContent === ch);
-    if (!btn) throw new Error("pulsante non trovato per la cifra " + ch);
+    if (!btn) throw new Error("button not found for digit " + ch);
     btn.click();
   }
 }
@@ -53,63 +53,63 @@ function check(name, cond){
   console.log((cond ? "PASS" : "FAIL") + "  " + name);
 }
 
-// Caso 1: PIN corretto (1984) sblocca il gate
+// Case 1: correct PIN (1984) unlocks the gate
 {
   const dom = await openGate(await loadHtml());
-  check("CFG.pin e impostato a 1984", dom.window.eval("CFG.pin") === "1984");
-  check("i pallini generati sono 4 come il PIN", dom.window.document.querySelectorAll("#dots i").length === 4);
+  check("CFG.pin is set to 1984", dom.window.eval("CFG.pin") === "1984");
+  check("the generated dots are 4, like the PIN", dom.window.document.querySelectorAll("#dots i").length === 4);
   await skipIntro(dom);
   pressDigits(dom, "1984");
   await sleep(250);
-  check("PIN corretto (1984) sblocca il gate", dom.window.document.getElementById("gate").classList.contains("hide"));
+  check("correct PIN (1984) unlocks the gate", dom.window.document.getElementById("gate").classList.contains("hide"));
 }
 
-// Caso 2: PIN sbagliato viene rifiutato
+// Case 2: wrong PIN is rejected
 {
   const dom = await openGate(await loadHtml());
   await skipIntro(dom);
   pressDigits(dom, "0000");
   await sleep(250);
   const doc = dom.window.document;
-  check("PIN sbagliato non sblocca il gate", !doc.getElementById("gate").classList.contains("hide"));
-  check("i pallini segnalano l errore", doc.getElementById("dots").classList.contains("bad"));
+  check("wrong PIN does not unlock the gate", !doc.getElementById("gate").classList.contains("hide"));
+  check("the dots signal the error", doc.getElementById("dots").classList.contains("bad"));
 }
 
-// Caso 3: spazio finale nel PIN configurato non deve impedire l accesso
+// Case 3: a trailing space in the configured PIN must not block access
 {
   const html = overridePin(await loadHtml(), '"1984 "');
   const dom = await openGate(html);
-  check("CFG.pin con spazio finale resta 1984 dopo il trim", dom.window.eval("CFG.pin.trim()") === "1984");
+  check("CFG.pin with a trailing space stays 1984 after trim", dom.window.eval("CFG.pin.trim()") === "1984");
   await skipIntro(dom);
   pressDigits(dom, "1984");
   await sleep(250);
-  check("PIN digitato senza spazio sblocca comunque il gate", dom.window.document.getElementById("gate").classList.contains("hide"));
+  check("PIN typed without a space still unlocks the gate", dom.window.document.getElementById("gate").classList.contains("hide"));
 }
 
-// Caso 4: il numero di pallini segue la lunghezza reale del PIN
+// Case 4: the number of dots follows the PIN's actual length
 {
   const html = overridePin(await loadHtml(), '"12"');
   const dom = await openGate(html);
-  check("i pallini seguono un PIN di 2 cifre", dom.window.document.querySelectorAll("#dots i").length === 2);
+  check("the dots follow a 2 digit PIN", dom.window.document.querySelectorAll("#dots i").length === 2);
 }
 
-// Caso 5: pin ottale non quotato rompe il parsing in strict mode
+// Case 5: an unquoted octal pin breaks parsing in strict mode
 {
   const html = await loadHtml();
   const m = html.match(/<script>\n"use strict";[\s\S]*?<\/script>/);
-  if (!m) throw new Error("script inline non trovato");
+  if (!m) throw new Error("inline script not found");
 
   const brokenSrc = overridePin(m[0], "0712").replace(/^<script>\n/, "").replace(/<\/script>$/, "");
   let threw = false;
   try { new Function(brokenSrc); } catch (e) { threw = e instanceof SyntaxError; }
-  check("pin: 0712 senza virgolette rompe il parsing (SyntaxError)", threw);
+  check("pin: 0712 without quotes breaks parsing (SyntaxError)", threw);
 
   const fixedSrc = overridePin(m[0], '"1984"').replace(/^<script>\n/, "").replace(/<\/script>$/, "");
   let ok = true;
   try { new Function(fixedSrc); } catch { ok = false; }
-  check('pin: "1984" tra virgolette non rompe il parsing', ok);
+  check('pin: "1984" in quotes does not break parsing', ok);
 }
 
 const failed = results.filter(r => !r.ok);
-console.log("\n" + (results.length - failed.length) + "/" + results.length + " casi passati");
+console.log("\n" + (results.length - failed.length) + "/" + results.length + " cases passed");
 if (failed.length) process.exit(1);
