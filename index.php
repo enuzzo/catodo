@@ -12,6 +12,11 @@
  * clearing cookies does not reset the lockout.
  */
 
+// Sent on every response, the login form included. The form is the page worth
+// protecting from framing: it is where the password gets typed.
+header('Cache-Control: private, no-store');
+header('X-Frame-Options: DENY');
+
 const COOKIE_NAME = 'catodo_auth';
 const COOKIE_DAYS = 30;
 const MAX_ATTEMPTS = 5;
@@ -135,8 +140,6 @@ if ($authed) {
         echo 'app.html not found.';
         exit;
     }
-    header('Cache-Control: private, no-store');
-    header('X-Frame-Options: DENY');
     echo $app;
     exit;
 }
