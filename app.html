@@ -466,6 +466,9 @@ video.fill{object-fit:cover}
       <input type="text" id="inSite" placeholder="https://catodo.yourdomain.ch" autocomplete="off" spellcheck="false">
       <input type="text" id="outSite" readonly>
     </div>
+    <div class="row" style="display:block">
+      <div class="rl"><b>Channel logos</b><span>When the playlist has no logo, some known broadcasters get one fetched from <a href="https://logo.dev" target="_blank" rel="noreferrer">logo.dev</a>. Names and logos remain their respective owners'.</span></div>
+    </div>
     <div class="foot">
       <button id="cfgReset">RESET DATA</button>
       <button class="pri" id="cfgOk">DONE</button>
@@ -534,6 +537,31 @@ const CFG = {
     "Germany":"Germany","Austria":"Austria","UK":"United Kingdom","Spain":"Spain",
     "Portugal":"Portugal","Ireland":"Ireland","Netherlands":"Netherlands","Belgium":"Belgium",
     "USA":"USA","Undefined":"No group"
+  },
+
+  /* Publishable logo.dev token, safe to expose client side: that is how
+     logo.dev designs it (a "publishable" key, not a secret). Sign up
+     for free at https://logo.dev and paste your token here. */
+  logoDevToken: "",
+
+  /* Text only: normalized channel name (lowercase, no spaces or symbols,
+     no HD/4K/+1) -> the broadcaster's official domain. The logo image is
+     always served live by logo.dev from that domain, never a file of
+     ours: CATODO does not host or store logo images. Deliberately
+     partial list, a starting point for the main Italian and Swiss
+     broadcasters, extend it here later. Channels outside this table show
+     the initials badge. */
+  logoDomains: {
+    "rai1": "rai.it", "rai2": "rai.it", "rai3": "rai.it",
+    "canale5": "mediaset.it", "italia1": "mediaset.it", "rete4": "mediaset.it",
+    "la7": "la7.it",
+    "nove": "nove.tv",
+    "realtime": "realtime.it",
+    "dmax": "dmax.it",
+    "foodnetwork": "foodnetwork.it",
+    "srf1": "srf.ch", "srf2": "srf.ch",
+    "rsila1": "rsi.ch", "rsila2": "rsi.ch",
+    "rts1": "rts.ch", "rts2": "rts.ch"
   }
 };
 
@@ -1105,6 +1133,19 @@ function renderGrid(){
   el.grid.appendChild(tiles);
 }
 
+function normalizeChannelName(name){
+  return String(name || "")
+    .toLowerCase()
+    .replace(/\b(hd|fhd|uhd|sd|4k|8k)\b/g, "")
+    .replace(/\+\d+/g, "")
+    .replace(/[^a-z0-9]+/g, "");
+}
+function logoDevUrl(c){
+  if (!CFG.logoDevToken) return "";
+  const domain = CFG.logoDomains[normalizeChannelName(c.name)];
+  return domain ? "https://img.logo.dev/" + domain + "?token=" + CFG.logoDevToken : "";
+}
+
 function makeTile(c, i){
   const b = document.createElement("button");
   b.className = "tile" + (playable(c) ? "" : " blocked") + (NOW && NOW.url === c.url ? " playing" : "");
@@ -1114,10 +1155,11 @@ function makeTile(c, i){
   b.querySelector(".nm").textContent  = c.name;
 
   const logo = b.querySelector(".logo");
-  if (c.logo){
+  const logoSrc = c.logo || logoDevUrl(c);
+  if (logoSrc){
     const img = document.createElement("img");
     img.loading = "lazy"; img.referrerPolicy = "no-referrer"; img.alt = "";
-    img.src = c.logo;
+    img.src = logoSrc;
     img.onerror = () => { logo.innerHTML = '<span class="fallback">' + initials(c.name) + '</span>'; };
     logo.appendChild(img);
   } else logo.innerHTML = '<span class="fallback">' + initials(c.name) + '</span>';

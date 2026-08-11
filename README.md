@@ -253,5 +253,7 @@ over services that distribute content, but those concern whoever distributes: a 
 password protected, for personal use, with no content of its own, is a different planet. The fact
 that it sits behind authentication and with `noindex` is not just hygiene, it is part of the position.
 
+**On logos.** When the playlist does not provide a channel logo, some known broadcasters show one fetched live from [logo.dev](https://logo.dev): CATODO never saves or hosts those files, the viewer's browser requests them, every time. Channel names and logos remain trademarks of their respective broadcasters; CATODO is not affiliated with them.
+
 Finally: the Tesla browser only plays video while the vehicle is parked, which is exactly the way
 this thing is meant to be used.
