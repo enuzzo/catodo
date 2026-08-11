@@ -11,7 +11,7 @@
 import { readFile } from "node:fs/promises";
 import { JSDOM } from "jsdom";
 
-const HTML_PATH = new URL("./index.html", import.meta.url);
+const HTML_PATH = new URL("./app.html", import.meta.url);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 async function loadHtml(){

@@ -1,11 +1,14 @@
-# CATODO: barriera vera davanti al sito. Il PIN nella pagina non basta da
-# solo (vedi README, sezione 3): questo file e la protezione reale,
-# richiesta prima ancora di servire index.html.
+# CATODO: real barrier in front of the site. index.php is the only entry
+# point: it shows a styled login, verifies it in PHP, then streams
+# app.html itself. app.html and .htpasswd are blocked from direct
+# requests below, so the only way to reach the player is through the
+# login.
 
-AuthType Basic
-AuthName "Accesso riservato"
-AuthUserFile .htpasswd
-Require valid-user
+DirectoryIndex index.php
+
+<Files "app.html">
+  Require all denied
+</Files>
 
 <Files ".htpasswd">
   Require all denied
