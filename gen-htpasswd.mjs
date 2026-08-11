@@ -17,7 +17,21 @@ function parseEnv(text){
   const out = {};
   for (const line of text.split(/\r?\n/)){
     const m = line.match(/^([A-Z_]+)=(.*)$/);
-    if (m) out[m[1]] = m[2];
+    if (!m) continue;
+
+    let value = m[2];
+    const quoted = value.match(/^(["'])([\s\S]*)\1$/);
+    if (quoted) {
+      // Quoted values are used literally, quotes stripped, no comment parsing:
+      // a quoted password can legitimately contain a space or a #.
+      value = quoted[2];
+    } else {
+      // Unquoted: a trailing " #comment" is a comment only when it is
+      // preceded by whitespace, so a password containing a bare # is safe.
+      value = value.replace(/\s+#.*$/, "");
+    }
+
+    out[m[1]] = value;
   }
   return out;
 }

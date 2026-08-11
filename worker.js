@@ -15,15 +15,33 @@
  *   https://your-worker.workers.dev/?url=<url-encoded>
  */
 
-// Only this domain can use the proxy. Prevents it from becoming a public open proxy.
-// Put the real origin of your CATODO here. "*" only for testing.
+// Server side check: a request is rejected unless its Origin header (or, when
+// Origin is absent, its Referer header) matches ALLOW_ORIGIN. That is what
+// actually stops the proxy from being usable by anyone who finds the URL.
+// The Access-Control-Allow-Origin response header set in cors() below only
+// tells browsers what they are allowed to read, it does nothing against curl
+// or any other client that ignores CORS, which is why it cannot do this job
+// alone. Put the real origin of your CATODO here. "*" only for testing, and
+// only on this constant: with "*" the check below allows every origin.
 const ALLOW_ORIGIN = "https://catodo.netmilk.dev";
 
 // Blocks anything that is not a plausible streaming host.
 const DENY_HOSTS = [
   /^localhost$/i, /^127\./, /^10\./, /^192\.168\./, /^172\.(1[6-9]|2\d|3[01])\./,
-  /^169\.254\./, /\.internal$/i, /metadata/i
+  /^169\.254\./, /\.internal$/i, /metadata/i,
+  // IPv6 loopback, the all zero address, and decimal/octal encoded IPv4.
+  // The URL parser already normalizes most numeric encodings of an IPv4
+  // address (0x7f000001, 017700000001, 2130706433) into dotted form before
+  // this list runs, so /^127\./ and /^0\.0\.0\.0$/ already catch them; this
+  // last pattern is a backstop for any purely numeric hostname that slips
+  // through un-normalized.
+  /^\[?::1\]?$/i, /^0\.0\.0\.0$/, /^\d+$/
 ];
+
+// Reasonable upper bound on a playlist body. Real HLS playlists are a few
+// KB to a few hundred KB; this just stops an abusive or misconfigured
+// upstream from making the worker buffer something huge into memory.
+const MAX_PLAYLIST_BYTES = 5 * 1024 * 1024;
 
 // Rules for hosts that require specific headers.
 // Add one here when a channel returns 403 but works in a normal browser.
@@ -37,6 +55,8 @@ const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
 export default {
   async fetch(request) {
     const here = new URL(request.url);
+
+    if (!originAllowed(request)) return forbidden();
 
     if (request.method === "OPTIONS") return preflight();
 
@@ -81,7 +101,12 @@ export default {
     // Playlists must be rewritten: every segment, every variant and every key
     // must go back through the proxy, otherwise the browser hits the CORS problem again.
     if (isPlaylist) {
+      const len = res.headers.get("content-length");
+      if (len && Number(len) > MAX_PLAYLIST_BYTES) return bad("Playlist too large", 502);
+
       const text = await res.text();
+      if (text.length > MAX_PLAYLIST_BYTES) return bad("Playlist too large", 502);
+
       const body = rewrite(text, res.url || up.toString(), here.origin + here.pathname);
       return new Response(body, {
         status: res.status,
@@ -146,4 +171,31 @@ function preflight() {
 
 function bad(msg, status = 400) {
   return new Response(msg, { status, headers: cors({ "content-type": "text/plain; charset=utf-8" }) });
+}
+
+/**
+ * Server side origin check. hls.js sends an Origin header on every XHR
+ * (including the OPTIONS preflight), so legitimate traffic always has one:
+ * if it is present, it must match ALLOW_ORIGIN. If it is absent (a bare
+ * curl request, or a top level browser navigation, which does not send
+ * Origin) fall back to the Referer header's origin. If neither header is
+ * present, or neither matches, the request is not allowed.
+ */
+function originAllowed(request) {
+  const origin = request.headers.get("origin");
+  if (origin !== null) return origin === ALLOW_ORIGIN;
+
+  const referer = request.headers.get("referer");
+  if (referer) {
+    try { return new URL(referer).origin === ALLOW_ORIGIN; }
+    catch { return false; }
+  }
+
+  return false;
+}
+
+function forbidden() {
+  return new Response("Forbidden", {
+    status: 403, headers: { "content-type": "text/plain; charset=utf-8" }
+  });
 }

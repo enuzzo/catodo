@@ -37,7 +37,7 @@ The Tesla browser occupies two thirds of the screen and the Fullscreen API does 
 The method the community has used for years (Channels DVR documents it officially, and ABetterTheater and Fullscreen Hub are built on top of it) is to go through a YouTube redirect: the system opens the YouTube app's webview, which is full screen, and then redirects it to your site.
 
 ```
-https://www.youtube.com/redirect?q=https://your-catodo.pages.dev
+https://www.youtube.com/redirect?q=https://your-catodo-domain.example
 ```
 
 In the car: paste, tap "go to site", save as a bookmark. The field in Catodo's settings generates this link ready made for you.
@@ -100,28 +100,38 @@ const CFG = {
   pin: "1984",     // change it
 ```
 
-### Step 2: private repo + Cloudflare Pages
+### Step 2: a real Apache host, over FTP
 
-GitHub Pages from a private repo requires a paid plan. Cloudflare Pages does not, and it is also closer as a network.
+CATODO needs PHP to run the login gate (see Step 3), so this cannot sit on a static host like Cloudflare Pages or GitHub Pages. Cloudflare Pages does not execute PHP: `index.php` would be served as a plain downloadable file instead of running, `.htaccess` is ignored there entirely, and `app.html` would end up publicly readable. That is not a corner case, it disables the whole security model. This project runs on ordinary Apache hosting with PHP, deployed over FTP. In practice, SiteGround.
+
+Upload these files to the document root:
 
 ```
-private repo on GitHub, push the files
-dash.cloudflare.com > Workers & Pages > Create > Pages > Connect to Git
-build command: (empty)     output directory: /
+index.php
+app.html
+.htaccess
+.htpasswd
+robots.txt
 ```
 
-You get a `https://catodo-xxx.pages.dev`. If you prefer, you can point your own subdomain at it.
+`.htpasswd` is not in the repo, see Step 3 for how to generate it. Everything else can go straight from the checkout.
 
-### Step 3: real protection
+### Step 3: the login gate
 
-The PIN in the page is convenience, not security: anyone who opens the source reads it in five seconds. It keeps out those who stumble onto it by chance, not a real attack. Since the deploy is on classic FTP hosting, the real barrier is HTTP Basic Auth via `.htaccess`:
+The PIN in the page is convenience, not security: anyone who opens the source reads it in five seconds. It keeps out those who stumble onto it by chance, not a real attack.
+
+The actual barrier is `index.php`, and it is not HTTP Basic Auth: it is a CATODO styled login form. The browser never shows its own username and password dialog. `index.php` checks what was submitted against `.htpasswd` (bcrypt, the same file Basic Auth would have used), and only on success does it stream `app.html` back inline. `.htaccess` blocks any direct request to `app.html` and to dotfiles, so the only way the player's bytes ever leave the server is through a successful login in `index.php`. Failed attempts are throttled per IP in a local file, so clearing cookies does not reset a lockout.
+
+Generate `.htpasswd` locally, it must never be committed:
 
 ```
 HTPASSWD_USER and HTPASSWD_PASSWORD in .env, then:
 node gen-htpasswd.mjs
 ```
 
-Upload `.htaccess`, `.htpasswd` and `robots.txt` to the FTP along with the site. From that point on the browser asks for a username and password before it even shows the page, PIN included.
+Upload the resulting `.htpasswd` next to `index.php`. Regenerate and re-upload it every time the password changes.
+
+**Watch out for the host's static file cache.** This bit us during development. Some hosts put an nginx layer in front of Apache for speed (SiteGround calls it "dynamic cache" or "nginx direct delivery"), and that layer can serve `.html` and `.json` files straight from disk, bypassing `.htaccess` entirely because `.htaccess` is an Apache mechanism nginx never reads. With that cache on, `app.html` was reachable directly, unauthenticated, with the login gate fully intact and doing nothing about it: `.htaccess` was correct, it just never ran. It must stay disabled for this domain. After any hosting change, verify by requesting `/app.html` directly: it must come back denied, not the player.
 
 **Future upgrade path.** If the domain one day moves to Cloudflare, the better protection becomes Cloudflare Access with a policy on email addresses:
 
@@ -131,7 +141,7 @@ domain: catodo.netmilk.dev
 policy: Allow > Emails > your email
 ```
 
-Free up to 50 users, no password in the repo, session as long as you like. Not necessary now: Basic Auth already protects the site.
+Free up to 50 users, no password in the repo, session as long as you like. This is not the current setup, today it is the PHP gate described above, marked here only as a possible future alternative.
 
 ### Step 4: the proxy
 
@@ -140,7 +150,7 @@ Workers & Pages > Create > Worker
 paste worker.js > Deploy
 ```
 
-Then in `worker.js` set `ALLOW_ORIGIN` to your real domain instead of `*`, otherwise anyone who finds out the URL gets a free proxy.
+Then in `worker.js` set `ALLOW_ORIGIN` to your real domain instead of `*`. The worker checks the request's `Origin` header (falling back to `Referer` when `Origin` is absent) against `ALLOW_ORIGIN` server side and returns 403 otherwise, so this is a real restriction, not just the CORS response header the browser can choose to ignore: without it, anyone who finds the worker's URL gets a free proxy at your expense. Remember `worker.js` runs on Cloudflare and is deployed by pasting the file into the dashboard, so editing the file in the repo changes nothing live until you paste and deploy it again.
 Copy the worker's address into Catodo's settings. From that point on channels marked `HTTP` become openable and the ones that gave a CORS error start.
 
 ### Step 5: the lists
@@ -193,7 +203,7 @@ It is not a Netflix style grid, it is a tuner. The difference matters because in
 
 - **Tuning bar at the bottom.** Channel number on a solid block of the category color, name, real resolution negotiated by hls.js and a signal indicator that reads the real bandwidth estimate, red when you are below it. On a shaky LTE connection you see the problem before you suffer it.
 - **On screen number.** When you zap, the number appears in the top left on a colored background along with the channel name, for two and a half seconds. It is the OSD of nineties televisions and does exactly the job it did back then.
-- **`◀ CH` and `CH ▶` paddles at 112 px.** Cyclic zapping within the current category, automatically skips unplayable channels and starts over from the beginning at the end of the list. They can be tapped without looking.
+- **`◀ CH` and `CH ▶` paddles at 114 px (86 px on narrow screens).** Cyclic zapping within the current category, automatically skips unplayable channels and starts over from the beginning at the end of the list. They can be tapped without looking.
 - **72 px minimum target** everywhere, because a 15 inch screen half a meter away with your finger is not a mouse.
 - **Overlays that disappear** after 4 seconds, a tap brings them back.
 - **Fit / fill**, because the Highland's 15.4" is wider than 16:9 and some SD channels are in 4:3.
@@ -214,7 +224,6 @@ Favorites and history live in `localStorage` with an in memory fallback: if the 
 | `CODEC NOT SUPPORTED` | the stream is HEVC or AC-3 | not fixable on the browser side, it is a decoder gap |
 | channel with the `GEO` badge that does not start | geoblocking on the SIM's IP | depends on where the Tesla network finds you |
 | everything black but the audio works | rare on older Chromium builds | tap "fill screen", it forces a redraw |
-| the list does not load | GitHub raw unreachable | a local `channels.json` covers this case |
 
 ---
 

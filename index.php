@@ -42,6 +42,18 @@ function clientIp(){
     return $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 }
 
+/** Drops entries that are neither mid failure streak nor still locked out. */
+function pruneAttempts($data){
+    foreach ($data as $ip => $record) {
+        $fails = $record['fails'] ?? 0;
+        $lockUntil = $record['lockUntil'] ?? 0;
+        if ($fails === 0 && $lockUntil < time()) {
+            unset($data[$ip]);
+        }
+    }
+    return $data;
+}
+
 /** Reads, mutates, and writes .gate-attempts.json under one exclusive lock. */
 function withAttempts(callable $mutator){
     $fp = fopen(ATTEMPTS_FILE, 'c+');
@@ -70,14 +82,14 @@ $error = '';
 
 if (!$authed && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $ip = clientIp();
-    $submittedUser = (string)($_POST['user'] ?? '');
-    $submittedPass = (string)($_POST['pass'] ?? '');
+    $submittedUser = is_string($_POST['user'] ?? null) ? $_POST['user'] : '';
+    $submittedPass = is_string($_POST['pass'] ?? null) ? $_POST['pass'] : '';
 
     $outcome = withAttempts(function($data) use ($ip, $storedUser, $storedHash, $submittedUser, $submittedPass) {
         $record = $data[$ip] ?? ['fails' => 0, 'lockUntil' => 0];
 
-        if (time() < $record['lockUntil']) {
-            return ['data' => $data, 'status' => 'locked'];
+        if (time() < ($record['lockUntil'] ?? 0)) {
+            return ['data' => pruneAttempts($data), 'status' => 'locked'];
         }
 
         $userOk = $storedUser !== '' && hash_equals($storedUser, $submittedUser);
@@ -85,7 +97,7 @@ if (!$authed && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($userOk && $passOk) {
             unset($data[$ip]);
-            return ['data' => $data, 'status' => 'ok'];
+            return ['data' => pruneAttempts($data), 'status' => 'ok'];
         }
 
         $record['fails']++;
@@ -94,7 +106,7 @@ if (!$authed && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $record['fails'] = 0;
         }
         $data[$ip] = $record;
-        return ['data' => $data, 'status' => 'fail'];
+        return ['data' => pruneAttempts($data), 'status' => 'fail'];
     });
 
     if ($outcome['status'] === 'locked') {
@@ -123,6 +135,8 @@ if ($authed) {
         echo 'app.html not found.';
         exit;
     }
+    header('Cache-Control: private, no-store');
+    header('X-Frame-Options: DENY');
     echo $app;
     exit;
 }
