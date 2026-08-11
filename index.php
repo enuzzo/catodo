@@ -4,58 +4,119 @@
  *
  * Shows a CATODO styled login form and verifies the submitted username
  * and password against .htpasswd (the same bcrypt file gen-htpasswd.mjs
- * writes). On success it opens a PHP session and streams app.html, the
- * real player, which stays blocked from direct requests by .htaccess.
- * app.html's bytes only ever leave through this file.
+ * writes). On success it sets a signed cookie, not a PHP session, so it
+ * keeps working regardless of the host's session garbage collection, and
+ * streams app.html, the real player, which stays blocked from direct
+ * requests by .htaccess. app.html's bytes only ever leave through this
+ * file. Failed attempts are throttled per IP address in a local file, so
+ * clearing cookies does not reset the lockout.
  */
 
-session_set_cookie_params([
-    'lifetime' => 60 * 60 * 24 * 30,
-    'path' => '/',
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'Lax',
-]);
-session_start();
+const COOKIE_NAME = 'catodo_auth';
+const COOKIE_DAYS = 30;
+const MAX_ATTEMPTS = 5;
+const LOCK_SECONDS = 300;
+const ATTEMPTS_FILE = __DIR__ . '/.gate-attempts.json';
 
-$maxAttempts = 5;
-$lockSeconds = 30;
+function readHtpasswd(){
+    $line = trim((string)@file_get_contents(__DIR__ . '/.htpasswd'));
+    $parts = explode(':', $line, 2);
+    return [$parts[0] ?? '', $parts[1] ?? ''];
+}
+
+function signToken($expires, $storedUser, $storedHash){
+    return hash_hmac('sha256', $expires . ':' . $storedUser, $storedHash);
+}
+
+function validCookie($cookieValue, $storedUser, $storedHash){
+    if ($storedHash === '' || $cookieValue === null) return false;
+    $parts = explode('.', $cookieValue, 2);
+    if (count($parts) !== 2) return false;
+    [$expires, $sig] = $parts;
+    if (!ctype_digit($expires) || (int)$expires < time()) return false;
+    $expected = signToken($expires, $storedUser, $storedHash);
+    return hash_equals($expected, $sig);
+}
+
+function clientIp(){
+    return $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+}
+
+/** Reads, mutates, and writes .gate-attempts.json under one exclusive lock. */
+function withAttempts(callable $mutator){
+    $fp = fopen(ATTEMPTS_FILE, 'c+');
+    if ($fp === false) return $mutator([]);
+    flock($fp, LOCK_EX);
+    rewind($fp);
+    $raw = stream_get_contents($fp);
+    $data = json_decode((string)$raw, true);
+    if (!is_array($data)) $data = [];
+
+    $result = $mutator($data);
+
+    rewind($fp);
+    ftruncate($fp, 0);
+    fwrite($fp, json_encode($result['data']));
+    fflush($fp);
+    flock($fp, LOCK_UN);
+    fclose($fp);
+
+    return $result;
+}
+
+[$storedUser, $storedHash] = readHtpasswd();
+$authed = validCookie($_COOKIE[COOKIE_NAME] ?? null, $storedUser, $storedHash);
 $error = '';
 
-if (!isset($_SESSION['fails'])) $_SESSION['fails'] = 0;
-if (!isset($_SESSION['lockUntil'])) $_SESSION['lockUntil'] = 0;
+if (!$authed && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $ip = clientIp();
+    $submittedUser = (string)($_POST['user'] ?? '');
+    $submittedPass = (string)($_POST['pass'] ?? '');
 
-if (empty($_SESSION['authed']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (time() < $_SESSION['lockUntil']) {
-        $error = 'Too many attempts. Wait a moment and try again.';
-    } else {
-        $submittedUser = (string)($_POST['user'] ?? '');
-        $submittedPass = (string)($_POST['pass'] ?? '');
-        $line = trim((string)@file_get_contents(__DIR__ . '/.htpasswd'));
-        $parts = explode(':', $line, 2);
-        $storedUser = $parts[0] ?? '';
-        $storedHash = $parts[1] ?? '';
+    $outcome = withAttempts(function($data) use ($ip, $storedUser, $storedHash, $submittedUser, $submittedPass) {
+        $record = $data[$ip] ?? ['fails' => 0, 'lockUntil' => 0];
+
+        if (time() < $record['lockUntil']) {
+            return ['data' => $data, 'status' => 'locked'];
+        }
 
         $userOk = $storedUser !== '' && hash_equals($storedUser, $submittedUser);
         $passOk = $storedHash !== '' && password_verify($submittedPass, $storedHash);
 
         if ($userOk && $passOk) {
-            session_regenerate_id(true);
-            $_SESSION['authed'] = true;
-            $_SESSION['fails'] = 0;
-        } else {
-            $_SESSION['fails']++;
-            if ($_SESSION['fails'] >= $maxAttempts) {
-                $_SESSION['lockUntil'] = time() + $lockSeconds;
-                $_SESSION['fails'] = 0;
-            }
-            usleep(400000);
-            $error = 'Wrong username or password.';
+            unset($data[$ip]);
+            return ['data' => $data, 'status' => 'ok'];
         }
+
+        $record['fails']++;
+        if ($record['fails'] >= MAX_ATTEMPTS) {
+            $record['lockUntil'] = time() + LOCK_SECONDS;
+            $record['fails'] = 0;
+        }
+        $data[$ip] = $record;
+        return ['data' => $data, 'status' => 'fail'];
+    });
+
+    if ($outcome['status'] === 'locked') {
+        $error = 'Too many attempts. Wait a few minutes and try again.';
+    } elseif ($outcome['status'] === 'ok') {
+        $expires = time() + 60 * 60 * 24 * COOKIE_DAYS;
+        $token = $expires . '.' . signToken((string)$expires, $storedUser, $storedHash);
+        setcookie(COOKIE_NAME, $token, [
+            'expires' => $expires,
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+        $authed = true;
+    } else {
+        usleep(400000);
+        $error = 'Wrong username or password.';
     }
 }
 
-if (!empty($_SESSION['authed'])) {
+if ($authed) {
     $app = @file_get_contents(__DIR__ . '/app.html');
     if ($app === false) {
         http_response_code(500);

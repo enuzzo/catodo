@@ -10,9 +10,9 @@ DirectoryIndex index.php
   Require all denied
 </Files>
 
-<Files ".htpasswd">
+<FilesMatch "^\.">
   Require all denied
-</Files>
+</FilesMatch>
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
