@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0C0D0B">
+<title>CATODO</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><rect width='4' height='28' x='0' fill='%23BFBFBF'/><rect width='4' height='28' x='4' fill='%23BFBF00'/><rect width='4' height='28' x='8' fill='%2300BFBF'/><rect width='4' height='28' x='12' fill='%2300BF00'/><rect width='4' height='28' x='16' fill='%23BF00BF'/><rect width='4' height='28' x='20' fill='%23BF0000'/><rect width='4' height='28' x='24' fill='%230000BF'/></svg>">
+<style>
+/* ==========================================================================
+   CATODO
+   Lettore, non catalogo. Nasce vuoto: le liste le carica chi lo usa.
+   Identita dalle sette barre colore EBU, usate come codifica delle categorie.
+   ========================================================================== */
+:root{
+  --ebu-white:#BFBFBF; --ebu-yellow:#BFBF00; --ebu-cyan:#00BFBF; --ebu-green:#00BF00;
+  --ebu-magenta:#BF00BF; --ebu-red:#BF0000; --ebu-blue:#1D1DBF;
+
+  --c-white:#E6E1D6; --c-yellow:#E8C93A; --c-cyan:#3FD6D6; --c-green:#4FCB57;
+  --c-magenta:#D361C8; --c-red:#E05545; --c-blue:#6A84F2; --c-amber:#FFB03A;
+
+  --glass:#0C0D0B; --cabinet:#191714; --raise:#231F1A; --line:#332E27;
+  --dim:#8A8175; --ink:#F0EBE1;
+  --c:var(--c-amber);
+
+  --mono: ui-monospace, "SF Mono", "Roboto Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "DejaVu Sans", Arial, sans-serif;
+  --tap:72px; --r:2px; --rail:242px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{background:var(--glass);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.35;
+  -webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;overscroll-behavior:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input{font:inherit;color:inherit}
+a{color:var(--c-cyan);text-decoration:none}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--line)}
+::-webkit-scrollbar-track{background:transparent}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.hide{display:none !important}
+.fringe{text-shadow:1.2px 0 0 rgba(224,85,69,.75), -1.2px 0 0 rgba(63,214,214,.7)}
+.spacer{flex:1}
+
+.barStrip{display:flex;gap:2px}
+.barStrip i{flex:1}
+.barStrip i:nth-child(1){background:var(--ebu-white)}
+.barStrip i:nth-child(2){background:var(--ebu-yellow)}
+.barStrip i:nth-child(3){background:var(--ebu-cyan)}
+.barStrip i:nth-child(4){background:var(--ebu-green)}
+.barStrip i:nth-child(5){background:var(--ebu-magenta)}
+.barStrip i:nth-child(6){background:var(--ebu-red)}
+.barStrip i:nth-child(7){background:var(--ebu-blue)}
+
+/* ---------- CARTOLINA DI PROVA ---------- */
+#testcard{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;background:#000}
+#testcard .bars{flex:1;display:flex;gap:0}
+#testcard .bars i{flex:1;transform:scaleY(0);transform-origin:top;animation:barDrop .34s cubic-bezier(.2,.7,.3,1) forwards}
+#testcard .bars i:nth-child(1){background:var(--ebu-white);animation-delay:0s}
+#testcard .bars i:nth-child(2){background:var(--ebu-yellow);animation-delay:.04s}
+#testcard .bars i:nth-child(3){background:var(--ebu-cyan);animation-delay:.08s}
+#testcard .bars i:nth-child(4){background:var(--ebu-green);animation-delay:.12s}
+#testcard .bars i:nth-child(5){background:var(--ebu-magenta);animation-delay:.16s}
+#testcard .bars i:nth-child(6){background:var(--ebu-red);animation-delay:.2s}
+#testcard .bars i:nth-child(7){background:var(--ebu-blue);animation-delay:.24s}
+@keyframes barDrop{to{transform:scaleY(1)}}
+#testcard .band{flex:0 0 30%;background:#000;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:11px;opacity:0;animation:fadeUp .3s .42s forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+#testcard b{font-size:26px;font-weight:800;letter-spacing:.46em;text-indent:.46em}
+#testcard span{font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;color:var(--dim)}
+#testcard.out{animation:tcOut .42s cubic-bezier(.6,0,.9,.2) forwards}
+@keyframes tcOut{to{transform:scaleY(.004);filter:brightness(3.4);opacity:0}}
+
+/* ---------- ACCESSO ---------- */
+#gate{position:fixed;inset:0;z-index:100;background:var(--glass);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:26px;padding:20px}
+.miniBars{width:126px;height:11px;margin:0 auto 17px}
+#gate h1{font-size:15px;font-weight:800;letter-spacing:.46em;text-indent:.46em;text-align:center}
+#gate .sub{font-size:10.5px;letter-spacing:.24em;color:var(--dim);margin-top:10px;text-align:center}
+#gate .sub.bad{color:var(--c-red);letter-spacing:.1em;max-width:360px;line-height:1.6}
+.pinDots{display:flex;gap:13px;height:15px;align-items:center}
+.pinDots i{width:13px;height:13px;border:1.5px solid var(--line);display:block}
+.pinDots.bad i{border-color:var(--c-red) !important;background:transparent !important;animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.pad{display:grid;grid-template-columns:repeat(3,var(--tap));gap:12px}
+.pad button{height:var(--tap);border:1px solid var(--line);border-radius:var(--r);background:var(--cabinet);
+  font-family:var(--mono);font-size:24px;transition:background .07s,color .07s,border-color .07s}
+.pad button:active{background:var(--c-amber);border-color:var(--c-amber);color:#000}
+.pad button.ghost{font-size:15px;letter-spacing:.1em;color:var(--dim);background:transparent}
+#gateNote{font-size:11px;color:var(--dim);max-width:340px;text-align:center;line-height:1.6}
+
+/* ---------- TELAIO ---------- */
+#shell{display:flex;flex-direction:column;height:100%}
+header{display:flex;align-items:center;gap:12px;height:64px;flex:0 0 64px;padding:0 14px;
+  background:var(--cabinet);position:relative}
+header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;opacity:.85;
+  background:linear-gradient(90deg,var(--ebu-white) 0 14.28%,var(--ebu-yellow) 14.28% 28.56%,
+  var(--ebu-cyan) 28.56% 42.84%,var(--ebu-green) 42.84% 57.12%,var(--ebu-magenta) 57.12% 71.4%,
+  var(--ebu-red) 71.4% 85.68%,var(--ebu-blue) 85.68% 100%)}
+.wordmark{display:flex;align-items:baseline;gap:10px}
+.wordmark b{font-size:14px;font-weight:800;letter-spacing:.36em;text-indent:.36em}
+.wordmark span{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.12em}
+.searchWrap{flex:1;position:relative;max-width:360px}
+.searchWrap input{width:100%;height:44px;background:var(--glass);border:1px solid var(--line);
+  border-radius:var(--r);padding:0 40px 0 13px;font-size:15px;outline:none}
+.searchWrap input:focus{border-color:var(--c-amber)}
+.searchWrap input::placeholder{color:var(--dim)}
+.searchWrap .clr{position:absolute;right:4px;top:4px;width:36px;height:36px;color:var(--dim);font-size:19px}
+#clk{font-family:var(--mono);font-size:11px;letter-spacing:.13em;color:var(--dim);white-space:nowrap}
+.hbtn{height:44px;min-width:44px;padding:0 14px;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--glass);font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--dim);
+  display:flex;align-items:center;gap:7px;white-space:nowrap}
+.hbtn:active{border-color:var(--c-amber);color:var(--c-amber)}
+.hbtn.on{border-color:var(--c-amber);color:var(--c-amber)}
+#body{display:flex;flex:1;min-height:0}
+
+/* ---------- CATEGORIE ---------- */
+#rail{width:var(--rail);flex:0 0 var(--rail);border-right:1px solid var(--line);background:var(--cabinet);
+  overflow-y:auto;overscroll-behavior:contain;padding:6px 0 26px}
+.railHead{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--dim);padding:15px 16px 7px}
+.cat{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:0 16px 0 13px;
+  border-left:3px solid transparent;text-align:left}
+.cat:active{background:var(--raise)}
+.cat.on{background:var(--raise);border-left-color:var(--cc)}
+.chip{width:9px;height:26px;flex:0 0 9px;background:var(--cc);opacity:.5}
+.cat.on .chip{opacity:1}
+.cName{flex:1;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cat.on .cName{color:var(--cc)}
+.cNum{font-family:var(--mono);font-size:11px;color:var(--dim)}
+.cat.on .cNum{color:var(--cc)}
+
+/* ---------- GRIGLIA ---------- */
+#grid{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:16px 16px 40px}
+.gridHead{display:flex;align-items:center;gap:12px;padding:2px 2px 16px}
+.gridHead .tag{width:11px;height:22px;background:var(--c);flex:0 0 11px}
+.gridHead h2{font-size:19px;font-weight:600}
+.gridHead .cnt{font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.12em}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:11px}
+.tile{position:relative;background:var(--cabinet);border:1px solid var(--line);border-radius:var(--r);
+  padding:13px;text-align:left;min-height:134px;display:flex;flex-direction:column;gap:9px;
+  transition:border-color .1s,background .1s;overflow:hidden}
+.tile::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c);opacity:.55}
+.tile:active{border-color:var(--c);background:var(--raise)}
+.tile.playing{border-color:var(--c)}
+.tile.playing::before{opacity:1}
+.tile .num{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.12em;padding-left:5px}
+.tile.playing .num{color:var(--c)}
+.logo{height:46px;display:flex;align-items:center;padding-left:5px}
+.logo img{max-height:46px;max-width:100%;object-fit:contain}
+.logo .fallback{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--dim);letter-spacing:.06em}
+.tile .nm{font-size:13.5px;line-height:1.28;margin-top:auto;padding-left:5px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.badges{position:absolute;top:10px;right:10px;display:flex;gap:5px}
+.bdg{font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;padding:2px 5px;
+  border:1px solid var(--line);color:var(--dim);line-height:1.5}
+.bdg.fav{border-color:var(--c-amber);color:var(--c-amber)}
+.bdg.warn{border-color:#54432a;color:#9c7f42}
+.tile.blocked{opacity:.4}
+.empty{padding:56px 20px;text-align:center;color:var(--dim);font-size:14px;line-height:1.7;max-width:620px;margin:0 auto}
+.empty b{display:block;color:var(--ink);font-size:17px;margin-bottom:10px;font-weight:600}
+.empty .cta{margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* ---------- SORGENTI ---------- */
+#srcview{position:fixed;inset:0;z-index:70;background:var(--glass);display:flex;flex-direction:column}
+#srcview .top{display:flex;align-items:center;gap:12px;height:64px;flex:0 0 64px;padding:0 14px;
+  background:var(--cabinet);border-bottom:1px solid var(--line)}
+#srcview .top h2{font-size:13px;font-weight:800;letter-spacing:.3em;text-indent:.3em}
+#srcview .scroll{flex:1;overflow-y:auto;padding:24px 20px 60px}
+#srcview .inner{max-width:760px;margin:0 auto}
+.sect{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--dim);margin:30px 0 12px}
+.sect:first-child{margin-top:0}
+
+.srcItem{display:flex;align-items:center;gap:14px;background:var(--cabinet);border:1px solid var(--line);
+  border-left:4px solid var(--sc);padding:15px;margin-bottom:9px}
+.srcItem .info{flex:1;min-width:0}
+.srcItem .info b{display:block;font-size:15px;font-weight:600;margin-bottom:4px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.srcItem .info span{font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.06em;
+  display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.srcItem .info span.err{color:var(--c-red)}
+.sbtn{width:50px;height:50px;flex:0 0 50px;border:1px solid var(--line);border-radius:var(--r);
+  display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;color:var(--dim)}
+.sbtn:active{border-color:var(--c-amber);color:var(--c-amber)}
+.sbtn.del:active{border-color:var(--c-red);color:var(--c-red)}
+
+.addRow{display:flex;gap:9px;margin-bottom:9px}
+.addRow input{flex:1;height:54px;background:var(--cabinet);border:1px solid var(--line);border-radius:var(--r);
+  padding:0 14px;font-family:var(--mono);font-size:12.5px;outline:none;min-width:0}
+.addRow input:focus{border-color:var(--c-amber)}
+.addRow button{height:54px;padding:0 22px;border:1px solid var(--c-amber);border-radius:var(--r);
+  background:var(--c-amber);color:#000;font-family:var(--mono);font-size:11px;letter-spacing:.12em;font-weight:800}
+.addRow button.ghost{background:none;color:var(--dim);border-color:var(--line);font-weight:400}
+.addRow button:active{opacity:.75}
+
+.dir{display:flex;align-items:flex-start;gap:14px;border:1px solid var(--line);border-left:4px solid var(--dc);
+  padding:15px;margin-bottom:9px;background:var(--cabinet)}
+.dir .d1{flex:1;min-width:0}
+.dir .d1 b{font-size:15px;font-weight:600;display:block;margin-bottom:5px}
+.dir .d1 p{font-size:12.5px;color:var(--dim);line-height:1.55;margin-bottom:7px}
+.dir .d1 code{font-family:var(--mono);font-size:10.5px;color:var(--dim);word-break:break-all;display:block}
+.dir .use{flex:0 0 auto;height:50px;padding:0 18px;border:1px solid var(--line);border-radius:var(--r);
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--dim);align-self:center}
+.dir .use:active{border-color:var(--c-amber);color:var(--c-amber)}
+
+.legal{border-top:1px solid var(--line);margin-top:34px;padding-top:20px;font-size:12.5px;
+  color:var(--dim);line-height:1.7}
+.legal b{color:var(--ink);display:block;margin-bottom:8px;font-size:13.5px}
+
+/* ---------- RIPRODUZIONE ---------- */
+#player{position:fixed;inset:0;z-index:60;background:#000;display:flex;flex-direction:column}
+#stage{flex:1;position:relative;min-height:0;background:#000;overflow:hidden}
+#tube{position:absolute;inset:0;transform-origin:center center}
+#tube.on{animation:crtOn .34s cubic-bezier(.2,.8,.3,1)}
+#tube.off{animation:crtOff .4s cubic-bezier(.7,0,.9,.3) forwards}
+@keyframes crtOn{0%{transform:scale(1.25,.004);filter:brightness(4.5);opacity:.85}
+  42%{transform:scale(1,.03);filter:brightness(2.6)}100%{transform:scale(1,1);filter:brightness(1);opacity:1}}
+@keyframes crtOff{0%{transform:scale(1,1);filter:brightness(1)}
+  52%{transform:scale(1.012,.005);filter:brightness(3.2)}72%{transform:scale(1,.005);filter:brightness(3.4)}
+  100%{transform:scale(.002,.004);filter:brightness(7);opacity:0}}
+video{width:100%;height:100%;object-fit:contain;background:#000;display:block}
+video.fill{object-fit:cover}
+#fx{position:absolute;inset:0;pointer-events:none;z-index:2;display:none}
+#fx.on{display:block}
+#fx::before{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(to bottom,rgba(0,0,0,.26) 0 1px,transparent 1px 3px)}
+#fx::after{content:"";position:absolute;inset:0;background:
+  repeating-linear-gradient(to right,rgba(255,60,60,.055) 0 1px,rgba(60,255,60,.055) 1px 2px,rgba(60,60,255,.055) 2px 3px),
+  radial-gradient(125% 105% at 50% 50%,transparent 52%,rgba(0,0,0,.55) 100%)}
+#tapzone{position:absolute;inset:0;z-index:4}
+#osd{position:absolute;top:22px;left:22px;z-index:5;display:flex;opacity:0;transform:translateY(-6px);
+  transition:opacity .18s,transform .18s;pointer-events:none}
+#osd.up{opacity:1;transform:none}
+#osd .k{background:var(--c);color:#000;font-family:var(--mono);font-size:38px;font-weight:800;
+  padding:6px 14px;line-height:1.05}
+#osd .n{background:rgba(0,0,0,.78);padding:0 18px;display:flex;align-items:center;font-size:19px;
+  font-weight:600;max-width:52vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#status{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);z-index:5;display:flex;
+  flex-direction:column;align-items:center;gap:16px;pointer-events:none;text-align:center;padding:0 24px}
+.spin{width:34px;height:34px;border:2px solid var(--line);border-top-color:var(--c);animation:rot .85s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+#statusTxt{font-family:var(--mono);font-size:12px;letter-spacing:.15em;color:var(--dim)}
+#statusTxt.err{color:var(--c-red)}
+#statusAct{pointer-events:auto;display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+#top{position:absolute;top:0;left:0;right:0;z-index:6;padding:14px 16px;display:flex;align-items:center;
+  gap:10px;background:linear-gradient(180deg,rgba(0,0,0,.85),rgba(0,0,0,0));transition:opacity .22s,transform .22s}
+#top.away{opacity:0;transform:translateY(-10px);pointer-events:none}
+.ibtn{width:52px;height:52px;border:1px solid rgba(255,255,255,.16);border-radius:var(--r);
+  background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:13px}
+.ibtn:active{border-color:var(--c);color:var(--c)}
+.ibtn.on{color:var(--c-amber);border-color:var(--c-amber)}
+.ibtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- BARRA DI SINTONIA ---------- */
+#tuner{flex:0 0 auto;display:flex;background:var(--cabinet);position:relative;transition:opacity .22s,transform .22s}
+#tuner::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--c)}
+#tuner.away{opacity:0;transform:translateY(100%);pointer-events:none}
+.zap{width:114px;flex:0 0 114px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:5px;border-right:1px solid var(--line);color:var(--dim)}
+.zap:last-child{border-right:0;border-left:1px solid var(--line)}
+.zap:active{background:var(--c);color:#000}
+.zap .car{font-size:22px;line-height:1}
+.zap .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em}
+.readout{flex:1;min-width:0;display:flex;align-items:center;gap:16px;padding:13px 18px}
+.readout .chno{font-family:var(--mono);font-size:30px;font-weight:800;color:#000;background:var(--c);
+  padding:5px 12px;line-height:1.05;flex:0 0 auto}
+.readout .meta{flex:1;min-width:0}
+.readout .t1{font-size:18px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.readout .t2{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--dim);margin-top:5px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dot{width:7px;height:7px;background:var(--dim);flex:0 0 auto}
+.dot.live{background:var(--c-green);animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.28}}
+.meter{display:flex;align-items:flex-end;gap:3px;height:19px;flex:0 0 auto}
+.meter i{width:5px;background:var(--line);display:block}
+.meter i:nth-child(1){height:6px}.meter i:nth-child(2){height:10px}
+.meter i:nth-child(3){height:14px}.meter i:nth-child(4){height:19px}
+.meter i.l1{background:var(--c-red)}.meter i.l2{background:var(--c-yellow)}
+.meter i.l3{background:var(--c-green)}.meter i.l4{background:var(--c-cyan)}
+
+/* ---------- IMPOSTAZIONI ---------- */
+#sheet{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.76);display:flex;align-items:center;
+  justify-content:center;padding:22px}
+.card{width:min(560px,100%);max-height:88vh;overflow-y:auto;background:var(--cabinet);
+  border:1px solid var(--line);border-radius:var(--r);padding:0 26px 26px}
+.card .cardTop{height:6px;margin:0 -26px 22px}
+.card h3{font-size:12px;letter-spacing:.3em;text-indent:.3em;margin-bottom:20px;font-weight:800}
+.row{display:flex;align-items:center;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)}
+.row:last-of-type{border-bottom:0}
+.row .rl{flex:1;min-width:0}
+.row .rl b{display:block;font-size:14.5px;font-weight:600;margin-bottom:4px}
+.row .rl span{font-size:12px;color:var(--dim);line-height:1.55;display:block}
+.sw{width:56px;height:32px;flex:0 0 56px;background:var(--glass);border:1px solid var(--line);position:relative;transition:border-color .14s}
+.sw::after{content:"";position:absolute;top:4px;left:4px;width:22px;height:22px;background:var(--dim);
+  transition:transform .14s,background .14s}
+.sw.on{border-color:var(--c-amber)}
+.sw.on::after{transform:translateX(24px);background:var(--c-amber)}
+.card input[type=text]{width:100%;height:48px;background:var(--glass);border:1px solid var(--line);
+  border-radius:var(--r);padding:0 13px;font-family:var(--mono);font-size:13px;outline:none;margin-top:9px}
+.card input[type=text]:focus{border-color:var(--c-amber)}
+.card .foot{display:flex;gap:10px;margin-top:24px}
+.card .foot button{flex:1;height:56px;border:1px solid var(--line);border-radius:var(--r);
+  font-family:var(--mono);font-size:12px;letter-spacing:.12em}
+.card .foot button.pri{background:var(--c-amber);color:#000;border-color:var(--c-amber);font-weight:800}
+.card .foot button:active{opacity:.75}
+.note{font-size:11.5px;color:var(--dim);line-height:1.65;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(16px);z-index:95;
+  background:var(--raise);border-left:4px solid var(--c-amber);padding:13px 20px;font-family:var(--mono);
+  font-size:11.5px;letter-spacing:.1em;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;
+  max-width:82vw;text-align:center}
+#toast.up{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (max-width:860px){
+  :root{--rail:158px}
+  .tiles{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+  .zap{width:86px;flex:0 0 86px}
+  .readout{padding:12px 14px;gap:12px}
+  .readout .chno{font-size:24px;padding:4px 9px}
+  .readout .t1{font-size:15px}
+  .searchWrap{max-width:none}
+  .hbtn .txt,#clk{display:none}
+  .hbtn{padding:0 12px}
+  #osd .k{font-size:28px}#osd .n{font-size:15px}
+  .dir{flex-direction:column}.dir .use{align-self:stretch;text-align:center;line-height:50px;padding:0}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+
+<div id="testcard">
+  <div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="band"><b class="fringe">CATODO</b><span id="tcLine">RICEVITORE PRIVATO</span></div>
+</div>
+
+<div id="gate" class="hide">
+  <div>
+    <div class="miniBars barStrip"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <h1 class="fringe">CATODO</h1>
+    <div class="sub mono" id="gateSub">INSERISCI IL CODICE</div>
+  </div>
+  <div class="pinDots" id="dots"></div>
+  <div class="pad" id="pad"></div>
+  <div id="gateNote">Il codice tiene fuori i curiosi, non gli attacchi. La protezione vera si mette davanti al sito.</div>
+</div>
+
+<div id="shell" class="hide">
+  <header>
+    <div class="wordmark"><b class="fringe">CATODO</b><span id="wmCount" class="mono">- - - -</span></div>
+    <div class="searchWrap">
+      <input id="q" type="search" placeholder="Cerca un canale" autocomplete="off" spellcheck="false">
+      <button class="clr hide" id="qclr">&#10005;</button>
+    </div>
+    <div class="spacer"></div>
+    <div id="clk" class="mono"></div>
+    <button class="hbtn" id="btnSrc"><span class="txt">SORGENTI</span><span class="mono" id="srcCount">0</span></button>
+    <button class="hbtn" id="btnCfg"><span class="txt">IMPOSTAZIONI</span><span class="mono">&#9881;</span></button>
+  </header>
+  <div id="body"><nav id="rail"></nav><main id="grid"></main></div>
+</div>
+
+<!-- ============ SORGENTI ============ -->
+<div id="srcview" class="hide">
+  <div class="top">
+    <button class="sbtn" id="srcBack"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <h2>SORGENTI</h2>
+  </div>
+  <div class="scroll"><div class="inner">
+
+    <div class="sect">LE TUE LISTE</div>
+    <div id="srcList"></div>
+
+    <div class="sect">AGGIUNGI</div>
+    <div class="addRow">
+      <input type="text" id="srcUrl" placeholder="https://.../lista.m3u" autocomplete="off" spellcheck="false">
+      <button id="srcAdd">CARICA</button>
+    </div>
+    <div class="addRow">
+      <button class="ghost" id="srcFileBtn" style="flex:1">OPPURE SCEGLI UN FILE .M3U DAL DISPOSITIVO</button>
+    </div>
+    <input type="file" id="srcFile" accept=".m3u,.m3u8,audio/x-mpegurl,application/x-mpegurl,text/plain" multiple class="hide">
+
+    <div class="sect">DOVE TROVARE LE LISTE</div>
+    <div id="dirList"></div>
+
+    <div class="legal">
+      <b>CATODO non distribuisce canali.</b>
+      Questo e un lettore vuoto: non contiene liste, non ospita flussi, non fa da tramite. I collegamenti
+      qui sopra portano a progetti indipendenti di terzi, che CATODO non gestisce, non verifica e non
+      garantisce. Quando carichi una lista, la scarichi tu dal suo server e resta solo sul tuo dispositivo.
+      Usa esclusivamente contenuti che hai il diritto di guardare, tipicamente canali diffusi
+      gratuitamente dalle emittenti. Il rispetto delle regole di ogni fonte e delle leggi del tuo paese
+      resta una tua responsabilita.
+    </div>
+
+  </div></div>
+</div>
+
+<!-- ============ RIPRODUZIONE ============ -->
+<div id="player" class="hide">
+  <div id="stage">
+    <div id="tube"><video id="v" playsinline webkit-playsinline preload="none"></video><div id="fx"></div></div>
+    <div id="tapzone"></div>
+    <div id="osd"><div class="k mono" id="osdK">00</div><div class="n" id="osdN"></div></div>
+    <div id="top">
+      <button class="ibtn" id="pClose"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button class="ibtn" id="pFav">&#9733;</button>
+      <div class="spacer"></div>
+      <button class="ibtn" id="pFx">&#9636;</button>
+      <button class="ibtn" id="pFit">&#8862;</button>
+      <button class="ibtn" id="pMute">&#9834;</button>
+      <button class="ibtn" id="pFull"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    </div>
+    <div id="status" class="hide">
+      <div class="spin" id="statusSpin"></div>
+      <div id="statusTxt" class="mono">SINTONIA</div>
+      <div id="statusAct" class="hide"></div>
+    </div>
+  </div>
+  <div id="tuner">
+    <button class="zap" id="zPrev"><span class="car">&#9664;</span><span class="lbl">CH</span></button>
+    <div class="readout">
+      <div class="chno mono" id="rNo">00</div>
+      <div class="meta">
+        <div class="t1" id="rName">- - -</div>
+        <div class="t2"><span class="dot" id="rDot"></span><span id="rState">IN ATTESA</span>
+          <span id="rCat"></span><span id="rRes"></span></div>
+      </div>
+      <div class="meter" id="rMeter"><i></i><i></i><i></i><i></i></div>
+    </div>
+    <button class="zap" id="zNext"><span class="car">&#9654;</span><span class="lbl">CH</span></button>
+  </div>
+</div>
+
+<!-- ============ IMPOSTAZIONI ============ -->
+<div id="sheet" class="hide">
+  <div class="card">
+    <div class="cardTop barStrip"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <h3>IMPOSTAZIONI</h3>
+    <div class="row">
+      <div class="rl"><b>Effetto catodico</b><span>Righe di scansione e maschera fosfori sul video. Bello da vedere, ma toglie nitidezza.</span></div>
+      <button class="sw" id="swFx"></button>
+    </div>
+    <div class="row">
+      <div class="rl"><b>Qualita limitata alla finestra</b><span>Non scarica 1080p per riempire mezzo schermo. Meno dati sulla SIM dell auto.</span></div>
+      <button class="sw on" id="swCap"></button>
+    </div>
+    <div class="row">
+      <div class="rl"><b>Nascondi canali non riproducibili</b><span>YouTube, Twitch, RTMP e i flussi http senza proxy: il browser non li apre.</span></div>
+      <button class="sw on" id="swHide"></button>
+    </div>
+    <div class="row">
+      <div class="rl"><b>Salta canale morto</b><span>Dopo due errori passa al successivo invece di restare fermo.</span></div>
+      <button class="sw on" id="swSkip"></button>
+    </div>
+    <div class="row" style="display:block">
+      <div class="rl"><b>Proxy CORS</b><span>URL del tuo Cloudflare Worker. Serve per le liste e i flussi che il browser blocca, e per quelli in http.</span></div>
+      <input type="text" id="inProxy" placeholder="https://catodo-proxy.tuonome.workers.dev/" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="row" style="display:block">
+      <div class="rl"><b>Schermo intero Tesla</b><span>Il browser Tesla resta a due terzi di schermo. Passando da un redirect YouTube si apre a pieno schermo. Salva il link generato come segnalibro nell auto.</span></div>
+      <input type="text" id="inSite" placeholder="https://catodo.tuodominio.ch" autocomplete="off" spellcheck="false">
+      <input type="text" id="outSite" readonly>
+    </div>
+    <div class="foot">
+      <button id="cfgReset">AZZERA DATI</button>
+      <button class="pri" id="cfgOk">FATTO</button>
+    </div>
+    <div class="note" id="storeNote"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+<script>
+"use strict";
+
+/* ================================================================
+   CONFIGURAZIONE
+   Il PIN va SEMPRE fra virgolette. Senza, uno zero iniziale
+   viene letto come numero ottale e lo script non parte affatto.
+   ================================================================ */
+const CFG = {
+  pin: "1957",
+  cacheHours: 12,
+
+  /* Indirizzi di progetti indipendenti, non gestiti da CATODO.
+     Sono collegamenti, non contenuti: la lista la scarica il browser di chi usa l app. */
+  directory: [
+    {
+      name: "Free-TV / IPTV",
+      what: "Curata a mano, solo emittenti dichiarate gratuite: niente canali a pagamento, niente adulti. Poche voci ma quasi tutte in HD. Buon punto di partenza per Italia e Svizzera.",
+      project: "https://github.com/Free-TV/IPTV",
+      url: "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8"
+    },
+    {
+      name: "iptv-org, solo Italia",
+      what: "Indice pubblico molto piu grande, diviso per paese. Il progetto dichiara di raccogliere solo collegamenti a flussi resi pubblici dai titolari dei diritti.",
+      project: "https://github.com/iptv-org/iptv",
+      url: "https://iptv-org.github.io/iptv/countries/it.m3u"
+    },
+    {
+      name: "iptv-org, solo Svizzera",
+      what: "Stesso progetto, elenco svizzero. Utile di qua dal confine, dove la SIM dell auto puo darti un indirizzo elvetico.",
+      project: "https://github.com/iptv-org/iptv",
+      url: "https://iptv-org.github.io/iptv/countries/ch.m3u"
+    },
+    {
+      name: "iptv-org, indice completo",
+      what: "Tutto il mondo in un file solo. Diverse migliaia di voci: pesante da caricare in auto, meglio partire da un elenco per paese.",
+      project: "https://github.com/iptv-org/iptv",
+      url: "https://iptv-org.github.io/iptv/index.m3u"
+    },
+    {
+      name: "awesome-iptv",
+      what: "Non e una lista di canali ma un elenco ragionato di risorse, strumenti e altri progetti. Da qui si arriva a tutto il resto.",
+      project: "https://github.com/iptv-org/awesome-iptv",
+      url: ""
+    }
+  ],
+
+  /* ordine preferito dei gruppi, se presenti. Tutto il resto viene dopo, per numerosita. */
+  order: ["Italy","Italia","Switzerland","Svizzera","VOD Italy","News","Documentaries (EN)",
+          "Business","Weather","France","Germany","Austria","UK","Spain","Portugal",
+          "Ireland","Netherlands","Belgium","USA"],
+  label: {
+    "Italy":"Italia","Switzerland":"Svizzera","VOD Italy":"Film e serie IT","News":"News",
+    "Documentaries (EN)":"Documentari","Business":"Economia","Weather":"Meteo","France":"Francia",
+    "Germany":"Germania","Austria":"Austria","UK":"Regno Unito","Spain":"Spagna",
+    "Portugal":"Portogallo","Ireland":"Irlanda","Netherlands":"Paesi Bassi","Belgium":"Belgio",
+    "USA":"Stati Uniti","Undefined":"Senza gruppo"
+  }
+};
+
+const HUE = {white:"#E6E1D6",yellow:"#E8C93A",cyan:"#3FD6D6",green:"#4FCB57",
+  magenta:"#D361C8",red:"#E05545",blue:"#6A84F2",amber:"#FFB03A"};
+const CYCLE = ["yellow","cyan","green","magenta","red","blue"];
+const FIXED = {"__fav":"amber","__recent":"white","Italy":"green","Italia":"green",
+  "Switzerland":"red","Svizzera":"red","VOD Italy":"magenta","News":"cyan","Weather":"blue",
+  "Business":"cyan","Documentaries (EN)":"yellow"};
+function hueOf(g){
+  if (FIXED[g]) return HUE[FIXED[g]];
+  let h = 0;
+  for (let i = 0; i < g.length; i++) h = (h * 31 + g.charCodeAt(i)) >>> 0;
+  return HUE[CYCLE[h % CYCLE.length]];
+}
+
+/* ================================================================
+   MEMORIA
+   ================================================================ */
+const mem = {};
+const STORAGE_OK = (() => {
+  try { localStorage.setItem("catodo:probe","1"); localStorage.removeItem("catodo:probe"); return true; }
+  catch(e){ return false; }
+})();
+const store = {
+  get(k, d){
+    try { const v = localStorage.getItem("catodo:"+k); return v === null ? d : JSON.parse(v); }
+    catch(e){ return k in mem ? mem[k] : d; }
+  },
+  set(k, v){
+    mem[k] = v;
+    try { localStorage.setItem("catodo:"+k, JSON.stringify(v)); return true; }
+    catch(e){ return false; }
+  },
+  del(k){
+    delete mem[k];
+    try { localStorage.removeItem("catodo:"+k); } catch(e){}
+  },
+  wipe(){
+    for (const k in mem) delete mem[k];
+    try { Object.keys(localStorage).filter(x=>x.startsWith("catodo:")).forEach(x=>localStorage.removeItem(x)); } catch(e){}
+  }
+};
+
+const S = {
+  sources: store.get("sources", []),
+  favs:   new Set(store.get("favs", [])),
+  recent: store.get("recent", []),
+  fx:     store.get("fx", false),
+  cap:    store.get("cap", true),
+  hide:   store.get("hide", true),
+  skip:   store.get("skip", true),
+  proxy:  store.get("proxy", ""),
+  site:   store.get("site", ""),
+  cat:    store.get("cat", ""),
+  query:  ""
+};
+
+/* ================================================================
+   DOM
+   ================================================================ */
+const $ = s => document.querySelector(s);
+const el = {
+  testcard:$("#testcard"), tcLine:$("#tcLine"),
+  gate:$("#gate"), gateSub:$("#gateSub"), dots:$("#dots"), pad:$("#pad"),
+  shell:$("#shell"), rail:$("#rail"), grid:$("#grid"), wmCount:$("#wmCount"), clk:$("#clk"),
+  q:$("#q"), qclr:$("#qclr"), btnSrc:$("#btnSrc"), srcCount:$("#srcCount"), btnCfg:$("#btnCfg"),
+  srcview:$("#srcview"), srcList:$("#srcList"), dirList:$("#dirList"),
+  srcUrl:$("#srcUrl"), srcFile:$("#srcFile"),
+  player:$("#player"), tube:$("#tube"), v:$("#v"), fx:$("#fx"), tapzone:$("#tapzone"),
+  top:$("#top"), tuner:$("#tuner"), osd:$("#osd"), osdK:$("#osdK"), osdN:$("#osdN"),
+  status:$("#status"), statusSpin:$("#statusSpin"), statusTxt:$("#statusTxt"), statusAct:$("#statusAct"),
+  rNo:$("#rNo"), rName:$("#rName"), rDot:$("#rDot"), rState:$("#rState"), rCat:$("#rCat"),
+  rRes:$("#rRes"), rMeter:$("#rMeter"),
+  pFav:$("#pFav"), pFx:$("#pFx"), pFit:$("#pFit"), pMute:$("#pMute"),
+  sheet:$("#sheet"), toast:$("#toast"), storeNote:$("#storeNote")
+};
+
+let toastT;
+function toast(msg){
+  el.toast.textContent = msg;
+  el.toast.classList.add("up");
+  clearTimeout(toastT);
+  toastT = setTimeout(()=>el.toast.classList.remove("up"), 2600);
+}
+
+const GG = ["DOM","LUN","MAR","MER","GIO","VEN","SAB"];
+const MM = ["GEN","FEB","MAR","APR","MAG","GIU","LUG","AGO","SET","OTT","NOV","DIC"];
+function tick(){
+  const d = new Date();
+  el.clk.textContent = GG[d.getDay()] + " " + String(d.getDate()).padStart(2,"0") + " " + MM[d.getMonth()]
+    + "   " + String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+}
+tick(); setInterval(tick, 20000);
+
+/* ================================================================
+   CARTOLINA DI PROVA
+   ================================================================ */
+(function testcard(){
+  el.tcLine.textContent = "RICEVITORE PRIVATO   " + new Date().getFullYear();
+  let done = false;
+  const go = () => {
+    if (done) return;
+    done = true;
+    el.testcard.classList.add("out");
+    setTimeout(() => { el.testcard.remove(); el.gate.classList.remove("hide"); }, 400);
+  };
+  el.testcard.onclick = go;
+  setTimeout(go, 1250);
+})();
+
+/* ================================================================
+   ACCESSO
+   ================================================================ */
+(function buildGate(){
+  const PIN = String(CFG.pin == null ? "" : CFG.pin).trim();
+  const valid = /^[0-9]{1,8}$/.test(PIN);
+
+  if (!valid){
+    el.gateSub.className = "sub bad";
+    el.gateSub.textContent = PIN
+      ? "Il codice impostato contiene caratteri che il tastierino non puo produrre. Correggi CFG.pin: solo cifre, da 1 a 8, sempre fra virgolette."
+      : "Nessun codice impostato. Apri index.html e scrivi CFG.pin fra virgolette.";
+    el.pad.classList.add("hide");
+    return;
+  }
+
+  for (let i = 0; i < PIN.length; i++) el.dots.appendChild(document.createElement("i"));
+  const fill = [HUE.yellow,HUE.cyan,HUE.green,HUE.magenta,HUE.red,HUE.blue,HUE.white,HUE.amber];
+  let buf = "";
+
+  const paint = bad => {
+    el.dots.classList.toggle("bad", !!bad);
+    [...el.dots.children].forEach((d,i)=>{
+      const on = i < buf.length && !bad;
+      d.style.background = on ? fill[i % fill.length] : "transparent";
+      d.style.borderColor = on ? fill[i % fill.length] : "";
+    });
+  };
+  const submit = () => {
+    if (buf.trim() === PIN){ el.gate.classList.add("hide"); boot(); }
+    else { paint(true); buf = ""; setTimeout(()=>paint(false), 340); }
+  };
+  const digit = k => {
+    if (buf.length < PIN.length) buf += k;
+    paint(false);
+    if (buf.length === PIN.length) setTimeout(submit, 130);
+  };
+
+  ["1","2","3","4","5","6","7","8","9","CANC","0","OK"].forEach(k=>{
+    const b = document.createElement("button");
+    b.textContent = k;
+    if (k === "CANC" || k === "OK") b.className = "ghost";
+    b.onclick = () => {
+      if (k === "CANC"){ buf = buf.slice(0,-1); paint(false); }
+      else if (k === "OK") submit();
+      else digit(k);
+    };
+    el.pad.appendChild(b);
+  });
+
+  addEventListener("keydown", e=>{
+    if (el.gate.classList.contains("hide")) return;
+    if (/^[0-9]$/.test(e.key)) digit(e.key);
+    else if (e.key === "Backspace"){ buf = buf.slice(0,-1); paint(false); }
+    else if (e.key === "Enter") submit();
+  });
+})();
+
+/* ================================================================
+   SORGENTI
+   Nessuna lista e inclusa nel prodotto. Le carica chi lo usa.
+   ================================================================ */
+let ALL = [], VIEW = [];
+
+const KIND = u => {
+  if (!u) return "none";
+  if (/youtube\.com|youtu\.be/i.test(u)) return "youtube";
+  if (/twitch\.tv/i.test(u))             return "twitch";
+  if (/dailymotion/i.test(u))            return "dailymotion";
+  if (/^rtmps?:|^rtsp:/i.test(u))        return "rtmp";
+  if (/^http:\/\//i.test(u))             return "insecure";
+  return "hls";
+};
+
+function parseM3U(text){
+  const lines = text.split(/\r?\n/);
+  const out = [];
+  const attr = (l,k) => { const m = l.match(new RegExp(k+'="([^"]*)"')); return m ? m[1] : ""; };
+  for (let i = 0; i < lines.length; i++){
+    if (!lines[i].startsWith("#EXTINF")) continue;
+    let url = "";
+    for (let j = i+1; j < lines.length; j++){
+      const t = lines[j].trim();
+      if (!t || t.startsWith("#")) continue;
+      url = t; break;
+    }
+    if (!url) continue;
+    const line = lines[i];
+    const raw  = (line.split(",").slice(1).join(",") || "").trim();
+    out.push({
+      name:  raw.replace(/[\u24C8\u24BC\u24CE\u24C9]/g,"").replace(/\s+/g," ").trim() || "Senza nome",
+      group: attr(line,"group-title") || attr(line,"tvg-country") || "Undefined",
+      logo:  attr(line,"tvg-logo"),
+      url,
+      kind:  KIND(url),
+      sd:    /\u24C8/.test(raw),
+      geo:   /\u24BC/.test(raw)
+    });
+  }
+  return out;
+}
+
+const proxied = u => S.proxy ? S.proxy.replace(/\/+$/,"") + "/?url=" + encodeURIComponent(u) : u;
+const newId = () => "s" + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+
+async function fetchPlaylist(url){
+  const attempts = [url];
+  if (S.proxy) attempts.push(proxied(url));
+  let last = "";
+  for (const a of attempts){
+    try {
+      const r = await fetch(a, {cache:"no-cache"});
+      if (!r.ok){ last = "HTTP " + r.status; continue; }
+      const t = await r.text();
+      if (!t.includes("#EXTM3U") && !t.includes("#EXTINF")){ last = "non sembra un file M3U"; continue; }
+      return t;
+    } catch(e){ last = "bloccata dal browser (CORS) o irraggiungibile"; }
+  }
+  throw new Error(last || "non raggiungibile");
+}
+
+function saveSources(){
+  store.set("sources", S.sources);
+  el.srcCount.textContent = S.sources.length;
+}
+
+async function loadSource(src, force){
+  const key = "ch:" + src.id;
+  const cached = store.get(key, null);
+  const fresh = cached && (Date.now() - cached.ts) < CFG.cacheHours * 3600e3;
+
+  if (cached && (fresh && !force || src.kind === "file")){
+    src.count = cached.ch.length;
+    src.err = "";
+    return cached.ch;
+  }
+  if (src.kind === "file"){
+    src.err = "file non piu in memoria, ricaricalo";
+    src.count = 0;
+    return [];
+  }
+
+  try {
+    const ch = parseM3U(await fetchPlaylist(src.url));
+    if (!ch.length) throw new Error("nessun canale trovato");
+    src.count = ch.length;
+    src.err = "";
+    src.ts = Date.now();
+    if (!store.set(key, {ts: Date.now(), ch})) src.warn = "cache non salvata";
+    return ch;
+  } catch(e){
+    src.err = e.message;
+    if (cached){ src.count = cached.ch.length; return cached.ch; }
+    src.count = 0;
+    return [];
+  }
+}
+
+async function loadAll(force){
+  const seen = new Set();
+  const merged = [];
+  for (const src of S.sources){
+    const ch = await loadSource(src, force);
+    for (const c of ch){
+      if (seen.has(c.url)) continue;
+      seen.add(c.url);
+      c.src = src.id;
+      merged.push(c);
+    }
+  }
+  ALL = merged;
+  saveSources();
+  el.wmCount.textContent = String(ALL.length).padStart(4,"0");
+}
+
+async function addUrlSource(url){
+  url = url.trim();
+  if (!url) return;
+  if (!/^https?:\/\//i.test(url)) return toast("SERVE UN INDIRIZZO CHE INIZIA CON HTTP");
+  if (S.sources.some(s => s.url === url)) return toast("QUESTA LISTA C E GIA");
+
+  const src = {id:newId(), kind:"url", url, name:nameFromUrl(url)};
+  toast("SCARICO LA LISTA");
+  const ch = await loadSource(src, true);
+  if (!ch.length){
+    toast((src.err || "lista vuota").toUpperCase());
+    if (!S.proxy && /CORS/i.test(src.err || "")) toast("PROVA A IMPOSTARE IL PROXY");
+    return;
+  }
+  S.sources.push(src);
+  saveSources();
+  el.srcUrl.value = "";
+  renderSources();
+  await refreshAfterSourceChange();
+  toast(ch.length + " CANALI AGGIUNTI");
+}
+
+function nameFromUrl(u){
+  try {
+    const p = new URL(u);
+    const last = p.pathname.split("/").filter(Boolean).pop() || p.hostname;
+    return decodeURIComponent(last).replace(/\.(m3u8?|txt)$/i,"") + "  ·  " + p.hostname;
+  } catch(e){ return u.slice(0,60); }
+}
+
+function addFileSource(file){
+  const rd = new FileReader();
+  rd.onload = async () => {
+    const ch = parseM3U(String(rd.result));
+    if (!ch.length) return toast("NESSUN CANALE IN " + file.name.toUpperCase());
+    const src = {id:newId(), kind:"file", url:"", name:file.name, count:ch.length, ts:Date.now()};
+    if (!store.set("ch:"+src.id, {ts:Date.now(), ch})){
+      toast("MEMORIA PIENA: IL FILE NON RESTA SALVATO");
+    }
+    S.sources.push(src);
+    saveSources();
+    renderSources();
+    await refreshAfterSourceChange();
+    toast(ch.length + " CANALI DA " + file.name.toUpperCase());
+  };
+  rd.onerror = () => toast("NON RIESCO A LEGGERE IL FILE");
+  rd.readAsText(file);
+}
+
+function removeSource(id){
+  S.sources = S.sources.filter(s => s.id !== id);
+  store.del("ch:" + id);
+  saveSources();
+  renderSources();
+  refreshAfterSourceChange();
+}
+
+async function refreshAfterSourceChange(){
+  await loadAll(false);
+  if (!ALL.some(c => c.group === S.cat)) S.cat = "";
+  renderRail();
+  renderGrid();
+}
+
+function ago(ts){
+  if (!ts) return "mai aggiornata";
+  const m = Math.round((Date.now() - ts) / 60000);
+  if (m < 1) return "aggiornata ora";
+  if (m < 60) return "aggiornata " + m + " min fa";
+  const h = Math.round(m/60);
+  if (h < 48) return "aggiornata " + h + " h fa";
+  return "aggiornata " + Math.round(h/24) + " giorni fa";
+}
+
+function renderSources(){
+  el.srcCount.textContent = S.sources.length;
+  el.srcList.innerHTML = "";
+
+  if (!S.sources.length){
+    el.srcList.innerHTML = '<div class="empty" style="padding:26px 0;text-align:left">' +
+      '<b>Nessuna lista caricata</b>CATODO arriva vuoto, di proposito: non contiene canali e non ne distribuisce. ' +
+      'Incolla l indirizzo di una lista M3U, oppure scegli un file dal dispositivo. Qui sotto trovi dove cercarne.</div>';
+  }
+
+  S.sources.forEach((s, i) => {
+    const d = document.createElement("div");
+    d.className = "srcItem";
+    d.style.setProperty("--sc", HUE[CYCLE[i % CYCLE.length]]);
+    const sub = s.err ? s.err : (s.count || 0) + " canali  ·  " + ago(s.ts) + (s.kind === "file" ? "  ·  file locale" : "");
+    d.innerHTML = '<div class="info"><b></b><span class="' + (s.err ? "err" : "") + '"></span></div>';
+    d.querySelector("b").textContent = s.name;
+    d.querySelector("span").textContent = sub;
+
+    if (s.kind === "url"){
+      const r = document.createElement("button");
+      r.className = "sbtn"; r.title = "Aggiorna"; r.innerHTML = "&#8635;";
+      r.onclick = async () => { toast("AGGIORNO"); await loadSource(s, true); renderSources(); await refreshAfterSourceChange(); toast("FATTO"); };
+      d.appendChild(r);
+    }
+    const x = document.createElement("button");
+    x.className = "sbtn del"; x.title = "Rimuovi"; x.innerHTML = "&#10005;";
+    x.onclick = () => removeSource(s.id);
+    d.appendChild(x);
+    el.srcList.appendChild(d);
+  });
+}
+
+function renderDirectory(){
+  el.dirList.innerHTML = "";
+  CFG.directory.forEach((entry, i) => {
+    const d = document.createElement("div");
+    d.className = "dir";
+    d.style.setProperty("--dc", HUE[CYCLE[i % CYCLE.length]]);
+    d.innerHTML = '<div class="d1"><b></b><p></p><a target="_blank" rel="noopener noreferrer nofollow"></a><code></code></div>';
+    d.querySelector("b").textContent = entry.name;
+    d.querySelector("p").textContent = entry.what;
+    const a = d.querySelector("a");
+    a.href = entry.project; a.textContent = entry.project;
+    d.querySelector("code").textContent = entry.url || "";
+    if (entry.url){
+      const u = document.createElement("button");
+      u.className = "use"; u.textContent = "USA QUESTA";
+      u.onclick = () => {
+        el.srcUrl.value = entry.url;
+        el.srcUrl.scrollIntoView({block:"center"});
+        el.srcUrl.focus();
+        toast("INDIRIZZO PRONTO: TOCCA CARICA");
+      };
+      d.appendChild(u);
+    }
+    el.dirList.appendChild(d);
+  });
+}
+
+function openSources(){ el.srcview.classList.remove("hide"); renderSources(); }
+el.btnSrc.onclick = openSources;
+$("#srcBack").onclick = () => {
+  el.srcview.classList.add("hide");
+  if (!S.sources.length) renderGrid();
+};
+$("#srcAdd").onclick = () => addUrlSource(el.srcUrl.value);
+el.srcUrl.addEventListener("keydown", e => { if (e.key === "Enter") addUrlSource(el.srcUrl.value); });
+$("#srcFileBtn").onclick = () => el.srcFile.click();
+el.srcFile.onchange = e => { [...e.target.files].forEach(addFileSource); e.target.value = ""; };
+
+/* ================================================================
+   AVVIO
+   ================================================================ */
+async function boot(){
+  el.shell.classList.remove("hide");
+  renderDirectory();
+  el.srcCount.textContent = S.sources.length;
+  el.storeNote.textContent = STORAGE_OK
+    ? "Preferiti, liste e impostazioni restano su questo dispositivo. Non escono di qui."
+    : "Questo browser blocca la memoria locale: liste e preferiti valgono solo per questa sessione.";
+
+  if (!S.sources.length){
+    renderRail(); renderGrid();
+    openSources();
+    return;
+  }
+  el.grid.innerHTML = '<div class="empty"><b>Carico le liste</b>Un momento.</div>';
+  await loadAll(false);
+  if (!S.cat || !ALL.some(c => c.group === S.cat)){
+    const g = groupCounts();
+    S.cat = orderedGroups(g)[0] || "";
+  }
+  renderRail(); renderGrid();
+}
+
+const playable = c => c.kind === "hls" || (c.kind === "insecure" && !!S.proxy);
+function why(c){
+  if (c.kind === "insecure") return "http";
+  if (c.kind === "youtube")  return "yt";
+  if (c.kind === "twitch")   return "twitch";
+  if (c.kind === "dailymotion") return "dm";
+  if (c.kind === "rtmp")     return "rtmp";
+  return "";
+}
+
+/* ================================================================
+   CATEGORIE
+   ================================================================ */
+function groupCounts(){
+  const counts = {};
+  ALL.forEach(c => { if (S.hide && !playable(c)) return; counts[c.group] = (counts[c.group]||0)+1; });
+  return counts;
+}
+function orderedGroups(counts){
+  const keys = Object.keys(counts);
+  const pref = CFG.order.filter(g => counts[g]);
+  const rest = keys.filter(g => !CFG.order.includes(g)).sort((a,b)=>counts[b]-counts[a]);
+  return [...pref, ...rest];
+}
+
+function renderRail(){
+  const counts = groupCounts();
+  const list = orderedGroups(counts);
+  const frag = document.createDocumentFragment();
+  const head = t => { const d = document.createElement("div"); d.className="railHead"; d.textContent=t; frag.appendChild(d); };
+  const item = (key, label, n) => {
+    const b = document.createElement("button");
+    b.className = "cat" + (S.cat === key ? " on" : "");
+    b.style.setProperty("--cc", hueOf(key));
+    b.innerHTML = '<span class="chip"></span><span class="cName"></span><span class="cNum mono"></span>';
+    b.querySelector(".cName").textContent = label;
+    b.querySelector(".cNum").textContent = String(n).padStart(3,"0");
+    b.onclick = () => { S.cat = key; store.set("cat", key); renderRail(); renderGrid(); el.grid.scrollTop = 0; };
+    frag.appendChild(b);
+  };
+
+  head("PERSONALI");
+  item("__fav", "Preferiti", S.favs.size);
+  item("__recent", "Visti di recente", S.recent.length);
+  if (list.length){
+    head("GRUPPI");
+    list.forEach(g => item(g, CFG.label[g] || g, counts[g]));
+  }
+  el.rail.innerHTML = "";
+  el.rail.appendChild(frag);
+}
+
+/* ================================================================
+   GRIGLIA
+   ================================================================ */
+function currentSet(){
+  let arr;
+  if (S.query){
+    const q = S.query.toLowerCase();
+    arr = ALL.filter(c => c.name.toLowerCase().includes(q));
+    if (S.hide) arr = arr.filter(playable);
+    return arr.slice(0, 300);
+  }
+  if (S.cat === "__fav")         arr = ALL.filter(c => S.favs.has(c.url));
+  else if (S.cat === "__recent") arr = S.recent.map(u => ALL.find(c => c.url === u)).filter(Boolean);
+  else                           arr = ALL.filter(c => c.group === S.cat);
+  if (S.hide) arr = arr.filter(playable);
+  return arr;
+}
+
+function renderGrid(){
+  VIEW = currentSet();
+  const title = S.query ? 'Risultati per "' + S.query + '"'
+    : S.cat === "__fav" ? "Preferiti"
+    : S.cat === "__recent" ? "Visti di recente"
+    : (CFG.label[S.cat] || S.cat || "Canali");
+  document.documentElement.style.setProperty("--c", hueOf(S.query ? "__recent" : S.cat));
+
+  el.grid.innerHTML = "";
+  const head = document.createElement("div");
+  head.className = "gridHead";
+  head.innerHTML = '<span class="tag"></span><h2></h2><span class="cnt mono"></span>';
+  head.querySelector("h2").textContent = title;
+  head.querySelector(".cnt").textContent = VIEW.length + " CANALI";
+  el.grid.appendChild(head);
+
+  if (!VIEW.length){
+    const e = document.createElement("div");
+    e.className = "empty";
+    if (!S.sources.length){
+      e.innerHTML = "<b>Nessuna lista caricata</b>CATODO non contiene canali. Carica una lista M3U tua, " +
+        "oppure parti da uno dei progetti pubblici elencati nella schermata sorgenti.";
+      const cta = document.createElement("div");
+      cta.className = "cta";
+      const b = document.createElement("button");
+      b.className = "hbtn"; b.style.height = "56px"; b.style.padding = "0 26px";
+      b.textContent = "APRI SORGENTI"; b.onclick = openSources;
+      cta.appendChild(b); e.appendChild(cta);
+    } else {
+      e.innerHTML = S.cat === "__fav"
+        ? "<b>Nessun preferito</b>Apri un canale e tocca la stella in alto a sinistra."
+        : S.cat === "__recent"
+        ? "<b>Nessuna cronologia</b>Gli ultimi venti canali aperti finiscono qui."
+        : "<b>Niente da mostrare</b>Prova a togliere il filtro dei canali non riproducibili nelle impostazioni.";
+    }
+    el.grid.appendChild(e);
+    return;
+  }
+
+  const tiles = document.createElement("div");
+  tiles.className = "tiles";
+  VIEW.forEach((c, i) => tiles.appendChild(makeTile(c, i)));
+  el.grid.appendChild(tiles);
+}
+
+function makeTile(c, i){
+  const b = document.createElement("button");
+  b.className = "tile" + (playable(c) ? "" : " blocked") + (NOW && NOW.url === c.url ? " playing" : "");
+  b.style.setProperty("--c", hueOf(c.group));
+  b.innerHTML = '<div class="num mono"></div><div class="logo"></div><div class="nm"></div><div class="badges"></div>';
+  b.querySelector(".num").textContent = String(i+1).padStart(3,"0");
+  b.querySelector(".nm").textContent  = c.name;
+
+  const logo = b.querySelector(".logo");
+  if (c.logo){
+    const img = document.createElement("img");
+    img.loading = "lazy"; img.referrerPolicy = "no-referrer"; img.alt = "";
+    img.src = c.logo;
+    img.onerror = () => { logo.innerHTML = '<span class="fallback">' + initials(c.name) + '</span>'; };
+    logo.appendChild(img);
+  } else logo.innerHTML = '<span class="fallback">' + initials(c.name) + '</span>';
+
+  const bg = b.querySelector(".badges");
+  if (S.favs.has(c.url)) bg.innerHTML += '<span class="bdg fav">&#9733;</span>';
+  if (c.sd)  bg.innerHTML += '<span class="bdg">SD</span>';
+  if (c.geo) bg.innerHTML += '<span class="bdg">GEO</span>';
+  const w = playable(c) ? "" : why(c);
+  if (w) bg.innerHTML += '<span class="bdg warn">' + w.toUpperCase() + '</span>';
+
+  b.onclick = () => {
+    if (!playable(c)) return toast(c.kind === "insecure" ? "FLUSSO HTTP: SERVE IL PROXY" : "NON APRIBILE DAL BROWSER");
+    tune(VIEW.indexOf(c));
+  };
+  return b;
+}
+const initials = n =>
+  n.replace(/[^A-Za-z0-9 ]/g,"").split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase() || "TV";
+
+let qT;
+el.q.addEventListener("input", () => {
+  clearTimeout(qT);
+  qT = setTimeout(() => {
+    S.query = el.q.value.trim();
+    el.qclr.classList.toggle("hide", !S.query);
+    renderGrid(); el.grid.scrollTop = 0;
+  }, 170);
+});
+el.qclr.onclick = () => { el.q.value=""; S.query=""; el.qclr.classList.add("hide"); renderGrid(); };
+
+/* ================================================================
+   RIPRODUZIONE
+   ================================================================ */
+let hls = null, NOW = null, NOWi = -1, fails = 0, hideT = null, osdT = null;
+
+function setStatus(txt, mode){
+  if (!txt){ el.status.classList.add("hide"); return; }
+  el.status.classList.remove("hide");
+  el.statusTxt.textContent = txt;
+  el.statusTxt.classList.toggle("err", mode === "err");
+  el.statusSpin.classList.toggle("hide", mode !== "load");
+  el.statusAct.classList.add("hide");
+  el.statusAct.innerHTML = "";
+}
+function statusButtons(list){
+  el.statusAct.classList.remove("hide");
+  el.statusAct.innerHTML = "";
+  list.forEach(([label, fn]) => {
+    const b = document.createElement("button");
+    b.className = "hbtn"; b.style.height = "52px"; b.style.padding = "0 20px";
+    b.textContent = label; b.onclick = fn;
+    el.statusAct.appendChild(b);
+  });
+}
+function meter(bars, weak){
+  [...el.rMeter.children].forEach((i,k)=>{
+    i.className = "";
+    if (k < bars) i.className = weak ? "l1" : (bars <= 1 ? "l1" : bars === 2 ? "l2" : bars === 3 ? "l3" : "l4");
+  });
+}
+function showOsd(){
+  el.osd.classList.add("up");
+  clearTimeout(osdT);
+  osdT = setTimeout(()=>el.osd.classList.remove("up"), 2400);
+}
+
+function tune(i){
+  if (i < 0 || i >= VIEW.length) return;
+  const first = el.player.classList.contains("hide");
+  NOWi = i; NOW = VIEW[i]; fails = 0;
+  el.player.style.setProperty("--c", hueOf(NOW.group));
+  el.player.classList.remove("hide");
+  if (first){
+    el.tube.classList.remove("off");
+    el.tube.classList.add("on");
+    setTimeout(()=>el.tube.classList.remove("on"), 360);
+  }
+  const n = String(i+1).padStart(3,"0");
+  el.rNo.textContent = n;
+  el.osdK.textContent = n;
+  el.osdN.textContent = NOW.name;
+  showOsd();
+  el.rName.textContent = NOW.name;
+  el.rCat.textContent  = (CFG.label[NOW.group] || NOW.group).toUpperCase();
+  el.rRes.textContent  = "";
+  el.pFav.classList.toggle("on", S.favs.has(NOW.url));
+  el.rDot.classList.remove("live");
+  el.rState.textContent = "SINTONIA";
+  meter(0);
+  remember(NOW.url);
+  attach(proxied(NOW.url));
+  wake();
+}
+
+function attach(src){
+  detach();
+  setStatus("SINTONIA", "load");
+  const v = el.v;
+  if (!window.Hls || !Hls.isSupported()){
+    if (v.canPlayType("application/vnd.apple.mpegurl")){ v.src = src; v.play().catch(()=>{}); return; }
+    setStatus("QUESTO BROWSER NON SUPPORTA HLS", "err");
+    return;
+  }
+  hls = new Hls({
+    enableWorker:true, lowLatencyMode:false, capLevelToPlayerSize:S.cap,
+    backBufferLength:30, maxBufferLength:18, maxMaxBufferLength:40,
+    liveSyncDurationCount:3, liveMaxLatencyDurationCount:10,
+    manifestLoadingTimeOut:12000, manifestLoadingMaxRetry:2, levelLoadingMaxRetry:3,
+    fragLoadingTimeOut:22000, fragLoadingMaxRetry:5, startLevel:-1
+  });
+  hls.on(Hls.Events.MANIFEST_PARSED, () => {
+    el.v.play().catch(() => {
+      setStatus("TOCCA PER AVVIARE", null);
+      statusButtons([["AVVIA", () => { el.v.play().catch(()=>{}); setStatus(null); }]]);
+    });
+  });
+  hls.on(Hls.Events.LEVEL_SWITCHED, (_, d) => {
+    const lv = hls.levels[d.level];
+    if (lv && lv.height) el.rRes.textContent = lv.height + "P";
+  });
+  hls.on(Hls.Events.ERROR, (_, d) => {
+    if (!d.fatal) return;
+    if (d.type === Hls.ErrorTypes.NETWORK_ERROR){
+      fails++;
+      if (fails <= 2){ setStatus("RIPROVO " + fails + "/2", "load"); hls.startLoad(); return; }
+      dead(d.details === "manifestLoadError" && !S.proxy ? "FLUSSO BLOCCATO (CORS O OFFLINE)" : "FLUSSO NON RAGGIUNGIBILE");
+    } else if (d.type === Hls.ErrorTypes.MEDIA_ERROR){
+      fails++;
+      if (fails <= 2){ setStatus("RECUPERO VIDEO", "load"); hls.recoverMediaError(); return; }
+      dead("CODEC NON SUPPORTATO");
+    } else dead("ERRORE DI RIPRODUZIONE");
+  });
+  hls.loadSource(src);
+  hls.attachMedia(v);
+}
+
+function dead(msg){
+  detach();
+  el.rState.textContent = "ERRORE";
+  el.rDot.classList.remove("live");
+  meter(1, true);
+  setStatus(msg, "err");
+  const acts = [["RIPROVA", () => attach(proxied(NOW.url))]];
+  if (!S.proxy) acts.push(["PROXY", () => { shut(); openCfg(); }]);
+  acts.push(["SUCCESSIVO", () => zap(1)]);
+  statusButtons(acts);
+  if (S.skip) setTimeout(() => { if (el.statusTxt.classList.contains("err")) zap(1); }, 4200);
+}
+
+function detach(){
+  try { if (hls){ hls.destroy(); hls = null; } } catch(e){}
+  try { el.v.removeAttribute("src"); el.v.load(); } catch(e){}
+}
+
+function shut(){
+  detach();
+  setStatus(null);
+  el.tube.classList.remove("on");
+  el.tube.classList.add("off");
+  setTimeout(() => {
+    el.tube.classList.remove("off");
+    el.player.classList.add("hide");
+    NOW = null; NOWi = -1;
+    renderGrid();
+  }, 410);
+  if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+}
+
+function zap(step){
+  if (!VIEW.length) return;
+  let n = NOWi;
+  for (let k = 0; k < VIEW.length; k++){
+    n = (n + step + VIEW.length) % VIEW.length;
+    if (playable(VIEW[n])) return tune(n);
+  }
+}
+function remember(u){
+  S.recent = [u, ...S.recent.filter(x => x !== u)].slice(0, 20);
+  store.set("recent", S.recent);
+}
+
+el.v.addEventListener("playing", () => {
+  setStatus(null);
+  el.rState.textContent = "IN ONDA";
+  el.rDot.classList.add("live");
+  fails = 0; autohide();
+});
+el.v.addEventListener("waiting", () => {
+  el.rState.textContent = "BUFFER";
+  el.rDot.classList.remove("live");
+});
+setInterval(() => {
+  if (!hls || el.player.classList.contains("hide")) return;
+  const bw = hls.bandwidthEstimate || 0;
+  const bars = bw > 6e6 ? 4 : bw > 2.5e6 ? 3 : bw > 900e3 ? 2 : bw > 0 ? 1 : 0;
+  meter(bars, bars === 1);
+}, 2500);
+
+function showChrome(){ el.top.classList.remove("away"); el.tuner.classList.remove("away"); autohide(); }
+function autohide(){
+  clearTimeout(hideT);
+  hideT = setTimeout(() => {
+    if (el.v.paused) return;
+    el.top.classList.add("away"); el.tuner.classList.add("away");
+  }, 4200);
+}
+el.tapzone.onclick = () => {
+  if (el.tuner.classList.contains("away")) showChrome();
+  else { clearTimeout(hideT); el.top.classList.add("away"); el.tuner.classList.add("away"); }
+};
+
+$("#pClose").onclick = shut;
+$("#zPrev").onclick  = () => { showChrome(); zap(-1); };
+$("#zNext").onclick  = () => { showChrome(); zap(1); };
+el.pFav.onclick = () => {
+  if (!NOW) return;
+  if (S.favs.has(NOW.url)) S.favs.delete(NOW.url); else S.favs.add(NOW.url);
+  store.set("favs", [...S.favs]);
+  el.pFav.classList.toggle("on", S.favs.has(NOW.url));
+  toast(S.favs.has(NOW.url) ? "AGGIUNTO AI PREFERITI" : "TOLTO DAI PREFERITI");
+  showChrome();
+};
+function setFx(on){
+  S.fx = on; store.set("fx", on);
+  el.fx.classList.toggle("on", on);
+  el.pFx.classList.toggle("on", on);
+  $("#swFx").classList.toggle("on", on);
+}
+el.pFx.onclick  = () => { setFx(!S.fx); toast(S.fx ? "EFFETTO CATODICO" : "IMMAGINE PULITA"); showChrome(); };
+el.pFit.onclick = () => {
+  el.v.classList.toggle("fill");
+  el.pFit.classList.toggle("on", el.v.classList.contains("fill"));
+  toast(el.v.classList.contains("fill") ? "RIEMPI SCHERMO" : "ADATTA");
+  showChrome();
+};
+el.pMute.onclick = () => {
+  el.v.muted = !el.v.muted;
+  el.pMute.classList.toggle("on", el.v.muted);
+  el.pMute.innerHTML = el.v.muted ? "&#9835;&#8260;" : "&#9834;";
+  showChrome();
+};
+$("#pFull").onclick = () => {
+  showChrome();
+  const d = document;
+  if (d.fullscreenElement || d.webkitFullscreenElement) (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+  else { const t = el.player; (t.requestFullscreen || t.webkitRequestFullscreen || (()=>{})).call(t); }
+};
+addEventListener("keydown", e => {
+  if (el.player.classList.contains("hide")) return;
+  if (e.key === "Escape")     shut();
+  if (e.key === "ArrowRight") zap(1);
+  if (e.key === "ArrowLeft")  zap(-1);
+  if (e.key === "f")          $("#pFull").click();
+  if (e.key === "c")          el.pFx.click();
+  if (e.key === " ")          { e.preventDefault(); el.v.paused ? el.v.play() : el.v.pause(); showChrome(); }
+});
+let wl = null;
+async function wake(){ try { if (navigator.wakeLock && !wl) wl = await navigator.wakeLock.request("screen"); } catch(e){} }
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && !el.player.classList.contains("hide")) wake();
+});
+
+/* ================================================================
+   IMPOSTAZIONI
+   ================================================================ */
+function applyStoredUI(){
+  setFx(S.fx);
+  $("#swCap").classList.toggle("on", S.cap);
+  $("#swHide").classList.toggle("on", S.hide);
+  $("#swSkip").classList.toggle("on", S.skip);
+  $("#inProxy").value = S.proxy;
+  $("#inSite").value  = S.site;
+  syncTeslaLink();
+}
+function syncTeslaLink(){
+  const u = ($("#inSite").value || "").trim();
+  $("#outSite").value = u ? "https://www.youtube.com/redirect?q=" + encodeURIComponent(u) : "";
+}
+function openCfg(){ el.sheet.classList.remove("hide"); }
+el.btnCfg.onclick = openCfg;
+$("#swFx").onclick   = () => setFx(!S.fx);
+$("#swCap").onclick  = e => { S.cap  = !S.cap;  store.set("cap", S.cap);   e.currentTarget.classList.toggle("on", S.cap); };
+$("#swHide").onclick = e => { S.hide = !S.hide; store.set("hide", S.hide); e.currentTarget.classList.toggle("on", S.hide); renderRail(); renderGrid(); };
+$("#swSkip").onclick = e => { S.skip = !S.skip; store.set("skip", S.skip); e.currentTarget.classList.toggle("on", S.skip); };
+$("#inProxy").oninput = e => { S.proxy = e.target.value.trim(); store.set("proxy", S.proxy); };
+$("#inSite").oninput  = e => { S.site  = e.target.value.trim(); store.set("site", S.site); syncTeslaLink(); };
+$("#outSite").onclick = e => { e.target.select(); toast("COPIA E SALVA COME SEGNALIBRO"); };
+$("#cfgOk").onclick = () => { el.sheet.classList.add("hide"); renderRail(); renderGrid(); };
+$("#cfgReset").onclick = () => {
+  store.wipe();
+  S.sources = []; S.favs = new Set(); S.recent = []; S.proxy = ""; S.site = ""; S.fx = false; S.cat = "";
+  ALL = [];
+  applyStoredUI(); renderSources(); renderRail(); renderGrid();
+  toast("DATI LOCALI AZZERATI");
+};
+el.sheet.onclick = e => { if (e.target === el.sheet) $("#cfgOk").click(); };
+applyStoredUI();
+</script>
+</body>
+</html>
