@@ -479,7 +479,10 @@ video.fill{object-fit:cover}
 
 <div id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"
+  crossorigin="anonymous"
+  integrity="sha384-9v3HcdYrO3D+OPDTjZ40RXocgE4GtXVCd3/mCS62JsM93JXgI1afJVuwjFvsu6ni"
+  onerror="window.__HLS_LOAD_FAILED = true;"></script>
 <script>
 "use strict";
 
@@ -588,8 +591,9 @@ const STORAGE_OK = (() => {
 })();
 const store = {
   get(k, d){
+    if (k in mem) return mem[k];
     try { const v = localStorage.getItem("catodo:"+k); return v === null ? d : JSON.parse(v); }
-    catch(e){ return k in mem ? mem[k] : d; }
+    catch(e){ return d; }
   },
   set(k, v){
     mem[k] = v;
@@ -756,12 +760,15 @@ function parseM3U(text){
     let url = "";
     for (let j = i+1; j < lines.length; j++){
       const t = lines[j].trim();
+      if (t.startsWith("#EXTINF")) break;
       if (!t || t.startsWith("#")) continue;
       url = t; break;
     }
     if (!url) continue;
     const line = lines[i];
-    const raw  = (line.split(",").slice(1).join(",") || "").trim();
+    const lastQuote = line.lastIndexOf('"');
+    const commaIdx  = line.indexOf(",", lastQuote + 1);
+    const raw = (commaIdx === -1 ? "" : line.slice(commaIdx + 1)).trim();
     out.push({
       name:  raw.replace(/[\u24C8\u24BC\u24CE\u24C9]/g,"").replace(/\s+/g," ").trim() || "No name",
       group: attr(line,"group-title") || attr(line,"tvg-country") || "Undefined",
@@ -783,13 +790,19 @@ async function fetchPlaylist(url){
   if (S.proxy) attempts.push(proxied(url));
   let last = "";
   for (const a of attempts){
+    const ac = new AbortController();
+    const to = setTimeout(() => ac.abort(), 15000);
     try {
-      const r = await fetch(a, {cache:"no-cache"});
+      const r = await fetch(a, {cache:"no-cache", signal: ac.signal});
+      clearTimeout(to);
       if (!r.ok){ last = "HTTP " + r.status; continue; }
       const t = await r.text();
       if (!t.includes("#EXTM3U") && !t.includes("#EXTINF")){ last = "does not look like an M3U file"; continue; }
       return t;
-    } catch(e){ last = "blocked by the browser (CORS) or unreachable"; }
+    } catch(e){
+      clearTimeout(to);
+      last = e.name === "AbortError" ? "the list did not download in time, try again" : "blocked by the browser (CORS) or unreachable";
+    }
   }
   throw new Error(last || "unreachable");
 }
@@ -858,8 +871,9 @@ async function addUrlSource(url){
   toast("DOWNLOADING THE LIST");
   const ch = await loadSource(src, true);
   if (!ch.length){
-    toast((src.err || "empty list").toUpperCase());
-    if (!S.proxy && /CORS/i.test(src.err || "")) toast("TRY SETTING THE PROXY");
+    let msg = (src.err || "empty list").toUpperCase();
+    if (!S.proxy && /CORS/i.test(src.err || "")) msg += ". TRY SETTING THE PROXY";
+    toast(msg);
     return;
   }
   S.sources.push(src);
@@ -998,6 +1012,9 @@ el.srcFile.onchange = e => { [...e.target.files].forEach(addFileSource); e.targe
    ================================================================ */
 async function boot(){
   el.shell.classList.remove("hide");
+  if (window.__HLS_LOAD_FAILED || !window.Hls){
+    toast("PLAYER LIBRARY DID NOT DOWNLOAD: RELOAD THE PAGE");
+  }
   renderDirectory();
   el.srcCount.textContent = S.sources.length;
   el.storeNote.textContent = STORAGE_OK
@@ -1079,13 +1096,16 @@ function currentSet(){
     const q = S.query.toLowerCase();
     arr = ALL.filter(c => c.name.toLowerCase().includes(q));
     if (S.hide) arr = arr.filter(playable);
-    return arr.slice(0, 300);
+  } else {
+    if (S.cat === "__fav")         arr = ALL.filter(c => S.favs.has(c.url));
+    else if (S.cat === "__recent") arr = S.recent.map(u => ALL.find(c => c.url === u)).filter(Boolean);
+    else                           arr = ALL.filter(c => c.group === S.cat);
+    if (S.hide) arr = arr.filter(playable);
   }
-  if (S.cat === "__fav")         arr = ALL.filter(c => S.favs.has(c.url));
-  else if (S.cat === "__recent") arr = S.recent.map(u => ALL.find(c => c.url === u)).filter(Boolean);
-  else                           arr = ALL.filter(c => c.group === S.cat);
-  if (S.hide) arr = arr.filter(playable);
-  return arr;
+  const total = arr.length;
+  const capped = arr.slice(0, 300);
+  capped.total = total;
+  return capped;
 }
 
 function renderGrid(){
@@ -1131,6 +1151,14 @@ function renderGrid(){
   tiles.className = "tiles";
   VIEW.forEach((c, i) => tiles.appendChild(makeTile(c, i)));
   el.grid.appendChild(tiles);
+
+  if (VIEW.total > VIEW.length){
+    const note = document.createElement("div");
+    note.className = "mono";
+    note.style.cssText = "padding:18px 2px 0;color:var(--dim);font-size:11px;letter-spacing:.1em";
+    note.textContent = "SHOWING THE FIRST " + VIEW.length + " OF " + VIEW.total + ". USE SEARCH TO NARROW.";
+    el.grid.appendChild(note);
+  }
 }
 
 function normalizeChannelName(name){
@@ -1173,7 +1201,7 @@ function makeTile(c, i){
 
   b.onclick = () => {
     if (!playable(c)) return toast(c.kind === "insecure" ? "HTTP STREAM: PROXY NEEDED" : "CANNOT BE OPENED BY THE BROWSER");
-    tune(VIEW.indexOf(c));
+    tune(i);
   };
   return b;
 }
@@ -1194,9 +1222,10 @@ el.qclr.onclick = () => { el.q.value=""; S.query=""; el.qclr.classList.add("hide
 /* ================================================================
    PLAYBACK
    ================================================================ */
-let hls = null, NOW = null, NOWi = -1, fails = 0, hideT = null, osdT = null;
+let hls = null, NOW = null, NOWi = -1, fails = 0, hideT = null, osdT = null, skipT = null, consecutiveSkips = 0;
 
 function setStatus(txt, mode){
+  el.statusTxt.classList.remove("err");
   if (!txt){ el.status.classList.add("hide"); return; }
   el.status.classList.remove("hide");
   el.statusTxt.textContent = txt;
@@ -1229,6 +1258,7 @@ function showOsd(){
 
 function tune(i){
   if (i < 0 || i >= VIEW.length) return;
+  clearTimeout(skipT);
   const first = el.player.classList.contains("hide");
   NOWi = i; NOW = VIEW[i]; fails = 0;
   el.player.style.setProperty("--c", hueOf(NOW.group));
@@ -1259,9 +1289,14 @@ function attach(src){
   detach();
   setStatus("TUNING", "load");
   const v = el.v;
-  if (!window.Hls || !Hls.isSupported()){
+  if (!window.Hls){
     if (v.canPlayType("application/vnd.apple.mpegurl")){ v.src = src; v.play().catch(()=>{}); return; }
-    setStatus("THIS BROWSER DOES NOT SUPPORT HLS", "err");
+    setStatus("PLAYER LIBRARY DID NOT DOWNLOAD, RELOAD THE PAGE", "err");
+    return;
+  }
+  if (!Hls.isSupported()){
+    if (v.canPlayType("application/vnd.apple.mpegurl")){ v.src = src; v.play().catch(()=>{}); return; }
+    setStatus("THIS BROWSER CANNOT PLAY HLS STREAMS", "err");
     return;
   }
   hls = new Hls({
@@ -1302,12 +1337,28 @@ function dead(msg){
   el.rState.textContent = "ERROR";
   el.rDot.classList.remove("live");
   meter(1, true);
+  clearTimeout(skipT);
+
+  if (S.skip && consecutiveSkips >= 5){
+    setStatus("SEVERAL CHANNELS IN A ROW DID NOT OPEN", "err");
+    const stuckActs = [];
+    if (!S.proxy) stuckActs.push(["PROXY", () => { shut(); openCfg(); }]);
+    stuckActs.push(["NEXT", () => zap(1)]);
+    statusButtons(stuckActs);
+    return;
+  }
+
   setStatus(msg, "err");
   const acts = [["RETRY", () => attach(proxied(NOW.url))]];
   if (!S.proxy) acts.push(["PROXY", () => { shut(); openCfg(); }]);
   acts.push(["NEXT", () => zap(1)]);
   statusButtons(acts);
-  if (S.skip) setTimeout(() => { if (el.statusTxt.classList.contains("err")) zap(1); }, 4200);
+  if (S.skip) skipT = setTimeout(() => {
+    if (el.player.classList.contains("hide")) return;
+    if (!el.statusTxt.classList.contains("err")) return;
+    consecutiveSkips++;
+    zap(1);
+  }, 4200);
 }
 
 function detach(){
@@ -1316,7 +1367,9 @@ function detach(){
 }
 
 function shut(){
+  clearTimeout(skipT);
   detach();
+  if (wl){ wl.release().catch(()=>{}); wl = null; }
   setStatus(null);
   el.tube.classList.remove("on");
   el.tube.classList.add("off");
@@ -1330,12 +1383,16 @@ function shut(){
 }
 
 function zap(step){
-  if (!VIEW.length) return;
+  if (!VIEW.length) return toast("NOTHING ELSE TO SWITCH TO");
   let n = NOWi;
   for (let k = 0; k < VIEW.length; k++){
     n = (n + step + VIEW.length) % VIEW.length;
-    if (playable(VIEW[n])) return tune(n);
+    if (playable(VIEW[n])){
+      if (n === NOWi) return toast("ONLY ONE PLAYABLE CHANNEL HERE");
+      return tune(n);
+    }
   }
+  toast("NOTHING ELSE TO SWITCH TO");
 }
 function remember(u){
   S.recent = [u, ...S.recent.filter(x => x !== u)].slice(0, 20);
@@ -1346,7 +1403,7 @@ el.v.addEventListener("playing", () => {
   setStatus(null);
   el.rState.textContent = "ON AIR";
   el.rDot.classList.add("live");
-  fails = 0; autohide();
+  fails = 0; consecutiveSkips = 0; autohide();
 });
 el.v.addEventListener("waiting", () => {
   el.rState.textContent = "BUFFERING";
@@ -1418,7 +1475,14 @@ addEventListener("keydown", e => {
   if (e.key === " ")          { e.preventDefault(); el.v.paused ? el.v.play() : el.v.pause(); showChrome(); }
 });
 let wl = null;
-async function wake(){ try { if (navigator.wakeLock && !wl) wl = await navigator.wakeLock.request("screen"); } catch(e){} }
+async function wake(){
+  try {
+    if (navigator.wakeLock && !wl){
+      wl = await navigator.wakeLock.request("screen");
+      wl.addEventListener("release", () => { wl = null; });
+    }
+  } catch(e){}
+}
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible" && !el.player.classList.contains("hide")) wake();
 });
@@ -1442,7 +1506,7 @@ function syncTeslaLink(){
 function openCfg(){ el.sheet.classList.remove("hide"); }
 el.btnCfg.onclick = openCfg;
 $("#swFx").onclick   = () => setFx(!S.fx);
-$("#swCap").onclick  = e => { S.cap  = !S.cap;  store.set("cap", S.cap);   e.currentTarget.classList.toggle("on", S.cap); };
+$("#swCap").onclick  = e => { S.cap  = !S.cap;  store.set("cap", S.cap);   e.currentTarget.classList.toggle("on", S.cap); if (hls) hls.capLevelToPlayerSize = S.cap; };
 $("#swHide").onclick = e => { S.hide = !S.hide; store.set("hide", S.hide); e.currentTarget.classList.toggle("on", S.hide); renderRail(); renderGrid(); };
 $("#swSkip").onclick = e => { S.skip = !S.skip; store.set("skip", S.skip); e.currentTarget.classList.toggle("on", S.skip); };
 $("#inProxy").oninput = e => { S.proxy = e.target.value.trim(); store.set("proxy", S.proxy); };

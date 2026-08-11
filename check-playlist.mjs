@@ -43,11 +43,14 @@ function parse(text) {
     let url = "";
     for (let j = i + 1; j < lines.length; j++) {
       const t = lines[j].trim();
+      if (t.startsWith("#EXTINF")) break;
       if (!t || t.startsWith("#")) continue;
       url = t; break;
     }
     if (!url) continue;
-    const raw = (lines[i].split(",").slice(1).join(",") || "").trim();
+    const lastQuote = lines[i].lastIndexOf('"');
+    const commaIdx = lines[i].indexOf(",", lastQuote + 1);
+    const raw = (commaIdx === -1 ? "" : lines[i].slice(commaIdx + 1)).trim();
     out.push({
       name: raw.replace(/[\u24C8\u24BC\u24CE\u24C9]/g, "").trim(),
       group: at(lines[i], "group-title") || "Undefined",
