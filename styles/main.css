@@ -2054,7 +2054,8 @@ textarea {
 /* Library and sources --------------------------------------------------- */
 
 .page--library,
-.page--sources {
+.page--sources,
+.page--guide {
   padding: 36px clamp(24px, 4vw, 64px) 56px;
 }
 
@@ -2156,6 +2157,13 @@ textarea {
   gap: 18px;
 }
 
+.guide-heading .page-heading__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .guide-setup {
   display: grid;
   grid-template-columns: minmax(280px, 0.8fr) minmax(420px, 1.2fr);
@@ -2233,6 +2241,120 @@ textarea {
   grid-template-columns: minmax(560px, 1.6fr) minmax(310px, 0.75fr);
   gap: 18px;
   align-items: start;
+}
+
+.guide-settings {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 22px;
+  padding: 24px;
+}
+
+.guide-settings__header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.guide-settings__header h2,
+.guide-settings__header p,
+.guide-provider h3,
+.guide-provider p { margin: 0; }
+
+.guide-settings__header h2 {
+  margin-top: 2px;
+  font-size: 24px;
+  text-transform: uppercase;
+}
+
+.guide-settings__header > div > p:last-child {
+  max-width: 760px;
+  margin-top: 6px;
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.guide-settings__status {
+  flex: 0 0 auto;
+  margin-top: 5px;
+  color: var(--ink-soft);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.guide-provider {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(105deg, var(--signal-soft), var(--paper-raised) 54%);
+}
+
+.guide-provider__icon {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  background: var(--signal);
+  color: #fff;
+  font-size: 27px;
+}
+
+.guide-provider__badge {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--signal);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.guide-provider h3 { font-size: 18px; text-transform: uppercase; }
+.guide-provider p { margin-top: 4px; color: var(--ink-soft); font-size: 11px; line-height: 1.4; }
+.guide-provider__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+
+.guide-settings__form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.32fr);
+  gap: 14px 18px;
+}
+
+.guide-settings__sources textarea {
+  min-height: 126px;
+  padding: 13px;
+  resize: vertical;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--paper-raised);
+  color: var(--ink);
+  font: 11px/1.5 var(--font-mono);
+}
+
+.guide-settings__cadence .select { width: 100%; }
+.guide-settings__consent { grid-column: 1 / -1; }
+.guide-settings__footer {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.guide-settings__footer p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 10px;
+  line-height: 1.4;
 }
 
 .world-catalog-callout {
@@ -4028,7 +4150,8 @@ textarea {
 
 @media (max-width: 820px) {
   .guide-setup,
-  .guide-channel { grid-template-columns: 1fr; }
+  .guide-channel,
+  .guide-settings__form { grid-template-columns: 1fr; }
   .guide-channel__identity { border-right: 0; border-bottom: 1px solid var(--line); }
 
   :root {
@@ -4101,7 +4224,8 @@ textarea {
   .page--home,
   .page--countries,
   .page--library,
-  .page--sources {
+  .page--sources,
+  .page--guide {
     padding: 18px 14px 34px;
   }
 
@@ -4219,6 +4343,17 @@ textarea {
     grid-column: 1 / -1;
     width: 100%;
   }
+
+  .guide-settings { padding: 18px; }
+  .guide-settings__header,
+  .guide-settings__footer { align-items: stretch; flex-direction: column; }
+  .guide-provider { grid-template-columns: 48px minmax(0, 1fr); }
+  .guide-provider__icon { width: 46px; height: 46px; font-size: 23px; }
+  .guide-provider__actions { grid-column: 1 / -1; justify-content: stretch; }
+  .guide-provider__actions .button { flex: 1 1 170px; }
+  .guide-settings__cadence,
+  .guide-settings__consent,
+  .guide-settings__footer { grid-column: 1; }
 
   .source-row__actions {
     grid-column: 1 / -1;

@@ -832,34 +832,18 @@ function createGuideView(t) {
   const refresh = actionButton({
     t, action: 'refresh-guide', iconName: 'arrows-clockwise', key: 'guide.refresh', fallback: 'Refresh guide', className: 'button--ghost',
   });
-  header.append(copy, refresh);
-
-  const setup = element('section', 'guide-setup panel');
-  const setupCopy = element('div');
-  setupCopy.append(
-    icon('calendar-dots'),
-    textNode('h2', null, t, 'guide.setupTitle', 'Connect an XMLTV guide'),
-    textNode('p', null, t, 'guide.setupBody', 'Paste one or more XMLTV URLs. Catodo only contacts them after you save, then caches schedules locally for six hours.'),
-  );
-  const form = element('form', 'guide-setup__form', { dataset: { action: 'save-guide-sources' } });
-  const input = element('textarea', null, {
-    name: 'guideSources', rows: 3, spellcheck: false,
-    placeholder: translate(t, 'guide.sourcePlaceholder', 'https://example.org/guide.xml'),
-    'aria-label': translate(t, 'guide.sourceAriaLabel', 'XMLTV guide URLs'),
+  const configure = actionButton({
+    t, action: 'navigate', iconName: 'gear', key: 'guide.configure', fallback: 'Guide settings', className: 'button--ghost',
+    dataset: { view: 'sources' },
   });
-  const consent = element('label', 'check-row');
-  const checkbox = element('input', null, { type: 'checkbox', name: 'guideConsent', required: true });
-  consent.append(checkbox, textNode('span', null, t, 'guide.consent', 'I understand these schedules come from third-party providers and Catodo will contact the URLs above.'));
-  const save = actionButton({
-    t, action: 'save-guide-sources', iconName: 'floppy-disk', key: 'common.save', fallback: 'Save', className: 'button--primary', type: 'submit',
-  });
-  form.append(input, consent, save);
-  setup.append(setupCopy, form);
+  const actions = element('div', 'page-heading__actions');
+  actions.append(configure, refresh);
+  header.append(copy, actions);
 
   const status = element('div', 'guide-status', { 'aria-live': 'polite' });
   const grid = element('div', 'guide-grid');
-  view.append(header, setup, status, grid);
-  return { view, setup, form, input, checkbox, status, grid, refresh };
+  view.append(header, status, grid);
+  return { view, status, grid, refresh };
 }
 
 function renderGuideCards(container, channels, t) {
@@ -956,6 +940,72 @@ function createSourcesView(t) {
   });
   worldCatalog.append(worldIcon, worldCopy, worldAction);
 
+  const guideSettings = element('section', 'panel guide-settings');
+  const guideHeader = element('div', 'guide-settings__header');
+  const guideTitle = element('div');
+  guideTitle.append(
+    textNode('p', 'eyebrow', t, 'guide.settingsEyebrow', 'Programme data'),
+    textNode('h2', null, t, 'guide.settingsTitle', 'TV Guide sources'),
+    textNode('p', null, t, 'guide.settingsBody', 'Connect plain XMLTV feeds, choose a refresh cadence, and keep programme data on this device.'),
+  );
+  const guideStatus = element('span', 'guide-settings__status mono', { 'aria-live': 'polite' });
+  guideHeader.append(guideTitle, guideStatus);
+
+  const provider = element('article', 'guide-provider');
+  const providerIcon = element('div', 'guide-provider__icon');
+  providerIcon.append(icon('calendar-check'));
+  const providerCopy = element('div', 'guide-provider__copy');
+  providerCopy.append(
+    textNode('span', 'guide-provider__badge', t, 'guide.recommended', 'Recommended free source'),
+    textNode('h3', null, t, 'guide.providerTitle', 'GlobeTV country guides'),
+    textNode('p', null, t, 'guide.providerBody', 'Daily XMLTV files organised by country. The Italy preset includes five feeds; other countries are available in the provider catalog.'),
+  );
+  const providerActions = element('div', 'guide-provider__actions');
+  providerActions.append(
+    actionButton({
+      t, action: 'use-guide-preset', iconName: 'plus', key: 'guide.useItalyPreset', fallback: 'Use Italy preset', className: 'button--primary button--small',
+      dataset: { presetId: 'globetv-italy' },
+    }),
+    actionButton({
+      t, action: 'view-guide-provider', iconName: 'arrow-square-out', key: 'guide.browseCountries', fallback: 'Browse countries', className: 'button--ghost button--small',
+      dataset: { url: 'https://github.com/globetvapp/epg' },
+    }),
+  );
+  provider.append(providerIcon, providerCopy, providerActions);
+
+  const guideForm = element('form', 'guide-settings__form', { dataset: { action: 'save-guide-sources' } });
+  const sourceLabel = element('label', 'field-stack guide-settings__sources');
+  sourceLabel.append(textNode('span', null, t, 'guide.sourceLabel', 'XMLTV source URLs'));
+  const guideInput = element('textarea', null, {
+    name: 'guideSources', rows: 5, spellcheck: false,
+    placeholder: translate(t, 'guide.sourcePlaceholder', 'https://example.org/guide.xml'),
+    'aria-label': translate(t, 'guide.sourceAriaLabel', 'XMLTV guide URLs'),
+  });
+  sourceLabel.append(guideInput);
+  const cadenceLabel = element('label', 'field-stack guide-settings__cadence');
+  cadenceLabel.append(textNode('span', null, t, 'guide.refreshCadence', 'Automatic refresh'));
+  const cadence = element('select', 'select', { name: 'guideRefreshMinutes' });
+  [
+    [0, 'Manual only'],
+    [30, 'Every 30 minutes'],
+    [60, 'Every hour'],
+    [360, 'Every 6 hours · recommended'],
+    [1440, 'Daily'],
+  ].forEach(([value, label]) => cadence.append(element('option', null, { value, textContent: label })));
+  cadenceLabel.append(cadence);
+  const consent = element('label', 'check-row guide-settings__consent');
+  const checkbox = element('input', null, { type: 'checkbox', name: 'guideConsent', required: true });
+  consent.append(checkbox, textNode('span', null, t, 'guide.consent', 'I understand these schedules come from third-party providers and Catodo will contact the URLs above.'));
+  const formFooter = element('div', 'guide-settings__footer');
+  formFooter.append(
+    textNode('p', null, t, 'guide.conditionalHint', 'Refreshes use ETag and Last-Modified when the provider supports them, avoiding unchanged downloads.'),
+    actionButton({
+      t, action: 'save-guide-sources', iconName: 'floppy-disk', key: 'common.save', fallback: 'Save guide settings', className: 'button--primary', type: 'submit',
+    }),
+  );
+  guideForm.append(sourceLabel, cadenceLabel, consent, formFooter);
+  guideSettings.append(guideHeader, provider, guideForm);
+
   const layout = element('div', 'sources-layout');
   const sourcePanel = element('section', 'panel sources-panel');
   const sourceHeader = createSectionTitle(
@@ -1019,8 +1069,8 @@ function createSourcesView(t) {
   proxyForm.append(proxyLabel, proxyFooter);
   guide.append(guideList, proxyForm);
   layout.append(sourcePanel, guide);
-  view.append(heading, worldCatalog, layout);
-  return { view, list, proxyForm, proxyInput };
+  view.append(heading, worldCatalog, guideSettings, layout);
+  return { view, list, proxyForm, proxyInput, guideInput, guideCadence: cadence, guideCheckbox: checkbox, guideStatus };
 }
 
 function createSignalLab(t) {
@@ -2144,7 +2194,8 @@ export function mountAppUI(root, options = {}) {
       countryShape: countries.shape,
       countryTableBody: countries.tableBody,
       guide: guide.view,
-      guideInput: guide.input,
+      guideInput: sources.guideInput,
+      guideCadence: sources.guideCadence,
       guideGrid: guide.grid,
       library: library.view,
       libraryGrid: library.grid,
@@ -2274,16 +2325,14 @@ export function mountAppUI(root, options = {}) {
     renderGuide(state = {}) {
       if (shouldActivateShellView(root.dataset.mode, state.activate)) activateShellView('guide');
       const channels = normaliseArray(state.channels);
-      guide.setup.hidden = Boolean(state.configured);
-      guide.refresh.hidden = !state.configured;
-      if (state.sources) guide.input.value = normaliseArray(state.sources).join('\n');
+      guide.refresh.disabled = Boolean(state.loading) || !state.configured;
       if (state.loading) setTranslatedText(guide.status, t, 'guide.loading', 'Loading live schedules…');
       else if (state.error) guide.status.textContent = safeText(state.error);
       else if (state.configured && !channels.some((channel) => channelSchedule(channel).length)) {
         setTranslatedText(guide.status, t, 'guide.empty', 'No matching programme data was returned. Check the guide URL and channel tvg-id values.');
       } else if (state.configured) {
         setTranslatedText(guide.status, t, 'guide.updated', 'Schedules cached locally · times shown in your timezone');
-      } else guide.status.textContent = '';
+      } else setTranslatedText(guide.status, t, 'guide.unconfigured', 'Connect an XMLTV source in Settings to add live programme data.');
       renderGuideCards(guide.grid, channels, t);
       return api;
     },
@@ -2367,6 +2416,17 @@ export function mountAppUI(root, options = {}) {
       if (Object.prototype.hasOwnProperty.call(state, 'proxy')) {
         sources.proxyInput.value = safeText(state.proxy);
       }
+      if (Object.prototype.hasOwnProperty.call(state, 'guideSources')) {
+        sources.guideInput.value = normaliseArray(state.guideSources).join('\n');
+      }
+      if (Object.prototype.hasOwnProperty.call(state, 'guideRefreshMinutes')) {
+        sources.guideCadence.value = safeText(state.guideRefreshMinutes, '360');
+      }
+      if (state.guideLastRefresh) {
+        sources.guideStatus.textContent = translate(t, 'guide.lastChecked', 'Last checked {time}', {
+          time: new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(state.guideLastRefresh)),
+        });
+      } else setTranslatedText(sources.guideStatus, t, 'guide.notChecked', 'Not checked yet');
       return api;
     },
 

@@ -12,7 +12,7 @@ import {
 import i18n from "./i18n/index.js";
 import { MultiviewController, PlayerManager } from "./player/index.js";
 import { mountAppUI } from "./ui/markup.js";
-import { EpgService } from "./epg/index.js";
+import { EpgService, epgPreset } from "./epg/index.js";
 import { filterChannelPicker } from "./ui/channel-picker-filter.js";
 import { multiviewTelemetry, singleTelemetry } from "./ui/telemetry-model.js";
 import { resetWorldMapView, zoomWorldMap } from "./ui/world-map.js";
@@ -54,6 +54,8 @@ const state = {
   throughputHistory: [],
   multiviewTelemetry: null,
   epgSources: [],
+  epgRefreshMinutes: 360,
+  epgLastRefresh: 0,
   schedules: new Map(),
   guideLoading: false,
   guideError: "",
@@ -69,6 +71,7 @@ let epg;
 let unsubscribeCatalog;
 let metricTimer;
 let clockTimer;
+let epgTimer;
 let lastRememberedId = "";
 let directoryMaps = { byCode: new Map(), byName: new Map() };
 let playerChromeTimer = 0;
@@ -447,6 +450,9 @@ function renderSources() {
   ui.renderSources({
     activate: state.view === "sources",
     proxy: state.proxy,
+    guideSources: state.epgSources,
+    guideRefreshMinutes: state.epgRefreshMinutes,
+    guideLastRefresh: state.epgLastRefresh,
     sources: (state.lastCatalog?.sources || []).map((source) => ({
       ...source,
       channelCount: source.count || 0,
@@ -457,11 +463,12 @@ function renderSources() {
 
 function renderGuide() {
   const channels = playableChannels().slice(0, 48).map(decorateChannel);
+  const hasMappedGuide = channels.some((channel) => channel?.hasGuide || channel?.guides?.length || channel?.endpoints?.some((endpoint) => endpoint?.guides?.length));
   ui.renderGuide({
     activate: state.view === "guide",
     channels,
     sources: state.epgSources,
-    configured: state.epgSources.length > 0,
+    configured: state.epgSources.length > 0 || hasMappedGuide,
     loading: state.guideLoading,
     error: state.guideError,
   });
@@ -514,16 +521,33 @@ async function loadSchedules(channels, { force = false } = {}) {
   state.guideError = "";
   renderGuide();
   try {
-    const schedules = await epg.schedules(values);
+    const schedules = await epg.schedules(values, { force });
     schedules.forEach((value, key) => state.schedules.set(key, value));
+    state.epgLastRefresh = epg.getLastRefresh();
   } catch (error) {
     state.guideError = error.message || "TV guide is unavailable.";
   } finally {
     state.guideLoading = false;
     renderHome();
     renderGuide();
+    renderSources();
     if (state.currentId) ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)) });
   }
+}
+
+function scheduleGuideRefresh() {
+  window.clearInterval(epgTimer);
+  epgTimer = 0;
+  if (!state.epgRefreshMinutes) return;
+  epgTimer = window.setInterval(() => void refreshGuideIfDue(), 60_000);
+}
+
+async function refreshGuideIfDue() {
+  if (document.hidden || !state.epgRefreshMinutes) return;
+  const dueAfter = state.epgRefreshMinutes * 60_000;
+  if (state.epgLastRefresh && Date.now() - state.epgLastRefresh < dueAfter) return;
+  state.schedules.clear();
+  await loadSchedules(playableChannels().slice(0, 48), { force: true });
 }
 
 function showPlayerChrome() {
@@ -817,14 +841,29 @@ async function handleAction(action, detail) {
       }
       try {
         state.epgSources = await epg.setSources(String(detail.formData.get("guideSources") || "").split(/\n+/));
+        state.epgRefreshMinutes = await epg.setRefreshMinutes(detail.formData.get("guideRefreshMinutes"));
+        scheduleGuideRefresh();
         state.schedules.clear();
         renderGuide();
+        renderSources();
         await loadSchedules(playableChannels().slice(0, 48), { force: true });
+        ui.toast("TV Guide settings saved.");
       } catch (error) {
         ui.toast(error.message, { tone: "error" });
       }
       break;
     }
+    case "use-guide-preset": {
+      const preset = epgPreset(detail.dataset.presetId);
+      if (!preset) break;
+      ui.refs.guideInput.value = preset.urls.join("\n");
+      ui.refs.guideInput.focus();
+      ui.toast(`${preset.name} is ready to review. Confirm and save to connect it.`);
+      break;
+    }
+    case "view-guide-provider":
+      if (detail.dataset.url) window.open(detail.dataset.url, "_blank", "noopener,noreferrer");
+      break;
     case "refresh-guide":
       state.schedules.clear();
       await loadSchedules(playableChannels().slice(0, 48), { force: true });
@@ -1142,6 +1181,9 @@ async function boot() {
   epg = new EpgService({ catalog, proxy: proxyUrl });
   await epg.init();
   state.epgSources = epg.getSources();
+  state.epgRefreshMinutes = epg.getRefreshMinutes();
+  state.epgLastRefresh = epg.getLastRefresh();
+  scheduleGuideRefresh();
   unsubscribeCatalog = catalog.subscribe((snapshot) => {
     state.lastCatalog = snapshot;
     rebuildCountryDirectoryMaps(snapshot.countries);
@@ -1200,6 +1242,7 @@ async function boot() {
 window.addEventListener("beforeunload", () => {
   window.clearInterval(clockTimer);
   window.clearInterval(metricTimer);
+  window.clearInterval(epgTimer);
   unsubscribeCatalog?.();
   homePlayer?.destroy();
   mainPlayer?.destroy();
@@ -1207,6 +1250,10 @@ window.addEventListener("beforeunload", () => {
   catalog?.destroy();
   ui?.destroy();
 }, { once: true });
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) void refreshGuideIfDue();
+});
 
 boot().catch((error) => {
   console.error("CATODO failed to start", error);
