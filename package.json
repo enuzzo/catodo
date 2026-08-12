@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/enuzzo/catodo/issues"
   },
-  "homepage": "https://enuzzo.github.io/catodo/",
+  "homepage": "https://catodo.netmilk.dev/",
   "type": "module",
   "scripts": {
     "dev": "vite",

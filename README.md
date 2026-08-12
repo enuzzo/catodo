@@ -47,15 +47,14 @@ The test suite covers catalogue parsing, import policy and migration, random sel
 
 ## Deployment
 
-### GitHub Pages (official)
+### SiteGround (official)
 
-CATODO is published from the Vite production bundle. A push to `main` runs
-`.github/workflows/deploy-pages.yml`: it uses Node.js 22, installs the locked
-dependencies, runs tests and syntax checks, builds `dist/`, and deploys that
-artifact to GitHub Pages. The public site is
-[enuzzo.github.io/catodo](https://enuzzo.github.io/catodo/).
+The official hosted instance is [catodo.netmilk.dev](https://catodo.netmilk.dev/).
+It runs the Vite production bundle behind the repository's PHP login gate on
+SiteGround. GitHub Pages is intentionally disabled and the repository does not
+contain an automatic Pages deployment workflow.
 
-For an equivalent self-hosted release:
+To produce the hosting artifact:
 
 ```sh
 npm ci

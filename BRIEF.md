@@ -26,7 +26,7 @@ public live television sources from around the world.
 
 ## Runtime constraints
 
-- No framework; Vite produces the only supported production artifact (`dist/`), deployed by GitHub Pages.
+- No framework; Vite produces the only supported production artifact (`dist/`), deployed to SiteGround behind the PHP access gate.
 - Vanilla ES modules split by data, player, UI, i18n and boot responsibilities.
 - Vendored, pinned runtime dependencies; no CDN is required to boot.
 - The optional Cloudflare proxy remains available for compatible third-party stream handling; it keeps an explicit origin allowlist.
