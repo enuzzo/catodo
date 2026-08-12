@@ -260,12 +260,14 @@ function renderChannelTiles(container, channels, t, options = {}) {
       dataset: { action: options.action || 'open-channel', channelId: id },
       'aria-label': translate(t, 'channel.openAriaLabel', 'Open {name}', { name: safeText(channel?.name) }),
     });
-    main.append(textNode('span', 'channel-tile__number', t, 'channel.number', '{number}', {
+    const masthead = element('span', 'channel-tile__masthead');
+    masthead.append(textNode('span', 'channel-tile__number', t, 'channel.number', '{number}', {
       number: channelNumber(channel, index),
     }));
     const logo = element('span', 'channel-logo channel-tile__logo');
     renderLogo(logo, channel, t);
-    main.append(logo);
+    masthead.append(logo);
+    main.append(masthead);
     const name = element('strong', 'channel-tile__name');
     name.textContent = safeText(channel?.name, translate(t, 'channel.unknown', 'Unknown channel'));
     main.append(name, channelMeta(channel));
@@ -439,7 +441,18 @@ function createHomeView(t) {
   liveStage.append(video, liveBadge, mute, nowBar);
 
   const liveInfo = element('div', 'live-anchor__info');
+  const channelHeading = element('div', 'live-anchor__heading');
   const channelName = textNode('h2', 'live-anchor__name', t, 'channel.unknown', 'Unknown channel');
+  const favorite = iconButton({
+    t,
+    action: 'add-favorite',
+    iconName: 'heart',
+    key: 'favorite.add',
+    fallback: 'Add to favorites',
+    className: 'live-anchor__favorite',
+  });
+  favorite.setAttribute('aria-pressed', 'false');
+  channelHeading.append(channelName, favorite);
   const description = textNode('p', 'live-anchor__description', t, 'home.liveDescriptionFallback', 'Live television from around the world');
   const facts = element('dl', 'live-anchor__facts');
   const factNodes = {};
@@ -456,7 +469,7 @@ function createHomeView(t) {
     facts.append(group);
     factNodes[name] = value;
   });
-  liveInfo.append(channelName, description, facts);
+  liveInfo.append(channelHeading, description, facts);
 
   const liveActions = element('div', 'live-anchor__actions');
   const openPlayer = actionButton({
@@ -532,6 +545,7 @@ function createHomeView(t) {
     liveClock: nowBar.querySelector('.live-clock'),
     mute,
     channelName,
+    favorite,
     description,
     facts: factNodes,
     openPlayer,
@@ -1991,6 +2005,14 @@ function setFeatured(refs, channel, t) {
   refs.openPlayer.dataset.channelId = id;
   refs.random.dataset.currentChannelId = id;
   refs.channelName.textContent = safeText(value.name, translate(t, 'channel.unknown', 'Unknown channel'));
+  const isFavorite = Boolean(value.favorite || value.isFavorite);
+  refs.favorite.dataset.channelId = id;
+  refs.favorite.dataset.action = isFavorite ? 'remove-favorite' : 'add-favorite';
+  refs.favorite.classList.toggle('is-active', isFavorite);
+  refs.favorite.setAttribute('aria-pressed', isFavorite ? 'true' : 'false');
+  refs.favorite.setAttribute('aria-label', translate(t, isFavorite ? 'favorite.remove' : 'favorite.add', isFavorite ? 'Remove from favorites' : 'Add to favorites'));
+  refs.favorite.title = refs.favorite.getAttribute('aria-label');
+  refs.favorite.replaceChildren(icon('heart'));
   refs.description.textContent = safeText(
     value.description || value.tagline,
     translate(t, 'home.liveDescriptionFallback', 'Live television from around the world'),

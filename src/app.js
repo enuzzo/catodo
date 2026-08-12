@@ -361,6 +361,16 @@ function setHomeFeatured(channel, { retune = true, resetFailures = true } = {}) 
   if (retune) tuneHome(channel);
 }
 
+function nextRandomHomeChannel() {
+  const playable = playableChannels();
+  if (!playable.length) return null;
+  const next = catalog.randomPlayable({ currentChannelId: state.featuredId, filters: {} });
+  if (next && isPlayableChannel(next) && (playable.length === 1 || channelId(next) !== state.featuredId)) return next;
+  const alternatives = playable.filter((channel) => channelId(channel) !== state.featuredId);
+  const pool = alternatives.length ? alternatives : playable;
+  return pool[Math.floor(Math.random() * pool.length)] || null;
+}
+
 function renderHome() {
   const snapshot = state.lastCatalog;
   if (!snapshot) return;
@@ -755,6 +765,16 @@ function closeOverlays() {
   ui.showMultiviewSignalLab(false);
   ui.showChannelPicker(false);
   ui.showView(state.view);
+  if (state.view === "home") {
+    refreshWorldMix();
+    const randomHome = nextRandomHomeChannel();
+    if (randomHome) {
+      state.featuredId = channelId(randomHome);
+      renderHome();
+      void tuneHome(randomHome);
+      return;
+    }
+  }
   void syncShellPreview();
 }
 
@@ -855,11 +875,19 @@ async function handleAction(action, detail) {
   if (ui.refs.root.dataset.mode === "multiview" && action !== "toggle-multiview-chrome") revealMultiviewChrome();
   switch (action) {
     case "navigate": {
+      const targetView = detail.dataset.mode === "explore" ? "explore" : detail.dataset.view || "home";
+      const shouldRandomizeHome = targetView === "home";
       state.view = detail.dataset.mode === "explore" ? "explore" : detail.dataset.view || "home";
+      if (shouldRandomizeHome) {
+        refreshWorldMix();
+        const randomHome = nextRandomHomeChannel();
+        if (randomHome) state.featuredId = channelId(randomHome);
+      }
       renderAll();
       ui.showView(state.view);
       if (state.view === "guide") void loadSchedules(playableChannels().slice(0, 48));
-      await syncShellPreview();
+      if (shouldRandomizeHome) await tuneHome(findChannel(state.featuredId));
+      else await syncShellPreview();
       break;
     }
     case "filter-explore": {
@@ -937,8 +965,7 @@ async function handleAction(action, detail) {
       await openPlayer(findChannel(id || state.featuredId));
       break;
     case "random-channel": {
-      const next = catalog.randomPlayable({ currentChannelId: state.featuredId, filters: {} });
-      const compatible = isPlayableChannel(next) ? next : playableChannels().find((channel) => channelId(channel) !== state.featuredId);
+      const compatible = nextRandomHomeChannel();
       if (compatible) setHomeFeatured(compatible);
       else ui.toast("Import a playlist to activate Random.", { tone: "error" });
       break;

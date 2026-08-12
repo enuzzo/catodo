@@ -47,6 +47,28 @@ The Home preserves Catodo's approved Soft Signal Grid while applying the annotat
 
 final result: passed
 
+## Home channel-card hierarchy — 2026-08-12
+
+- Source visual truth: `/var/folders/48/00rryty17dzb6g7877yxqym00000gn/T/codex-clipboard-57fba3de-2a84-4280-9c03-a113c7d335e6.png`.
+- Implementation evidence: in-app Browser at 1536 × 900 and 390 × 844 CSS px.
+- The former vertical stack left large blank regions when grid rows stretched. Cards now use a masthead for number + contained logo, a 19 px desktop title, wrapped metadata chips, and a bottom-aligned Now/Next strip.
+- Nine dashboard cards remain visible at desktop; mobile uses one resilient 347 px card column with no horizontal body overflow.
+- Favorite hearts are visible on the dashboard directory and the featured live channel uses the same red active-state language.
+- Console/framework health: no warnings, errors or overlays.
+- Automated verification: 64/64 tests, syntax check, production build and diff check passed.
+
+final result: passed
+
+## Home re-entry random + featured favorite — 2026-08-12
+
+- Implementation evidence: in-app Browser at 1536 × 900 CSS px.
+- Flow: Live channel → Countries → Live. The featured channel changed from Nopola News to South Park – Pluto TV, and the media blob source changed, proving a real retune rather than a cosmetic card swap.
+- The featured heart sits immediately after the channel name, reuses the established heart language, and switches `add-favorite` → `remove-favorite` with `aria-pressed=true` while the app remains in shell/Home mode.
+- Console/framework health: no warnings, errors or overlays.
+- Automated verification: 64/64 tests, syntax check, production build and diff check passed.
+
+final result: passed
+
 ## Countries Atlas → channel directory iteration — 2026-08-12
 
 - Source visual truth: `/var/folders/48/00rryty17dzb6g7877yxqym00000gn/T/codex-clipboard-07915d1c-c6db-4807-8c36-711436beadfc.png`.
