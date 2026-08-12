@@ -1,5 +1,5 @@
 import { renderCountryShape, renderWorldMap } from './world-map.js';
-import { shouldActivateShellView } from './view-mode.js';
+import { isPrimaryNavActive, shouldActivateShellView } from './view-mode.js';
 
 const FLAG_URLS = import.meta.glob('../../assets/vendor/flags/4x3/*.svg', {
   eager: true,
@@ -527,6 +527,7 @@ function createHomeView(t) {
     openPlayer,
     random,
     nearbyGrid,
+    atlas,
     map,
     favoriteGrid,
   };
@@ -1972,7 +1973,7 @@ export function mountAppUI(root, options = {}) {
     root.dataset.mode = 'shell';
     root.dataset.view = viewName;
     Object.entries(header.navButtons).forEach(([key, button]) => {
-      const active = key === viewName || (key === 'explore' && viewName === 'home' && root.dataset.homeMode === 'explore');
+      const active = isPrimaryNavActive(key, viewName, root.dataset.homeMode);
       button.classList.toggle('is-active', active);
       button.toggleAttribute('aria-current', active);
     });
@@ -1997,6 +1998,7 @@ export function mountAppUI(root, options = {}) {
       homeVideo: home.video,
       homeMap: home.map,
       homeChannelGrid: home.nearbyGrid,
+      homeAtlas: home.atlas,
       favoriteGrid: home.favoriteGrid,
       countries: countries.view,
       countryMap: countries.map,
@@ -2057,6 +2059,19 @@ export function mountAppUI(root, options = {}) {
       if (state.signalOk !== undefined) {
         signalBar.status.classList.toggle('is-error', !state.signalOk);
       }
+      return api;
+    },
+
+    focusExplore() {
+      home.atlas.tabIndex = -1;
+      scheduleFrame(() => {
+        home.atlas.focus({ preventScroll: true });
+        home.atlas.scrollIntoView({
+          behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+          block: 'nearest',
+          inline: 'nearest',
+        });
+      });
       return api;
     },
 

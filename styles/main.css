@@ -1166,6 +1166,16 @@ textarea {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: var(--paper-raised);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.catodo-app[data-home-mode="explore"] .atlas-card {
+  border-color: var(--signal);
+  box-shadow: 0 0 0 3px rgb(20 98 246 / 10%), 0 14px 34px rgb(20 98 246 / 9%);
+}
+
+.atlas-card:focus {
+  outline: none;
 }
 
 .atlas-card__header {

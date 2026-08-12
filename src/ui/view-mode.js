@@ -7,3 +7,8 @@ const OVERLAY_MODES = new Set(['player', 'multiview']);
 export function shouldActivateShellView(mode, requested = true) {
   return requested !== false && !OVERLAY_MODES.has(String(mode || ''));
 }
+
+export function isPrimaryNavActive(key, viewName, homeMode = 'live') {
+  if (viewName === 'home') return key === (homeMode === 'explore' ? 'explore' : 'home');
+  return key === viewName;
+}

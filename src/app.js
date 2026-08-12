@@ -24,6 +24,7 @@ const QA_MODE = new URLSearchParams(location.search).has("qa");
 
 const state = {
   view: "home",
+  homeMode: "live",
   query: "",
   libraryQuery: "",
   countryQuery: "",
@@ -444,7 +445,13 @@ function renderAll() {
   renderCountries();
   renderLibrary();
   renderSources();
-  ui.updateHeader({ view: state.view, query: state.query, time: formatClock(), signalOk: !state.lastCatalog?.error });
+  ui.updateHeader({
+    view: state.view,
+    homeMode: state.homeMode,
+    query: state.query,
+    time: formatClock(),
+    signalOk: !state.lastCatalog?.error,
+  });
 }
 
 async function tuneHome(channel) {
@@ -625,11 +632,29 @@ async function copyDiagnostics() {
 async function handleAction(action, detail) {
   const id = detail.dataset.channelId || detail.element?.closest?.("[data-channel-id]")?.dataset.channelId;
   switch (action) {
-    case "navigate":
+    case "navigate": {
+      const explore = detail.dataset.mode === "explore";
       state.view = detail.dataset.view || "home";
+      if (state.view === "home") state.homeMode = explore ? "explore" : "live";
+
+      let nextExploreChannel = null;
+      if (explore) {
+        refreshWorldMix();
+        const random = catalog.randomWorld({ currentChannelId: state.featuredId });
+        nextExploreChannel = random && isPlayableChannel(random)
+          ? random
+          : state.worldMixIds.map(findChannel).find((channel) => channel && channelId(channel) !== state.featuredId) || null;
+        if (nextExploreChannel) state.featuredId = channelId(nextExploreChannel);
+      }
+
       renderAll();
       ui.showView(state.view);
+      if (explore) {
+        ui.focusExplore();
+        if (nextExploreChannel) tuneHome(nextExploreChannel);
+      }
       break;
+    }
     case "search-query":
       state.query = detail.value || "";
       if (state.query.trim()) {
