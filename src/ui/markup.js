@@ -980,6 +980,91 @@ function createSignalLab(t) {
   return { panel, profile, chart, canvas, scale: { max, mid, min }, metrics: metricNodes };
 }
 
+function createMultiviewSignalLab(t) {
+  const backdrop = element('div', 'modal-backdrop multiview-lab-backdrop', {
+    hidden: true,
+    dataset: { overlay: 'multiview-signal-lab' },
+  });
+  const dialog = element('section', 'modal multiview-lab', {
+    role: 'dialog',
+    'aria-modal': 'true',
+    'aria-labelledby': 'multiview-lab-title',
+  });
+  const header = element('div', 'modal__header');
+  const heading = element('div');
+  const title = textNode('h2', null, t, 'signalLab.multiviewTitle', 'Multiview telemetry');
+  title.id = 'multiview-lab-title';
+  heading.append(title, textNode('p', null, t, 'signalLab.multiviewHint', 'Live browser measurements for every active feed.'));
+  header.append(heading, iconButton({
+    t,
+    action: 'close-multiview-signal-lab',
+    iconName: 'x',
+    key: 'common.close',
+    fallback: 'Close',
+  }));
+  const totals = element('dl', 'multiview-lab__totals');
+  const totalNodes = {};
+  [
+    ['download', 'arrow-down', 'signalLab.aggregateDownload', 'Download'],
+    ['received', 'download-simple', 'signalLab.aggregateReceived', 'Received'],
+    ['buffer', 'timer', 'signalLab.aggregateBuffer', 'Total buffer'],
+    ['upload', 'arrow-up', 'signalLab.upload', 'Upload'],
+  ].forEach(([key, iconName, labelKey, fallback]) => {
+    const item = element('div');
+    item.append(icon(iconName), textNode('dt', null, t, labelKey, fallback));
+    const value = element('dd', 'mono');
+    value.textContent = key === 'upload' ? 'N/A' : '—';
+    item.append(value);
+    totals.append(item);
+    totalNodes[key] = value;
+  });
+  const feeds = element('div', 'multiview-lab__feeds');
+  const footer = element('div', 'multiview-lab__footer');
+  footer.append(
+    icon('info'),
+    textNode('span', null, t, 'signalLab.uploadExplanation', 'Upload is unavailable: HLS playback is receive-only.'),
+  );
+  dialog.append(header, totals, feeds, footer);
+  backdrop.append(dialog);
+  return { backdrop, dialog, totals: totalNodes, feeds };
+}
+
+function renderMultiviewLabFeeds(container, feeds, t) {
+  const fragment = document.createDocumentFragment();
+  normaliseArray(feeds).forEach((feed, index) => {
+    const row = element('article', 'multiview-lab__feed');
+    const identity = element('div', 'multiview-lab__identity');
+    const slot = element('strong', 'mono');
+    slot.textContent = String(index + 1).padStart(2, '0');
+    const copy = element('div');
+    const name = element('strong');
+    name.textContent = safeText(feed?.channel?.name, translate(t, 'channel.unknown', 'Unknown channel'));
+    const route = element('span', 'mono');
+    route.textContent = safeText(feed?.route, 'DIRECT').toUpperCase();
+    copy.append(name, route);
+    identity.append(slot, copy);
+    const measurements = element('dl', 'multiview-lab__measurements');
+    [
+      ['↓', feed?.download || '0.00 Mbps'],
+      ['BUFFER', feed?.buffer || '0.0 s'],
+      ['VIDEO', feed?.resolution || 'N/A'],
+      ['FPS', feed?.fps || '0.0'],
+      ['DROP', safeText(feed?.dropped, '0')],
+    ].forEach(([label, value]) => {
+      const item = element('div');
+      const dt = element('dt');
+      dt.textContent = label;
+      const dd = element('dd', 'mono');
+      dd.textContent = value;
+      item.append(dt, dd);
+      measurements.append(item);
+    });
+    row.append(identity, measurements);
+    fragment.append(row);
+  });
+  container.replaceChildren(fragment);
+}
+
 function createPlayer(t) {
   const overlay = element('section', 'player-view', {
     hidden: true,
@@ -1189,7 +1274,7 @@ function createMultiview(t) {
     ['feeds', 'broadcast', 'multiview.liveFeeds', '{count} live feeds', 'multiview.active', 'Active'],
     ['throughput', 'trend-up', 'multiview.totalThroughput', 'Total {value}', 'multiview.aggregateThroughput', 'Aggregate throughput'],
     ['audio', 'speaker-high', 'multiview.audioFeed', 'Audio {slot}', 'multiview.youAreListening', 'You’re listening'],
-    ['signal', 'cell-signal-high', 'status.signalOk', 'Signal OK', 'multiview.allStable', 'All feeds stable'],
+    ['signal', 'download-simple', 'signalLab.received', '0 B received', 'signalLab.measured', 'Measured'],
   ];
   statusDefinitions.forEach(([name, iconName, key, fallback, subKey, subFallback]) => {
     const item = element('div', 'multiview-status__item');
@@ -1397,16 +1482,22 @@ function createSignalBar(t) {
   const bars = element('div', 'ebu-bars', { 'aria-hidden': 'true' });
   for (let index = 0; index < 8; index += 1) bars.append(element('i'));
   const network = element('div', 'signal-bar__network');
-  network.append(
-    textNode('span', null, t, 'footer.network', 'Network'),
-    textNode('span', null, t, 'footer.networkType', '5G'),
-    icon('cell-signal-high'),
-  );
+  const downLabel = textNode('span', 'signal-bar__telemetry-label', t, 'footer.download', 'Down');
+  const downValue = element('strong', 'mono');
+  downValue.textContent = '0.00 Mbps';
+  const upLabel = textNode('span', 'signal-bar__telemetry-label', t, 'footer.upload', 'Up');
+  const upValue = element('strong', 'mono');
+  upValue.textContent = 'N/A';
+  network.append(icon('arrow-down'), downLabel, downValue, icon('arrow-up'), upLabel, upValue);
   const status = element('div', 'signal-bar__status');
-  const statusText = textNode('span', null, t, 'status.signalOk', 'Signal OK');
-  status.append(statusText, icon('check-circle'));
+  const statusLabel = textNode('span', 'signal-bar__telemetry-label', t, 'footer.buffer', 'Buffer');
+  const statusText = element('strong', 'mono');
+  statusText.textContent = '—';
+  const statusMeta = element('span', 'signal-bar__status-meta mono');
+  statusMeta.textContent = 'Waiting';
+  status.append(icon('waveform'), statusLabel, statusText, statusMeta);
   bar.append(region, clock, bars, network, status);
-  return { bar, clock, status, statusText, network };
+  return { bar, clock, status, statusText, statusMeta, network, downValue, upValue };
 }
 
 function renderCountryRows(container, countries, t, selectedIso2) {
@@ -1844,6 +1935,7 @@ export function mountAppUI(root, options = {}) {
   const sources = createSourcesView(t);
   const player = createPlayer(t);
   const multiview = createMultiview(t);
+  const multiviewSignalLab = createMultiviewSignalLab(t);
   const channelPicker = createChannelPicker(t);
   const importDialog = createImportDialog(t);
   const signalBar = createSignalBar(t);
@@ -1853,7 +1945,7 @@ export function mountAppUI(root, options = {}) {
   main.append(home.view, countries.view, library.view, sources.view);
   shell.append(header.header, main, signalBar.bar);
   root.classList.add('catodo-app');
-  root.replaceChildren(shell, player.overlay, multiview.overlay, channelPicker.backdrop, importDialog.backdrop);
+  root.replaceChildren(shell, player.overlay, multiview.overlay, multiviewSignalLab.backdrop, channelPicker.backdrop, importDialog.backdrop);
 
   const toastRegion = element('div', 'toast-region', {
     'aria-live': 'polite',
@@ -1924,6 +2016,7 @@ export function mountAppUI(root, options = {}) {
       multiviewGrid: multiview.grid,
       multiviewSlots: multiview.slots,
       multiviewVideos: multiview.slots.map((slot) => slot.video),
+      multiviewSignalLab: multiviewSignalLab.backdrop,
       channelPicker: channelPicker.backdrop,
       channelPickerInput: channelPicker.input,
       channelPickerResults: channelPicker.results,
@@ -1953,15 +2046,30 @@ export function mountAppUI(root, options = {}) {
         signalBar.clock.textContent = safeText(state.time);
       }
       if (state.network !== undefined) signalBar.network.dataset.state = safeText(state.network).toLowerCase();
+      if (state.telemetry) {
+        signalBar.downValue.textContent = safeText(state.telemetry.download, '0.00 Mbps');
+        signalBar.upValue.textContent = safeText(state.telemetry.upload, 'N/A');
+        signalBar.statusText.textContent = safeText(state.telemetry.buffer, '—');
+        signalBar.statusMeta.textContent = safeText(state.telemetry.detail, 'Waiting');
+        signalBar.status.classList.toggle('is-error', Boolean(state.telemetry.issue));
+      }
       if (state.signalOk !== undefined) {
         signalBar.status.classList.toggle('is-error', !state.signalOk);
-        setTranslatedText(
-          signalBar.statusText,
-          t,
-          state.signalOk ? 'status.signalOk' : 'status.signalIssue',
-          state.signalOk ? 'Signal OK' : 'Signal issue',
-        );
       }
+      return api;
+    },
+
+    showMultiviewSignalLab(state = {}) {
+      if (state === false || state?.open === false) {
+        multiviewSignalLab.backdrop.hidden = true;
+        return api;
+      }
+      multiviewSignalLab.totals.download.textContent = safeText(state.download, '0.00 Mbps');
+      multiviewSignalLab.totals.received.textContent = safeText(state.received, '0 B');
+      multiviewSignalLab.totals.buffer.textContent = safeText(state.buffer, '0.0 s');
+      multiviewSignalLab.totals.upload.textContent = safeText(state.upload, 'N/A');
+      renderMultiviewLabFeeds(multiviewSignalLab.feeds, state.feeds, t);
+      multiviewSignalLab.backdrop.hidden = false;
       return api;
     },
 
@@ -2190,12 +2298,7 @@ export function mountAppUI(root, options = {}) {
       setTranslatedText(multiview.status.audio.value, t, 'multiview.audioFeed', 'Audio {slot}', {
         slot: audioIndex !== null && feeds[audioIndex] ? String(audioIndex + 1).padStart(2, '0') : '—',
       });
-      setTranslatedText(
-        multiview.status.signal.value,
-        t,
-        state.signalOk === false ? 'status.signalIssue' : 'status.signalOk',
-        state.signalOk === false ? 'Signal issue' : 'Signal OK',
-      );
+      multiview.status.signal.value.textContent = safeText(state.received, '0 B received');
       return api;
     },
 

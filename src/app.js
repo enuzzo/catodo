@@ -13,6 +13,7 @@ import i18n from "./i18n/index.js";
 import { MultiviewController, PlayerManager } from "./player/index.js";
 import { mountAppUI } from "./ui/markup.js";
 import { filterChannelPicker } from "./ui/channel-picker-filter.js";
+import { multiviewTelemetry, singleTelemetry } from "./ui/telemetry-model.js";
 import { resetWorldMapView, zoomWorldMap } from "./ui/world-map.js";
 
 const UI_CHANNEL_LIMIT = 72;
@@ -49,6 +50,7 @@ const state = {
   proxy: "",
   lastCatalog: null,
   throughputHistory: [],
+  multiviewTelemetry: null,
 };
 
 let catalog;
@@ -543,11 +545,13 @@ async function replaceMultiviewSlot(index, channel) {
 function updateMultiviewMetrics() {
   const metrics = multiview?.getAggregateMetrics();
   if (!metrics || ui.refs.root.dataset.mode !== "multiview") return;
+  state.multiviewTelemetry = multiviewTelemetry(metrics, state.multiviewFeeds.slice(0, state.multiviewLayout).map(decorateChannel));
   ui.updateMultiview({
     feeds: state.multiviewFeeds.slice(0, state.multiviewLayout).map(decorateChannel),
     layout: state.multiviewLayout,
     audioIndex: state.multiviewAudioIndex,
     throughput: formatRate(metrics.downloadThroughput),
+    received: `${state.multiviewTelemetry.received} received`,
     signalOk: !metrics.slots.some((entry) => entry.metrics.waiting),
   });
 }
@@ -556,6 +560,8 @@ function closeOverlays() {
   mainPlayer.setMuted(true);
   multiview.muteAll();
   state.multiviewAudioIndex = null;
+  ui.showMultiviewSignalLab(false);
+  ui.showChannelPicker(false);
   ui.showView(state.view);
   if (state.featuredId) tuneHome(findChannel(state.featuredId));
 }
@@ -830,7 +836,9 @@ async function handleAction(action, detail) {
     }
     case "open-signal-lab":
       if (ui.refs.root.dataset.mode === "multiview") {
-        ui.toast("Aggregate Signal Lab is summarized in the status strip.");
+        const metrics = multiview.getAggregateMetrics();
+        state.multiviewTelemetry = multiviewTelemetry(metrics, state.multiviewFeeds.slice(0, state.multiviewLayout).map(decorateChannel));
+        ui.showMultiviewSignalLab(state.multiviewTelemetry);
       } else {
         const metrics = mainPlayer.getMetrics();
         ui.showSignalLab({
@@ -840,6 +848,9 @@ async function handleAction(action, detail) {
           maxMbps: 20,
         });
       }
+      break;
+    case "close-multiview-signal-lab":
+      ui.showMultiviewSignalLab(false);
       break;
     case "close-signal-lab":
       ui.showSignalLab(false);
@@ -1029,6 +1040,24 @@ async function boot() {
       maxMbps: 20,
     });
     updateMultiviewMetrics();
+    const footerMetrics = ui.refs.root.dataset.mode === "multiview"
+      ? multiview.getAggregateMetrics()
+      : ui.refs.root.dataset.mode === "player"
+        ? metrics
+        : homePlayer.getMetrics();
+    const footerTelemetry = ui.refs.root.dataset.mode === "multiview"
+      ? singleTelemetry({
+          downloadThroughput: footerMetrics.downloadThroughput,
+          bufferSeconds: footerMetrics.slots.reduce((sum, entry) => sum + (entry.metrics.bufferSeconds || 0), 0),
+          frames: { dropped: footerMetrics.droppedFrames },
+          waiting: footerMetrics.slots.some((entry) => entry.metrics.waiting),
+        })
+      : singleTelemetry(footerMetrics);
+    ui.updateHeader({ telemetry: footerTelemetry });
+    if (!ui.refs.multiviewSignalLab.hidden && ui.refs.root.dataset.mode === "multiview") {
+      state.multiviewTelemetry = multiviewTelemetry(footerMetrics, state.multiviewFeeds.slice(0, state.multiviewLayout).map(decorateChannel));
+      ui.showMultiviewSignalLab(state.multiviewTelemetry);
+    }
   }, 1000);
 
   await bootPromise;

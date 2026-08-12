@@ -20,6 +20,12 @@
     "randomHint": "Play another live channel",
     "explore": "Explore the world"
   },
+  "footer": {
+    "global": "Global",
+    "download": "Down",
+    "upload": "Up",
+    "buffer": "Buffer"
+  },
   "catalog": {
     "favorites": "Favorites",
     "history": "History",
@@ -74,6 +80,12 @@
     }
   },
   "signalLab": {
+    "multiviewTitle": "Multiview telemetry",
+    "multiviewHint": "Live browser measurements for every active feed.",
+    "aggregateDownload": "Download",
+    "aggregateReceived": "Received",
+    "aggregateBuffer": "Total buffer",
+    "uploadExplanation": "Upload is unavailable: HLS playback is receive-only.",
     "channelProfile": "Channel profile",
     "profileUnavailable": "Official metadata is not available for this source yet.",
     "officialWebsite": "Official website",
