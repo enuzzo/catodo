@@ -2,6 +2,43 @@ import worldMap from '../../assets/vendor/map/world-map.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const instances = new WeakMap();
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 2.45;
+
+const clamp = (value, minimum, maximum) => Math.max(minimum, Math.min(maximum, value));
+
+export function calculateZoomedViewBox(baseViewBox, currentViewBox, nextZoomValue, focusPoint, focusRatio) {
+  if (!Array.isArray(baseViewBox) || baseViewBox.length !== 4) return null;
+  const [baseX, baseY, baseWidth, baseHeight] = baseViewBox.map(Number);
+  const current = Array.isArray(currentViewBox) && currentViewBox.length === 4
+    ? currentViewBox.map(Number)
+    : [baseX, baseY, baseWidth, baseHeight];
+  if (![baseX, baseY, baseWidth, baseHeight, ...current].every(Number.isFinite) || baseWidth <= 0 || baseHeight <= 0) return null;
+
+  const zoom = clamp(Number(nextZoomValue) || MIN_ZOOM, MIN_ZOOM, MAX_ZOOM);
+  const [currentX, currentY, currentWidth, currentHeight] = current;
+  const point = {
+    x: Number.isFinite(focusPoint?.x) ? Number(focusPoint.x) : currentX + currentWidth / 2,
+    y: Number.isFinite(focusPoint?.y) ? Number(focusPoint.y) : currentY + currentHeight / 2,
+  };
+  const ratioX = clamp(
+    Number.isFinite(focusRatio?.x) ? Number(focusRatio.x) : (point.x - currentX) / currentWidth,
+    0,
+    1,
+  );
+  const ratioY = clamp(
+    Number.isFinite(focusRatio?.y) ? Number(focusRatio.y) : (point.y - currentY) / currentHeight,
+    0,
+    1,
+  );
+  const width = baseWidth / zoom;
+  const height = baseHeight / zoom;
+  const maxX = baseX + baseWidth - width;
+  const maxY = baseY + baseHeight - height;
+  const x = clamp(point.x - ratioX * width, baseX, maxX);
+  const y = clamp(point.y - ratioY * height, baseY, maxY);
+  return { zoom, viewBox: [x, y, width, height] };
+}
 
 function svgElement(name, attributes = {}) {
   const node = document.createElementNS(SVG_NS, name);
@@ -97,10 +134,102 @@ function buildMap(container, t) {
     markers,
     pathsByIso2,
     baseViewBox,
+    viewBox: [...baseViewBox],
     zoom: 1,
   };
+  bindMapGestures(instance);
   instances.set(container, instance);
   return instance;
+}
+
+function pointFromClient(instance, clientX, clientY) {
+  const ctm = instance.svg.getScreenCTM?.();
+  if (ctm?.inverse) {
+    try {
+      const inverse = ctm.inverse();
+      return {
+        x: inverse.a * clientX + inverse.c * clientY + inverse.e,
+        y: inverse.b * clientX + inverse.d * clientY + inverse.f,
+      };
+    }
+    catch { /* fall through to the bounding-box approximation */ }
+  }
+  const bounds = instance.svg.getBoundingClientRect?.();
+  if (!bounds?.width || !bounds?.height) return null;
+  const [x, y, width, height] = instance.viewBox;
+  const scale = Math.min(bounds.width / width, bounds.height / height);
+  const renderedWidth = width * scale;
+  const renderedHeight = height * scale;
+  const renderedLeft = bounds.left + (bounds.width - renderedWidth) / 2;
+  const renderedTop = bounds.top + (bounds.height - renderedHeight) / 2;
+  return {
+    x: x + clamp((clientX - renderedLeft) / renderedWidth, 0, 1) * width,
+    y: y + clamp((clientY - renderedTop) / renderedHeight, 0, 1) * height,
+  };
+}
+
+function applyZoom(instance, nextZoom, focusPoint, focusRatio) {
+  const result = calculateZoomedViewBox(
+    instance.baseViewBox,
+    instance.viewBox,
+    nextZoom,
+    focusPoint,
+    focusRatio,
+  );
+  if (!result) return null;
+  instance.zoom = result.zoom;
+  instance.viewBox = result.viewBox;
+  instance.svg.setAttribute('viewBox', result.viewBox.join(' '));
+  return instance;
+}
+
+function touchDistance(first, second) {
+  return Math.hypot(second.clientX - first.clientX, second.clientY - first.clientY);
+}
+
+function bindMapGestures(instance) {
+  let pinch = null;
+  instance.svg.addEventListener('wheel', (event) => {
+    event.preventDefault();
+    const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? 640 : 1;
+    const factor = Math.exp(-event.deltaY * unit * 0.0016);
+    applyZoom(instance, instance.zoom * factor, pointFromClient(instance, event.clientX, event.clientY));
+  }, { passive: false });
+
+  instance.svg.addEventListener('touchstart', (event) => {
+    if (event.touches.length < 2) return;
+    const [first, second] = event.touches;
+    const point = pointFromClient(
+      instance,
+      (first.clientX + second.clientX) / 2,
+      (first.clientY + second.clientY) / 2,
+    );
+    const [x, y, width, height] = instance.viewBox;
+    pinch = {
+      distance: Math.max(1, touchDistance(first, second)),
+      zoom: instance.zoom,
+      point,
+      ratio: point ? { x: (point.x - x) / width, y: (point.y - y) / height } : null,
+    };
+  }, { passive: true });
+
+  instance.svg.addEventListener('touchmove', (event) => {
+    if (!pinch || event.touches.length < 2) return;
+    event.preventDefault();
+    const [first, second] = event.touches;
+    applyZoom(
+      instance,
+      pinch.zoom * (touchDistance(first, second) / pinch.distance),
+      pinch.point,
+      pinch.ratio,
+    );
+  }, { passive: false });
+
+  const endPinch = (event) => {
+    if (event.touches.length < 2) pinch = null;
+  };
+  instance.svg.addEventListener('touchend', endPinch, { passive: true });
+  instance.svg.addEventListener('touchcancel', endPinch, { passive: true });
 }
 
 function markerPointForInstance(instance, marker) {
@@ -190,23 +319,17 @@ export function getWorldMapInstance(container) {
 export function zoomWorldMap(container, direction = 'in') {
   const instance = instances.get(container);
   if (!instance || instance.baseViewBox.length !== 4) return null;
-  const [baseX, baseY, baseWidth, baseHeight] = instance.baseViewBox;
   const nextZoom = direction === 'out'
-    ? Math.max(1, instance.zoom / 1.25)
-    : Math.min(2.45, instance.zoom * 1.25);
-  instance.zoom = nextZoom;
-  const width = baseWidth / nextZoom;
-  const height = baseHeight / nextZoom;
-  const x = baseX + (baseWidth - width) / 2;
-  const y = baseY + (baseHeight - height) / 2;
-  instance.svg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
-  return instance;
+    ? instance.zoom / 1.25
+    : instance.zoom * 1.25;
+  return applyZoom(instance, nextZoom);
 }
 
 export function resetWorldMapView(container) {
   const instance = instances.get(container);
   if (!instance) return null;
   instance.zoom = 1;
+  instance.viewBox = [...instance.baseViewBox];
   instance.svg.setAttribute('viewBox', worldMap.viewBox);
   return instance;
 }
