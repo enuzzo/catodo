@@ -52,6 +52,11 @@ const DENY_HOSTS = [
 // upstream from making the worker buffer something huge into memory.
 const MAX_PLAYLIST_BYTES = 5 * 1024 * 1024;
 
+// Redirects are followed manually so that every destination is subjected to
+// the same SSRF checks as the URL supplied by the caller. This also puts a
+// finite bound on redirect loops.
+const MAX_REDIRECTS = 5;
+
 // Rules for hosts that require specific headers.
 // Add one here when a channel returns 403 but works in a normal browser.
 const RULES = {
@@ -79,28 +84,42 @@ export default {
 
     let up;
     try { up = new URL(target); } catch { return bad("Invalid URL", 400, callerOrigin); }
-    if (!/^https?:$/.test(up.protocol)) return bad("Only http and https", 400, callerOrigin);
-    if (DENY_HOSTS.some(re => re.test(up.hostname))) return bad("Host not allowed", 400, callerOrigin);
-
-    // outgoing headers
-    const out = new Headers({
-      "user-agent": UA,
-      "accept": "*/*",
-      "accept-language": "it-IT,it;q=0.9,en;q=0.8"
-    });
-    const rule = RULES[up.hostname] || RULES[up.hostname.replace(/^www\./, "")];
-    if (rule) for (const [k, v] of Object.entries(rule)) out.set(k, v);
-    else out.set("referer", up.origin + "/");
+    const targetError = validateTarget(up);
+    if (targetError) return bad(targetError, 400, callerOrigin);
 
     // range passthrough, needed for segments
     const range = request.headers.get("range");
-    if (range) out.set("range", range);
 
     let res;
-    try {
-      res = await fetch(up.toString(), { headers: out, redirect: "follow", cf: { cacheTtl: 0 } });
-    } catch (e) {
-      return bad("Origin unreachable: " + e.message, 502, callerOrigin);
+    let redirects = 0;
+    while (true) {
+      try {
+        res = await fetch(up.toString(), {
+          headers: outgoingHeaders(up, range),
+          redirect: "manual",
+          cf: { cacheTtl: 0 }
+        });
+      } catch (e) {
+        return bad("Origin unreachable: " + e.message, 502, callerOrigin);
+      }
+
+      if (!isRedirect(res.status)) break;
+
+      const location = res.headers.get("location");
+      // A redirect response without Location cannot be followed and is passed
+      // through just like any other non-playlist upstream response.
+      if (location === null) break;
+      if (redirects >= MAX_REDIRECTS) return bad("Too many redirects", 502, callerOrigin);
+
+      let next;
+      try { next = new URL(location, up); }
+      catch { return bad("Invalid redirect URL", 502, callerOrigin); }
+
+      const redirectError = validateTarget(next);
+      if (redirectError) return bad(redirectError, 400, callerOrigin);
+
+      up = next;
+      redirects += 1;
     }
 
     const ct = (res.headers.get("content-type") || "").toLowerCase();
@@ -117,7 +136,7 @@ export default {
       const text = await res.text();
       if (text.length > MAX_PLAYLIST_BYTES) return bad("Playlist too large", 502, callerOrigin);
 
-      const body = rewrite(text, res.url || up.toString(), here.origin + here.pathname);
+      const body = rewrite(text, up.toString(), here.origin + here.pathname);
       return new Response(body, {
         status: res.status,
         headers: cors({
@@ -141,6 +160,32 @@ export default {
     return new Response(res.body, { status: res.status, headers: h });
   }
 };
+
+/** Returns a public error message when a URL is unsafe to fetch. */
+function validateTarget(url) {
+  if (!/^https?:$/.test(url.protocol)) return "Only http and https";
+  if (url.username || url.password) return "Credentials not allowed";
+  if (DENY_HOSTS.some(re => re.test(url.hostname))) return "Host not allowed";
+  return null;
+}
+
+/** Builds host-specific headers afresh for each redirect destination. */
+function outgoingHeaders(url, range) {
+  const out = new Headers({
+    "user-agent": UA,
+    "accept": "*/*",
+    "accept-language": "it-IT,it;q=0.9,en;q=0.8"
+  });
+  const rule = RULES[url.hostname] || RULES[url.hostname.replace(/^www\./, "")];
+  if (rule) for (const [k, v] of Object.entries(rule)) out.set(k, v);
+  else out.set("referer", url.origin + "/");
+  if (range) out.set("range", range);
+  return out;
+}
+
+function isRedirect(status) {
+  return status === 301 || status === 302 || status === 303 || status === 307 || status === 308;
+}
 
 /** Rewrites every URL in an HLS playlist so it goes through the proxy. */
 function rewrite(text, baseUrl, proxyPath) {

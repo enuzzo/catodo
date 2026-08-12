@@ -55,7 +55,41 @@
   "signalLab": {
     "channelProfile": "Channel profile",
     "profileUnavailable": "Official metadata is not available for this source yet.",
-    "officialWebsite": "Official website"
+    "officialWebsite": "Official website",
+    "profile": {
+      "labels": {
+        "officialName": "Official name",
+        "network": "Network",
+        "owners": "Owners",
+        "categories": "Categories",
+        "feedName": "Feed",
+        "feedId": "Feed ID",
+        "coverage": "Coverage",
+        "languages": "Languages",
+        "timezones": "Time zones",
+        "feedFormat": "Declared format",
+        "streamTitle": "Stream title",
+        "streamQuality": "Stream ceiling",
+        "streamLabel": "Stream label",
+        "guideAvailability": "Guide",
+        "guideProviders": "Guide providers",
+        "guideMappings": "Guide site mapping",
+        "guideLanguages": "Guide languages",
+        "launched": "Launched",
+        "closedDate": "Closed on",
+        "replacedBy": "Replaced by"
+      },
+      "badges": {
+        "nsfw": "NSFW",
+        "blocked": "Blocked",
+        "closed": "Closed",
+        "mainFeed": "Main feed"
+      },
+      "values": {
+        "available": "Available",
+        "listSeparator": ", "
+      }
+    }
   },
   "status": {
     "loading": "Loading",

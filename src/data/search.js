@@ -1,10 +1,24 @@
 const normalize = (value) => String(value || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("en-US");
 
+export function searchDocument(channel) {
+  const endpointTerms = (channel.endpoints || []).flatMap((endpoint) => [
+    endpoint.streamTitle, endpoint.feedId, endpoint.feedName, ...(endpoint.feedAliases || []),
+    ...(endpoint.languageNames || []), endpoint.feedFormat, endpoint.quality, endpoint.label,
+  ]);
+  const categoryTerms = (channel.categoryDescriptions || []).flatMap((category) => [category?.id, category?.name, category?.description]);
+  return normalize([
+    channel.name, channel.officialName, ...(channel.aliases || []), channel.network, ...(channel.owners || []),
+    ...(channel.countries || []), ...(channel.countryNames || []), ...(channel.languages || []),
+    ...(channel.categories || []), ...(channel.categoryNames || []), ...categoryTerms,
+    ...(channel.sources || []), ...(channel.sourceNames || []), ...endpointTerms,
+  ].join(" "));
+}
+
 export function searchChannels(channels, query) {
   const terms = normalize(query).split(/\s+/).filter(Boolean);
   if (!terms.length) return [...channels];
   return channels.filter((channel) => {
-    const document = normalize([channel.name, ...(channel.aliases || []), ...(channel.countries || []), ...(channel.countryNames || []), ...(channel.languages || []), ...(channel.categories || []), ...(channel.sources || []), ...(channel.sourceNames || [])].join(" "));
+    const document = searchDocument(channel);
     return terms.every((term) => document.includes(term));
   });
 }
@@ -31,7 +45,12 @@ export class CatalogSearch {
 
   index(channels) {
     this.#channels = channels;
-    this.#worker?.postMessage({ type: "index", channels });
+    // Do not structured-clone logo/guide payloads into the worker. Only the
+    // compact normalized search records cross the thread boundary.
+    this.#worker?.postMessage({
+      type: "index",
+      records: channels.map((channel) => ({ channelId: channel.channelId, document: searchDocument(channel) })),
+    });
   }
 
   async search(query) {

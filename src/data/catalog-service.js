@@ -1,4 +1,4 @@
-import { openCatalogDb, get, getAll, put, transactionDone, replaceSourceSnapshot, hydrateCatalog } from "./db.js";
+import { openCatalogDb, get, getAll, put, recordsByIndex, transactionDone, replaceSourceSnapshot, hydrateCatalog } from "./db.js";
 import { parseM3U, mergeChannelRecords } from "./m3u.js";
 import { sourceIdFor } from "./identity.js";
 import { fetchPlaylist } from "./fetcher.js";
@@ -7,7 +7,14 @@ import { migrateLegacyStorage } from "./migration.js";
 import { loadCountries } from "./countries.js";
 import { randomPlayable, randomWorld, countryStats } from "./randomizer.js";
 import { CatalogSearch, searchChannels } from "./search.js";
-import { enrichPersistedChannelMetadata } from "./iptv-org-metadata.js";
+import {
+  enrichPersistedChannelMetadata,
+  enrichPersistedChannelSafety,
+  IPTV_ORG_METADATA_REVISION,
+} from "./iptv-org-metadata.js";
+
+const isBlocked = (channel) => Boolean(channel?.blocked || (Array.isArray(channel?.blocklist) && channel.blocklist.length));
+const isNsfw = (channel) => Boolean(channel?.isNsfw || channel?.is_nsfw);
 
 function readonlyState(state) {
   return { ...state, sources: [...state.sources], channels: [...state.channels], favorites: new Set(state.favorites), history: [...state.history], countries: [...state.countries] };
@@ -37,16 +44,16 @@ export class CatalogService {
         catch { legacyStorage = undefined; }
       }
       await migrateLegacyStorage(this.#db, legacyStorage);
-      const [catalog, countries] = await Promise.all([hydrateCatalog(this.#db), loadCountries(this.#db, { fetchImpl: this.#options.fetchImpl })]);
+      let [catalog, countries] = await Promise.all([hydrateCatalog(this.#db), loadCountries(this.#db, { fetchImpl: this.#options.fetchImpl })]);
+      if (this.#options.autoEnrichMetadata !== false && catalog.channels.length) {
+        const safety = await this.#enrichSafety(catalog.channels, { strict: true });
+        if (safety.updated) catalog = await hydrateCatalog(this.#db);
+      }
       this.#state = { ...this.#state, countries };
       this.#applyCatalog(catalog);
       this.#set({ ready: true, loading: false });
       const state = this.getState();
-      if (this.#options.autoEnrichMetadata !== false && state.channels.some((channel) => !channel.countries?.length || !channel.languages?.length)) {
-        // Legacy enrichment is intentionally detached: readiness never waits on
-        // the large, optional iptv-org directory requests.
-        void this.enrichMetadata();
-      }
+      if (this.#options.autoEnrichMetadata !== false && state.channels.some((channel) => channel.metadataRevision !== IPTV_ORG_METADATA_REVISION || channel.endpoints?.some((endpoint) => endpoint.metadataRevision !== IPTV_ORG_METADATA_REVISION))) this.#scheduleMetadataEnrichment();
       return state;
     } catch (error) {
       this.#set({ ready: false, loading: false, error });
@@ -107,6 +114,14 @@ export class CatalogService {
     this.#requireDb();
     const source = await get(this.#db, "sources", sourceId);
     if (!source) throw new Error(`Unknown source: ${sourceId}`);
+    const [previousEndpoints, previousRelations] = await Promise.all([
+      recordsByIndex(this.#db, "endpoints", "sourceId", sourceId),
+      recordsByIndex(this.#db, "channelSources", "sourceId", sourceId),
+    ]);
+    const previousChannelIds = new Set(previousRelations.map((row) => row.channelId));
+    const previousChannelRows = previousChannelIds.size
+      ? (await getAll(this.#db, "channels")).filter((row) => previousChannelIds.has(row.channelId))
+      : [];
     this.#set({ loading: true, error: null });
     try {
       const result = await fetchPlaylist(source.url, {
@@ -124,13 +139,21 @@ export class CatalogService {
         const channels = mergeChannelRecords(parsed);
         await replaceSourceSnapshot(this.#db, { ...source, etag: result.etag, lastModified: result.lastModified, checkedAt: Date.now() }, channels, { etag: result.etag, lastModified: result.lastModified });
       }
-      await this.#reload();
+      let stagedCatalog = await hydrateCatalog(this.#db);
+      if (this.#options.autoEnrichMetadata !== false) {
+        const safety = await this.#enrichSafety(stagedCatalog.channels, { ...options, strict: true });
+        if (safety.updated) stagedCatalog = await hydrateCatalog(this.#db);
+      }
+      this.#applyCatalog(stagedCatalog);
       this.#set({ loading: false });
+      if (this.#options.autoEnrichMetadata !== false) this.#scheduleMetadataEnrichment(options);
       return (await get(this.#db, "sources", sourceId));
     } catch (error) {
-      // Do not touch activeSnapshotId: the previous good snapshot remains active.
-      await put(this.#db, "sources", { ...source, checkedAt: Date.now(), error: error.message });
-      await this.#reload();
+      // replaceSourceSnapshot activates atomically; a failed safety gate must
+      // restore the prior active snapshot before any restart can hydrate it.
+      await this.#restoreSourceSnapshot(source, previousEndpoints, previousRelations, previousChannelRows, error);
+      // Keep the last in-memory good/safety-checked catalog visible. A newly
+      // replaced snapshot is not exposed until its safety pass succeeds.
       this.#set({ loading: false, error });
       throw error;
     }
@@ -186,7 +209,7 @@ export class CatalogService {
       force: options.force,
       signal: options.signal,
     }).then(async (result) => {
-      if (result.updated && this.#db === db) {
+      if ((result.updated || result.endpointsUpdated) && this.#db === db) {
         try { await this.#reload(); }
         catch (error) { result.warning ||= error?.message || String(error); }
       }
@@ -197,11 +220,11 @@ export class CatalogService {
   }
 
   list(filters = {}) {
-    let channels = [...this.#state.channels];
+    let channels = this.#state.channels.filter((channel) => !isBlocked(channel) && (filters.includeNsfw === true || !isNsfw(channel)));
     const contains = (values, expected) => !expected || values?.some((value) => value.toLocaleLowerCase("en-US") === String(expected).toLocaleLowerCase("en-US"));
     if (filters.country) channels = channels.filter((channel) => contains(channel.countries, filters.country));
     if (filters.language) channels = channels.filter((channel) => contains(channel.languages, filters.language));
-    if (filters.category) channels = channels.filter((channel) => contains(channel.categories, filters.category));
+    if (filters.category) channels = channels.filter((channel) => contains(channel.categories, filters.category) || contains(channel.categoryNames, filters.category));
     if (filters.source) {
       const source = String(filters.source).toLocaleLowerCase("en-US");
       channels = channels.filter((channel) => channel.sources?.includes(filters.source) || channel.sourceNames?.some((name) => name.toLocaleLowerCase("en-US") === source));
@@ -212,7 +235,10 @@ export class CatalogService {
   }
 
   filter(filters = {}) { return this.list(filters); }
-  search(query) { return this.#search.search(query); }
+  search(query, options = {}) {
+    if (options.includeNsfw === true) return Promise.resolve(searchChannels(this.list({ includeNsfw: true }), query));
+    return this.#search.search(query);
+  }
   randomPlayable(options = {}) { return randomPlayable(this.list(options.filters), options); }
   randomWorld(options = {}) { return randomWorld(this.list(options.filters), options); }
   getCountryStats(filters = {}) { return countryStats(this.list(filters)); }
@@ -233,8 +259,49 @@ export class CatalogService {
     const favorites = new Set(catalog.favorites.filter((item) => item.channelId).map((item) => item.channelId));
     const history = [...catalog.history].sort((a, b) => b.rememberedAt - a.rememberedAt);
     this.#state = { ...this.#state, ...catalog, favorites, history };
-    this.#search.index(catalog.channels);
+    this.#search.index(this.list());
     this.#emit();
+  }
+
+  async #enrichSafety(channels, options = {}) {
+    const result = await enrichPersistedChannelSafety(this.#db, channels, {
+      fetchImpl: options.fetchImpl || this.#options.fetchImpl,
+      maxAge: options.maxAge ?? this.#options.metadataMaxAge,
+      timeout: options.timeout ?? this.#options.metadataTimeout,
+      force: options.force,
+      signal: options.signal,
+    });
+    if (options.strict && result.error) {
+      const error = new Error(`Safety metadata unavailable: ${result.error}`);
+      error.code = "SAFETY_METADATA_UNAVAILABLE";
+      throw error;
+    }
+    return result;
+  }
+
+  #scheduleMetadataEnrichment(options = {}) {
+    const start = () => { if (this.#db) void this.enrichMetadata(options); };
+    if (this.#metadataEnrichment) void this.#metadataEnrichment.finally(start);
+    else start();
+  }
+
+  async #restoreSourceSnapshot(source, endpointRows, relationRows, channelRows, error) {
+    const tx = this.#db.transaction(["sources", "endpoints", "channelSources", "channels"], "readwrite");
+    const done = transactionDone(tx);
+    const removeIndexed = (store, index) => new Promise((resolve, reject) => {
+      const request = tx.objectStore(store).index(index).openCursor(source.sourceId);
+      request.onsuccess = () => { const cursor = request.result; if (!cursor) return resolve(); cursor.delete(); cursor.continue(); };
+      request.onerror = () => reject(request.error);
+    });
+    await Promise.all([
+      removeIndexed("endpoints", "sourceId"),
+      removeIndexed("channelSources", "sourceId"),
+    ]);
+    endpointRows.forEach((row) => tx.objectStore("endpoints").put(row));
+    relationRows.forEach((row) => tx.objectStore("channelSources").put(row));
+    channelRows.filter(Boolean).forEach((row) => tx.objectStore("channels").put(row));
+    tx.objectStore("sources").put({ ...source, checkedAt: Date.now(), error: error?.message || String(error) });
+    await done;
   }
 
   #set(update) { this.#state = { ...this.#state, ...update }; this.#emit(); }

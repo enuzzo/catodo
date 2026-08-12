@@ -1,10 +1,15 @@
 const playable = (channel) => Array.isArray(channel?.endpoints) && channel.endpoints.some((endpoint) => endpoint?.url && !["rtmp", "rtsp", "unknown"].includes(endpoint.kind));
+const safeForRandom = (channel) => !channel?.blocked
+  && !(Array.isArray(channel?.blocklist) && channel.blocklist.length)
+  && !channel?.isNsfw
+  && !channel?.is_nsfw
+  && !channel?.closed;
 function choose(values, rng) {
   return values.length ? values[Math.min(values.length - 1, Math.floor(rng() * values.length))] : null;
 }
 
 function withoutCurrent(channels, currentChannelId) {
-  const candidates = channels.filter(playable);
+  const candidates = channels.filter((channel) => safeForRandom(channel) && playable(channel));
   const alternatives = candidates.filter((channel) => channel.channelId !== currentChannelId);
   return alternatives.length ? alternatives : candidates;
 }

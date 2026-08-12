@@ -1493,68 +1493,138 @@ function formatMetricValue(value) {
   return safeText(value);
 }
 
-function metadataValue(value) {
-  if (Array.isArray(value)) return value.map((item) => {
-    if (typeof item === 'string') return item;
-    return item?.name || item?.label || item?.code || item?.id || '';
-  }).filter(Boolean).join(', ');
-  if (value && typeof value === 'object') return value.name || value.label || value.code || value.id || '';
+function metadataFlag(value) {
+  if (value === true) return true;
+  if (value === false || value === undefined || value === null) return false;
+  if (typeof value === 'number') return value !== 0;
+  if (typeof value === 'string') {
+    const normalised = value.trim().toLowerCase();
+    return Boolean(normalised) && !['false', '0', 'no', 'off', 'null', 'undefined'].includes(normalised);
+  }
+  if (Array.isArray(value)) return value.some(metadataFlag);
+  if (typeof value === 'object') {
+    if ('value' in value) return metadataFlag(value.value);
+    if ('enabled' in value) return metadataFlag(value.enabled);
+    return Object.keys(value).length > 0;
+  }
+  return false;
+}
+
+function metadataValue(value, separator) {
+  if (value === true || value === false || value === undefined || value === null) return '';
+  if (typeof value === 'string' && /^(?:true|false)$/i.test(value.trim())) return '';
+  if (Array.isArray(value)) {
+    return [...new Set(value.map((item) => metadataValue(item, separator)).filter(Boolean))].join(separator);
+  }
+  if (typeof value === 'object') {
+    return metadataValue(value.name ?? value.label ?? value.code ?? value.id, separator);
+  }
   return safeText(value);
+}
+
+function metadataDate(value, separator) {
+  if (typeof value === 'boolean' || (typeof value === 'string' && /^(?:true|false)$/i.test(value.trim()))) return '';
+  return metadataValue(value, separator);
 }
 
 function renderChannelProfile(container, channel, t) {
   const value = channel && typeof channel === 'object' ? channel : {};
-  const endpoint = normaliseArray(value.endpoints)[0] || {};
+  const endpoint = normaliseArray(value.endpoints).find((item) => item && typeof item === 'object')
+    || (value.endpoint && typeof value.endpoint === 'object' ? value.endpoint : {});
   const feed = endpoint.feed && typeof endpoint.feed === 'object' ? endpoint.feed : {};
-  const guide = endpoint.guide && typeof endpoint.guide === 'object'
-    ? endpoint.guide
-    : normaliseArray(endpoint.guides || value.guides)[0] || {};
-  const categories = value.categoryNames?.length ? value.categoryNames : value.categories;
+  const profileText = (group, key, vars) => translate(t, `signalLab.profile.${group}.${key}`, '', vars);
+  const separator = profileText('values', 'listSeparator');
+  const field = (...values) => values.map((item) => metadataValue(item, separator)).find(Boolean) || '';
+  const categories = field(value.categoryNames, value.category_names) || value.categories;
+  const guides = [
+    ...normaliseArray(endpoint.guides),
+    ...(endpoint.guide && typeof endpoint.guide === 'object' ? [endpoint.guide] : []),
+    ...normaliseArray(feed.guides),
+    ...normaliseArray(value.guides),
+    ...(value.guide && typeof value.guide === 'object' ? [value.guide] : []),
+  ].filter((item) => item && typeof item === 'object' && (!('available' in item) || metadataFlag(item.available)));
+  const guideProviders = guides.flatMap((guide) => [
+    guide.providerName,
+    guide.provider,
+    guide.site,
+    ...normaliseArray(guide.providers),
+    ...normaliseArray(guide.sources).map((source) => source?.providerName || source?.provider || source?.host),
+  ]);
+  const guideMappings = guides.map((guide) => [
+    guide.siteName ?? guide.site_name,
+    guide.site,
+    guide.siteId ?? guide.site_id,
+  ].map((item) => metadataValue(item, separator)).filter(Boolean));
+  const guideLanguages = guides.flatMap((guide) => [
+    guide.languageName,
+    guide.language_name,
+    guide.lang,
+    ...normaliseArray(guide.languageNames || guide.language_names),
+  ]);
+  const hasGuide = guides.length > 0
+    || metadataFlag(endpoint.hasGuide)
+    || metadataFlag(feed.hasGuide)
+    || metadataFlag(value.hasGuide);
+  const closed = metadataFlag(value.closed);
+  const closedDate = closed ? metadataDate(value.closed, separator) : '';
+  const isMain = metadataFlag(endpoint.isMain)
+    || metadataFlag(endpoint.is_main)
+    || metadataFlag(feed.isMain)
+    || metadataFlag(feed.is_main);
   const rows = [
-    ['Official name', value.officialName],
-    ['Network', value.network],
-    ['Owner', value.owners],
-    ['Categories', categories],
-    ['Feed', endpoint.feedName || feed.name || value.feedName],
-    ['Coverage', endpoint.broadcastArea || feed.broadcastArea || value.broadcastArea],
-    ['Languages', endpoint.languageNames || feed.languageNames || value.languageNames || value.languages],
-    ['Time zones', endpoint.timezones || feed.timezones || value.timezones],
-    ['Declared format', endpoint.feedFormat || feed.format || value.feedFormat],
-    ['Stream ceiling', endpoint.quality || value.quality],
-    ['Stream label', endpoint.label || value.streamLabel],
-    ['Guide', guide.siteName || guide.site || (value.hasGuide ? 'Available' : '')],
-    ['Guide language', guide.languageName || guide.lang],
-    ['Launched', value.launched],
-    ['Closed', value.closed],
-    ['Replaced by', value.replacedBy || value.replaced_by],
-  ].map(([label, raw]) => [label, metadataValue(raw)]).filter(([, text]) => text);
+    ['officialName', value.officialName ?? value.official_name],
+    ['network', value.network],
+    ['owners', value.owners, true],
+    ['categories', categories, true],
+    ['feedName', endpoint.feedName ?? endpoint.feed_name ?? feed.name ?? value.feedName],
+    ['feedId', endpoint.feedId ?? endpoint.feed_id ?? feed.id ?? value.feedId],
+    ['coverage', endpoint.broadcastArea ?? endpoint.broadcast_area ?? feed.broadcastArea ?? feed.broadcast_area ?? value.broadcastArea, true],
+    ['languages', endpoint.languageNames ?? endpoint.language_names ?? feed.languageNames ?? feed.language_names ?? endpoint.languages ?? feed.languages ?? value.languageNames ?? value.languages, true],
+    ['timezones', endpoint.timezones ?? feed.timezones ?? value.timezones, true],
+    ['feedFormat', endpoint.feedFormat ?? endpoint.feed_format ?? feed.format ?? value.feedFormat],
+    ['streamTitle', endpoint.streamTitle ?? endpoint.stream_title ?? endpoint.title ?? value.streamTitle],
+    ['streamQuality', endpoint.quality ?? value.quality],
+    ['streamLabel', endpoint.label ?? value.streamLabel],
+    ['guideAvailability', hasGuide ? profileText('values', 'available') : ''],
+    ['guideProviders', guideProviders, true],
+    ['guideMappings', guideMappings, true],
+    ['guideLanguages', guideLanguages, true],
+    ['launched', metadataDate(value.launched, separator)],
+    ['closedDate', closedDate],
+    ['replacedBy', value.replacedBy ?? value.replaced_by],
+  ].map(([key, raw, wide = false]) => ({
+    label: profileText('labels', key),
+    text: metadataValue(raw, separator),
+    wide,
+  })).filter((item) => item.text);
 
   const badges = [];
-  if (value.isNsfw || value.is_nsfw) badges.push(['NSFW', 'danger']);
-  if (value.blocked || value.blocklist) badges.push(['Blocked', 'danger']);
-  if (value.closed) badges.push(['Closed', 'warning']);
-  if (endpoint.isMain || feed.isMain || feed.is_main) badges.push(['Main feed', 'info']);
+  if (metadataFlag(value.isNsfw) || metadataFlag(value.is_nsfw)) badges.push(['nsfw', 'danger']);
+  if (metadataFlag(value.blocked) || metadataFlag(value.blocklist)) badges.push(['blocked', 'danger']);
+  if (closed) badges.push(['closed', 'warning']);
+  if (isMain) badges.push(['mainFeed', 'info']);
 
   container.replaceChildren();
   const header = element('div', 'channel-profile__header');
-  header.append(textNode('h3', null, t, 'signalLab.channelProfile', 'Channel profile'));
+  header.append(textNode('h3', null, t, 'signalLab.channelProfile', ''));
   const chips = element('div', 'channel-profile__badges');
-  badges.forEach(([label, tone]) => {
+  badges.forEach(([key, tone]) => {
     const badge = element('span', `channel-profile__badge channel-profile__badge--${tone}`);
-    badge.textContent = label;
+    badge.textContent = profileText('badges', key);
     chips.append(badge);
   });
   header.append(chips);
   container.append(header);
 
-  if (!rows.length && !value.website) {
-    container.append(textNode('p', 'channel-profile__empty', t, 'signalLab.profileUnavailable', 'Official metadata is not available for this source yet.'));
+  const website = safeMediaUrl(metadataValue(value.website, separator));
+  if (!rows.length && !website) {
+    container.append(textNode('p', 'channel-profile__empty', t, 'signalLab.profileUnavailable', ''));
     return;
   }
 
   const facts = element('dl', 'channel-profile__facts');
-  rows.forEach(([label, text]) => {
-    const item = element('div', 'channel-profile__fact');
+  rows.forEach(({ label, text, wide }) => {
+    const item = element('div', `channel-profile__fact${wide ? ' channel-profile__fact--wide' : ''}`);
     const term = element('dt');
     term.textContent = label;
     const description = element('dd');
@@ -1564,14 +1634,13 @@ function renderChannelProfile(container, channel, t) {
   });
   container.append(facts);
 
-  const website = safeMediaUrl(value.website);
   if (website) {
     const link = element('a', 'channel-profile__website button button--ghost', {
       href: website,
       target: '_blank',
       rel: 'noopener noreferrer',
     });
-    link.append(icon('arrow-square-out'), textNode('span', 'button__label', t, 'signalLab.officialWebsite', 'Official website'));
+    link.append(icon('arrow-square-out'), textNode('span', 'button__label', t, 'signalLab.officialWebsite', ''));
     container.append(link);
   }
 }

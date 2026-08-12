@@ -73,6 +73,7 @@ function firstEndpoint(channel) {
 }
 
 function isPlayableChannel(channel) {
+  if (channel?.blocked || channel?.isNsfw || channel?.is_nsfw || channel?.closed) return false;
   return (channel?.endpoints || []).some((endpoint) => PLAYABLE_KINDS.has(endpoint?.kind));
 }
 
