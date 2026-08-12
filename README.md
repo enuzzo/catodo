@@ -102,3 +102,12 @@ Runtime dependencies are pinned and vendored: hls.js, Phosphor Icons, SVG Maps W
 ## Security
 
 Treat every imported playlist and stream endpoint as untrusted input. Read [SECURITY.md](SECURITY.md) for the reporting process and deployment guidance.
+
+## Maintainer documentation
+
+- [Architecture](docs/ARCHITECTURE.md): runtime boundaries, data model, playback,
+  installation synchronization, EPG, security invariants and pressure points.
+- [Operations and gotchas](docs/OPERATIONS.md): development, release, migration
+  and symptom-oriented troubleshooting.
+- [Independent review brief](docs/REVIEW_BRIEF.md): scope and output contract for
+  code, product and UI/UX inspections.
