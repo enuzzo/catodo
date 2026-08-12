@@ -1,4 +1,4 @@
-import { openCatalogDb, get, getAll, put, recordsByIndex, transactionDone, replaceSourceSnapshot, hydrateCatalog } from "./db.js";
+import { openCatalogDb, get, getAll, put, recordsByIndex, transactionDone, replaceSourceSnapshot, hydrateCatalog, applyInstallationState } from "./db.js";
 import { parseM3U, mergeChannelRecords } from "./m3u.js";
 import { sourceIdFor } from "./identity.js";
 import { fetchPlaylist } from "./fetcher.js";
@@ -12,6 +12,7 @@ import {
   enrichPersistedChannelSafety,
   IPTV_ORG_METADATA_REVISION,
 } from "./iptv-org-metadata.js";
+import { InstallationSync, SYNC_SETTINGS, installationPayload } from "./installation-sync.js";
 
 const isBlocked = (channel) => Boolean(channel?.blocked || (Array.isArray(channel?.blocklist) && channel.blocklist.length));
 const isNsfw = (channel) => Boolean(channel?.isNsfw || channel?.is_nsfw);
@@ -26,6 +27,9 @@ export class CatalogService {
   #search;
   #options;
   #metadataEnrichment = null;
+  #installationSync = null;
+  #syncingInstallation = false;
+  #installationSyncPending = false;
   #state = { ready: false, loading: false, error: null, sources: [], channels: [], favorites: new Set(), history: [], countries: [] };
 
   constructor(options = {}) {
@@ -44,6 +48,16 @@ export class CatalogService {
         catch { legacyStorage = undefined; }
       }
       await migrateLegacyStorage(this.#db, legacyStorage);
+      this.#installationSync = this.#options.installationSync === false
+        ? null
+        : this.#options.installationSync || new InstallationSync({ fetchImpl: this.#options.fetchImpl || globalThis.fetch });
+      let remoteInstallation = null;
+      if (this.#installationSync) {
+        remoteInstallation = await this.#installationSync.load();
+        if (remoteInstallation?.updatedAt) await applyInstallationState(this.#db, remoteInstallation);
+      }
+      const syncedProxy = remoteInstallation?.settings?.proxy;
+      if (typeof syncedProxy === 'string' && syncedProxy) this.#options.proxy = syncedProxy;
       let [catalog, countries] = await Promise.all([hydrateCatalog(this.#db), loadCountries(this.#db, { fetchImpl: this.#options.fetchImpl })]);
       if (this.#options.autoEnrichMetadata !== false && catalog.channels.length) {
         const safety = await this.#enrichSafety(catalog.channels, { strict: true });
@@ -52,6 +66,13 @@ export class CatalogService {
       this.#state = { ...this.#state, countries };
       this.#applyCatalog(catalog, { emit: false });
       this.#set({ ready: true, loading: false });
+      if (this.#installationSync?.supported) {
+        if (!remoteInstallation?.updatedAt) void this.#pushInstallationState();
+        else {
+          const missingSources = catalog.sources.filter((source) => !source.activeSnapshotId);
+          if (missingSources.length) globalThis.setTimeout(() => void this.#hydrateInstallationSources(missingSources), 0);
+        }
+      }
       const state = this.getState();
       if (this.#options.autoEnrichMetadata !== false && state.channels.some((channel) => channel.metadataRevision !== IPTV_ORG_METADATA_REVISION || channel.endpoints?.some((endpoint) => endpoint.metadataRevision !== IPTV_ORG_METADATA_REVISION))) this.#scheduleMetadataEnrichment();
       return state;
@@ -78,6 +99,7 @@ export class CatalogService {
   async setSetting(key, value) {
     this.#requireDb();
     await put(this.#db, "settings", { key, value, updatedAt: Date.now() });
+    if (SYNC_SETTINGS.has(key)) await this.#pushInstallationState();
     return value;
   }
 
@@ -146,6 +168,7 @@ export class CatalogService {
       }
       this.#applyCatalog(stagedCatalog, { emit: false });
       this.#set({ loading: false });
+      await this.#pushInstallationState();
       if (this.#options.autoEnrichMetadata !== false) this.#scheduleMetadataEnrichment(options);
       return (await get(this.#db, "sources", sourceId));
     } catch (error) {
@@ -172,6 +195,7 @@ export class CatalogService {
     await Promise.all([removeIndexed("snapshots", "sourceId"), removeIndexed("endpoints", "sourceId"), removeIndexed("channelSources", "sourceId")]);
     await done;
     await this.#reload();
+    await this.#pushInstallationState();
   }
 
   async toggleFavorite(channelId) {
@@ -181,6 +205,7 @@ export class CatalogService {
     existing ? transaction.objectStore("favorites").delete(channelId) : transaction.objectStore("favorites").put({ id: channelId, channelId, createdAt: Date.now() });
     await transactionDone(transaction);
     await this.#reload();
+    await this.#pushInstallationState();
     return !existing;
   }
 
@@ -252,6 +277,40 @@ export class CatalogService {
   }
 
   async #reload() { this.#applyCatalog(await hydrateCatalog(this.#db)); }
+
+  async #pushInstallationState() {
+    if (!this.#installationSync?.supported) return;
+    if (this.#syncingInstallation) {
+      this.#installationSyncPending = true;
+      return;
+    }
+    this.#syncingInstallation = true;
+    try {
+      const settings = {};
+      for (const key of SYNC_SETTINGS) settings[key] = await this.getSetting(key, key === 'epg:sources' ? [] : key === 'epg:refreshMinutes' ? 360 : '');
+      const catalog = await hydrateCatalog(this.#db);
+      const saved = await this.#installationSync.save(installationPayload({ ...catalog, settings }));
+      if (saved && this.#installationSync.supported) {
+        await applyInstallationState(this.#db, saved);
+        await this.#reload();
+      }
+    } catch (error) {
+      this.#options.onSyncError?.(error);
+    } finally {
+      this.#syncingInstallation = false;
+      if (this.#installationSyncPending) {
+        this.#installationSyncPending = false;
+        queueMicrotask(() => void this.#pushInstallationState());
+      }
+    }
+  }
+
+  async #hydrateInstallationSources(sources) {
+    for (const source of sources) {
+      try { await this.refreshSource(source.sourceId, { confirmed: true }); }
+      catch (error) { this.#options.onSyncError?.(error); }
+    }
+  }
 
   #applyCatalog(catalog, { emit = true } = {}) {
     const countryNames = new Map(this.#state.countries.map((country) => [country.code, country.name]));

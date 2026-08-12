@@ -25,7 +25,8 @@ try {
   });
   await client.ensureDir(env.FTP_REMOTE_DIR || "/");
   await client.uploadFromDir(resolve(root, "dist"));
-  console.log("SiteGround upload complete: dist bundle only; existing access gate preserved");
+  await client.uploadFrom(resolve(root, ".htaccess"), ".htaccess");
+  console.log("SiteGround upload complete: production bundle, authenticated PHP services and protected installation storage");
 } finally {
   client.close();
 }

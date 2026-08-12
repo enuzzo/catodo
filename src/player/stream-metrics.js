@@ -47,8 +47,15 @@ function levelDetails(level) {
     width: finite(level && level.width, finite(attrs.RESOLUTION && attrs.RESOLUTION.width, 0)),
     height: finite(level && level.height, finite(attrs.RESOLUTION && attrs.RESOLUTION.height, 0)),
     codecs: codecs.join(", ") || attrs.CODECS || null,
+    videoCodec: (level && level.videoCodec) || null,
+    audioCodec: (level && level.audioCodec) || null,
     frameRate: finite(level && level.frameRate, finite(attrs["FRAME-RATE"], 0))
   };
+}
+
+function decodedAudioBytes(video) {
+  const value = finite(video && video.webkitAudioDecodedByteCount, -1);
+  return value >= 0 ? value : null;
 }
 
 export class StreamMetrics extends EventTarget {
@@ -71,6 +78,7 @@ export class StreamMetrics extends EventTarget {
     this.hasPlayed = false;
     this.frames = { total: 0, dropped: 0, presented: 0, fps: 0 };
     this.lastFrameSample = null;
+    this.audioDecodedBaseline = decodedAudioBytes(this.video) || 0;
     this.frameRequest = null;
     this.timer = null;
     this.started = false;
@@ -186,6 +194,9 @@ export class StreamMetrics extends EventTarget {
       : hls && finite(hls.liveSyncPosition, -1) >= 0 && this.video
         ? Math.max(0, hls.liveSyncPosition - finite(this.video.currentTime, 0))
         : null;
+    const rawAudioBytes = decodedAudioBytes(this.video);
+    const audioBytes = rawAudioBytes === null ? null : Math.max(0, rawAudioBytes - this.audioDecodedBaseline);
+    const audioCodec = manifest.audioCodec || null;
     return {
       loadedBytes: this.loadedBytes,
       downloadThroughput: this.lastThroughput,
@@ -199,6 +210,15 @@ export class StreamMetrics extends EventTarget {
       latencySeconds: latency,
       rebuffers: this.rebuffers,
       waiting: this.waiting,
+      audio: {
+        codec: audioCodec,
+        decodedBytes: audioBytes,
+        decoded: audioBytes !== null && audioBytes > 0,
+        muted: Boolean(this.video && this.video.muted),
+        volume: this.video ? finite(this.video.volume, 1) : 0,
+        paused: Boolean(this.video && this.video.paused),
+        readyState: this.video ? finite(this.video.readyState, 0) : 0,
+      },
       route: this.route || "direct",
       proxy: this.proxy,
       upload: null,
@@ -210,6 +230,8 @@ export class StreamMetrics extends EventTarget {
         bitrate: "manifest",
         resolution: "manifest",
         codecs: "manifest",
+        audioDecodedBytes: audioBytes === null ? "unavailable" : "measured",
+        audioOutput: "measured",
         frameRate: manifest.frameRate ? "manifest" : "measured",
         bufferSeconds: "measured",
         latencySeconds: latency === null ? "unavailable" : "estimated",
@@ -235,6 +257,7 @@ export class StreamMetrics extends EventTarget {
     this.hasPlayed = false;
     this.frames = { total: 0, dropped: 0, presented: 0, fps: 0 };
     this.lastFrameSample = null;
+    this.audioDecodedBaseline = decodedAudioBytes(this.video) || 0;
   }
 
   destroy() {

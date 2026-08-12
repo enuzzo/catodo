@@ -113,6 +113,8 @@
     "pause": "Pause",
     "mute": "Mute",
     "unmute": "Unmute",
+    "audioControls": "Audio controls",
+    "audioChecking": "Audio checking",
     "fullscreen": "Full screen",
     "favorite": "Add to favorites",
     "unfavorite": "Remove from favorites",
@@ -168,6 +170,8 @@
     }
   },
   "signalLab": {
+    "audioOutput": "Audio output",
+    "audioDecoded": "Audio decoded",
     "multiviewTitle": "Multiview telemetry",
     "multiviewHint": "Live browser measurements for every active feed.",
     "aggregateDownload": "Download",

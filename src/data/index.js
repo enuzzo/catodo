@@ -11,3 +11,4 @@ export * from "./regions.js";
 export * from "./search.js";
 export * from "./catalog-service.js";
 export * from "./source-presets.js";
+export * from "./installation-sync.js";

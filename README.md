@@ -32,7 +32,9 @@ Users are responsible for ensuring they may access a source in their jurisdictio
 
 ## Data and privacy
 
-Sources, imported catalog snapshots, favourites, history, and settings stay on the device in IndexedDB. Existing legacy browser storage is migrated on first use. A failed refresh does not replace the last known-good snapshot. If an unusually restricted embedded browser exposes no IndexedDB at all, CATODO falls back to an in-memory session catalog and does not claim persistence.
+On the authenticated PHP installation, approved playlist sources, favourites, proxy configuration, and TV Guide source/cadence settings are canonical installation data and follow the user across browsers. IndexedDB remains a fast per-browser catalog/cache and refreshes any installation source that is new to that browser. Existing legacy browser storage is migrated on first use. A failed refresh does not replace the last known-good snapshot. Static deployments without the PHP endpoints continue to use browser-only IndexedDB.
+
+Remote channel logos are requested through an authenticated same-origin cache on the private installation. The cache accepts HTTPS images only, enforces public-host resolution, bounded redirects, supported image MIME types, and a 2 MB limit; it is not a general-purpose proxy. This improves durability and avoids every browser hotlinking separately, but does not change copyright or trademark ownership of third-party logos. If the cache cannot fetch a logo, the UI tries the original URL and then its text fallback.
 
 ## Local setup
 
@@ -70,10 +72,13 @@ npm run check
 npm run build
 ```
 
-Deploy only the generated `dist/` directory over HTTPS. Do not publish the
-source tree as the application runtime. Maintainers with a local `.env` can
-publish the bundle with `npm run deploy:siteground`; the script uploads only
-`dist/` and deliberately leaves the existing authentication gate untouched.
+Deploy the generated `dist/` directory over HTTPS; Vite copies the authenticated
+PHP services from `public/` into that bundle. Do not publish the source tree as
+the application runtime. Maintainers with a local `.env` can publish these
+runtime artifacts with `npm run deploy:siteground`; the script updates the
+versioned access rules while leaving the existing login endpoint and credentials
+untouched. The PHP runtime creates private `.catodo-data/` state/cache files,
+which must remain blocked from HTTP access and preserved across deploys.
 
 ### Cloudflare Worker proxy (optional)
 

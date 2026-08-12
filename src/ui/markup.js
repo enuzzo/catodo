@@ -168,7 +168,12 @@ function setMedia(video, data = {}) {
     delete video.dataset.uiSrc;
   }
 
-  video.muted = data.muted !== false;
+  // Partial UI refreshes (programme data, chrome visibility, favorites, metrics)
+  // must never reset the media element's audio state. Only an explicit audio
+  // update is allowed to change `muted`.
+  if (Object.prototype.hasOwnProperty.call(data, 'muted') && data.muted !== undefined) {
+    video.muted = Boolean(data.muted);
+  }
   video.playsInline = true;
   if (data.autoplay !== undefined) video.autoplay = Boolean(data.autoplay);
 }
@@ -197,7 +202,15 @@ function renderLogo(container, channel, t) {
     decoding: 'async',
     referrerPolicy: 'no-referrer',
   });
-  image.addEventListener('error', () => image.replaceWith(fallback), { once: true });
+  image.addEventListener('error', () => {
+    const original = safeMediaUrl(channel?.originalLogo, { image: true });
+    if (original && image.src !== original && image.dataset.originalTried !== 'true') {
+      image.dataset.originalTried = 'true';
+      image.src = original;
+      return;
+    }
+    image.replaceWith(fallback);
+  });
   container.append(image);
 }
 
@@ -1303,6 +1316,8 @@ function createSignalLab(t) {
     ['resolution', 'signalLab.resolution', 'Resolution'],
     ['video', 'signalLab.videoCodec', 'Video'],
     ['audio', 'signalLab.audioCodec', 'Audio'],
+    ['audioOutput', 'signalLab.audioOutput', 'Audio output'],
+    ['audioDecoded', 'signalLab.audioDecoded', 'Audio decoded'],
     ['fps', 'signalLab.presentedFps', 'Presented'],
     ['dropped', 'signalLab.droppedFrames', 'Dropped'],
     ['level', 'signalLab.level', 'Level'],
@@ -1473,8 +1488,19 @@ function createPlayer(t) {
   const rewind = iconButton({ t, action: 'rewind', iconName: 'caret-left', key: 'player.rewind', fallback: 'Rewind' });
   const playPause = iconButton({ t, action: 'toggle-playback', iconName: 'pause', key: 'player.pause', fallback: 'Pause', className: 'player-controls__primary' });
   const forward = iconButton({ t, action: 'forward', iconName: 'caret-right', key: 'player.forward', fallback: 'Forward' });
-  const volume = element('label', 'volume-control');
-  volume.append(icon('speaker-high'));
+  const volume = element('div', 'volume-control', {
+    role: 'group',
+    'aria-label': translate(t, 'player.audioControls', 'Audio controls'),
+  });
+  const volumeMute = iconButton({
+    t,
+    action: 'set-player-muted',
+    iconName: 'speaker-high',
+    key: 'player.mute',
+    fallback: 'Mute',
+    className: 'volume-control__mute',
+    dataset: { muted: 'true' },
+  });
   const volumeValue = textNode('span', null, t, 'player.volumeValue', '{value}', { value: 100 });
   const range = element('input', null, {
     type: 'range',
@@ -1484,7 +1510,12 @@ function createPlayer(t) {
     'aria-label': translate(t, 'player.volume', 'Volume'),
     dataset: { action: 'set-volume' },
   });
-  volume.append(volumeValue, range);
+  const audioStatus = element('span', 'volume-control__status mono', {
+    role: 'status',
+    'aria-live': 'polite',
+  });
+  audioStatus.textContent = translate(t, 'player.audioChecking', 'Audio checking');
+  volume.append(volumeMute, volumeValue, range, audioStatus);
   controls.append(labButton, rewind, playPause, forward, volume);
   const programmeStrip = element('section', 'player-programmes');
   const localTime = element('div', 'player-programmes__clock');
@@ -1510,7 +1541,9 @@ function createPlayer(t) {
     labButton,
     playPause,
     volume: range,
+    volumeMute,
     volumeValue,
+    audioStatus,
     programmeList,
     localTime: localTime.querySelector('strong'),
   };
@@ -2778,6 +2811,20 @@ export function mountAppUI(root, options = {}) {
         const volume = Math.max(0, Math.min(100, Number(state.volume) || 0));
         player.volume.value = String(volume);
         setTranslatedText(player.volumeValue, t, 'player.volumeValue', '{value}', { value: Math.round(volume) });
+      }
+      if (state.muted !== undefined) {
+        const muted = Boolean(state.muted);
+        player.volumeMute.replaceChildren(icon(muted ? 'speaker-slash' : 'speaker-high'));
+        player.volumeMute.dataset.muted = muted ? 'false' : 'true';
+        player.volumeMute.setAttribute('aria-pressed', muted ? 'true' : 'false');
+        player.volumeMute.setAttribute('aria-label', translate(t, muted ? 'player.unmute' : 'player.mute', muted ? 'Unmute' : 'Mute'));
+        player.volumeMute.title = player.volumeMute.getAttribute('aria-label');
+      }
+      if (state.audioStatus !== undefined) {
+        const status = state.audioStatus || {};
+        player.audioStatus.textContent = safeText(status.label, translate(t, 'player.audioChecking', 'Audio checking'));
+        player.audioStatus.dataset.tone = safeText(status.tone, 'checking');
+        player.audioStatus.title = safeText(status.detail, player.audioStatus.textContent);
       }
       if (state.signalLab !== undefined) api.showSignalLab(state.signalLab);
       return api;

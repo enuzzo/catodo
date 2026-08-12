@@ -43,6 +43,9 @@ const state = {
   featuredId: "",
   currentId: "",
   homeMuted: true,
+  playerMuted: false,
+  playerVolume: 100,
+  playerLastAudibleVolume: 100,
   multiviewLayout: 4,
   multiviewFeeds: [],
   multiviewAudioIndex: null,
@@ -195,6 +198,18 @@ function playbackSource(channel) {
   return { endpoints };
 }
 
+function cachedLogoUrl(value) {
+  const url = String(value || "").trim();
+  if (!url) return "";
+  try {
+    const parsed = new URL(url, location.href);
+    if (parsed.origin === location.origin || parsed.protocol !== "https:") return url;
+    return `./logo-cache.php?url=${encodeURIComponent(parsed.href)}`;
+  } catch {
+    return url;
+  }
+}
+
 function decorateChannel(channel, index = 0) {
   if (!channel) return null;
   const country = inferredCountryCode(channel);
@@ -209,7 +224,9 @@ function decorateChannel(channel, index = 0) {
     quality: endpoint?.quality || channel.quality || channel.feedFormat || "",
     tone: TONE_BY_COUNTRY[(country.charCodeAt?.(0) || index) % TONE_BY_COUNTRY.length],
     favorite: state.lastCatalog?.favorites.has(channelId(channel)) || false,
-    poster: channel.poster || channel.image || channel.thumbnail || channel.logo || "",
+    logo: cachedLogoUrl(channel.logo),
+    originalLogo: channel.logo || "",
+    poster: channel.poster || channel.image || channel.thumbnail || cachedLogoUrl(channel.logo) || "",
     schedule: state.schedules.get(channelId(channel))?.programmes || [],
     guideStatus: state.schedules.get(channelId(channel))?.status || "unconfigured",
   };
@@ -343,11 +360,55 @@ function metricsForUi(metrics) {
     resolution: { value: resolution, state: metrics.labels.resolution },
     video: { value: codecs[0] || "N/A", state: metrics.labels.codecs },
     audio: { value: codecs[1] || "N/A", state: metrics.labels.codecs },
+    audioOutput: {
+      value: metrics.audio?.muted ? "MUTED" : metrics.audio?.paused ? "PAUSED" : `${Math.round((metrics.audio?.volume ?? 1) * 100)}%`,
+      state: metrics.labels.audioOutput,
+    },
+    audioDecoded: {
+      value: metrics.audio?.decodedBytes === null || metrics.audio?.decodedBytes === undefined ? "N/A" : formatBytes(metrics.audio.decodedBytes),
+      state: metrics.labels.audioDecodedBytes,
+    },
     fps: { value: `${(metrics.frameRate || 0).toFixed(1)} fps`, state: metrics.labels.frameRate },
     dropped: { value: String(metrics.frames?.dropped || 0), state: "measured" },
     level: { value: metrics.bitrate ? formatRate(metrics.bitrate) : "AUTO", state: metrics.labels.bitrate },
     route: { value: metrics.proxy ? "PROXY" : "DIRECT", state: metrics.labels.route },
   };
+}
+
+function playerAudioStatus(metrics = mainPlayer?.getMetrics?.() || {}) {
+  const audio = metrics.audio || {};
+  const muted = state.playerMuted || ui?.refs?.playerVideo?.muted || state.playerVolume === 0;
+  if (muted) return { label: "Muted", tone: "muted", detail: `Output muted · volume ${state.playerVolume}%` };
+  if (audio.paused) return { label: "Audio paused", tone: "muted", detail: "Playback is paused" };
+  if (audio.decoded) {
+    return {
+      label: "Audio decoded",
+      tone: "live",
+      detail: `${audio.codec || "audio track"} · ${formatBytes(audio.decodedBytes)} decoded · volume ${state.playerVolume}%`,
+    };
+  }
+  if (audio.codec) return { label: "Audio track found", tone: "checking", detail: `${audio.codec} · waiting for decoded bytes` };
+  return { label: "Checking audio", tone: "checking", detail: "Waiting for the stream audio track" };
+}
+
+function playerUiState(extra = {}) {
+  return {
+    channel: decorateChannel(findChannel(state.currentId)),
+    muted: state.playerMuted,
+    volume: state.playerVolume,
+    audioStatus: playerAudioStatus(),
+    ...extra,
+  };
+}
+
+async function applyPlayerAudio({ resume = false } = {}) {
+  const volume = Math.max(0, Math.min(100, Number(state.playerVolume) || 0));
+  state.playerVolume = volume;
+  state.playerMuted = Boolean(state.playerMuted || volume === 0);
+  ui.refs.playerVideo.volume = volume / 100;
+  mainPlayer.setMuted(state.playerMuted);
+  if (resume && !state.playerMuted) await ui.refs.playerVideo.play().catch(() => {});
+  ui.updatePlayer(playerUiState());
 }
 
 function setHomeFeatured(channel, { retune = true, resetFailures = true } = {}) {
@@ -590,10 +651,12 @@ async function openPlayer(channel, { returnMode = "shell" } = {}) {
   }
   state.currentId = channelId(channel);
   state.playerChromeVisible = false;
-  ui.showPlayer({ channel: decorateChannel(channel), muted: true, loading: true, playing: false, chromeVisible: false });
-  void loadSchedules([channel]).then(() => ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)) }));
-  await mainPlayer.tune(playbackSource(channel), { muted: true }).catch((error) => {
-    ui.updatePlayer({ channel: decorateChannel(channel), loading: false, error: error.message, playing: false });
+  state.playerMuted = state.playerVolume === 0;
+  ui.refs.playerVideo.volume = state.playerVolume / 100;
+  ui.showPlayer(playerUiState({ loading: true, playing: false, chromeVisible: false }));
+  void loadSchedules([channel]).then(() => ui.updatePlayer(playerUiState()));
+  await mainPlayer.tune(playbackSource(channel), { muted: state.playerMuted }).catch((error) => {
+    ui.updatePlayer(playerUiState({ loading: false, error: error.message, playing: false }));
   });
 }
 
@@ -615,7 +678,7 @@ async function loadSchedules(channels, { force = false } = {}) {
     renderHome();
     renderGuide();
     renderSources();
-    if (state.currentId) ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)) });
+    if (state.currentId) ui.updatePlayer(playerUiState());
   }
 }
 
@@ -636,11 +699,11 @@ async function refreshGuideIfDue() {
 
 function showPlayerChrome() {
   state.playerChromeVisible = !state.playerChromeVisible;
-  ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)), chromeVisible: state.playerChromeVisible });
+  ui.updatePlayer(playerUiState({ chromeVisible: state.playerChromeVisible }));
   window.clearTimeout(playerChromeTimer);
   if (state.playerChromeVisible) playerChromeTimer = window.setTimeout(() => {
     state.playerChromeVisible = false;
-    ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)), chromeVisible: false });
+    ui.updatePlayer(playerUiState({ chromeVisible: false }));
   }, 8000);
 }
 
@@ -684,12 +747,12 @@ function createMultiviewController() {
 
 function createMainPlayer() {
   return new PlayerManager({ video: ui.refs.playerVideo, id: "main", onEvent: (type, detail) => {
-    if (type === "fatal") ui.updatePlayer({
-      channel: decorateChannel(findChannel(state.currentId)),
+    if (type === "fatal") ui.updatePlayer(playerUiState({
       loading: false,
       error: detail.error?.message,
       playing: false,
-    });
+    }));
+    if (type === "autoplay-blocked") ui.updatePlayer(playerUiState({ chromeVisible: true, playing: false }));
   } });
 }
 
@@ -993,7 +1056,7 @@ async function handleAction(action, detail) {
       if (action === "remove-favorite" && !wasFavorite) break;
       await catalog.toggleFavorite(id);
       if (ui.refs.root.dataset.mode === "player" && id === state.currentId) {
-        ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)), chromeVisible: state.playerChromeVisible });
+        ui.updatePlayer(playerUiState({ chromeVisible: state.playerChromeVisible }));
       }
       break;
     }
@@ -1179,9 +1242,22 @@ async function handleAction(action, detail) {
       break;
     case "set-volume": {
       const volume = Math.max(0, Math.min(100, Number(detail.value) || 0));
-      ui.refs.playerVideo.volume = volume / 100;
-      ui.refs.playerVideo.muted = volume === 0;
-      ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)), volume });
+      state.playerVolume = volume;
+      if (volume > 0) state.playerLastAudibleVolume = volume;
+      state.playerMuted = volume === 0;
+      await applyPlayerAudio({ resume: volume > 0 });
+      break;
+    }
+    case "set-player-muted": {
+      const shouldMute = detail.dataset.muted === "true";
+      if (!shouldMute) {
+        state.playerVolume = state.playerVolume > 0 ? state.playerVolume : state.playerLastAudibleVolume || 100;
+        state.playerMuted = false;
+      } else {
+        state.playerLastAudibleVolume = state.playerVolume || state.playerLastAudibleVolume;
+        state.playerMuted = true;
+      }
+      await applyPlayerAudio({ resume: !state.playerMuted });
       break;
     }
     case "rewind":
@@ -1332,17 +1408,17 @@ function bindVideoEvents() {
     ui.updateHeader({ signalOk: true });
   });
   ui.refs.playerVideo.addEventListener("playing", async () => {
-    ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)), loading: false, playing: true });
+    ui.updatePlayer(playerUiState({ loading: false, playing: true }));
     if (state.currentId && lastRememberedId !== state.currentId) {
       lastRememberedId = state.currentId;
       await catalog.remember(state.currentId, { endpointId: firstEndpoint(findChannel(state.currentId))?.endpointId });
     }
   });
   ui.refs.playerVideo.addEventListener("pause", () => {
-    ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)), playing: false });
+    ui.updatePlayer(playerUiState({ playing: false }));
   });
   ui.refs.playerVideo.addEventListener("waiting", () => {
-    ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)), loading: true, playing: false });
+    ui.updatePlayer(playerUiState({ loading: true, playing: false }));
   });
   ui.refs.multiview.addEventListener("pointermove", () => {
     const now = performance.now();
@@ -1418,6 +1494,7 @@ async function boot() {
   clockTimer = window.setInterval(() => ui.updateHeader({ time: formatClock() }), 30_000);
   metricTimer = window.setInterval(() => {
     const metrics = mainPlayer.getMetrics();
+    if (ui.refs.root.dataset.mode === "player") ui.updatePlayer(playerUiState());
     state.throughputHistory.push((metrics.downloadThroughput || 0) / 1_000_000);
     state.throughputHistory = state.throughputHistory.slice(-60);
     if (!ui.refs.signalLab.hidden) ui.showSignalLab({

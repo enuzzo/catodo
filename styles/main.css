@@ -3525,15 +3525,19 @@ textarea {
 
 .volume-control {
   display: grid;
-  grid-template-columns: 28px 34px;
+  grid-template-columns: 36px 34px minmax(72px, 1fr);
   align-items: center;
   gap: 5px 10px;
-  min-width: 150px;
+  min-width: 205px;
 }
 
-.volume-control > i {
+.volume-control__mute {
   grid-row: 1 / 3;
-  font-size: 28px;
+  width: 36px;
+  height: 52px;
+  min-width: 36px;
+  border: 0;
+  font-size: 26px;
 }
 
 .volume-control input {
@@ -3541,6 +3545,22 @@ textarea {
   width: 100%;
   accent-color: var(--signal);
 }
+
+.volume-control__status {
+  grid-column: 2 / 4;
+  overflow: hidden;
+  color: var(--ink-soft);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.volume-control__status[data-tone="live"] { color: var(--success); }
+.volume-control__status[data-tone="muted"] { color: var(--ink-soft); }
+.volume-control__status[data-tone="warning"] { color: var(--danger); }
 
 /* Multiview ------------------------------------------------------------- */
 

@@ -20,6 +20,7 @@ test("StreamMetrics does not double count fragments or repeated waiting events",
   video.dispatchEvent(new Event("playing"));
   video.dispatchEvent(new Event("waiting"));
   video.dispatchEvent(new Event("waiting"));
+  video.webkitAudioDecodedByteCount = 4096;
   metrics.sample();
 
   const snapshot = metrics.snapshot();
@@ -35,6 +36,16 @@ test("StreamMetrics does not double count fragments or repeated waiting events",
   assert.equal(snapshot.labels.downloadThroughput, "measured");
   assert.equal(snapshot.labels.bandwidthEstimate, "estimated");
   assert.equal(snapshot.labels.bitrate, "manifest");
+  assert.deepEqual(snapshot.audio, {
+    codec: "mp4a.40.2",
+    decodedBytes: 4096,
+    decoded: true,
+    muted: false,
+    volume: 1,
+    paused: true,
+    readyState: 4,
+  });
+  assert.equal(snapshot.labels.audioDecodedBytes, "measured");
 
   video.dispatchEvent(new Event("playing"));
   video.dispatchEvent(new Event("waiting"));

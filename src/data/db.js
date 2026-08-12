@@ -173,3 +173,18 @@ export async function hydrateCatalog(db) {
   }));
   return { sources, channels, favorites, history };
 }
+
+export async function applyInstallationState(db, payload = {}) {
+  const existingSources = new Map((await getAll(db, 'sources')).map((source) => [source.sourceId, source]));
+  const stores = ['sources', 'favorites', 'settings'];
+  const transaction = db.transaction(stores, 'readwrite');
+  const sourceStore = transaction.objectStore('sources');
+  const favoriteStore = transaction.objectStore('favorites');
+  const settingStore = transaction.objectStore('settings');
+  sourceStore.clear();
+  favoriteStore.clear();
+  (payload.sources || []).forEach((source) => sourceStore.put({ ...(existingSources.get(source.sourceId) || {}), ...source }));
+  (payload.favorites || []).forEach((favorite) => favoriteStore.put({ ...favorite }));
+  Object.entries(payload.settings || {}).forEach(([key, value]) => settingStore.put({ key, value, updatedAt: Date.now(), installation: true }));
+  await transactionDone(transaction);
+}

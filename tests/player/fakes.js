@@ -3,6 +3,10 @@ export class FakeVideo extends EventTarget {
     super();
     this.autoplay = false;
     this.muted = false;
+    this.volume = 1;
+    this.paused = true;
+    this.readyState = 4;
+    this.webkitAudioDecodedByteCount = 0;
     this.playsInline = false;
     this.currentTime = 5;
     this.ended = false;
@@ -20,11 +24,13 @@ export class FakeVideo extends EventTarget {
   }
   play() {
     this.playCalls += 1;
+    this.paused = false;
     return Promise.resolve();
   }
 
   pause() {
     this.pauseCalls += 1;
+    this.paused = true;
   }
 
   load() {
