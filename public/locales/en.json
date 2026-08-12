@@ -21,6 +21,25 @@
     "randomHint": "Play another live channel",
     "explore": "Explore the world"
   },
+  "explore": {
+    "title": "Explore the signal",
+    "description": "Curated live television collections built from your imported catalog.",
+    "featuredCollection": "Featured collection",
+    "watchLive": "Watch live",
+    "surprise": "Surprise me",
+    "filterAriaLabel": "Explore categories",
+    "channelCount": "{count} channels",
+    "categories": {
+      "all": "All",
+      "news": "News",
+      "sports": "Sports",
+      "movies": "Movies",
+      "music": "Music",
+      "kids": "Kids",
+      "culture": "Culture",
+      "local": "Local"
+    }
+  },
   "footer": {
     "global": "Global",
     "download": "Down",

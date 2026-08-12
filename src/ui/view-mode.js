@@ -8,7 +8,7 @@ export function shouldActivateShellView(mode, requested = true) {
   return requested !== false && !OVERLAY_MODES.has(String(mode || ''));
 }
 
-export function isPrimaryNavActive(key, viewName, homeMode = 'live') {
-  if (viewName === 'home') return key === (homeMode === 'explore' ? 'explore' : 'home');
+export function isPrimaryNavActive(key, viewName) {
+  if (viewName === 'home') return key === 'home';
   return key === viewName;
 }

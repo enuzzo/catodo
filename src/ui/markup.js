@@ -1,5 +1,6 @@
 import { renderCountryShape, renderWorldMap } from './world-map.js';
 import { isPrimaryNavActive, shouldActivateShellView } from './view-mode.js';
+import { EXPLORE_CATEGORIES } from './explore-model.js';
 
 const FLAG_URLS = import.meta.glob('../../assets/vendor/flags/4x3/*.svg', {
   eager: true,
@@ -8,7 +9,7 @@ const FLAG_URLS = import.meta.glob('../../assets/vendor/flags/4x3/*.svg', {
 });
 
 const TONES = ['white', 'red', 'green', 'yellow', 'cyan', 'magenta', 'blue'];
-const VIEW_NAMES = ['home', 'countries', 'guide', 'library', 'sources'];
+const VIEW_NAMES = ['home', 'explore', 'countries', 'guide', 'library', 'sources'];
 const MULTIVIEW_SIZE = 4;
 const mountedApps = new WeakMap();
 
@@ -358,10 +359,9 @@ function createHeader(t) {
   const navButtons = {};
   navDefinitions.forEach(([view, key, fallback]) => {
     const action = view === 'multiview' ? 'open-multiview' : 'navigate';
-    const targetView = view === 'explore' ? 'home' : view;
     const button = element('button', 'primary-nav__item', {
       type: 'button',
-      dataset: { action, view: targetView, mode: view },
+      dataset: { action, view, mode: view },
     });
     button.append(textNode('span', null, t, key, fallback));
     nav.append(button);
@@ -534,6 +534,109 @@ function createHomeView(t) {
     nearbyGrid,
     favoriteGrid,
   };
+}
+
+function createExploreView(t) {
+  const view = element('section', 'page page--explore', { dataset: { page: 'explore' }, hidden: true });
+  const intro = element('header', 'explore-intro');
+  const copy = element('div');
+  copy.append(
+    textNode('h1', null, t, 'explore.title', 'Explore the signal'),
+    textNode('p', null, t, 'explore.description', 'Curated live television collections built from your imported catalog.'),
+  );
+  const surprise = actionButton({
+    t, action: 'explore-surprise', iconName: 'dice-five', key: 'explore.surprise', fallback: 'Surprise me', className: 'button--primary',
+  });
+  intro.append(copy, surprise);
+
+  const hero = element('article', 'explore-hero');
+  const heroStage = element('div', 'explore-hero__stage');
+  const video = element('video', 'explore-hero__video', {
+    muted: true, autoplay: true, playsInline: true, preload: 'metadata', dataset: { mediaRole: 'explore-live' },
+  });
+  const heroLive = element('span', 'explore-hero__live');
+  heroLive.append(element('i', 'live-dot', { 'aria-hidden': 'true' }), textNode('span', null, t, 'status.liveMuted', 'LIVE · MUTED'));
+  heroStage.append(video, heroLive);
+  const heroCopy = element('div', 'explore-hero__copy');
+  const heroCollection = textNode('span', 'explore-hero__collection', t, 'explore.featuredCollection', 'Featured collection');
+  const heroName = textNode('h2', null, t, 'channel.unknown', 'Unknown channel');
+  const heroMeta = element('div', 'explore-hero__meta');
+  const heroSchedule = element('div', 'explore-hero__schedule');
+  const heroActions = element('div', 'explore-hero__actions');
+  const watch = actionButton({
+    t, action: 'open-player', iconName: 'play', key: 'explore.watchLive', fallback: 'Watch live', className: 'button--primary',
+  });
+  const random = actionButton({
+    t, action: 'explore-random', iconName: 'shuffle', key: 'home.random', fallback: 'Random', className: 'button--ghost',
+  });
+  heroActions.append(watch, random);
+  heroCopy.append(heroCollection, heroName, heroMeta, heroSchedule, heroActions);
+  hero.append(heroStage, heroCopy);
+
+  const filters = element('div', 'explore-filters', { role: 'tablist', 'aria-label': translate(t, 'explore.filterAriaLabel', 'Explore categories') });
+  const filterButtons = {};
+  EXPLORE_CATEGORIES.forEach((category, index) => {
+    const button = actionButton({
+      t, action: 'filter-explore', iconName: category.icon, key: `explore.categories.${category.id}`, fallback: category.label,
+      className: index === 0 ? 'is-active' : '', dataset: { category: category.id },
+    });
+    button.setAttribute('role', 'tab');
+    button.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+    filters.append(button);
+    filterButtons[category.id] = button;
+  });
+
+  const collections = element('div', 'explore-collections');
+  view.append(intro, hero, filters, collections);
+  return { view, video, hero, heroCollection, heroName, heroMeta, heroSchedule, watch, random, surprise, filters, filterButtons, collections };
+}
+
+function setExploreHero(refs, channel, collection, t) {
+  const value = channel && typeof channel === 'object' ? channel : {};
+  const id = safeId(value.channelId || value.id || value.tvgId || value.url);
+  refs.hero.dataset.channelId = id;
+  refs.watch.dataset.channelId = id;
+  refs.random.dataset.currentChannelId = id;
+  refs.heroCollection.textContent = safeText(collection?.title, translate(t, 'explore.featuredCollection', 'Featured collection'));
+  refs.heroName.textContent = safeText(value.name, translate(t, 'channel.unknown', 'Unknown channel'));
+  refs.heroMeta.replaceChildren(channelMeta(value));
+  const schedule = channelSchedule(value);
+  const now = schedule.find((programme) => Number(programme.start) <= Date.now() && Number(programme.stop) > Date.now());
+  const next = schedule.find((programme) => Number(programme.start) > Date.now());
+  refs.heroSchedule.replaceChildren();
+  [[now, 'guide.now', 'Now'], [next, 'guide.next', 'Next']].forEach(([programme, key, fallback]) => {
+    const row = element('div');
+    row.append(
+      textNode('span', null, t, key, fallback),
+      textNode('strong', null, t, programme ? 'guide.programmeValue' : 'guide.noDataShort', programme ? '{time} · {title}' : 'Guide unavailable', {
+        time: programme ? formatProgrammeTime(programme.start) : '', title: programme?.title || '',
+      }),
+    );
+    refs.heroSchedule.append(row);
+  });
+  setMedia(refs.video, { ...value, muted: true, autoplay: true });
+}
+
+function renderExploreCollections(container, collections, t) {
+  const fragment = document.createDocumentFragment();
+  normaliseArray(collections).forEach((collection) => {
+    const section = element('section', 'explore-collection', { dataset: { collection: safeId(collection?.id) } });
+    const header = element('div', 'explore-collection__header');
+    const copy = element('div');
+    const title = element('h2');
+    title.append(icon(collection?.icon || 'broadcast'), document.createTextNode(safeText(collection?.title)));
+    const description = element('p');
+    description.textContent = safeText(collection?.description);
+    copy.append(title, description);
+    const count = element('span', 'explore-collection__count mono');
+    count.textContent = translate(t, 'explore.channelCount', '{count} channels', { count: normaliseArray(collection?.channels).length });
+    header.append(copy, count);
+    const rail = element('div', 'channel-grid explore-collection__rail');
+    renderChannelTiles(rail, normaliseArray(collection?.channels), t, { schedule: true });
+    section.append(header, rail);
+    fragment.append(section);
+  });
+  container.replaceChildren(fragment);
 }
 
 function createCountriesView(t) {
@@ -2120,6 +2223,7 @@ export function mountAppUI(root, options = {}) {
   const t = options.t;
   const header = createHeader(t);
   const home = createHomeView(t);
+  const explore = createExploreView(t);
   const countries = createCountriesView(t);
   const guide = createGuideView(t);
   const library = createLibraryView(t);
@@ -2133,7 +2237,7 @@ export function mountAppUI(root, options = {}) {
 
   const shell = element('div', 'catodo-shell');
   const main = element('main', 'app-content');
-  main.append(home.view, countries.view, guide.view, library.view, sources.view);
+  main.append(home.view, explore.view, countries.view, guide.view, library.view, sources.view);
   shell.append(header.header, main, signalBar.bar);
   root.classList.add('catodo-app');
   root.replaceChildren(shell, player.overlay, multiview.overlay, multiviewSignalLab.backdrop, channelPicker.backdrop, importDialog.backdrop);
@@ -2146,6 +2250,7 @@ export function mountAppUI(root, options = {}) {
   const dispatcher = makeActionDispatcher(root, options.onAction);
   const views = {
     home: home.view,
+    explore: explore.view,
     countries: countries.view,
     guide: guide.view,
     library: library.view,
@@ -2164,7 +2269,7 @@ export function mountAppUI(root, options = {}) {
     root.dataset.mode = 'shell';
     root.dataset.view = viewName;
     Object.entries(header.navButtons).forEach(([key, button]) => {
-      const active = isPrimaryNavActive(key, viewName, root.dataset.homeMode);
+      const active = isPrimaryNavActive(key, viewName);
       button.classList.toggle('is-active', active);
       button.toggleAttribute('aria-current', active);
     });
@@ -2187,6 +2292,7 @@ export function mountAppUI(root, options = {}) {
       home: home.view,
       homeLiveCard: home.liveCard,
       homeVideo: home.video,
+      exploreVideo: explore.video,
       homeChannelGrid: home.nearbyGrid,
       favoriteGrid: home.favoriteGrid,
       countries: countries.view,
@@ -2226,7 +2332,6 @@ export function mountAppUI(root, options = {}) {
     updateHeader(state = {}) {
       if (state.query !== undefined) header.searchInput.value = safeText(state.query);
       if (state.searchPlaceholder) header.searchInput.placeholder = safeText(state.searchPlaceholder);
-      if (state.homeMode) root.dataset.homeMode = safeText(state.homeMode);
       if (state.view && VIEW_NAMES.includes(state.view) && shouldActivateShellView(root.dataset.mode)) {
         activateShellView(state.view);
       }
@@ -2252,19 +2357,6 @@ export function mountAppUI(root, options = {}) {
       if (state.signalOk !== undefined) {
         signalBar.status.classList.toggle('is-error', !state.signalOk);
       }
-      return api;
-    },
-
-    focusExplore() {
-      home.nearbyGrid.tabIndex = -1;
-      scheduleFrame(() => {
-        home.nearbyGrid.focus({ preventScroll: true });
-        home.nearbyGrid.scrollIntoView({
-          behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-          block: 'nearest',
-          inline: 'nearest',
-        });
-      });
       return api;
     },
 
@@ -2319,6 +2411,21 @@ export function mountAppUI(root, options = {}) {
         'Save channels here for one-tap tuning.',
       );
       if (state.time !== undefined) api.updateHeader({ time: state.time });
+      return api;
+    },
+
+    renderExplore(state = {}) {
+      if (shouldActivateShellView(root.dataset.mode, state.activate)) activateShellView('explore');
+      const collections = normaliseArray(state.collections);
+      const featuredCollection = collections.find((collection) => normaliseArray(collection.channels).some((channel) =>
+        safeId(channel?.channelId || channel?.id) === safeId(state.featured?.channelId || state.featured?.id))) || collections[0];
+      setExploreHero(explore, state.featured || featuredCollection?.channels?.[0] || {}, featuredCollection, t);
+      renderExploreCollections(explore.collections, collections, t);
+      Object.entries(explore.filterButtons).forEach(([category, button]) => {
+        const active = category === safeText(state.category, 'all');
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
       return api;
     },
 

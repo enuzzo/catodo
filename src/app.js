@@ -14,6 +14,7 @@ import { MultiviewController, PlayerManager } from "./player/index.js";
 import { mountAppUI } from "./ui/markup.js";
 import { EpgService, epgPreset } from "./epg/index.js";
 import { filterChannelPicker } from "./ui/channel-picker-filter.js";
+import { buildExploreCollections, pickExploreFeatured } from "./ui/explore-model.js";
 import { multiviewTelemetry, singleTelemetry } from "./ui/telemetry-model.js";
 import { resetWorldMapView, zoomWorldMap } from "./ui/world-map.js";
 
@@ -25,7 +26,8 @@ const QA_MODE = new URLSearchParams(location.search).has("qa");
 
 const state = {
   view: "home",
-  homeMode: "live",
+  exploreCategory: "all",
+  exploreFeaturedId: "",
   query: "",
   libraryQuery: "",
   countryQuery: "",
@@ -65,6 +67,7 @@ const state = {
 let catalog;
 let ui;
 let homePlayer;
+let explorePlayer;
 let mainPlayer;
 let multiview;
 let epg;
@@ -393,6 +396,26 @@ function renderHome() {
   });
 }
 
+function exploreCollections() {
+  return buildExploreCollections(playableChannels().map(decorateChannel).filter(Boolean), {
+    activeCategory: state.exploreCategory,
+    limit: 12,
+  });
+}
+
+function renderExplore() {
+  const collections = exploreCollections();
+  const featured = pickExploreFeatured(collections, state.exploreFeaturedId);
+  if (featured) state.exploreFeaturedId = channelId(featured);
+  ui.renderExplore({
+    activate: state.view === "explore",
+    category: state.exploreCategory,
+    collections,
+    featured: featured ? { ...featured, muted: true, autoplay: state.view === "explore" } : null,
+  });
+  if (state.view !== "explore") ui.refs.exploreVideo.pause();
+}
+
 function renderCountries() {
   let countries = countryModels();
   countries = filterCountriesByRegion(countries, state.countryRegion);
@@ -476,13 +499,13 @@ function renderGuide() {
 
 function renderAll() {
   renderHome();
+  renderExplore();
   renderCountries();
   renderLibrary();
   renderGuide();
   renderSources();
   ui.updateHeader({
     view: state.view,
-    homeMode: state.homeMode,
     query: state.query,
     time: formatClock(),
     signalOk: !state.lastCatalog?.error,
@@ -497,6 +520,22 @@ async function tuneHome(channel) {
   });
 }
 
+async function syncShellPreview() {
+  if (state.view === "home") {
+    ui.refs.exploreVideo.pause();
+    ui.refs.homeVideo.muted = state.homeMuted;
+    await ui.refs.homeVideo.play().catch(() => {});
+    return;
+  }
+  ui.refs.homeVideo.pause();
+  if (state.view === "explore") {
+    const channel = findChannel(state.exploreFeaturedId);
+    if (channel) await explorePlayer.tune(playbackSource(channel), { muted: true }).catch(() => {});
+    return;
+  }
+  ui.refs.exploreVideo.pause();
+}
+
 async function openPlayer(channel) {
   if (!channel || !isPlayableChannel(channel)) {
     ui.toast("No browser-playable HLS endpoint is available for this channel.", { tone: "error" });
@@ -504,6 +543,8 @@ async function openPlayer(channel) {
   }
   state.homeMuted = true;
   homePlayer.setMuted(true);
+  ui.refs.homeVideo.pause();
+  ui.refs.exploreVideo.pause();
   state.currentId = channelId(channel);
   state.playerChromeVisible = false;
   ui.showPlayer({ channel: decorateChannel(channel), muted: true, loading: true, playing: false, chromeVisible: false });
@@ -654,7 +695,7 @@ function closeOverlays() {
   ui.showMultiviewSignalLab(false);
   ui.showChannelPicker(false);
   ui.showView(state.view);
-  if (state.featuredId) tuneHome(findChannel(state.featuredId));
+  void syncShellPreview();
 }
 
 function showImportForCountry(code) {
@@ -725,27 +766,36 @@ async function handleAction(action, detail) {
   const id = detail.dataset.channelId || detail.element?.closest?.("[data-channel-id]")?.dataset.channelId;
   switch (action) {
     case "navigate": {
-      const explore = detail.dataset.mode === "explore";
-      state.view = detail.dataset.view || "home";
-      if (state.view === "home") state.homeMode = explore ? "explore" : "live";
-
-      let nextExploreChannel = null;
-      if (explore) {
-        refreshWorldMix();
-        const random = catalog.randomWorld({ currentChannelId: state.featuredId });
-        nextExploreChannel = random && isPlayableChannel(random)
-          ? random
-          : state.worldMixIds.map(findChannel).find((channel) => channel && channelId(channel) !== state.featuredId) || null;
-        if (nextExploreChannel) state.featuredId = channelId(nextExploreChannel);
-      }
-
+      state.view = detail.dataset.mode === "explore" ? "explore" : detail.dataset.view || "home";
       renderAll();
       ui.showView(state.view);
       if (state.view === "guide") void loadSchedules(playableChannels().slice(0, 48));
-      if (explore) {
-        ui.focusExplore();
-        if (nextExploreChannel) tuneHome(nextExploreChannel);
-      }
+      await syncShellPreview();
+      break;
+    }
+    case "filter-explore": {
+      state.exploreCategory = detail.dataset.category || "all";
+      state.exploreFeaturedId = "";
+      renderExplore();
+      const channel = findChannel(state.exploreFeaturedId);
+      if (channel) await explorePlayer.tune(playbackSource(channel), { muted: true }).catch(() => {});
+      break;
+    }
+    case "explore-random": {
+      const collections = exploreCollections();
+      const pool = collections.flatMap((collection) => collection.channels || []);
+      const alternatives = pool.filter((channel) => channelId(channel) !== state.exploreFeaturedId);
+      const channel = (alternatives.length ? alternatives : pool)[Math.floor(Math.random() * Math.max(1, alternatives.length || pool.length))];
+      if (!channel) break;
+      state.exploreFeaturedId = channelId(channel);
+      renderExplore();
+      const source = findChannel(state.exploreFeaturedId);
+      if (source) await explorePlayer.tune(playbackSource(source), { muted: true }).catch(() => {});
+      break;
+    }
+    case "explore-surprise": {
+      const channel = catalog.randomWorld({ currentChannelId: state.exploreFeaturedId }) || catalog.randomPlayable({ currentChannelId: state.exploreFeaturedId });
+      if (channel && isPlayableChannel(channel)) await openPlayer(channel);
       break;
     }
     case "search-query":
@@ -1169,6 +1219,7 @@ async function boot() {
     if (next) window.setTimeout(() => setHomeFeatured(next, { resetFailures: false }), 250);
     else ui.updateHeader({ signalOk: false });
   } });
+  explorePlayer = new PlayerManager({ video: ui.refs.exploreVideo, id: "explore" });
   mainPlayer = new PlayerManager({ video: ui.refs.playerVideo, id: "main", onEvent: (type, detail) => {
     if (type === "fatal") ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)), loading: false, error: detail.error?.message, playing: false });
   } });
@@ -1245,6 +1296,7 @@ window.addEventListener("beforeunload", () => {
   window.clearInterval(epgTimer);
   unsubscribeCatalog?.();
   homePlayer?.destroy();
+  explorePlayer?.destroy();
   mainPlayer?.destroy();
   multiview?.destroy();
   catalog?.destroy();

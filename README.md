@@ -8,6 +8,7 @@ It is a vanilla ES-module application with no framework. Pinned runtime assets a
 
 - **Soft Signal Grid:** an editorial broadcast UI with electric-blue and EBU accents.
 - **Home Live Anchor:** when a cached catalog is available, the first tile at left starts muted and stays live while you explore. Use **Random** beside it to switch quickly to another playable channel.
+- **Explore collections:** Explore is a separate editorial surface built entirely from real catalog metadata. Filter ready-made rails for News, Sports, Movies, Music, Kids, Culture, and Local television; preview one live feed muted or use **Surprise me** to jump into a world-random channel.
 - **Signal Atlas:** explore every country exposed by the upstream catalog, with global search and country discovery.
 - **Country flags:** the Countries index and country detail use self-hosted SVG artwork from the MIT-licensed `flag-icons` collection, with an ISO-code fallback.
 - **Multiview:** 2-, 3-, or 4-feed layouts; exactly one selected feed supplies audio.
