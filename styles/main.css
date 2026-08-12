@@ -3316,10 +3316,17 @@ textarea {
 .multiview-view {
   display: grid;
   grid-template-rows: 124px minmax(0, 1fr) 142px;
+  background: #000;
+  transition: grid-template-rows 240ms ease;
 }
 
 .multiview-toolbar {
+  position: relative;
+  z-index: 5;
   gap: 28px;
+  min-height: 0;
+  overflow: hidden;
+  transition: opacity 180ms ease, transform 220ms ease;
 }
 
 .multiview-toolbar__title {
@@ -3369,6 +3376,7 @@ textarea {
   padding: 14px 20px;
   overflow: hidden;
   background: #000;
+  transition: gap 220ms ease, padding 220ms ease;
 }
 
 .multiview-grid[data-count="2"] {
@@ -3445,6 +3453,7 @@ textarea {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+  transition: opacity 160ms ease;
 }
 
 .multiview-slot__id {
@@ -3495,6 +3504,7 @@ textarea {
   min-width: 54px;
   border-radius: 50%;
   font-size: 22px;
+  transition: opacity 160ms ease;
 }
 
 .multiview-slot.is-listening .multiview-slot__audio {
@@ -3514,6 +3524,7 @@ textarea {
   font-size: 12px;
   text-transform: uppercase;
   transform: translateX(-50%);
+  transition: opacity 160ms ease;
 }
 
 .multiview-slot__info {
@@ -3527,6 +3538,7 @@ textarea {
   border-radius: var(--radius-xs);
   background: rgb(0 0 0 / 72%);
   color: #fff;
+  transition: opacity 160ms ease;
 }
 
 .multiview-slot__info strong {
@@ -3547,12 +3559,49 @@ textarea {
 }
 
 .multiview-status {
+  position: relative;
+  z-index: 5;
   display: grid;
   grid-template-columns: repeat(4, minmax(180px, 1fr)) 210px;
   align-items: center;
   padding: 0 30px;
   border-top: 1px solid var(--line);
   background: var(--paper-raised);
+  min-height: 0;
+  overflow: hidden;
+  transition: opacity 180ms ease, transform 220ms ease;
+}
+
+.multiview-view:not(.is-chrome-visible) {
+  grid-template-rows: 0 minmax(0, 1fr) 0;
+  cursor: none;
+}
+
+.multiview-view:not(.is-chrome-visible) .multiview-toolbar,
+.multiview-view:not(.is-chrome-visible) .multiview-status {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.multiview-view:not(.is-chrome-visible) .multiview-toolbar {
+  transform: translateY(-18px);
+}
+
+.multiview-view:not(.is-chrome-visible) .multiview-status {
+  transform: translateY(18px);
+}
+
+.multiview-view:not(.is-chrome-visible) .multiview-grid {
+  gap: 2px;
+  padding: 0;
+}
+
+.multiview-view:not(.is-chrome-visible) .multiview-slot__top,
+.multiview-view:not(.is-chrome-visible) .multiview-slot__audio,
+.multiview-view:not(.is-chrome-visible) .multiview-slot__listening,
+.multiview-view:not(.is-chrome-visible) .multiview-slot__info {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .multiview-status__item {
@@ -3718,11 +3767,35 @@ textarea {
 }
 
 .channel-picker__logo {
+  display: flex;
   width: 54px;
   height: 48px;
+  min-width: 54px;
+  flex: 0 0 54px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 4px;
   border: 1px solid var(--line);
   border-radius: var(--radius-xs);
   background: #fff;
+}
+
+.channel-picker__logo .channel-logo__image {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.channel-picker__logo .channel-logo__fallback {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .channel-picker__copy {

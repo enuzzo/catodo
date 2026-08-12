@@ -1479,6 +1479,7 @@ function createMultiview(t) {
   toolbar.append(titleGroup, layout, toolbarActions);
 
   const grid = element('div', 'multiview-grid', { dataset: { count: '4' } });
+  grid.dataset.action = 'toggle-multiview-chrome';
   const slots = [];
   for (let index = 0; index < MULTIVIEW_SIZE; index += 1) {
     const slotNumber = index + 1;
@@ -1519,6 +1520,15 @@ function createMultiview(t) {
         key: 'multiview.chooseChannel',
         fallback: 'Choose channel',
         className: 'button--media multiview-slot__choose',
+        dataset: { slot: String(slotNumber) },
+      }),
+      iconButton({
+        t,
+        action: 'expand-multiview-slot',
+        iconName: 'corners-out',
+        key: 'multiview.expandFeed',
+        fallback: 'Open feed full screen',
+        className: 'button--media multiview-slot__expand',
         dataset: { slot: String(slotNumber) },
       }),
       iconButton({
@@ -2614,6 +2624,7 @@ export function mountAppUI(root, options = {}) {
       setViewVisible(player.overlay, false);
       setViewVisible(multiview.overlay, true);
       root.dataset.mode = 'multiview';
+      multiview.overlay.classList.toggle('is-chrome-visible', state.chromeVisible !== false);
       api.updateMultiview(state);
       return api;
     },
@@ -2621,6 +2632,9 @@ export function mountAppUI(root, options = {}) {
     updateMultiview(state = {}) {
       const feeds = normaliseArray(state.feeds || state.channels).slice(0, MULTIVIEW_SIZE);
       const layoutCount = Math.max(2, Math.min(4, Number(state.layout || state.count || Math.max(feeds.length, 4)) || 4));
+      if (state.chromeVisible !== undefined) {
+        multiview.overlay.classList.toggle('is-chrome-visible', Boolean(state.chromeVisible));
+      }
       multiview.grid.dataset.count = String(layoutCount);
       [...multiview.layout.children].forEach((button) => {
         button.classList.toggle('is-active', button.dataset.count === String(layoutCount));

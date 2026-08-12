@@ -140,6 +140,7 @@
   "multiview": {
     "random": "Random",
     "chooseChannel": "Choose channel",
+    "expandFeed": "Open feed full screen",
     "pickerTitle": "Choose channel · Slot {slot}",
     "pickerSearch": "Search channels, countries, languages…",
     "pickerCount": "{count} channels",

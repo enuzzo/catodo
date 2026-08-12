@@ -42,6 +42,7 @@ const state = {
   multiviewLayout: 4,
   multiviewFeeds: [],
   multiviewAudioIndex: null,
+  multiviewChromeVisible: true,
   multiviewPickerSlot: null,
   multiviewPickerQuery: "",
   libraryCategory: "",
@@ -62,6 +63,7 @@ const state = {
   guideLoading: false,
   guideError: "",
   playerChromeVisible: false,
+  playerReturnMode: "shell",
 };
 
 let catalog;
@@ -78,6 +80,8 @@ let epgTimer;
 let lastRememberedId = "";
 let directoryMaps = { byCode: new Map(), byName: new Map() };
 let playerChromeTimer = 0;
+let multiviewChromeTimer = 0;
+let multiviewPointerAt = 0;
 
 function legacyStorage() {
   try { return globalThis.localStorage || undefined; }
@@ -536,7 +540,7 @@ async function syncShellPreview() {
   ui.refs.exploreVideo.pause();
 }
 
-async function openPlayer(channel) {
+async function openPlayer(channel, { returnMode = "shell" } = {}) {
   if (!channel || !isPlayableChannel(channel)) {
     ui.toast("No browser-playable HLS endpoint is available for this channel.", { tone: "error" });
     return;
@@ -545,6 +549,11 @@ async function openPlayer(channel) {
   homePlayer.setMuted(true);
   ui.refs.homeVideo.pause();
   ui.refs.exploreVideo.pause();
+  state.playerReturnMode = returnMode;
+  if (returnMode === "multiview") {
+    multiview.muteAll();
+    ui.refs.multiviewVideos.forEach((video) => video.pause());
+  }
   state.currentId = channelId(channel);
   state.playerChromeVisible = false;
   ui.showPlayer({ channel: decorateChannel(channel), muted: true, loading: true, playing: false, chromeVisible: false });
@@ -601,6 +610,20 @@ function showPlayerChrome() {
   }, 8000);
 }
 
+function setMultiviewChrome(visible, { autoHide = true } = {}) {
+  state.multiviewChromeVisible = Boolean(visible);
+  ui.refs.multiview.classList.toggle("is-chrome-visible", state.multiviewChromeVisible);
+  window.clearTimeout(multiviewChromeTimer);
+  if (state.multiviewChromeVisible && autoHide && ui.refs.root.dataset.mode === "multiview") {
+    multiviewChromeTimer = window.setTimeout(() => setMultiviewChrome(false, { autoHide: false }), 6500);
+  }
+}
+
+function revealMultiviewChrome() {
+  if (ui.refs.root.dataset.mode !== "multiview") return;
+  setMultiviewChrome(true);
+}
+
 function fillMultiview(seed) {
   const candidates = playableChannels();
   const ids = new Set(state.multiviewFeeds.map(channelId));
@@ -625,12 +648,24 @@ function createMultiviewController() {
   });
 }
 
+function createMainPlayer() {
+  return new PlayerManager({ video: ui.refs.playerVideo, id: "main", onEvent: (type, detail) => {
+    if (type === "fatal") ui.updatePlayer({
+      channel: decorateChannel(findChannel(state.currentId)),
+      loading: false,
+      error: detail.error?.message,
+      playing: false,
+    });
+  } });
+}
+
 async function openMultiview(seed, { fill = true } = {}) {
   homePlayer.setMuted(true);
   if (fill) fillMultiview(seed);
   const feeds = state.multiviewFeeds.slice(0, state.multiviewLayout);
   state.multiviewAudioIndex = null;
-  ui.showMultiview({ feeds: feeds.map(decorateChannel), layout: state.multiviewLayout, mutedAll: true });
+  ui.showMultiview({ feeds: feeds.map(decorateChannel), layout: state.multiviewLayout, mutedAll: true, chromeVisible: true });
+  setMultiviewChrome(true);
   await multiview.start(feeds.map(playbackSource), { count: state.multiviewLayout, videos: ui.refs.multiviewVideos });
 }
 
@@ -689,6 +724,7 @@ function updateMultiviewMetrics() {
 }
 
 function closeOverlays() {
+  window.clearTimeout(multiviewChromeTimer);
   mainPlayer.setMuted(true);
   multiview.muteAll();
   state.multiviewAudioIndex = null;
@@ -696,6 +732,34 @@ function closeOverlays() {
   ui.showChannelPicker(false);
   ui.showView(state.view);
   void syncShellPreview();
+}
+
+async function closePlayerOverlay() {
+  mainPlayer.setMuted(true);
+  ui.refs.playerVideo.pause();
+  if (document.fullscreenElement === ui.refs.player) await document.exitFullscreen?.().catch(() => {});
+  mainPlayer.destroy();
+  mainPlayer = createMainPlayer();
+  if (state.playerReturnMode !== "multiview") {
+    closeOverlays();
+    return;
+  }
+
+  state.playerReturnMode = "shell";
+  const feeds = state.multiviewFeeds.slice(0, state.multiviewLayout);
+  ui.showMultiview({
+    feeds: feeds.map(decorateChannel),
+    layout: state.multiviewLayout,
+    audioIndex: state.multiviewAudioIndex,
+    chromeVisible: true,
+  });
+  await Promise.all(ui.refs.multiviewVideos.slice(0, state.multiviewLayout).map((video) => video.play().catch(() => {})));
+  if (state.multiviewAudioIndex !== null) {
+    const slotId = `slot-${state.multiviewAudioIndex + 1}`;
+    multiview.registerUserGesture(slotId);
+    multiview.activateAudio(slotId);
+  }
+  setMultiviewChrome(true);
 }
 
 function showImportForCountry(code) {
@@ -764,6 +828,7 @@ async function copyDiagnostics() {
 
 async function handleAction(action, detail) {
   const id = detail.dataset.channelId || detail.element?.closest?.("[data-channel-id]")?.dataset.channelId;
+  if (ui.refs.root.dataset.mode === "multiview" && action !== "toggle-multiview-chrome") revealMultiviewChrome();
   switch (action) {
     case "navigate": {
       state.view = detail.dataset.mode === "explore" ? "explore" : detail.dataset.view || "home";
@@ -1024,6 +1089,8 @@ async function handleAction(action, detail) {
       break;
     }
     case "close-player":
+      await closePlayerOverlay();
+      break;
     case "close-multiview":
       closeOverlays();
       break;
@@ -1047,7 +1114,7 @@ async function handleAction(action, detail) {
     case "previous-channel": {
       const channels = playableChannels();
       const index = channels.findIndex((channel) => channelId(channel) === state.currentId);
-      await openPlayer(channels[(index - 1 + channels.length) % channels.length]);
+      await openPlayer(channels[(index - 1 + channels.length) % channels.length], { returnMode: state.playerReturnMode });
       break;
     }
     case "open-signal-lab":
@@ -1089,6 +1156,15 @@ async function handleAction(action, detail) {
     case "open-multiview":
       await openMultiview(findChannel(id || state.featuredId));
       break;
+    case "toggle-multiview-chrome":
+      setMultiviewChrome(!state.multiviewChromeVisible);
+      break;
+    case "expand-multiview-slot": {
+      const index = Math.max(0, Math.min(3, Number(detail.dataset.slot) - 1));
+      const channel = state.multiviewFeeds[index];
+      if (channel) await openPlayer(channel, { returnMode: "multiview" });
+      break;
+    }
     case "set-multiview-layout":
       state.multiviewLayout = Math.max(2, Math.min(4, Number(detail.dataset.count) || 4));
       await openMultiview();
@@ -1189,6 +1265,13 @@ function bindVideoEvents() {
   ui.refs.playerVideo.addEventListener("waiting", () => {
     ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)), loading: true, playing: false });
   });
+  ui.refs.multiview.addEventListener("pointermove", () => {
+    const now = performance.now();
+    if (now - multiviewPointerAt < 500) return;
+    multiviewPointerAt = now;
+    revealMultiviewChrome();
+  });
+  ui.refs.multiview.addEventListener("keydown", revealMultiviewChrome);
 }
 
 async function boot() {
@@ -1220,9 +1303,7 @@ async function boot() {
     else ui.updateHeader({ signalOk: false });
   } });
   explorePlayer = new PlayerManager({ video: ui.refs.exploreVideo, id: "explore" });
-  mainPlayer = new PlayerManager({ video: ui.refs.playerVideo, id: "main", onEvent: (type, detail) => {
-    if (type === "fatal") ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)), loading: false, error: detail.error?.message, playing: false });
-  } });
+  mainPlayer = createMainPlayer();
   multiview = createMultiviewController();
   bindVideoEvents();
 
@@ -1294,6 +1375,8 @@ window.addEventListener("beforeunload", () => {
   window.clearInterval(clockTimer);
   window.clearInterval(metricTimer);
   window.clearInterval(epgTimer);
+  window.clearTimeout(playerChromeTimer);
+  window.clearTimeout(multiviewChromeTimer);
   unsubscribeCatalog?.();
   homePlayer?.destroy();
   explorePlayer?.destroy();
