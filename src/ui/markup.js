@@ -295,15 +295,20 @@ function renderChannelTiles(container, channels, t, options = {}) {
     tile.append(main);
 
     if (options.favorites !== false) {
+      const isFavorite = Boolean(channel?.favorite || channel?.isFavorite);
       const favorite = iconButton({
         t,
-        action: channel?.favorite || channel?.isFavorite ? 'remove-favorite' : 'add-favorite',
+        action: isFavorite ? 'remove-favorite' : 'add-favorite',
         iconName: 'heart',
-        key: channel?.favorite || channel?.isFavorite ? 'favorite.remove' : 'favorite.add',
-        fallback: channel?.favorite || channel?.isFavorite ? 'Remove from favorites' : 'Add to favorites',
-        className: `channel-tile__favorite${channel?.favorite || channel?.isFavorite ? ' is-active' : ''}`,
+        key: isFavorite ? 'favorite.remove' : 'favorite.add',
+        fallback: isFavorite ? 'Remove from favorites' : 'Add to favorites',
+        className: `channel-tile__favorite${isFavorite ? ' is-active' : ''}`,
         dataset: { channelId: id },
       });
+      favorite.setAttribute('aria-pressed', isFavorite ? 'true' : 'false');
+      const glyph = favorite.querySelector('i');
+      glyph.className = 'channel-tile__favorite-glyph';
+      glyph.textContent = isFavorite ? '\u2665' : '\u2661';
       tile.append(favorite);
     }
     fragment.append(tile);

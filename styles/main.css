@@ -1181,11 +1181,32 @@ textarea {
   min-height: 32px;
   border-color: transparent;
   background: transparent;
+  color: var(--ink-soft);
   font-size: 18px;
 }
 
+.channel-tile__favorite:hover {
+  border-color: transparent;
+  background: rgb(218 45 45 / 8%);
+  color: var(--danger);
+}
+
+.channel-tile__favorite-glyph {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 25px;
+  font-style: normal;
+  line-height: 1;
+}
+
 .channel-tile__favorite.is-active {
-  color: var(--signal);
+  border-color: transparent;
+  background: transparent;
+  color: var(--danger);
+}
+
+.channel-tile__favorite.is-active:hover {
+  background: rgb(218 45 45 / 8%);
+  color: #bd1717;
 }
 
 .atlas-card {
