@@ -67,7 +67,11 @@ export class CatalogService {
       this.#applyCatalog(catalog, { emit: false });
       this.#set({ ready: true, loading: false });
       if (this.#installationSync?.supported) {
-        if (!remoteInstallation?.updatedAt) void this.#pushInstallationState();
+        if (!remoteInstallation?.updatedAt) {
+          const sharedSettings = await Promise.all([...SYNC_SETTINGS].map((key) => get(this.#db, "settings", key)));
+          const hasLocalInstallationData = catalog.sources.length > 0 || catalog.favorites.length > 0 || sharedSettings.some(Boolean);
+          if (hasLocalInstallationData) void this.#pushInstallationState();
+        }
         else {
           const missingSources = catalog.sources.filter((source) => !source.activeSnapshotId);
           if (missingSources.length) globalThis.setTimeout(() => void this.#hydrateInstallationSources(missingSources), 0);
