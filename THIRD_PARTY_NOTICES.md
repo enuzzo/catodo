@@ -5,7 +5,7 @@ CATODO vendors pinned runtime assets so the player can boot without a CDN.
 | Component | Version | License | Local notice |
 |---|---:|---|---|
 | hls.js | 1.5.17 | Apache-2.0 | `assets/vendor/hls/LICENSE` |
-| Three.js | r162 / 0.162.0 | MIT | `assets/vendor/three/LICENSE` |
+| Three.js | r162 / 0.162.0 | MIT | `assets/vendor/three/LICENSE` (legacy vendored archive, not loaded by the current runtime) |
 | Phosphor Icons Web | 2.1.2 | MIT | `assets/vendor/phosphor/LICENSE` |
 | SVG Maps — World | 2.0.0 | CC-BY-4.0 | `assets/vendor/map/LICENSE.md` |
 | flag-icons | 7.5.0 | MIT | `assets/vendor/flags/LICENSE` |

@@ -42,6 +42,15 @@
     "consentRequired": "Confirm before CATODO contacts this source",
     "channelsImported": "{count} channels imported"
   },
+  "import": {
+    "presetsTitle": "Recommended playlists",
+    "presetsHint": "Official iptv-org directories — choose one to review before importing.",
+    "presetTitle": "Add {playlist}"
+  },
+  "library": {
+    "loadMore": "Load more channels",
+    "loadMoreCount": "Load more channels · {count} remaining"
+  },
   "player": {
     "play": "Play",
     "pause": "Pause",

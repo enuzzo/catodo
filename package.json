@@ -16,6 +16,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "deploy:siteground": "node scripts/siteground-deploy.mjs",
     "preview": "vite preview",
     "test": "node --test tests/**/*.test.js",
     "check": "node scripts/check-syntax.mjs",
@@ -33,7 +34,6 @@
     "@svg-maps/world": "2.0.0",
     "fake-indexeddb": "^6.2.5",
     "flag-icons": "^7.5.0",
-    "hls.js": "1.5.17",
-    "three": "0.162.0"
+    "hls.js": "1.5.17"
   }
 }

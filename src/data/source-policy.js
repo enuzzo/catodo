@@ -2,6 +2,7 @@ const IPTV_ORG_ORIGIN = "https://iptv-org.github.io";
 const COUNTRY_RE = /^\/iptv\/countries\/([a-z]{2})\.m3u$/;
 const ALLOWED_PATHS = [
   /^\/iptv\/index\.m3u$/,
+  /^\/iptv\/index\.(?:category|country|language)\.m3u$/,
   COUNTRY_RE,
   /^\/iptv\/(?:categories|languages|regions)\/[a-z0-9_-]+\.m3u$/,
 ];
@@ -26,8 +27,8 @@ export function inspectSourceUrl(value) {
 export function assertImportAllowed(value, { confirmed = false } = {}) {
   const result = inspectSourceUrl(value);
   if (!result.valid) throw new TypeError(result.reason);
-  if (!result.allowed && !confirmed) {
-    const error = new Error(result.reason);
+  if (!confirmed) {
+    const error = new Error("Source import requires explicit confirmation");
     error.code = "CONSENT_REQUIRED";
     error.source = result;
     throw error;
@@ -47,7 +48,7 @@ export function parseDeepLink(value, base = "https://catodo.invalid/") {
   }
   if (source) {
     const inspected = inspectSourceUrl(source);
-    return { type: "source", valid: inspected.valid, confirmed: false, url: inspected.url, trusted: inspected.trusted, consentRequired: !inspected.trusted };
+    return { type: "source", valid: inspected.valid, confirmed: false, url: inspected.url, trusted: inspected.trusted, consentRequired: true };
   }
   return { type: "none", valid: true, confirmed: false };
 }

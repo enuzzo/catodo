@@ -802,8 +802,17 @@ function createLibraryView(t) {
   filters.append(searchWrap, category, language, favorites);
   toolbar.append(title, filters);
   const grid = element('div', 'channel-grid channel-grid--library');
-  view.append(header, stats, toolbar, grid);
-  return { view, stats: statNodes, search, category, language, favorites, grid };
+  const loadMore = actionButton({
+    t,
+    action: 'load-more-library',
+    iconName: 'plus',
+    key: 'library.loadMore',
+    fallback: 'Load more channels',
+    className: 'button--ghost library-load-more',
+  });
+  loadMore.hidden = true;
+  view.append(header, stats, toolbar, grid, loadMore);
+  return { view, stats: statNodes, search, category, language, favorites, grid, loadMore };
 }
 
 function createSourcesView(t) {
@@ -1212,6 +1221,14 @@ function createImportDialog(t) {
   header.append(title, iconButton({ t, action: 'close-import-dialog', iconName: 'x', key: 'common.close', fallback: 'Close' }));
 
   const form = element('form', 'import-form', { dataset: { action: 'confirm-import' } });
+  const presets = element('section', 'import-presets');
+  const presetsHeader = element('div', 'import-presets__header');
+  presetsHeader.append(
+    textNode('h3', null, t, 'import.presetsTitle', 'Recommended playlists'),
+    textNode('p', null, t, 'import.presetsHint', 'Official iptv-org directories — choose one to review before importing.'),
+  );
+  const presetGrid = element('div', 'import-presets__grid');
+  presets.append(presetsHeader, presetGrid);
   const sourceFacts = element('dl', 'import-source-facts');
   const factNodes = {};
   [
@@ -1258,10 +1275,34 @@ function createImportDialog(t) {
   const cancel = actionButton({ t, action: 'close-import-dialog', key: 'common.cancel', fallback: 'Cancel', className: 'button--ghost' });
   actions.append(confirm, cancel);
   const sourceLink = actionButton({ t, action: 'view-import-source', key: 'import.viewSource', fallback: 'View source', className: 'button--text' });
-  form.append(sourceFacts, urlField, note, legal, consent, actions, sourceLink);
+  form.append(presets, sourceFacts, urlField, note, legal, consent, actions, sourceLink);
   dialog.append(header, form);
   backdrop.append(dialog);
-  return { backdrop, dialog, title, form, facts: factNodes, urlInput, consent: checkbox, confirm, sourceLink };
+  return { backdrop, dialog, title, form, facts: factNodes, presets, presetGrid, urlInput, consent: checkbox, confirm, sourceLink };
+}
+
+function renderSourcePresets(container, presets, t, selectedId = '') {
+  const fragment = document.createDocumentFragment();
+  normaliseArray(presets).forEach((preset) => {
+    const button = actionButton({
+      t,
+      action: 'select-source-preset',
+      iconName: safeText(preset.icon, 'broadcast'),
+      fallback: safeText(preset.name, 'Playlist'),
+      className: `source-preset${preset.id === selectedId ? ' is-active' : ''}`,
+      dataset: { presetId: safeId(preset.id) },
+    });
+    const label = button.querySelector('.button__label');
+    if (label) {
+      const name = element('strong');
+      name.textContent = safeText(preset.name);
+      const description = element('span');
+      description.textContent = safeText(preset.description);
+      label.replaceChildren(name, description);
+    }
+    fragment.append(button);
+  });
+  container.replaceChildren(fragment);
 }
 
 function createSignalBar(t) {
@@ -1788,6 +1829,7 @@ export function mountAppUI(root, options = {}) {
       countryTableBody: countries.tableBody,
       library: library.view,
       libraryGrid: library.grid,
+      libraryLoadMore: library.loadMore,
       sources: sources.view,
       sourceList: sources.list,
       proxyInput: sources.proxyInput,
@@ -1802,6 +1844,7 @@ export function mountAppUI(root, options = {}) {
       multiviewVideos: multiview.slots.map((slot) => slot.video),
       importDialog: importDialog.backdrop,
       importForm: importDialog.form,
+      importPresetGrid: importDialog.presetGrid,
       signalBar: signalBar.bar,
       toastRegion,
     },
@@ -1943,6 +1986,16 @@ export function mountAppUI(root, options = {}) {
           className: 'button--primary',
         }),
       );
+      const visibleCount = Number(state.visibleCount ?? channels.length) || 0;
+      const filteredCount = Number(state.filteredCount ?? visibleCount) || 0;
+      library.loadMore.hidden = visibleCount >= filteredCount;
+      const loadMoreLabel = library.loadMore.querySelector('.button__label');
+      if (loadMoreLabel) loadMoreLabel.textContent = translate(
+        t,
+        'library.loadMoreCount',
+        'Load more channels · {count} remaining',
+        { count: Math.max(0, filteredCount - visibleCount) },
+      );
       return api;
     },
 
@@ -2065,6 +2118,8 @@ export function mountAppUI(root, options = {}) {
         importDialog.form.reset();
         delete importDialog.form.dataset.iso2;
         delete importDialog.form.dataset.sourceId;
+        delete importDialog.form.dataset.presetId;
+        importDialog.urlInput.readOnly = false;
         return api;
       }
       const source = state?.source && typeof state.source === 'object'
@@ -2072,6 +2127,10 @@ export function mountAppUI(root, options = {}) {
         : state?.country && typeof state.country === 'object'
           ? state.country
           : state;
+      const presets = normaliseArray(state?.presets);
+      importDialog.presets.hidden = !presets.length;
+      renderSourcePresets(importDialog.presetGrid, presets, t, safeId(source.presetId || source.id));
+      importDialog.form.dataset.presetId = safeId(source.presetId);
       importDialog.backdrop.hidden = false;
       const iso2 = safeIso2(source.iso2 || source.code);
       importDialog.backdrop.dataset.iso2 = iso2;
@@ -2079,14 +2138,15 @@ export function mountAppUI(root, options = {}) {
       importDialog.form.dataset.sourceId = safeId(source.sourceId || source.id || source.url);
       importDialog.title.textContent = translate(
         t,
-        source.name ? 'import.countryTitle' : 'import.title',
-        source.name ? 'Add {country} playlist' : 'Add external playlist',
-        { country: safeText(source.name) },
+        source.iso2 ? 'import.countryTitle' : source.presetId ? 'import.presetTitle' : 'import.title',
+        source.iso2 ? 'Add {country} playlist' : source.presetId ? 'Add {playlist}' : 'Add external playlist',
+        { country: safeText(source.name), playlist: safeText(source.name) },
       );
       importDialog.facts.provider.textContent = safeText(source.provider, '—');
       importDialog.facts.host.textContent = safeText(source.host, '—');
       importDialog.facts.source.textContent = safeText(source.source || source.description || source.name, '—');
       importDialog.urlInput.value = safeText(source.url);
+      importDialog.urlInput.readOnly = Boolean(source.presetId);
       importDialog.urlInput.closest('.field-stack').hidden = Boolean(source.hideUrl || (source.iso2 && !source.url));
       importDialog.consent.checked = Boolean(source.consent);
       importDialog.confirm.dataset.iso2 = iso2;

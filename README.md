@@ -13,11 +13,13 @@ It is a vanilla ES-module application with no framework. Pinned runtime assets a
 - **Multiview:** 2-, 3-, or 4-feed layouts; exactly one selected feed supplies audio.
 - **Signal Lab:** playback diagnostics separate measured, estimated, and manifest-declared values.
 - **Channel profiles:** when upstream metadata is available, Signal Lab also surfaces canonical channel, network, owner, category, feed, coverage, language, format, quality, availability, lifecycle, website, logo, and guide descriptors without inventing missing values.
-- **Resilient boot:** a Three.js r162 signal sequence uses capability detection and a graceful non-WebGL fallback.
+- **Analog boot:** EBU colour bars descend, split around the Catodo ident, then open onto the live dashboard; reduced-motion users get a short static reveal.
 
 ## Content boundary
 
 CATODO ships software and a directory of external source links. It does **not** include playlist snapshots, stream media, video, permanent logo packs, or EPG data. The iptv-org catalog is fetched only after the user has confirmed the provider and disclaimer; no playlist is imported before that consent.
+
+The Add Playlist dialog includes ready-to-review iptv-org presets for the complete worldwide directory, country/language/category groupings, major regions, news, sports, movies and music. These are canonical external links, not bundled playlist copies. Selecting a preset only fills the consent dialog; CATODO contacts the source after explicit confirmation.
 
 CATODO uses the official iptv-org JSON directory as optional metadata: channels, feeds, streams, logos, categories, languages, guides and the upstream blocklist. Guide records are discovery mappings only; CATODO does not bundle or redistribute programme data. Blocklisted sources are excluded and adult content is hidden from default discovery and random playback.
 
@@ -64,7 +66,9 @@ npm run build
 ```
 
 Deploy only the generated `dist/` directory over HTTPS. Do not publish the
-source tree as the application runtime.
+source tree as the application runtime. Maintainers with a local `.env` can
+publish the bundle with `npm run deploy:siteground`; the script uploads only
+`dist/` and deliberately leaves the existing authentication gate untouched.
 
 ### Cloudflare Worker proxy (optional)
 
@@ -72,10 +76,10 @@ source tree as the application runtime.
 
 ## Limits and compatibility
 
-- Tesla/in-car Chromium variants have constrained CPU, memory, WebGL, MSE, and codec support. A stream that works in VLC may still fail in the browser.
+- Tesla/in-car Chromium variants have constrained CPU, memory, MSE, and codec support. A stream that works in VLC may still fail in the browser.
 - Multiview starts multiple independent decoders. On Tesla hardware, 2 feeds is the practical default; 3 or 4 can exhaust decoder, thermal, or network capacity. CATODO keeps one audio feed to reduce noise, not decoder load.
 - HLS, codecs, CORS policy, mixed-content blocking, hotlink protection, and geoblocking are controlled by external sources and may change without notice.
-- The Three.js boot sequence is decorative and falls back when WebGL is unavailable.
+- The analog boot sequence is decorative, uses lightweight CSS transforms and respects reduced-motion preferences.
 
 ## Locales
 
@@ -83,7 +87,7 @@ English is the current product locale. Add future locales as `locales/<language-
 
 ## Dependencies
 
-Runtime dependencies are pinned and vendored: hls.js, Three.js r162, Phosphor Icons, SVG Maps World, `flag-icons` 7.5.0 (self-hosted SVG, MIT), and Exo 2 Variable (self-hosted, OFL-1.1) for the interface. IBM Plex Mono is self-hosted only for diagnostic statistics. `fake-indexeddb` is loaded only as an in-memory compatibility fallback when IndexedDB is absent. Development utilities include `basic-ftp` and `bcryptjs`. Licences and notices are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Runtime dependencies are pinned and vendored: hls.js, Phosphor Icons, SVG Maps World, `flag-icons` 7.5.0 (self-hosted SVG, MIT), and Exo 2 Variable (self-hosted, OFL-1.1) for the interface. IBM Plex Mono is self-hosted only for diagnostic statistics. `fake-indexeddb` is loaded only as an in-memory compatibility fallback when IndexedDB is absent. Development utilities include `basic-ftp` and `bcryptjs`. Licences and notices are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Security
 

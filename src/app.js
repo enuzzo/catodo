@@ -1,11 +1,13 @@
-import { playSignalHyperjump } from "./boot/signal-hyperjump.js";
+import { playAnalogBoot } from "./boot/signal-hyperjump.js";
 import Hls from "hls.js";
 import {
   CatalogService,
+  SOURCE_PRESETS,
   countryPlaylistUrl,
   filterCountriesByRegion,
   parseDeepLink,
   regionForCountry,
+  sourcePreset,
 } from "./data/index.js";
 import i18n from "./i18n/index.js";
 import { MultiviewController, PlayerManager } from "./player/index.js";
@@ -37,6 +39,7 @@ const state = {
   libraryCategory: "",
   libraryLanguage: "",
   libraryFavoritesOnly: false,
+  libraryLimit: UI_CHANNEL_LIMIT,
   worldMixIds: [],
   homeFailureCount: 0,
   homeFailedIds: [],
@@ -349,16 +352,14 @@ function renderHome() {
       markers.push({ iso2, label: markers.length + index + 1 });
     });
   }
-  const displayedCountryCount = QA_MODE
-    ? Math.min(worldMix.length, 10)
-    : mixCountries.size;
+  const allPlayableCountries = new Set(allPlayable.map(inferredCountryCode).filter(Boolean));
   ui.renderHome({
     activate: state.view === "home",
     featured: featured ? { ...decorateChannel(featured), muted: state.homeMuted, autoplay: true } : null,
     channels: worldMix.map(decorateChannel),
     favorites: favorites.slice(0, 5),
-    liveCount: worldMix.length,
-    countryCount: displayedCountryCount || Math.min(worldMix.length, 10),
+    liveCount: allPlayable.length,
+    countryCount: allPlayableCountries.size,
     selectedIso2: inferredCountryCode(featured),
     importedIso2: importedIso2(),
     availableIso2: snapshot.countries.map((country) => country.code),
@@ -402,7 +403,8 @@ function renderLibrary() {
     language: state.libraryLanguage || undefined,
     favorite: state.libraryFavoritesOnly || undefined,
   };
-  const channels = catalog.list(filters).slice(0, UI_CHANNEL_LIMIT);
+  const matchingChannels = catalog.list(filters);
+  const channels = matchingChannels.slice(0, state.libraryLimit);
   const allChannels = state.lastCatalog?.channels || [];
   ui.renderLibrary({
     activate: state.view === "library",
@@ -415,6 +417,8 @@ function renderLibrary() {
     category: state.libraryCategory,
     language: state.libraryLanguage,
     favoritesOnly: state.libraryFavoritesOnly,
+    visibleCount: channels.length,
+    filteredCount: matchingChannels.length,
   });
 }
 
@@ -538,6 +542,7 @@ async function performImport(detail) {
   const code = String(detail.dataset.iso2 || "").toUpperCase();
   const url = String(detail.formData?.get("url") || "").trim();
   const consent = detail.formData?.get("consent") === "on";
+  const preset = sourcePreset(detail.dataset.presetId);
   if (!consent) {
     ui.toast("Confirm the source and content disclaimer first.", { tone: "error" });
     return;
@@ -545,7 +550,7 @@ async function performImport(detail) {
   ui.toast("Importing playlist…", { icon: "arrows-clockwise", duration: 1800 });
   try {
     if (code) await catalog.importCountry(code, { confirmed: true, proxy: state.proxy || undefined });
-    else await catalog.importUrl(url, { confirmed: true, proxy: state.proxy || undefined });
+    else await catalog.importUrl(url, { confirmed: true, name: preset?.name, proxy: state.proxy || undefined });
     ui.showImportDialog(false);
     ui.toast("Playlist imported and kept on this device.");
   } catch (error) {
@@ -599,18 +604,26 @@ async function handleAction(action, detail) {
     }
     case "filter-library":
       state.libraryQuery = detail.value || "";
+      state.libraryLimit = UI_CHANNEL_LIMIT;
       renderLibrary();
       break;
     case "filter-library-category":
       state.libraryCategory = detail.value || "";
+      state.libraryLimit = UI_CHANNEL_LIMIT;
       renderLibrary();
       break;
     case "filter-library-language":
       state.libraryLanguage = detail.value || "";
+      state.libraryLimit = UI_CHANNEL_LIMIT;
       renderLibrary();
       break;
     case "filter-library-favorites":
       state.libraryFavoritesOnly = !state.libraryFavoritesOnly;
+      state.libraryLimit = UI_CHANNEL_LIMIT;
+      renderLibrary();
+      break;
+    case "load-more-library":
+      state.libraryLimit += UI_CHANNEL_LIMIT;
       renderLibrary();
       break;
     case "open-channel":
@@ -684,13 +697,23 @@ async function handleAction(action, detail) {
       renderLibrary();
       break;
     case "open-import-dialog":
-      if (detail.dataset.iso2 || ui.getImportCountryCode()) {
-        const country = importCountryModel(detail.dataset.iso2 || ui.getImportCountryCode());
+      if (detail.dataset.iso2) {
+        const country = importCountryModel(detail.dataset.iso2);
         if (country) ui.showImportDialog({ source: country, country });
       } else {
-        ui.showImportDialog({ provider: "External source", host: "User supplied", source: "M3U playlist URL" });
+        ui.showImportDialog({
+          provider: "External source",
+          host: "User supplied",
+          source: "M3U playlist URL",
+          presets: SOURCE_PRESETS,
+        });
       }
       break;
+    case "select-source-preset": {
+      const preset = sourcePreset(detail.dataset.presetId);
+      if (preset) ui.showImportDialog({ ...preset, presetId: preset.id, presets: SOURCE_PRESETS });
+      break;
+    }
     case "close-import-dialog":
       ui.showImportDialog(false);
       break;
@@ -878,11 +901,10 @@ async function boot() {
   const root = document.querySelector("#app");
   const bootOptions = {
     screen: document.querySelector("#boot-screen"),
-    mount: document.querySelector("#boot-canvas"),
     skipButton: document.querySelector("#boot-skip"),
     disabled: new URLSearchParams(location.search).has("qa"),
   };
-  const bootPromise = playSignalHyperjump(bootOptions);
+  const bootPromise = playAnalogBoot(bootOptions);
   await i18n.load("en").catch(() => i18n);
   document.documentElement.lang = i18n.locale;
   document.documentElement.dir = i18n.direction;

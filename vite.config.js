@@ -12,7 +12,6 @@ export default defineConfig({
       output: {
         manualChunks: {
           hls: ["hls.js"],
-          three: [resolve(import.meta.dirname, "assets/vendor/three/three.module.min.js")],
         },
       },
     },

@@ -10,3 +10,4 @@ export * from "./iptv-org-metadata.js";
 export * from "./regions.js";
 export * from "./search.js";
 export * from "./catalog-service.js";
+export * from "./source-presets.js";
