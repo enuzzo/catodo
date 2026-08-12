@@ -91,6 +91,23 @@
     "loadMore": "Load more channels",
     "loadMoreCount": "Load more channels · {count} remaining"
   },
+  "countries": {
+    "backToWorld": "Back to world map",
+    "countryChannelsEyebrow": "Country channels",
+    "searchChannelsPlaceholder": "Search this country…",
+    "searchChannelsAriaLabel": "Search channels in this country",
+    "categoryFilterAriaLabel": "Filter country channels by category",
+    "languageFilterAriaLabel": "Filter country channels by language",
+    "channelAvailability": "{shown} shown · {total} available now",
+    "channelsNotImported": {
+      "title": "Add this country's channels",
+      "body": "This country is in the public directory, but its playlist is not in your local catalog yet."
+    },
+    "noChannelMatches": {
+      "title": "No channels match these filters",
+      "body": "Try a different search, category, or language."
+    }
+  },
   "player": {
     "play": "Play",
     "pause": "Pause",

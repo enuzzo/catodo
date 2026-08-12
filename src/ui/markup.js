@@ -648,7 +648,8 @@ function createCountriesView(t) {
   const view = element('section', 'page page--countries', { dataset: { page: 'countries' }, hidden: true });
   const layout = element('div', 'countries-layout');
   const atlas = element('article', 'countries-atlas panel');
-  atlas.append(textNode('h1', 'panel-title', t, 'map.signalAtlas', 'Signal Atlas'));
+  const atlasMap = element('div', 'countries-atlas__map');
+  atlasMap.append(textNode('h1', 'panel-title', t, 'map.signalAtlas', 'Signal Atlas'));
   const map = element('div', 'world-map-shell world-map-shell--countries');
   const controls = element('div', 'map-controls');
   controls.append(
@@ -675,7 +676,59 @@ function createCountriesView(t) {
     dataset: { mode: 'list' },
   });
   mapMode.append(mapButton, listButton);
-  atlas.append(map, controls, mapMode);
+  atlasMap.append(map, controls, mapMode);
+
+  const channelPanel = element('section', 'country-channels', { hidden: true });
+  const channelHeader = element('header', 'country-channels__header');
+  const channelBack = actionButton({
+    t,
+    action: 'back-to-world-map',
+    iconName: 'arrow-left',
+    key: 'countries.backToWorld',
+    fallback: 'Back to world map',
+    className: 'button--ghost country-channels__back',
+  });
+  const channelIdentity = element('div', 'country-channels__identity');
+  const channelFlag = element('span', 'country-channels__flag');
+  const channelCopy = element('div');
+  const channelEyebrow = textNode('p', 'eyebrow', t, 'countries.countryChannelsEyebrow', 'Country channels');
+  const channelTitle = textNode('h1', null, t, 'countries.selectPrompt', 'Select a country');
+  const channelCount = element('p', 'country-channels__count');
+  channelCopy.append(channelEyebrow, channelTitle, channelCount);
+  channelIdentity.append(channelFlag, channelCopy);
+  channelHeader.append(channelBack, channelIdentity);
+
+  const channelToolbar = element('div', 'country-channels__toolbar');
+  const channelSearchWrap = element('label', 'field field--icon');
+  channelSearchWrap.append(icon('magnifying-glass'));
+  const channelSearch = element('input', null, {
+    type: 'search',
+    placeholder: translate(t, 'countries.searchChannelsPlaceholder', 'Search this country…'),
+    'aria-label': translate(t, 'countries.searchChannelsAriaLabel', 'Search channels in this country'),
+    dataset: { action: 'filter-country-channels' },
+  });
+  channelSearchWrap.append(channelSearch);
+  const channelCategory = element('select', 'select', {
+    'aria-label': translate(t, 'countries.categoryFilterAriaLabel', 'Filter country channels by category'),
+    dataset: { action: 'filter-country-channel-category' },
+  });
+  const channelLanguage = element('select', 'select', {
+    'aria-label': translate(t, 'countries.languageFilterAriaLabel', 'Filter country channels by language'),
+    dataset: { action: 'filter-country-channel-language' },
+  });
+  channelToolbar.append(channelSearchWrap, channelCategory, channelLanguage);
+  const channelGrid = element('div', 'channel-grid country-channels__grid');
+  const channelLoadMore = actionButton({
+    t,
+    action: 'load-more-country-channels',
+    iconName: 'plus',
+    key: 'library.loadMore',
+    fallback: 'Load more channels',
+    className: 'button--ghost country-channels__load-more',
+  });
+  channelLoadMore.hidden = true;
+  channelPanel.append(channelHeader, channelToolbar, channelGrid, channelLoadMore);
+  atlas.append(atlasMap, channelPanel);
 
   const directory = element('div', 'country-directory');
   const detail = element('article', 'country-detail panel');
@@ -700,7 +753,6 @@ function createCountriesView(t) {
     ['language', 'channel.language', 'Language'],
     ['region', 'countries.region', 'Region'],
     ['channels', 'countries.channels', 'Channels'],
-    ['categories', 'countries.categories', 'Categories'],
     ['updated', 'countries.lastUpdate', 'Last catalog update'],
   ].forEach(([name, key, fallback]) => {
     facts.append(textNode('dt', null, t, key, fallback));
@@ -709,7 +761,15 @@ function createCountriesView(t) {
     facts.append(value);
     factNodes[name] = value;
   });
-  detailCopy.append(detailHeading, localName, facts);
+  const categories = element('details', 'country-detail__categories');
+  const categoriesSummary = element('summary');
+  const categoriesLabel = textNode('span', null, t, 'countries.categories', 'Categories');
+  const categoriesCount = element('strong', 'mono');
+  categoriesCount.textContent = '0';
+  categoriesSummary.append(categoriesLabel, categoriesCount, icon('caret-down'));
+  const categoriesList = element('div', 'country-detail__category-list');
+  categories.append(categoriesSummary, categoriesList);
+  detailCopy.append(detailHeading, localName, facts, categories);
   const shape = element('div', 'country-detail__shape');
   const detailActions = element('div', 'country-detail__actions');
   const importButton = actionButton({
@@ -720,15 +780,7 @@ function createCountriesView(t) {
     fallback: 'Add country channels',
     className: 'button--primary',
   });
-  const viewChannels = actionButton({
-    t,
-    action: 'view-country-channels',
-    iconName: 'eye',
-    key: 'countries.viewChannels',
-    fallback: 'View channels',
-    className: 'button--ghost',
-  });
-  detailActions.append(importButton, viewChannels);
+  detailActions.append(importButton);
   detailGrid.append(detailCopy, shape, detailActions);
   detail.append(detailBack, detailGrid);
 
@@ -818,18 +870,32 @@ function createCountriesView(t) {
 
   return {
     view,
+    atlasMap,
+    channelPanel,
+    channelHeader,
+    channelFlag,
+    channelTitle,
+    channelCount,
+    channelSearch,
+    channelCategory,
+    channelLanguage,
+    channelGrid,
+    channelLoadMore,
     map,
     mapMode,
     mapButton,
     listButton,
     detail,
+    detailBack,
     countryName,
     detailFlag,
     localName,
     facts: factNodes,
+    categories,
+    categoriesCount,
+    categoriesList,
     shape,
     importButton,
-    viewChannels,
     regionButtons,
     search,
     sort,
@@ -1944,9 +2010,10 @@ function setFeatured(refs, channel, t) {
 function setCountryDetail(refs, country, t) {
   const value = country && typeof country === 'object' ? country : {};
   const iso2 = safeIso2(value.iso2 || value.code);
+  const previousIso2 = refs.detail.dataset.iso2;
   refs.detail.dataset.iso2 = iso2;
+  refs.detailBack.hidden = !iso2;
   refs.importButton.dataset.iso2 = iso2;
-  refs.viewChannels.dataset.iso2 = iso2;
   refs.countryName.textContent = safeText(value.name, translate(t, 'countries.selectPrompt', 'Select a country'));
   refs.detailFlag.replaceChildren(countryFlag(iso2, value.name, 'country-detail__flag-image'));
   refs.detailFlag.hidden = !iso2;
@@ -1955,12 +2022,86 @@ function setCountryDetail(refs, country, t) {
   refs.facts.language.textContent = safeText(value.language || value.languageName, '—');
   refs.facts.region.textContent = safeText(value.region, '—');
   refs.facts.channels.textContent = safeText(value.channelCount ?? value.channels, '—');
-  const categories = Array.isArray(value.categories) ? value.categories.join(', ') : safeText(value.categories);
-  refs.facts.categories.textContent = categories || '—';
   refs.facts.updated.textContent = safeText(value.updatedAt || value.lastUpdated, '—');
+  const categoryValues = [...new Map(normaliseArray(value.categories)
+    .flatMap((category) => safeText(category).split(/[;,]/))
+    .map((category) => category.trim())
+    .filter(Boolean)
+    .map((category) => [category.toLocaleLowerCase('en-US'), category])).values()]
+    .sort((a, b) => a.localeCompare(b));
+  refs.categoriesCount.textContent = safeText(categoryValues.length);
+  refs.categoriesList.replaceChildren(...categoryValues.map((category) => {
+    const chip = element('span');
+    chip.textContent = category;
+    return chip;
+  }));
+  refs.categories.hidden = !categoryValues.length;
+  if (previousIso2 !== iso2) refs.categories.open = false;
   refs.importButton.hidden = !iso2 || Boolean(value.imported);
-  refs.viewChannels.hidden = !iso2;
   renderCountryShape(refs.shape, iso2, { t });
+}
+
+function setCountryChannels(refs, state, selected, selectedIso2, t) {
+  const channels = normaliseArray(state.countryChannels);
+  const total = Math.max(0, Number(state.countryChannelTotal) || 0);
+  const filteredTotal = Math.max(0, Number(state.countryChannelFilteredTotal) || 0);
+  const countryName = safeText(selected?.name, selectedIso2);
+  refs.atlasMap.hidden = Boolean(selectedIso2);
+  refs.channelPanel.hidden = !selectedIso2;
+  refs.channelPanel.dataset.iso2 = selectedIso2;
+  if (!selectedIso2) return;
+
+  refs.channelFlag.replaceChildren(countryFlag(selectedIso2, countryName, 'country-channels__flag-image'));
+  refs.channelTitle.textContent = countryName;
+  refs.channelCount.textContent = translate(t, 'countries.channelAvailability', '{shown} shown · {total} available now', {
+    shown: channels.length,
+    total,
+  });
+  refs.channelSearch.value = safeText(state.countryChannelQuery);
+  setLibrarySelectOptions(
+    refs.channelCategory,
+    state.countryChannelCategories,
+    translate(t, 'library.allCategories', 'All categories'),
+    state.countryChannelCategory,
+  );
+  setLibrarySelectOptions(
+    refs.channelLanguage,
+    state.countryChannelLanguages,
+    translate(t, 'library.allLanguages', 'All languages'),
+    state.countryChannelLanguage,
+  );
+
+  if (channels.length) renderChannelTiles(refs.channelGrid, channels, t, { schedule: true });
+  else if (!total) {
+    const importButton = actionButton({
+      t,
+      action: 'open-import-dialog',
+      iconName: 'download-simple',
+      key: 'countries.addChannels',
+      fallback: 'Add country channels',
+      className: 'button--primary',
+      dataset: { iso2: selectedIso2 },
+    });
+    renderEmpty(
+      refs.channelGrid,
+      t,
+      'countries.channelsNotImported',
+      `Add ${countryName} channels`,
+      'This country is in the public directory, but its playlist is not in your local catalog yet.',
+      importButton,
+    );
+  } else {
+    renderEmpty(
+      refs.channelGrid,
+      t,
+      'countries.noChannelMatches',
+      'No channels match these filters',
+      'Try a different search, category, or language.',
+    );
+  }
+  const remaining = Math.max(0, filteredTotal - channels.length);
+  refs.channelLoadMore.hidden = remaining === 0;
+  setTranslatedText(refs.channelLoadMore.querySelector('.button__label'), t, 'library.loadMoreCount', 'Load more channels · {count} remaining', { count: remaining });
 }
 
 function updateChannelMeta(container, channel) {
@@ -2473,6 +2614,7 @@ export function mountAppUI(root, options = {}) {
         counts: state.countryCounts,
       });
       setCountryDetail(countries, selected, t);
+      setCountryChannels(countries, state, selected, selectedIso2, t);
       renderCountryRows(countries.tableBody, values, t, selectedIso2);
       if (state.query !== undefined) countries.search.value = safeText(state.query);
       if (state.sort !== undefined) countries.sort.value = safeText(state.sort);

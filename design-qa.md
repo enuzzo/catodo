@@ -47,6 +47,43 @@ The Home preserves Catodo's approved Soft Signal Grid while applying the annotat
 
 final result: passed
 
+## Countries Atlas → channel directory iteration — 2026-08-12
+
+- Source visual truth: `/var/folders/48/00rryty17dzb6g7877yxqym00000gn/T/codex-clipboard-07915d1c-c6db-4807-8c36-711436beadfc.png`.
+- Implementation evidence: `/tmp/catodo-countries-qa/implementation-desktop.png` and `/tmp/catodo-countries-qa/implementation-mobile.png`; combined comparison: `/tmp/catodo-countries-qa/comparison.png`.
+- Viewports: desktop 1536 × 900 CSS px; mobile 390 × 844 CSS px. Source pixels: 4412 × 2274; desktop implementation pixels: 1536 × 900.
+- Visual target: preserve the existing Soft Signal Grid, Exo 2 typography, paper panels, thin rules and compact broadcast directory; change only the selected-country information architecture.
+
+### Full-view comparison evidence
+
+The reference left 58% of the selected-country screen occupied by a map whose selection job was already complete, while the channel destination remained a secondary button. The implementation uses the same footprint for an immediate country-channel directory and keeps the selected row, compact country profile and country browser in the right rail. The layout remains within the existing density and radius system.
+
+### Focused comparison evidence
+
+- Selecting a country from either map or table produces the same state: country flag/name, honest local availability count, search, category/language filters and channel grid.
+- “Back to world map” restores an unselected Atlas; the initial profile has no misleading default country.
+- Categories are split, case-insensitively deduplicated, displayed as chips inside a native details element, and closed on every country change.
+- Large countries render 72 channels initially and expose a remaining-count Load More action; this avoids thousands of simultaneous TV cards on Tesla-class hardware.
+- Countries with catalog channels are marked Imported even when their channels came from the world preset rather than a country-specific source.
+
+### Comparison history
+
+1. P1 source-state mismatch: world-catalog channels were shown as available in the left directory while the right table still said Not imported. Fixed by treating local country statistics as an imported state.
+2. P2 prompt noise: the initial unselected country profile showed a Back arrow with nowhere meaningful to go. Hidden until a real country is selected.
+3. P2 density: the original comma-separated category list expanded the profile dramatically. Replaced by a collapsed summary with a count and a bounded chip list.
+
+### Required fidelity surfaces
+
+- Typography and icon system: passed; no new asset family or font introduced.
+- Spacing/layout: passed at desktop and mobile; no horizontal body overflow, clipped toolbar, or control overlap.
+- Image quality: existing vendored SVG flags and source channel logos remain contained without stretching.
+- Copy/content: English and locale-keyed; counts distinguish channels “available now” from the wider provider directory.
+- Interaction: map selection, table selection, channel search, Categories disclosure, Load More, filters and world-map return passed.
+- Console/framework health: no warnings, errors or overlays.
+- Automated verification: 64/64 tests, syntax check, production build and diff check passed.
+
+final result: passed
+
 ## Home atlas removal iteration — 2026-08-12
 
 - Previous accepted implementation: `/tmp/catodo-qa/implementation-home.png` (1280 × 720).

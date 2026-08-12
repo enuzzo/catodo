@@ -36,6 +36,10 @@ const state = {
   countryMode: "map",
   selectedCountry: "",
   activeCountry: "",
+  countryChannelQuery: "",
+  countryChannelCategory: "",
+  countryChannelLanguage: "",
+  countryChannelLimit: UI_CHANNEL_LIMIT,
   featuredId: "",
   currentId: "",
   homeMuted: true,
@@ -248,7 +252,7 @@ function countryViewModel(directoryCountry, statsByCode, sourceCountries) {
     language: directoryCountry.languages?.join(", ") || "—",
     channelCount: stats?.channels || 0,
     categories: stats?.categories || [],
-    imported: sourceCountries.has(code),
+    imported: sourceCountries.has(code) || Boolean(stats?.channels),
     provider: "iptv-org",
     host: "iptv-org.github.io",
     source: "Public country playlist directory",
@@ -430,7 +434,19 @@ function renderCountries() {
   countries.sort(state.countrySort === "az"
     ? (a, b) => a.name.localeCompare(b.name)
     : (a, b) => b.channelCount - a.channelCount || a.name.localeCompare(b.name));
-  const selected = countryModels().find((country) => country.code === state.selectedCountry) || countries[0] || null;
+  const selected = state.selectedCountry
+    ? countryModels().find((country) => country.code === state.selectedCountry) || null
+    : null;
+  const selectedChannelFilters = selected ? {
+    country: selected.code,
+    query: state.countryChannelQuery || undefined,
+    category: state.countryChannelCategory || undefined,
+    language: state.countryChannelLanguage || undefined,
+  } : null;
+  const selectedCountryChannels = selected ? catalog.list({ country: selected.code }).filter(isPlayableChannel) : [];
+  const matchingCountryChannels = selectedChannelFilters
+    ? catalog.list(selectedChannelFilters).filter(isPlayableChannel)
+    : [];
   state.activeCountry = selected?.code || "";
   ui.renderCountries({
     activate: state.view === "countries",
@@ -444,6 +460,14 @@ function renderCountries() {
     region: state.countryRegion,
     sort: state.countrySort,
     mode: state.countryMode,
+    countryChannels: matchingCountryChannels.slice(0, state.countryChannelLimit).map(decorateChannel),
+    countryChannelTotal: selectedCountryChannels.length,
+    countryChannelFilteredTotal: matchingCountryChannels.length,
+    countryChannelQuery: state.countryChannelQuery,
+    countryChannelCategory: state.countryChannelCategory,
+    countryChannelLanguage: state.countryChannelLanguage,
+    countryChannelCategories: [...new Set(selectedCountryChannels.flatMap((channel) => channel.categories || []))].sort(),
+    countryChannelLanguages: [...new Set(selectedCountryChannels.flatMap((channel) => channel.languages || []))].sort(),
   });
 }
 
@@ -985,11 +1009,20 @@ async function handleAction(action, detail) {
       break;
     case "select-country":
       state.selectedCountry = String(detail.dataset.iso2 || "").toUpperCase();
+      state.countryChannelQuery = "";
+      state.countryChannelCategory = "";
+      state.countryChannelLanguage = "";
+      state.countryChannelLimit = UI_CHANNEL_LIMIT;
       state.view = "countries";
       renderCountries();
       break;
     case "clear-country-selection":
+    case "back-to-world-map":
       state.selectedCountry = "";
+      state.countryChannelQuery = "";
+      state.countryChannelCategory = "";
+      state.countryChannelLanguage = "";
+      state.countryChannelLimit = UI_CHANNEL_LIMIT;
       renderCountries();
       break;
     case "filter-countries-region":
@@ -1019,9 +1052,28 @@ async function handleAction(action, detail) {
       renderCountries();
       break;
     case "view-country-channels":
-      state.libraryQuery = state.selectedCountry || detail.dataset.iso2 || "";
-      state.view = "library";
-      renderLibrary();
+      state.selectedCountry = String(detail.dataset.iso2 || state.selectedCountry || "").toUpperCase();
+      state.countryChannelLimit = UI_CHANNEL_LIMIT;
+      renderCountries();
+      break;
+    case "filter-country-channels":
+      state.countryChannelQuery = detail.value || "";
+      state.countryChannelLimit = UI_CHANNEL_LIMIT;
+      renderCountries();
+      break;
+    case "filter-country-channel-category":
+      state.countryChannelCategory = detail.value || "";
+      state.countryChannelLimit = UI_CHANNEL_LIMIT;
+      renderCountries();
+      break;
+    case "filter-country-channel-language":
+      state.countryChannelLanguage = detail.value || "";
+      state.countryChannelLimit = UI_CHANNEL_LIMIT;
+      renderCountries();
+      break;
+    case "load-more-country-channels":
+      state.countryChannelLimit += UI_CHANNEL_LIMIT;
+      renderCountries();
       break;
     case "open-import-dialog":
       if (detail.dataset.presetId) {
