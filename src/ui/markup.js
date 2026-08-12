@@ -1,4 +1,5 @@
 import { renderCountryShape, renderWorldMap } from './world-map.js';
+import { shouldActivateShellView } from './view-mode.js';
 
 const FLAG_URLS = import.meta.glob('../../assets/vendor/flags/4x3/*.svg', {
   eager: true,
@@ -1853,7 +1854,9 @@ export function mountAppUI(root, options = {}) {
       if (state.query !== undefined) header.searchInput.value = safeText(state.query);
       if (state.searchPlaceholder) header.searchInput.placeholder = safeText(state.searchPlaceholder);
       if (state.homeMode) root.dataset.homeMode = safeText(state.homeMode);
-      if (state.view && VIEW_NAMES.includes(state.view)) activateShellView(state.view);
+      if (state.view && VIEW_NAMES.includes(state.view) && shouldActivateShellView(root.dataset.mode)) {
+        activateShellView(state.view);
+      }
       if (state.activeNav) {
         Object.entries(header.navButtons).forEach(([key, button]) => {
           const active = key === state.activeNav;
@@ -1894,7 +1897,7 @@ export function mountAppUI(root, options = {}) {
     },
 
     renderHome(state = {}) {
-      if (state.activate !== false) activateShellView('home');
+      if (shouldActivateShellView(root.dataset.mode, state.activate)) activateShellView('home');
       const channels = normaliseArray(state.channels || state.nearbyChannels || state.liveChannels);
       const favorites = normaliseArray(state.favorites);
       const featured = state.featured || state.currentChannel || channels[0] || {};
@@ -1927,7 +1930,7 @@ export function mountAppUI(root, options = {}) {
     },
 
     renderCountries(state = {}) {
-      if (state.activate !== false) activateShellView('countries');
+      if (shouldActivateShellView(root.dataset.mode, state.activate)) activateShellView('countries');
       const values = normaliseArray(state.countries);
       const selectedIso2 = safeIso2(state.selectedIso2 || state.selectedCountry?.iso2 || state.selectedCountry?.code);
       const selected = state.selectedCountry || values.find((country) => safeIso2(country?.iso2 || country?.code) === selectedIso2) || {};
@@ -1960,7 +1963,7 @@ export function mountAppUI(root, options = {}) {
     },
 
     renderLibrary(state = {}) {
-      if (state.activate !== false) activateShellView('library');
+      if (shouldActivateShellView(root.dataset.mode, state.activate)) activateShellView('library');
       const channels = normaliseArray(state.channels || state.favorites);
       library.stats.favorites.textContent = safeText(state.favoriteCount ?? state.favorites?.length ?? 0);
       library.stats.channels.textContent = safeText(state.channelCount ?? channels.length);
@@ -2000,7 +2003,7 @@ export function mountAppUI(root, options = {}) {
     },
 
     renderSources(state = {}) {
-      if (state.activate !== false) activateShellView('sources');
+      if (shouldActivateShellView(root.dataset.mode, state.activate)) activateShellView('sources');
       renderSources(sources.list, state.sources || state.playlists, t);
       if (Object.prototype.hasOwnProperty.call(state, 'proxy')) {
         sources.proxyInput.value = safeText(state.proxy);
