@@ -1136,10 +1136,19 @@ function createMultiview(t) {
       actionButton({
         t,
         action: 'replace-multiview-channel',
-        iconName: 'arrows-clockwise',
-        key: 'multiview.replace',
-        fallback: 'Replace',
+        iconName: 'shuffle',
+        key: 'multiview.random',
+        fallback: 'Random',
         className: 'button--media',
+        dataset: { slot: String(slotNumber) },
+      }),
+      actionButton({
+        t,
+        action: 'open-multiview-picker',
+        iconName: 'magnifying-glass',
+        key: 'multiview.chooseChannel',
+        fallback: 'Choose channel',
+        className: 'button--media multiview-slot__choose',
         dataset: { slot: String(slotNumber) },
       }),
       iconButton({
@@ -1207,6 +1216,77 @@ function createMultiview(t) {
   }));
   overlay.append(toolbar, grid, footer);
   return { overlay, toolbar, layout, grid, slots, status: statusNodes };
+}
+
+function createChannelPicker(t) {
+  const backdrop = element('div', 'modal-backdrop channel-picker-backdrop', {
+    hidden: true,
+    dataset: { overlay: 'channel-picker' },
+  });
+  const dialog = element('section', 'modal channel-picker', {
+    role: 'dialog',
+    'aria-modal': 'true',
+    'aria-labelledby': 'channel-picker-title',
+  });
+  const header = element('div', 'modal__header');
+  const title = textNode('h2', null, t, 'multiview.pickerTitle', 'Choose channel · Slot {slot}', { slot: '01' });
+  title.id = 'channel-picker-title';
+  header.append(title, iconButton({
+    t,
+    action: 'close-multiview-picker',
+    iconName: 'x',
+    key: 'common.close',
+    fallback: 'Close',
+  }));
+
+  const search = element('label', 'channel-picker__search');
+  search.append(icon('magnifying-glass'));
+  const input = element('input', null, {
+    type: 'search',
+    autocomplete: 'off',
+    spellcheck: false,
+    placeholder: translate(t, 'multiview.pickerSearch', 'Search channels, countries, languages…'),
+    'aria-label': translate(t, 'multiview.pickerSearch', 'Search channels, countries, languages…'),
+    dataset: { action: 'filter-multiview-picker' },
+  });
+  search.append(input);
+  const count = element('p', 'channel-picker__count', { 'aria-live': 'polite' });
+  const results = element('div', 'channel-picker__results', { role: 'listbox' });
+  dialog.append(header, search, count, results);
+  backdrop.append(dialog);
+  return { backdrop, dialog, title, input, count, results };
+}
+
+function renderChannelPickerResults(container, channels, t) {
+  const values = normaliseArray(channels);
+  const fragment = document.createDocumentFragment();
+  values.forEach((channel) => {
+    const id = safeId(channel?.channelId || channel?.id || channel?.tvgId || channel?.url);
+    const button = element('button', 'channel-picker__result', {
+      type: 'button',
+      role: 'option',
+      dataset: { action: 'select-multiview-channel', channelId: id },
+      'aria-label': translate(t, 'multiview.chooseNamedChannel', 'Choose {name}', { name: safeText(channel?.name) }),
+    });
+    const logo = element('span', 'channel-logo channel-picker__logo');
+    renderLogo(logo, channel, t);
+    const copy = element('span', 'channel-picker__copy');
+    const name = element('strong');
+    name.textContent = safeText(channel?.name, translate(t, 'channel.unknown', 'Unknown channel'));
+    copy.append(name, channelMeta(channel, 'channel-picker__meta'));
+    button.append(logo, copy, icon('caret-right'));
+    fragment.append(button);
+  });
+  container.replaceChildren(fragment);
+  if (!values.length) {
+    renderEmpty(
+      container,
+      t,
+      'multiview.pickerEmpty',
+      'No matching channels',
+      'Try a channel, country, or language.',
+    );
+  }
 }
 
 function createImportDialog(t) {
@@ -1764,6 +1844,7 @@ export function mountAppUI(root, options = {}) {
   const sources = createSourcesView(t);
   const player = createPlayer(t);
   const multiview = createMultiview(t);
+  const channelPicker = createChannelPicker(t);
   const importDialog = createImportDialog(t);
   const signalBar = createSignalBar(t);
 
@@ -1772,7 +1853,7 @@ export function mountAppUI(root, options = {}) {
   main.append(home.view, countries.view, library.view, sources.view);
   shell.append(header.header, main, signalBar.bar);
   root.classList.add('catodo-app');
-  root.replaceChildren(shell, player.overlay, multiview.overlay, importDialog.backdrop);
+  root.replaceChildren(shell, player.overlay, multiview.overlay, channelPicker.backdrop, importDialog.backdrop);
 
   const toastRegion = element('div', 'toast-region', {
     'aria-live': 'polite',
@@ -1843,6 +1924,9 @@ export function mountAppUI(root, options = {}) {
       multiviewGrid: multiview.grid,
       multiviewSlots: multiview.slots,
       multiviewVideos: multiview.slots.map((slot) => slot.video),
+      channelPicker: channelPicker.backdrop,
+      channelPickerInput: channelPicker.input,
+      channelPickerResults: channelPicker.results,
       importDialog: importDialog.backdrop,
       importForm: importDialog.form,
       importPresetGrid: importDialog.presetGrid,
@@ -2112,6 +2196,28 @@ export function mountAppUI(root, options = {}) {
         state.signalOk === false ? 'status.signalIssue' : 'status.signalOk',
         state.signalOk === false ? 'Signal issue' : 'Signal OK',
       );
+      return api;
+    },
+
+    showChannelPicker(state = {}) {
+      if (state === false || state?.open === false) {
+        channelPicker.backdrop.hidden = true;
+        channelPicker.input.value = '';
+        delete channelPicker.backdrop.dataset.slot;
+        return api;
+      }
+      const slot = Math.max(1, Math.min(MULTIVIEW_SIZE, Number(state.slot) || 1));
+      channelPicker.backdrop.dataset.slot = String(slot);
+      channelPicker.title.textContent = translate(t, 'multiview.pickerTitle', 'Choose channel · Slot {slot}', {
+        slot: String(slot).padStart(2, '0'),
+      });
+      channelPicker.input.value = safeText(state.query);
+      renderChannelPickerResults(channelPicker.results, state.channels, t);
+      setTranslatedText(channelPicker.count, t, 'multiview.pickerCount', '{count} channels', {
+        count: normaliseArray(state.channels).length,
+      });
+      channelPicker.backdrop.hidden = false;
+      scheduleFrame(() => channelPicker.input.focus());
       return api;
     },
 

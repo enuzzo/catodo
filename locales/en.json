@@ -61,6 +61,18 @@
     "unfavorite": "Remove from favorites",
     "nextEndpoint": "Try another stream"
   },
+  "multiview": {
+    "random": "Random",
+    "chooseChannel": "Choose channel",
+    "pickerTitle": "Choose channel · Slot {slot}",
+    "pickerSearch": "Search channels, countries, languages…",
+    "pickerCount": "{count} channels",
+    "chooseNamedChannel": "Choose {name}",
+    "pickerEmpty": {
+      "title": "No matching channels",
+      "body": "Try a channel, country, or language."
+    }
+  },
   "signalLab": {
     "channelProfile": "Channel profile",
     "profileUnavailable": "Official metadata is not available for this source yet.",

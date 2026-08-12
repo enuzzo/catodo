@@ -12,6 +12,7 @@ import {
 import i18n from "./i18n/index.js";
 import { MultiviewController, PlayerManager } from "./player/index.js";
 import { mountAppUI } from "./ui/markup.js";
+import { filterChannelPicker } from "./ui/channel-picker-filter.js";
 import { resetWorldMapView, zoomWorldMap } from "./ui/world-map.js";
 
 const UI_CHANNEL_LIMIT = 72;
@@ -36,6 +37,8 @@ const state = {
   multiviewLayout: 4,
   multiviewFeeds: [],
   multiviewAudioIndex: null,
+  multiviewPickerSlot: null,
+  multiviewPickerQuery: "",
   libraryCategory: "",
   libraryLanguage: "",
   libraryFavoritesOnly: false,
@@ -497,6 +500,46 @@ async function openMultiview(seed, { fill = true } = {}) {
   await multiview.start(feeds.map(playbackSource), { count: state.multiviewLayout, videos: ui.refs.multiviewVideos });
 }
 
+function multiviewPickerChannels() {
+  const currentIds = new Set(state.multiviewFeeds.map(channelId));
+  return filterChannelPicker(playableChannels(), {
+    query: state.multiviewPickerQuery,
+    excludedIds: currentIds,
+    getId: channelId,
+    limit: 60,
+  })
+    .map(decorateChannel);
+}
+
+function showMultiviewPicker() {
+  ui.showChannelPicker({
+    slot: state.multiviewPickerSlot,
+    query: state.multiviewPickerQuery,
+    channels: multiviewPickerChannels(),
+  });
+}
+
+async function replaceMultiviewSlot(index, channel) {
+  if (!channel || !isPlayableChannel(channel)) return;
+  state.multiviewFeeds[index] = channel;
+  const slot = multiview.slots?.[index] || multiview.findSlot?.(`slot-${index + 1}`);
+  const keepAudio = state.multiviewAudioIndex === index;
+  ui.updateMultiview({
+    feeds: state.multiviewFeeds.slice(0, state.multiviewLayout).map(decorateChannel),
+    layout: state.multiviewLayout,
+    audioIndex: state.multiviewAudioIndex,
+  });
+  if (!slot) {
+    await openMultiview(null, { fill: false });
+    return;
+  }
+  await slot.tune(playbackSource(channel), { muted: !keepAudio }).catch(() => {});
+  if (keepAudio) {
+    multiview.registerUserGesture(slot.id);
+    multiview.activateAudio(slot.id);
+  }
+}
+
 function updateMultiviewMetrics() {
   const metrics = multiview?.getAggregateMetrics();
   if (!metrics || ui.refs.root.dataset.mode !== "multiview") return;
@@ -829,9 +872,34 @@ async function handleAction(action, detail) {
     }
     case "replace-multiview-channel": {
       const index = Math.max(0, Math.min(3, Number(detail.dataset.slot) - 1));
-      const next = catalog.randomPlayable({ currentChannelId: channelId(state.multiviewFeeds[index]) });
-      if (next && isPlayableChannel(next)) state.multiviewFeeds[index] = next;
-      await openMultiview();
+      const currentIds = new Set(state.multiviewFeeds.map(channelId));
+      const candidates = playableChannels().filter((channel) => !currentIds.has(channelId(channel)));
+      const next = candidates[Math.floor(Math.random() * candidates.length)];
+      if (next && isPlayableChannel(next)) await replaceMultiviewSlot(index, next);
+      else ui.toast("No other playable channel is available.", { tone: "error" });
+      break;
+    }
+    case "open-multiview-picker":
+      state.multiviewPickerSlot = Math.max(1, Math.min(4, Number(detail.dataset.slot) || 1));
+      state.multiviewPickerQuery = "";
+      showMultiviewPicker();
+      break;
+    case "filter-multiview-picker":
+      state.multiviewPickerQuery = detail.value || "";
+      showMultiviewPicker();
+      break;
+    case "close-multiview-picker":
+      state.multiviewPickerSlot = null;
+      state.multiviewPickerQuery = "";
+      ui.showChannelPicker(false);
+      break;
+    case "select-multiview-channel": {
+      const index = Math.max(0, Math.min(3, Number(state.multiviewPickerSlot) - 1));
+      const channel = findChannel(id);
+      state.multiviewPickerSlot = null;
+      state.multiviewPickerQuery = "";
+      ui.showChannelPicker(false);
+      if (channel) await replaceMultiviewSlot(index, channel);
       break;
     }
     case "remove-multiview-channel": {
