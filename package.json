@@ -1,12 +1,39 @@
 {
   "name": "catodo",
-  "private": true,
+  "version": "2.0.0",
+  "description": "A Tesla-first, open-source player for discovering public live television sources.",
+  "private": false,
+  "license": "AGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enuzzo/catodo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/enuzzo/catodo/issues"
+  },
+  "homepage": "https://enuzzo.github.io/catodo/",
   "type": "module",
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test tests/**/*.test.js",
+    "check": "node scripts/check-syntax.mjs",
     "gen:htpasswd": "node gen-htpasswd.mjs"
   },
   "devDependencies": {
     "basic-ftp": "^6.2.0",
-    "bcryptjs": "^3.0.3"
+    "bcryptjs": "^3.0.3",
+    "vite": "7.3.6"
+  },
+  "dependencies": {
+    "@fontsource-variable/exo-2": "5.3.0",
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@phosphor-icons/web": "2.1.2",
+    "@svg-maps/world": "2.0.0",
+    "fake-indexeddb": "^6.2.5",
+    "flag-icons": "^7.5.0",
+    "hls.js": "1.5.17",
+    "three": "0.162.0"
   }
 }

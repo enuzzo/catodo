@@ -1,260 +1,91 @@
-# CATODO
+# CATODO 2.0
 
-Private IPTV receiver for the Tesla browser. One HTML file, zero frameworks, zero backend.
+CATODO is an open-source, Tesla-first web player for discovering and watching public live television sources. It is licensed under [AGPL-3.0-or-later](LICENSE).
 
-Channel source: `Free-TV/IPTV`, a playlist of channels declared free to air only.
-No stream is hosted here: the page points to the same public URLs you would use in VLC.
+It is a vanilla ES-module application with no framework. Pinned runtime assets are vendored, so a CDN is not required to boot; Vite is used for the verified production bundle.
 
----
+## Experience
 
-## 1. What I checked before writing the code
+- **Soft Signal Grid:** an editorial broadcast UI with electric-blue and EBU accents.
+- **Home Live Anchor:** when a cached catalog is available, the first tile at left starts muted and stays live while you explore. Use **Random** beside it to switch quickly to another playable channel.
+- **Signal Atlas:** explore every country exposed by the upstream catalog, with global search and country discovery.
+- **Country flags:** the Countries index and country detail use self-hosted SVG artwork from the MIT-licensed `flag-icons` collection, with an ISO-code fallback.
+- **Multiview:** 2-, 3-, or 4-feed layouts; exactly one selected feed supplies audio.
+- **Signal Lab:** playback diagnostics separate measured, estimated, and manifest-declared values.
+- **Channel profiles:** when upstream metadata is available, Signal Lab also surfaces canonical channel, network, owner, category, feed, coverage, language, format, quality, availability, lifecycle, website, logo, and guide descriptors without inventing missing values.
+- **Resilient boot:** a Three.js r162 signal sequence uses capability detection and a graceful non-WebGL fallback.
 
-### The Tesla browser
+## Content boundary
 
-It is Chromium, not Safari. The user agents collected show `Chromium/88` with a `Tesla/<firmware version>` suffix.
-Two practical consequences:
+CATODO ships software and a directory of external source links. It does **not** include playlist snapshots, stream media, video, permanent logo packs, or EPG data. The iptv-org catalog is fetched only after the user has confirmed the provider and disclaimer; no playlist is imported before that consent.
 
-- **No native HLS.** Chromium only added the HLS demuxer from version 142. On an 88 engine the tag `<video src="...m3u8">` does nothing. A library on Media Source Extensions is required.
-- **Old engine.** No `container queries`, no `:has()`, caution with modern syntax. The code in here sits on ES2016 and CSS that has worked since 2020.
+CATODO uses the official iptv-org JSON directory as optional metadata: channels, feeds, streams, logos, categories, languages, guides and the upstream blocklist. Guide records are discovery mappings only; CATODO does not bundle or redistribute programme data. Blocklisted sources are excluded and adult content is hidden from default discovery and random playback.
 
-### The player
+Users are responsible for ensuring they may access a source in their jurisdiction. See [CONTENT_POLICY.md](CONTENT_POLICY.md), [TAKEDOWN.md](TAKEDOWN.md), and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-I looked at hls.js, Video.js, Shaka Player, Vidstack, Plyr and mpegts.js.
+## Data and privacy
 
-| | verdict |
-|---|---|
-| **hls.js** | **chosen.** It is the engine underneath almost all the others. No UI to fight, direct control over errors, ~90 KB gzip bundle. Only requirement: MSE with `video/MP4` mime, which the Tesla's Chromium 88 has. |
-| Video.js | great for branded VOD, but drags in a heavy theme and still uses hls.js underneath. Useless weight on the car's SIM. |
-| Shaka Player | excellent on DASH and DRM. No DRM is needed here and the bundle is bigger. |
-| Vidstack, Plyr | nice UI but designed for mouse and desktop. The touch targets are too small for a car screen. |
-| mpegts.js | only needed for raw `.ts` streams: in the playlist that is 7 channels out of 1930. Not worth the dependency. |
+Sources, imported catalog snapshots, favourites, history, and settings stay on the device in IndexedDB. Existing legacy browser storage is migrated on first use. A failed refresh does not replace the last known-good snapshot. If an unusually restricted embedded browser exposes no IndexedDB at all, CATODO falls back to an in-memory session catalog and does not claim persistence.
 
-Error handling: the player retries twice over the network, twice to recover the decoder, then moves to the next channel. In a car, with coverage coming and going, this is what makes the difference between "it works" and "it does not work".
+## Local setup
 
-### Full screen
+Requirements: a current browser with ES modules; Node.js for tests and development utilities. Playback additionally depends on browser HLS/MSE support and the codec, network, CORS, and geographic availability of each third-party source.
 
-The Tesla browser occupies two thirds of the screen and the Fullscreen API does not expand it: it expands the video inside that window.
-The method the community has used for years (Channels DVR documents it officially, and ABetterTheater and Fullscreen Hub are built on top of it) is to go through a YouTube redirect: the system opens the YouTube app's webview, which is full screen, and then redirects it to your site.
-
-```
-https://www.youtube.com/redirect?q=https://your-catodo-domain.example
+```sh
+npm install
+npm run dev
 ```
 
-In the car: paste, tap "go to site", save as a bookmark. The field in Catodo's settings generates this link ready made for you.
-Honest note: this is undocumented behavior, some firmware versions have blocked it and then restored it. If it stops working one day, the player still works, just in a window.
+Open the local URL printed by Vite.
 
-### The two real walls: CORS and mixed content
-
-They are the reason most IPTV players in the browser "do not work", and nobody explains it.
-
-1. **CORS.** hls.js downloads the manifest, every variant, every segment and every AES key via XHR. Each of those requests is cross-origin and the browser blocks it if the server does not send `Access-Control-Allow-Origin`. Fixing only the manifest is not enough: playback starts and dies at the first segment. A stream that plays in VLC may well not play in the browser: VLC knows nothing about CORS.
-2. **Mixed content.** The playlist has 257 channels on `http://`. A page served over https cannot load them, Chromium just blocks them. In the subset you care about, that is 109.
-
-Both are solved with the same piece: `worker.js`, a Cloudflare Worker that redoes the request server side, adds the CORS headers, rewrites the playlist so the segments also go back through it, and closes the http to https gap. Free up to 100,000 requests a day.
-
-### What to expect from a public list
-
-Running the Free-TV list through `check-playlist.mjs`: 1930 entries, 1918 unique.
-1576 open directly in the browser as they are, 257 are on `http` and need the proxy,
-85 will never open (72 YouTube, 6 RTMP, 4 Twitch, 3 Dailymotion).
-
-This holds for any list: roughly one channel in seven is not usable in a browser,
-and the number has nothing to do with the quality of the source. That is the reason `check-playlist.mjs`
-exists.
-
-Two things to keep in mind when choosing:
-
-- **Geoblocking.** Many national channels look at the IP address. In the car the Tesla SIM can give you
-  an Italian or Swiss address depending on the network it latches onto, and the same channel behaves
-  differently from one day to the next.
-- **Provenance.** Any public list can end up with streams that do not come from the
-  broadcaster but from resale panels. They are recognizable: bare IP addresses with high ports,
-  paths like `/user/password/12345`. They are not free to air, and should be removed.
-
----
-
-## 2. Files
-
-```
-app.html              the player. Arrives with no list inside. Served only through index.php.
-index.php              login gate: checks username and password against .htpasswd, then streams app.html
-worker.js              Cloudflare proxy for CORS, mixed content and hotlinking. Does not go on the FTP.
-check-playlist.mjs     diagnostics: tells you which channels of your list will open in the browser
-gen-htpasswd.mjs       generates .htpasswd (bcrypt) from HTPASSWD_USER/HTPASSWD_PASSWORD in .env
-.htaccess              blocks direct access to app.html and forces the login through index.php
-README.md              this file
-BRIEF.md               open tasks, for whoever works on this
+```sh
+npm test
+npm run check
 ```
 
----
+The test suite covers catalogue parsing, import policy and migration, random selection, and player/multiview behaviour. `npm run check` performs syntax checks.
 
-## 3. Getting it on the road
+## Deployment
 
-### Step 1: a real Apache host, over FTP
+### GitHub Pages (official)
 
-CATODO needs PHP to run the login gate (see Step 2), so this cannot sit on a static host like Cloudflare Pages or GitHub Pages. Cloudflare Pages does not execute PHP: `index.php` would be served as a plain downloadable file instead of running, `.htaccess` is ignored there entirely, and `app.html` would end up publicly readable. That is not a corner case, it disables the whole security model. This project runs on ordinary Apache hosting with PHP, deployed over FTP. In practice, SiteGround.
+CATODO is published from the Vite production bundle. A push to `main` runs
+`.github/workflows/deploy-pages.yml`: it uses Node.js 22, installs the locked
+dependencies, runs tests and syntax checks, builds `dist/`, and deploys that
+artifact to GitHub Pages. The public site is
+[enuzzo.github.io/catodo](https://enuzzo.github.io/catodo/).
 
-Upload these files to the document root:
+For an equivalent self-hosted release:
 
-```
-index.php
-app.html
-.htaccess
-.htpasswd
-robots.txt
-```
-
-`.htpasswd` is not in the repo, see Step 2 for how to generate it. Everything else can go straight from the checkout.
-
-### Step 2: the login gate
-
-The barrier is `index.php`, and it is not HTTP Basic Auth: it is a CATODO styled login form. The browser never shows its own username and password dialog. `index.php` checks what was submitted against `.htpasswd` (bcrypt, the same file Basic Auth would have used), and only on success does it stream `app.html` back inline. `.htaccess` blocks any direct request to `app.html` and to dotfiles, so the only way the player's bytes ever leave the server is through a successful login in `index.php`. Failed attempts are throttled per IP in a local file, so clearing cookies does not reset a lockout.
-
-Generate `.htpasswd` locally, it must never be committed:
-
-```
-HTPASSWD_USER and HTPASSWD_PASSWORD in .env, then:
-node gen-htpasswd.mjs
+```sh
+npm ci
+npm test
+npm run check
+npm run build
 ```
 
-Upload the resulting `.htpasswd` next to `index.php`. Regenerate and re-upload it every time the password changes.
+Deploy only the generated `dist/` directory over HTTPS. Do not publish the
+source tree as the application runtime.
 
-**Watch out for the host's static file cache.** This bit us during development. Some hosts put an nginx layer in front of Apache for speed (SiteGround calls it "dynamic cache" or "nginx direct delivery"), and that layer can serve `.html` and `.json` files straight from disk, bypassing `.htaccess` entirely because `.htaccess` is an Apache mechanism nginx never reads. With that cache on, `app.html` was reachable directly, unauthenticated, with the login gate fully intact and doing nothing about it: `.htaccess` was correct, it just never ran. It must stay disabled for this domain. After any hosting change, verify by requesting `/app.html` directly: it must come back denied, not the player.
+### Cloudflare Worker proxy (optional)
 
-**Future upgrade path.** If the domain one day moves to Cloudflare, the better protection becomes Cloudflare Access with a policy on email addresses:
+`worker.js` is an optional Cloudflare Worker for third-party streams that need CORS handling, HTTPS-to-HTTP bridging, or compatible request headers. Deploy it in **Workers & Pages**, keep `ALLOWED_ORIGINS` restricted to the intended CATODO sites, and configure its URL in CATODO. The proxy is not a bypass for access controls, DRM, geoblocking, or content rights; keep its destination restrictions and origin checks intact.
 
-```
-Cloudflare > Zero Trust > Access > Applications > Add > Self-hosted
-domain: catodo.netmilk.dev
-policy: Allow > Emails > your email
-```
+## Limits and compatibility
 
-Free up to 50 users, no password in the repo, session as long as you like. This is not the current setup, today it is the PHP gate described above, marked here only as a possible future alternative.
+- Tesla/in-car Chromium variants have constrained CPU, memory, WebGL, MSE, and codec support. A stream that works in VLC may still fail in the browser.
+- Multiview starts multiple independent decoders. On Tesla hardware, 2 feeds is the practical default; 3 or 4 can exhaust decoder, thermal, or network capacity. CATODO keeps one audio feed to reduce noise, not decoder load.
+- HLS, codecs, CORS policy, mixed-content blocking, hotlink protection, and geoblocking are controlled by external sources and may change without notice.
+- The Three.js boot sequence is decorative and falls back when WebGL is unavailable.
 
-### Step 3: the proxy
+## Locales
 
-```
-Workers & Pages > Create > Worker
-paste worker.js > Deploy
-```
+English is the current product locale. Add future locales as `locales/<language-tag>.json`, mirror them under `public/locales/` for the production bundle, keep keys aligned with `locales/en.json`, and register/select the locale through the i18n service. UI layouts intentionally allow for strings roughly 30–40% longer than English.
 
-Then in `worker.js` set `ALLOW_ORIGIN` to your real domain instead of `*`. The worker checks the request's `Origin` header (falling back to `Referer` when `Origin` is absent) against `ALLOW_ORIGIN` server side and returns 403 otherwise. That is worth doing, and it is more than the CORS response header alone, which browsers honor and everything else ignores.
+## Dependencies
 
-Be honest with yourself about how far it goes, though. It stops a page on someone else's site from quietly using your proxy, and it stops the casual case of the URL being pasted around. It does not stop anyone who actually tries: `Origin` and `Referer` are ordinary headers and curl will send whatever you tell it to. Real protection would be a shared secret in the query string that only your CATODO knows. That is the next step if the proxy ever gets abused, and it is not worth the setup before then.
+Runtime dependencies are pinned and vendored: hls.js, Three.js r162, Phosphor Icons, SVG Maps World, `flag-icons` 7.5.0 (self-hosted SVG, MIT), and Exo 2 Variable (self-hosted, OFL-1.1) for the interface. IBM Plex Mono is self-hosted only for diagnostic statistics. `fake-indexeddb` is loaded only as an in-memory compatibility fallback when IndexedDB is absent. Development utilities include `basic-ftp` and `bcryptjs`. Licences and notices are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-Remember `worker.js` runs on Cloudflare and is deployed by pasting the file into the dashboard, so editing the file in the repo changes nothing live until you paste and deploy it again.
-Copy the worker's address into Catodo's settings. From that point on channels marked `HTTP` become openable and the ones that gave a CORS error start.
+## Security
 
-### Step 4: the lists
-
-There is nothing to prepare. On first launch CATODO opens the sources screen and asks you
-to load one. Inside you will find a curated list of independent public projects to
-start from, with a button that fills the field for you. The lists are downloaded by the browser
-directly from their server and cached locally for twelve hours.
-
-To understand what is worth keeping in a list, before loading it:
-
-```
-node check-playlist.mjs https://.../list.m3u
-node check-playlist.mjs https://.../list.m3u --deep --csv
-```
-
-It tells you how many channels will open in the browser as they are, how many need the proxy and how many
-are unrecoverable. With `--deep` it actually downloads the manifests and checks the CORS headers.
-
-### Step 5: in the car
-
-1. Parked. The video only starts while stationary.
-2. Browser, paste the YouTube redirect link generated in the settings.
-3. "Go to site", then bookmark it.
-4. Log in, category, channel.
-
----
-
-## 4. Identity
-
-The name comes from the cathode ray tube. Everything else follows from that.
-
-**The EBU color bars.** Seven standardized values (white, yellow, cyan, green, magenta, red, blue) used as a system, not as decoration: each channel category takes a bar and keeps it everywhere, in the column, in the card's border, in the on screen number, in the thread above the tuning bar. Italy green, Switzerland red, movies magenta, news cyan. The color tells you where you are before you read it.
-
-**The background is not black.** It is `#0C0D0B`, the warm green-black of the glass of a switched off tube. And the white is not white, it is `#F0EBE1`. A television turned on at night has never had a pure black.
-
-**The test card.** On opening, the seven bars drop one after another, the logotype appears on the black band, then everything collapses. It lasts a bit over a second and can be skipped by tapping the screen.
-
-**The power off.** When you close a channel the image squashes into a horizontal line, whitens and disappears into a point. It is the physical behavior of the object the software takes its name from, and it costs four CSS keyframes.
-
-**The convergence error.** The logotype has a thread of red on the right and cyan on the left, like a poorly aligned tube. Only the logotype, never the current text.
-
-**The cathode effect** is off by default and turns on from the button while watching or from the settings: scan lines, RGB phosphor mask and vignetting. Nice, but it really does reduce sharpness, so the choice is always yours.
-
-**The clock in the header** is in Televideo format (`TUE 11 AUG 17:42`), which in the car is more useful than it sounds.
-
-## 5. How the interface is built
-
-It is not a Netflix style grid, it is a tuner. The difference matters because in the car you are not browsing a catalog: you are channel surfing.
-
-- **Tuning bar at the bottom.** Channel number on a solid block of the category color, name, real resolution negotiated by hls.js and a signal indicator that reads the real bandwidth estimate, red when you are below it. On a shaky LTE connection you see the problem before you suffer it.
-- **On screen number.** When you zap, the number appears in the top left on a colored background along with the channel name, for two and a half seconds. It is the OSD of nineties televisions and does exactly the job it did back then.
-- **`◀ CH` and `CH ▶` paddles at 114 px (86 px on narrow screens).** Cyclic zapping within the current category, automatically skips unplayable channels and starts over from the beginning at the end of the list. They can be tapped without looking.
-- **72 px minimum target** everywhere, because a 15 inch screen half a meter away with your finger is not a mouse.
-- **Overlays that disappear** after 4 seconds, a tap brings them back.
-- **Fit / fill**, because the Highland's 15.4" is wider than 16:9 and some SD channels are in 4:3.
-- **Quality limited to window size** on by default: it does not download 1080p to fill half a screen. On the car's SIM it is the biggest source of data usage.
-- **Unplayable channels** marked `HTTP`, `YT`, `RTMP` instead of hidden silently, so you know why they are missing.
-
-Favorites and history live in `localStorage` with an in memory fallback: if the browser blocks storage the page does not break, it only loses memory between one session and the next.
-
----
-
-## 6. If something does not start
-
-| symptom | cause | what to do |
-|---|---|---|
-| `STREAM BLOCKED (CORS OR OFFLINE)` | the server does not send the CORS headers | turn on the proxy |
-| the channel has the `HTTP` badge | mixed content | turn on the proxy |
-| 403 error on just one channel | hotlink protection | add the host to `RULES` inside `worker.js` with the right Referer and Origin |
-| `CODEC NOT SUPPORTED` | the stream is HEVC or AC-3 | not fixable on the browser side, it is a decoder gap |
-| channel with the `GEO` badge that does not start | geoblocking on the SIM's IP | depends on where the Tesla network finds you |
-| everything black but the audio works | rare on older Chromium builds | tap "fill screen", it forces a redraw |
-
----
-
-## 7. The legal position
-
-I am not a lawyer and this is not legal advice. But the architecture was chosen to
-keep the project on the simple side of the question, and it is worth understanding why.
-
-**CATODO is a player, not a catalog.** It does not contain lists, does not host streams, does not act as an
-intermediary between whoever watches and whoever broadcasts. It is the same category as VLC, Kodi or IPTVnator:
-neutral software, which only becomes useful once the user gives it its own content.
-
-**We do not redistribute anything.** The first version of this project included a filtered copy
-of the Free-TV playlist inside the repo. Even though the upstream file is public, that
-copy was still a redistribution: a choice the upstream project makes for itself and
-takes responsibility for, one you have no reason to inherit. Now that file no longer exists. The
-list is downloaded by the browser of whoever uses the app, directly from the server of whoever publishes it.
-
-**On the links.** The sources screen points to independent projects and shows both the
-project's page and the list's address. One honest point of attention: the European Court of
-Justice, in the 2016 GS Media case, ruled that linking to unauthorized content
-can be relevant when whoever links does so for profit or knowing the
-content is unlawful. Three reasons why the position here is comfortable: the site is private and
-without profit motive, the listed projects both state they only collect streams made
-public by the rights holders, and the text at the bottom of the screen clearly states that
-CATODO does not verify or guarantee what is on the other side.
-
-**What remains your responsibility.** Load only lists you have the right to watch. In practice:
-channels broadcast free of charge by their stations. If a public list contains streams that
-come from resale panels instead of the broadcaster, it is not free to air: remove it or
-do not use that source. `check-playlist.mjs` helps you spot them.
-
-**On the context.** You live in Italy and work in Switzerland, so Italian rules apply
-for use and the hosting country's rules apply for the site. In Italy AGCOM has very sharp powers
-over services that distribute content, but those concern whoever distributes: a private page,
-password protected, for personal use, with no content of its own, is a different planet. The fact
-that it sits behind authentication and with `noindex` is not just hygiene, it is part of the position.
-
-**On logos.** When the playlist does not provide a channel logo, some known broadcasters show one fetched live from [logo.dev](https://logo.dev): CATODO never saves or hosts those files, the viewer's browser requests them, every time. Channel names and logos remain trademarks of their respective broadcasters; CATODO is not affiliated with them.
-
-Finally: the Tesla browser only plays video while the vehicle is parked, which is exactly the way
-this thing is meant to be used.
+Treat every imported playlist and stream endpoint as untrusted input. Read [SECURITY.md](SECURITY.md) for the reporting process and deployment guidance.

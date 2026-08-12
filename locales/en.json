@@ -1,0 +1,73 @@
+{
+  "app": {
+    "name": "CATODO",
+    "tagline": "Live television from around the world"
+  },
+  "nav": {
+    "live": "Live",
+    "countries": "Countries",
+    "categories": "Categories",
+    "multiview": "Multiview",
+    "archive": "Archive",
+    "settings": "Settings",
+    "search": "Search"
+  },
+  "home": {
+    "liveCount": "{count} live channels",
+    "countryCount": "{count} countries",
+    "nowLive": "Live now",
+    "random": "Random",
+    "randomHint": "Play another live channel",
+    "explore": "Explore the world"
+  },
+  "catalog": {
+    "favorites": "Favorites",
+    "history": "History",
+    "allChannels": "All channels",
+    "noChannels": "No channels found",
+    "unknownCountry": "Unknown country",
+    "unknownLanguage": "Unknown language",
+    "offline": "Unavailable",
+    "notAlwaysOn": "Not always on",
+    "geoRestricted": "Geo-restricted"
+  },
+  "sources": {
+    "title": "Sources",
+    "add": "Add source",
+    "importCountry": "Import country",
+    "confirmImport": "CATODO will download this public playlist. Continue?",
+    "refresh": "Refresh source",
+    "remove": "Remove source",
+    "lastGood": "Showing the last successful update",
+    "consentRequired": "Confirm before CATODO contacts this source",
+    "channelsImported": "{count} channels imported"
+  },
+  "player": {
+    "play": "Play",
+    "pause": "Pause",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "fullscreen": "Full screen",
+    "favorite": "Add to favorites",
+    "unfavorite": "Remove from favorites",
+    "nextEndpoint": "Try another stream"
+  },
+  "signalLab": {
+    "channelProfile": "Channel profile",
+    "profileUnavailable": "Official metadata is not available for this source yet.",
+    "officialWebsite": "Official website"
+  },
+  "status": {
+    "loading": "Loading",
+    "ready": "Ready",
+    "error": "Something went wrong",
+    "empty": "Nothing here yet"
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "retry": "Try again",
+    "done": "Done"
+  }
+}

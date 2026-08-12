@@ -140,6 +140,7 @@ if ($authed) {
         echo 'app.html not found.';
         exit;
     }
+    header('Content-Type: text/html; charset=utf-8');
     echo $app;
     exit;
 }
@@ -151,7 +152,7 @@ if ($authed) {
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <meta name="referrer" content="no-referrer">
-<meta name="theme-color" content="#0C0D0B">
+<meta name="theme-color" content="#F2F1EA">
 <title>CATODO</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><rect width='4' height='28' x='0' fill='%23BFBFBF'/><rect width='4' height='28' x='4' fill='%23BFBF00'/><rect width='4' height='28' x='8' fill='%2300BFBF'/><rect width='4' height='28' x='12' fill='%2300BF00'/><rect width='4' height='28' x='16' fill='%23BF00BF'/><rect width='4' height='28' x='20' fill='%23BF0000'/><rect width='4' height='28' x='24' fill='%230000BF'/></svg>">
 <style>
@@ -159,7 +160,7 @@ if ($authed) {
   --ebu-white:#BFBFBF; --ebu-yellow:#BFBF00; --ebu-cyan:#00BFBF; --ebu-green:#00BF00;
   --ebu-magenta:#BF00BF; --ebu-red:#BF0000; --ebu-blue:#1D1DBF;
   --c-red:#E05545; --c-amber:#FFB03A;
-  --glass:#0C0D0B; --cabinet:#191714; --line:#332E27; --dim:#8A8175; --ink:#F0EBE1;
+  --glass:#F2F1EA; --cabinet:#FFFFFF; --line:#D8D5CA; --dim:#6E6D68; --ink:#0A0B0D;
   --mono: ui-monospace, "SF Mono", "Roboto Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "DejaVu Sans", Arial, sans-serif;
   --tap:72px; --r:2px;
@@ -186,10 +187,10 @@ h1{font-size:15px;font-weight:800;letter-spacing:.46em;text-indent:.46em;text-al
 .sub{font-size:10.5px;letter-spacing:.24em;color:var(--dim);margin-top:10px;text-align:center}
 .sub.bad{color:var(--c-red);letter-spacing:.1em;max-width:360px;line-height:1.6}
 form{display:flex;flex-direction:column;gap:12px;width:100%}
-input[type=text],input[type=password]{height:var(--tap);border:1px solid var(--line);border-radius:var(--r);
+input[type=text],input[type=password]{height:var(--tap);border:1px solid var(--line);border-radius:12px;
   background:var(--cabinet);font-family:var(--mono);font-size:18px;padding:0 16px;width:100%}
 input[type=text]:focus,input[type=password]:focus{border-color:var(--c-amber)}
-button[type=submit]{height:var(--tap);border:1px solid var(--line);border-radius:var(--r);background:var(--cabinet);
+button[type=submit]{height:var(--tap);border:1px solid #1457FF;border-radius:12px;background:#1457FF;color:#fff;
   font-family:var(--mono);font-size:15px;letter-spacing:.1em;transition:background .07s,color .07s,border-color .07s}
 button[type=submit]:active{background:var(--c-amber);border-color:var(--c-amber);color:#000}
 #note{font-size:11px;color:var(--dim);max-width:340px;text-align:center;line-height:1.6}

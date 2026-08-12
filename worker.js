@@ -16,7 +16,7 @@
  */
 
 // Server side check: a request is rejected unless its Origin header (or, when
-// Origin is absent, its Referer header) matches ALLOW_ORIGIN. The
+// Origin is absent, its Referer header) matches ALLOWED_ORIGINS. The
 // Access-Control-Allow-Origin response header set in cors() below only tells
 // browsers what they may read: it does nothing against curl or any other
 // client that ignores CORS, which is why it cannot do this job alone.
@@ -28,9 +28,11 @@
 // step up, if this proxy ever gets abused, is a shared secret in the query
 // string that only your CATODO knows.
 //
-// Put the real origin of your CATODO here. "*" disables the check entirely and
-// is for local testing only: it leaves the proxy open to everyone.
-const ALLOW_ORIGIN = "https://catodo.netmilk.dev";
+// Keep this explicit. A wildcard leaves the proxy open to every web origin.
+const ALLOWED_ORIGINS = new Set([
+  "https://catodo.netmilk.dev",
+  "https://enuzzo.github.io"
+]);
 
 // Blocks anything that is not a plausible streaming host.
 const DENY_HOSTS = [
@@ -63,21 +65,22 @@ export default {
   async fetch(request) {
     const here = new URL(request.url);
 
-    if (!originAllowed(request)) return forbidden();
+    const callerOrigin = allowedOrigin(request);
+    if (!callerOrigin) return forbidden();
 
-    if (request.method === "OPTIONS") return preflight();
+    if (request.method === "OPTIONS") return preflight(callerOrigin);
 
     const target = here.searchParams.get("url");
     if (!target) {
       return new Response("CATODO PROXY. Usage: /?url=<url-encoded>", {
-        status: 400, headers: cors({ "content-type": "text/plain; charset=utf-8" })
+        status: 400, headers: cors({ "content-type": "text/plain; charset=utf-8" }, callerOrigin)
       });
     }
 
     let up;
-    try { up = new URL(target); } catch { return bad("Invalid URL"); }
-    if (!/^https?:$/.test(up.protocol)) return bad("Only http and https");
-    if (DENY_HOSTS.some(re => re.test(up.hostname))) return bad("Host not allowed");
+    try { up = new URL(target); } catch { return bad("Invalid URL", 400, callerOrigin); }
+    if (!/^https?:$/.test(up.protocol)) return bad("Only http and https", 400, callerOrigin);
+    if (DENY_HOSTS.some(re => re.test(up.hostname))) return bad("Host not allowed", 400, callerOrigin);
 
     // outgoing headers
     const out = new Headers({
@@ -97,7 +100,7 @@ export default {
     try {
       res = await fetch(up.toString(), { headers: out, redirect: "follow", cf: { cacheTtl: 0 } });
     } catch (e) {
-      return bad("Origin unreachable: " + e.message, 502);
+      return bad("Origin unreachable: " + e.message, 502, callerOrigin);
     }
 
     const ct = (res.headers.get("content-type") || "").toLowerCase();
@@ -109,10 +112,10 @@ export default {
     // must go back through the proxy, otherwise the browser hits the CORS problem again.
     if (isPlaylist) {
       const len = res.headers.get("content-length");
-      if (len && Number(len) > MAX_PLAYLIST_BYTES) return bad("Playlist too large", 502);
+      if (len && Number(len) > MAX_PLAYLIST_BYTES) return bad("Playlist too large", 502, callerOrigin);
 
       const text = await res.text();
-      if (text.length > MAX_PLAYLIST_BYTES) return bad("Playlist too large", 502);
+      if (text.length > MAX_PLAYLIST_BYTES) return bad("Playlist too large", 502, callerOrigin);
 
       const body = rewrite(text, res.url || up.toString(), here.origin + here.pathname);
       return new Response(body, {
@@ -120,7 +123,7 @@ export default {
         headers: cors({
           "content-type": "application/vnd.apple.mpegurl; charset=utf-8",
           "cache-control": "no-store"
-        })
+        }, callerOrigin)
       });
     }
 
@@ -128,7 +131,7 @@ export default {
     const h = cors({
       "content-type": res.headers.get("content-type") || "application/octet-stream",
       "cache-control": "public, max-age=8"
-    });
+    }, callerOrigin);
     const len = res.headers.get("content-length");
     if (len) h.set("content-length", len);
     const cr = res.headers.get("content-range");
@@ -162,45 +165,45 @@ function rewrite(text, baseUrl, proxyPath) {
   }).join("\n");
 }
 
-function cors(extra = {}) {
+function cors(extra = {}, callerOrigin) {
   const h = new Headers(extra);
-  h.set("access-control-allow-origin", ALLOW_ORIGIN);
+  h.set("access-control-allow-origin", callerOrigin);
   h.set("access-control-allow-methods", "GET, HEAD, OPTIONS");
   h.set("access-control-allow-headers", "range, content-type");
   h.set("access-control-expose-headers", "content-length, content-range, accept-ranges");
-  h.set("timing-allow-origin", "*");
+  h.set("timing-allow-origin", callerOrigin);
   return h;
 }
 
-function preflight() {
-  return new Response(null, { status: 204, headers: cors({ "access-control-max-age": "86400" }) });
+function preflight(callerOrigin) {
+  return new Response(null, { status: 204, headers: cors({ "access-control-max-age": "86400" }, callerOrigin) });
 }
 
-function bad(msg, status = 400) {
-  return new Response(msg, { status, headers: cors({ "content-type": "text/plain; charset=utf-8" }) });
+function bad(msg, status = 400, callerOrigin) {
+  return new Response(msg, { status, headers: cors({ "content-type": "text/plain; charset=utf-8" }, callerOrigin) });
 }
 
 /**
  * Server side origin check. hls.js sends an Origin header on every XHR
  * (including the OPTIONS preflight), so legitimate traffic always has one:
- * if it is present, it must match ALLOW_ORIGIN. If it is absent (a bare
+ * if it is present, it must match one member of ALLOWED_ORIGINS. If it is absent (a bare
  * curl request, or a top level browser navigation, which does not send
  * Origin) fall back to the Referer header's origin. If neither header is
  * present, or neither matches, the request is not allowed.
  */
-function originAllowed(request) {
-  if (ALLOW_ORIGIN === "*") return true;
-
+function allowedOrigin(request) {
   const origin = request.headers.get("origin");
-  if (origin !== null) return origin === ALLOW_ORIGIN;
+  if (origin !== null) return ALLOWED_ORIGINS.has(origin) ? origin : null;
 
   const referer = request.headers.get("referer");
   if (referer) {
-    try { return new URL(referer).origin === ALLOW_ORIGIN; }
-    catch { return false; }
+    try {
+      const refererOrigin = new URL(referer).origin;
+      return ALLOWED_ORIGINS.has(refererOrigin) ? refererOrigin : null;
+    } catch { return null; }
   }
 
-  return false;
+  return null;
 }
 
 function forbidden() {

@@ -2,8 +2,11 @@
 .env.*
 !.env.example
 node_modules/
+dist/
 .DS_Store
 *.log
 deploy/
 .htpasswd
 .gate-attempts.json
+/design-qa*.png
+/.design-qa*.png
