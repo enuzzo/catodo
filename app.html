@@ -76,24 +76,6 @@ a{color:var(--c-cyan);text-decoration:none}
 #testcard.out{animation:tcOut .42s cubic-bezier(.6,0,.9,.2) forwards}
 @keyframes tcOut{to{transform:scaleY(.004);filter:brightness(3.4);opacity:0}}
 
-/* ---------- ACCESS ---------- */
-#gate{position:fixed;inset:0;z-index:100;background:var(--glass);display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:26px;padding:20px}
-.miniBars{width:126px;height:11px;margin:0 auto 17px}
-#gate h1{font-size:15px;font-weight:800;letter-spacing:.46em;text-indent:.46em;text-align:center}
-#gate .sub{font-size:10.5px;letter-spacing:.24em;color:var(--dim);margin-top:10px;text-align:center}
-#gate .sub.bad{color:var(--c-red);letter-spacing:.1em;max-width:360px;line-height:1.6}
-.pinDots{display:flex;gap:13px;height:15px;align-items:center}
-.pinDots i{width:13px;height:13px;border:1.5px solid var(--line);display:block}
-.pinDots.bad i{border-color:var(--c-red) !important;background:transparent !important;animation:shake .3s}
-@keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
-.pad{display:grid;grid-template-columns:repeat(3,var(--tap));gap:12px}
-.pad button{height:var(--tap);border:1px solid var(--line);border-radius:var(--r);background:var(--cabinet);
-  font-family:var(--mono);font-size:24px;transition:background .07s,color .07s,border-color .07s}
-.pad button:active{background:var(--c-amber);border-color:var(--c-amber);color:#000}
-.pad button.ghost{font-size:15px;letter-spacing:.1em;color:var(--dim);background:transparent}
-#gateNote{font-size:11px;color:var(--dim);max-width:340px;text-align:center;line-height:1.6}
-
 /* ---------- CHASSIS ---------- */
 #shell{display:flex;flex-direction:column;height:100%}
 header{display:flex;align-items:center;gap:14px;height:88px;flex:0 0 88px;padding:0 16px;
@@ -362,17 +344,6 @@ video.fill{object-fit:cover}
   <div class="band"><b class="fringe">CATODO</b><span id="tcLine">PRIVATE RECEIVER</span></div>
 </div>
 
-<div id="gate" class="hide">
-  <div>
-    <div class="miniBars barStrip"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-    <h1 class="fringe">CATODO</h1>
-    <div class="sub mono" id="gateSub">ENTER THE CODE</div>
-  </div>
-  <div class="pinDots" id="dots"></div>
-  <div class="pad" id="pad"></div>
-  <div id="gateNote">The code keeps out the curious, not attacks. Real protection goes in front of the site.</div>
-</div>
-
 <div id="shell" class="hide">
   <header>
     <div class="wordmark"><b class="fringe">CATODO</b><span id="wmCount" class="mono">- - - -</span></div>
@@ -513,11 +484,8 @@ video.fill{object-fit:cover}
 
 /* ================================================================
    CONFIGURATION
-   The PIN must ALWAYS be in quotes. Without them, a leading zero
-   is read as an octal number and the script does not start at all.
    ================================================================ */
 const CFG = {
-  pin: "1984",
   cacheHours: 12,
 
   /* Addresses of independent projects, not managed by CATODO.
@@ -655,7 +623,6 @@ const S = {
 const $ = s => document.querySelector(s);
 const el = {
   testcard:$("#testcard"), tcLine:$("#tcLine"),
-  gate:$("#gate"), gateSub:$("#gateSub"), dots:$("#dots"), pad:$("#pad"),
   shell:$("#shell"), rail:$("#rail"), grid:$("#grid"), wmCount:$("#wmCount"), clk:$("#clk"),
   clkD:$("#clkD"), clkT:$("#clkT"),
   q:$("#q"), qclr:$("#qclr"), btnSrc:$("#btnSrc"), srcCount:$("#srcCount"), btnCfg:$("#btnCfg"),
@@ -698,68 +665,10 @@ tick(); setInterval(tick, 20000);
     if (done) return;
     done = true;
     el.testcard.classList.add("out");
-    setTimeout(() => { el.testcard.remove(); el.gate.classList.remove("hide"); }, 400);
+    setTimeout(() => { el.testcard.remove(); boot(); }, 400);
   };
   el.testcard.onclick = go;
   setTimeout(go, 1250);
-})();
-
-/* ================================================================
-   ACCESS
-   ================================================================ */
-(function buildGate(){
-  const PIN = String(CFG.pin == null ? "" : CFG.pin).trim();
-  const valid = /^[0-9]{1,8}$/.test(PIN);
-
-  if (!valid){
-    el.gateSub.className = "sub bad";
-    el.gateSub.textContent = PIN
-      ? "The configured code contains characters the keypad cannot produce. Fix CFG.pin: digits only, from 1 to 8, always in quotes."
-      : "No code set. Open app.html and write CFG.pin in quotes.";
-    el.pad.classList.add("hide");
-    return;
-  }
-
-  for (let i = 0; i < PIN.length; i++) el.dots.appendChild(document.createElement("i"));
-  const fill = [HUE.yellow,HUE.cyan,HUE.green,HUE.magenta,HUE.red,HUE.blue,HUE.white,HUE.amber];
-  let buf = "";
-
-  const paint = bad => {
-    el.dots.classList.toggle("bad", !!bad);
-    [...el.dots.children].forEach((d,i)=>{
-      const on = i < buf.length && !bad;
-      d.style.background = on ? fill[i % fill.length] : "transparent";
-      d.style.borderColor = on ? fill[i % fill.length] : "";
-    });
-  };
-  const submit = () => {
-    if (buf.trim() === PIN){ el.gate.classList.add("hide"); boot(); }
-    else { paint(true); buf = ""; setTimeout(()=>paint(false), 340); }
-  };
-  const digit = k => {
-    if (buf.length < PIN.length) buf += k;
-    paint(false);
-    if (buf.length === PIN.length) setTimeout(submit, 130);
-  };
-
-  ["1","2","3","4","5","6","7","8","9","DEL","0","OK"].forEach(k=>{
-    const b = document.createElement("button");
-    b.textContent = k;
-    if (k === "DEL" || k === "OK") b.className = "ghost";
-    b.onclick = () => {
-      if (k === "DEL"){ buf = buf.slice(0,-1); paint(false); }
-      else if (k === "OK") submit();
-      else digit(k);
-    };
-    el.pad.appendChild(b);
-  });
-
-  addEventListener("keydown", e=>{
-    if (el.gate.classList.contains("hide")) return;
-    if (/^[0-9]$/.test(e.key)) digit(e.key);
-    else if (e.key === "Backspace"){ buf = buf.slice(0,-1); paint(false); }
-    else if (e.key === "Enter") submit();
-  });
 })();
 
 /* ================================================================

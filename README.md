@@ -81,7 +81,6 @@ index.php              login gate: checks username and password against .htpassw
 worker.js              Cloudflare proxy for CORS, mixed content and hotlinking. Does not go on the FTP.
 check-playlist.mjs     diagnostics: tells you which channels of your list will open in the browser
 gen-htpasswd.mjs       generates .htpasswd (bcrypt) from HTPASSWD_USER/HTPASSWD_PASSWORD in .env
-test-pin.mjs           automated test for the PIN gate
 .htaccess              blocks direct access to app.html and forces the login through index.php
 README.md              this file
 BRIEF.md               open tasks, for whoever works on this
@@ -91,18 +90,9 @@ BRIEF.md               open tasks, for whoever works on this
 
 ## 3. Getting it on the road
 
-### Step 1: the PIN
+### Step 1: a real Apache host, over FTP
 
-In `app.html`, around line 490:
-
-```js
-const CFG = {
-  pin: "1984",     // change it
-```
-
-### Step 2: a real Apache host, over FTP
-
-CATODO needs PHP to run the login gate (see Step 3), so this cannot sit on a static host like Cloudflare Pages or GitHub Pages. Cloudflare Pages does not execute PHP: `index.php` would be served as a plain downloadable file instead of running, `.htaccess` is ignored there entirely, and `app.html` would end up publicly readable. That is not a corner case, it disables the whole security model. This project runs on ordinary Apache hosting with PHP, deployed over FTP. In practice, SiteGround.
+CATODO needs PHP to run the login gate (see Step 2), so this cannot sit on a static host like Cloudflare Pages or GitHub Pages. Cloudflare Pages does not execute PHP: `index.php` would be served as a plain downloadable file instead of running, `.htaccess` is ignored there entirely, and `app.html` would end up publicly readable. That is not a corner case, it disables the whole security model. This project runs on ordinary Apache hosting with PHP, deployed over FTP. In practice, SiteGround.
 
 Upload these files to the document root:
 
@@ -114,13 +104,11 @@ app.html
 robots.txt
 ```
 
-`.htpasswd` is not in the repo, see Step 3 for how to generate it. Everything else can go straight from the checkout.
+`.htpasswd` is not in the repo, see Step 2 for how to generate it. Everything else can go straight from the checkout.
 
-### Step 3: the login gate
+### Step 2: the login gate
 
-The PIN in the page is convenience, not security: anyone who opens the source reads it in five seconds. It keeps out those who stumble onto it by chance, not a real attack.
-
-The actual barrier is `index.php`, and it is not HTTP Basic Auth: it is a CATODO styled login form. The browser never shows its own username and password dialog. `index.php` checks what was submitted against `.htpasswd` (bcrypt, the same file Basic Auth would have used), and only on success does it stream `app.html` back inline. `.htaccess` blocks any direct request to `app.html` and to dotfiles, so the only way the player's bytes ever leave the server is through a successful login in `index.php`. Failed attempts are throttled per IP in a local file, so clearing cookies does not reset a lockout.
+The barrier is `index.php`, and it is not HTTP Basic Auth: it is a CATODO styled login form. The browser never shows its own username and password dialog. `index.php` checks what was submitted against `.htpasswd` (bcrypt, the same file Basic Auth would have used), and only on success does it stream `app.html` back inline. `.htaccess` blocks any direct request to `app.html` and to dotfiles, so the only way the player's bytes ever leave the server is through a successful login in `index.php`. Failed attempts are throttled per IP in a local file, so clearing cookies does not reset a lockout.
 
 Generate `.htpasswd` locally, it must never be committed:
 
@@ -143,7 +131,7 @@ policy: Allow > Emails > your email
 
 Free up to 50 users, no password in the repo, session as long as you like. This is not the current setup, today it is the PHP gate described above, marked here only as a possible future alternative.
 
-### Step 4: the proxy
+### Step 3: the proxy
 
 ```
 Workers & Pages > Create > Worker
@@ -157,7 +145,7 @@ Be honest with yourself about how far it goes, though. It stops a page on someon
 Remember `worker.js` runs on Cloudflare and is deployed by pasting the file into the dashboard, so editing the file in the repo changes nothing live until you paste and deploy it again.
 Copy the worker's address into Catodo's settings. From that point on channels marked `HTTP` become openable and the ones that gave a CORS error start.
 
-### Step 5: the lists
+### Step 4: the lists
 
 There is nothing to prepare. On first launch CATODO opens the sources screen and asks you
 to load one. Inside you will find a curated list of independent public projects to
@@ -174,12 +162,12 @@ node check-playlist.mjs https://.../list.m3u --deep --csv
 It tells you how many channels will open in the browser as they are, how many need the proxy and how many
 are unrecoverable. With `--deep` it actually downloads the manifests and checks the CORS headers.
 
-### Step 6: in the car
+### Step 5: in the car
 
 1. Parked. The video only starts while stationary.
 2. Browser, paste the YouTube redirect link generated in the settings.
 3. "Go to site", then bookmark it.
-4. PIN, category, channel.
+4. Log in, category, channel.
 
 ---
 

@@ -207,7 +207,7 @@ button[type=submit]:active{background:var(--c-amber);border-color:var(--c-amber)
     <input type="password" name="pass" placeholder="PASSWORD" autocomplete="off" required>
     <button type="submit">ENTER</button>
   </form>
-  <div id="note">This login keeps out anyone who does not know the password. It runs before the page is sent, unlike the in app PIN.</div>
+  <div id="note">This login runs before the page is ever sent, so nobody who does not know the password can reach it.</div>
 </div>
 </body>
 </html>
