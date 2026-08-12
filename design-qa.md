@@ -46,3 +46,17 @@ The Home preserves Catodo's approved Soft Signal Grid while applying the annotat
 - Automated tests: 60/60 passed; syntax and Vite production build passed.
 
 final result: passed
+
+## Home atlas removal iteration — 2026-08-12
+
+- Previous accepted implementation: `/tmp/catodo-qa/implementation-home.png` (1280 × 720).
+- Latest implementation: `/tmp/catodo-home-wide.png` (1280 × 720) and `/tmp/catodo-home-mobile.png` (390 × 844).
+- User direction: remove Signal Atlas from Live/Home, keep it in Countries, and use the recovered width for a more cinematic 16:9 live anchor.
+- Full comparison: the right-hand Atlas is removed; the live anchor and nine-channel directory now occupy the full content width. No replacement filler panel or unapproved copy was added.
+- Focused checks: 16:9 stream geometry, Random visibility, nine channel tiles, Home without Atlas, Countries with Atlas, mobile stacking, Exo 2 hierarchy, existing palette/radii and icon treatment.
+- Browser proof: Home `Signal Atlas` hidden; Countries `Signal Atlas` and `.world-map-shell--countries` visible; Random visible; nine directory tiles; console clean.
+- Material fix after first render: the old ≤1450px media query still constrained the live anchor. Replaced it with balanced full-width columns and an explicit 16:9 stage.
+- Intentional deviation: narrow mobile naturally stacks the nine-channel directory below the live anchor; the live frame remains 16:9 and horizontally unclipped.
+- Above-the-fold copy diff: no new copy; all existing labels retained.
+
+final result: passed

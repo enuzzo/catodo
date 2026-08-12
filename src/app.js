@@ -1056,7 +1056,7 @@ async function handleAction(action, detail) {
     case "map-zoom-in":
     case "map-zoom-out":
     case "map-center": {
-      const map = state.view === "countries" ? ui.refs.countryMap : ui.refs.homeMap;
+      const map = ui.refs.countryMap;
       if (action === "map-center") resetWorldMapView(map);
       else zoomWorldMap(map, action === "map-zoom-out" ? "out" : "in");
       break;

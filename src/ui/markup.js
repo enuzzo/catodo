@@ -475,37 +475,7 @@ function createHomeView(t) {
 
   const nearbyGrid = element('div', 'channel-grid channel-grid--nearby');
   directory.append(liveCard, nearbyGrid);
-
-  const atlas = element('article', 'atlas-card');
-  const atlasHeader = element('div', 'atlas-card__header');
-  atlasHeader.append(
-    textNode('h2', null, t, 'map.signalAtlas', 'Signal Atlas'),
-    actionButton({
-      t,
-      action: 'shuffle-world',
-      iconName: 'shuffle',
-      key: 'map.shuffleWorld',
-      fallback: 'Shuffle world',
-      className: 'button--text',
-    }),
-  );
-  const map = element('div', 'world-map-shell world-map-shell--home');
-  const mapControls = element('div', 'map-controls');
-  mapControls.append(
-    iconButton({ t, action: 'map-zoom-in', iconName: 'plus', key: 'map.zoomIn', fallback: 'Zoom in' }),
-    iconButton({ t, action: 'map-zoom-out', iconName: 'minus', key: 'map.zoomOut', fallback: 'Zoom out' }),
-    iconButton({ t, action: 'map-center', iconName: 'crosshair', key: 'map.center', fallback: 'Center map' }),
-  );
-  const centerMap = actionButton({
-    t,
-    action: 'map-center',
-    iconName: 'crosshair',
-    key: 'map.center',
-    fallback: 'Center map',
-    className: 'button--small button--ghost atlas-card__center',
-  });
-  atlas.append(atlasHeader, map, mapControls, centerMap);
-  top.append(directory, atlas);
+  top.append(directory);
 
   const bottom = element('div', 'home-bottom');
   const multiPromo = element('article', 'multiview-promo');
@@ -562,8 +532,6 @@ function createHomeView(t) {
     openPlayer,
     random,
     nearbyGrid,
-    atlas,
-    map,
     favoriteGrid,
   };
 }
@@ -2169,9 +2137,7 @@ export function mountAppUI(root, options = {}) {
       home: home.view,
       homeLiveCard: home.liveCard,
       homeVideo: home.video,
-      homeMap: home.map,
       homeChannelGrid: home.nearbyGrid,
-      homeAtlas: home.atlas,
       favoriteGrid: home.favoriteGrid,
       countries: countries.view,
       countryMap: countries.map,
@@ -2239,10 +2205,10 @@ export function mountAppUI(root, options = {}) {
     },
 
     focusExplore() {
-      home.atlas.tabIndex = -1;
+      home.nearbyGrid.tabIndex = -1;
       scheduleFrame(() => {
-        home.atlas.focus({ preventScroll: true });
-        home.atlas.scrollIntoView({
+        home.nearbyGrid.focus({ preventScroll: true });
+        home.nearbyGrid.scrollIntoView({
           behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
           block: 'nearest',
           inline: 'nearest',
@@ -2301,14 +2267,6 @@ export function mountAppUI(root, options = {}) {
         'No favorites yet',
         'Save channels here for one-tap tuning.',
       );
-      renderWorldMap(home.map, {
-        t,
-        selectedIso2: state.selectedIso2 || featured.iso2 || featured.countryCode,
-        importedIso2: state.importedIso2,
-        availableIso2: state.availableIso2,
-        markers: state.markers,
-        counts: state.countryCounts,
-      });
       if (state.time !== undefined) api.updateHeader({ time: state.time });
       return api;
     },
@@ -2676,7 +2634,6 @@ export function mountAppUI(root, options = {}) {
     },
   };
 
-  renderWorldMap(home.map, { t });
   renderWorldMap(countries.map, { t });
   renderEmpty(home.favoriteGrid, t, 'favorites.empty', 'No favorites yet', 'Save channels here for one-tap tuning.');
   renderEmpty(library.grid, t, 'library.empty', 'Your library is waiting', 'Add a playlist or favorite a live channel to keep it close.');
