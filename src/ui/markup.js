@@ -8,7 +8,7 @@ const FLAG_URLS = import.meta.glob('../../assets/vendor/flags/4x3/*.svg', {
 });
 
 const TONES = ['white', 'red', 'green', 'yellow', 'cyan', 'magenta', 'blue'];
-const VIEW_NAMES = ['home', 'countries', 'library', 'sources'];
+const VIEW_NAMES = ['home', 'countries', 'guide', 'library', 'sources'];
 const MULTIVIEW_SIZE = 4;
 const mountedApps = new WeakMap();
 
@@ -236,6 +236,17 @@ function channelNumber(channel, index) {
   return Number.isFinite(numeric) ? String(Math.max(0, Math.floor(numeric))).padStart(3, '0') : safeText(supplied);
 }
 
+function formatProgrammeTime(value) {
+  const date = new Date(Number(value));
+  return Number.isFinite(date.getTime())
+    ? new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(date)
+    : '--:--';
+}
+
+function channelSchedule(channel) {
+  return normaliseArray(channel?.schedule || channel?.programmes);
+}
+
 function renderChannelTiles(container, channels, t, options = {}) {
   const fragment = document.createDocumentFragment();
   normaliseArray(channels).forEach((channel, index) => {
@@ -257,6 +268,29 @@ function renderChannelTiles(container, channels, t, options = {}) {
     const name = element('strong', 'channel-tile__name');
     name.textContent = safeText(channel?.name, translate(t, 'channel.unknown', 'Unknown channel'));
     main.append(name, channelMeta(channel));
+    if (options.schedule === true) {
+      const schedule = channelSchedule(channel);
+      const now = schedule.find((programme) => Number(programme.start) <= Date.now() && Number(programme.stop) > Date.now());
+      const next = schedule.find((programme) => Number(programme.start) > Date.now());
+      const strip = element('div', 'channel-tile__schedule');
+      const nowRow = element('div');
+      nowRow.append(
+        textNode('span', 'channel-tile__schedule-label', t, 'guide.now', 'Now'),
+        textNode('strong', null, t, now ? 'guide.programmeValue' : 'guide.noDataShort', now ? '{time} · {title}' : 'Guide unavailable', {
+          time: now ? formatProgrammeTime(now.start) : '', title: now?.title || '',
+        }),
+      );
+      strip.append(nowRow);
+      if (next) {
+        const nextRow = element('div');
+        nextRow.append(
+          textNode('span', 'channel-tile__schedule-label', t, 'guide.next', 'Next'),
+          textNode('strong', null, t, 'guide.programmeValue', '{time} · {title}', { time: formatProgrammeTime(next.start), title: next.title }),
+        );
+        strip.append(nextRow);
+      }
+      main.append(strip);
+    }
     tile.append(main);
 
     if (options.favorites !== false) {
@@ -318,6 +352,7 @@ function createHeader(t) {
     ['explore', 'nav.explore', 'Explore'],
     ['countries', 'nav.countries', 'Countries'],
     ['multiview', 'nav.multiview', 'Multiview'],
+    ['guide', 'nav.guide', 'TV Guide'],
     ['library', 'nav.library', 'Library'],
   ];
   const navButtons = {};
@@ -817,6 +852,91 @@ function createLibraryView(t) {
   return { view, stats: statNodes, search, category, language, favorites, grid, loadMore };
 }
 
+function createGuideView(t) {
+  const view = element('section', 'page page--guide', { dataset: { page: 'guide' }, hidden: true });
+  const header = element('div', 'page-heading guide-heading');
+  const copy = element('div');
+  copy.append(
+    textNode('p', 'eyebrow', t, 'guide.eyebrow', 'Live schedules'),
+    textNode('h1', null, t, 'guide.title', 'TV Guide'),
+    textNode('p', 'page-heading__description', t, 'guide.description', 'Now and next across your imported channels. Times are shown in your local timezone.'),
+  );
+  const refresh = actionButton({
+    t, action: 'refresh-guide', iconName: 'arrows-clockwise', key: 'guide.refresh', fallback: 'Refresh guide', className: 'button--ghost',
+  });
+  header.append(copy, refresh);
+
+  const setup = element('section', 'guide-setup panel');
+  const setupCopy = element('div');
+  setupCopy.append(
+    icon('calendar-dots'),
+    textNode('h2', null, t, 'guide.setupTitle', 'Connect an XMLTV guide'),
+    textNode('p', null, t, 'guide.setupBody', 'Paste one or more XMLTV URLs. Catodo only contacts them after you save, then caches schedules locally for six hours.'),
+  );
+  const form = element('form', 'guide-setup__form', { dataset: { action: 'save-guide-sources' } });
+  const input = element('textarea', null, {
+    name: 'guideSources', rows: 3, spellcheck: false,
+    placeholder: translate(t, 'guide.sourcePlaceholder', 'https://example.org/guide.xml'),
+    'aria-label': translate(t, 'guide.sourceAriaLabel', 'XMLTV guide URLs'),
+  });
+  const consent = element('label', 'check-row');
+  const checkbox = element('input', null, { type: 'checkbox', name: 'guideConsent', required: true });
+  consent.append(checkbox, textNode('span', null, t, 'guide.consent', 'I understand these schedules come from third-party providers and Catodo will contact the URLs above.'));
+  const save = actionButton({
+    t, action: 'save-guide-sources', iconName: 'floppy-disk', key: 'common.save', fallback: 'Save', className: 'button--primary', type: 'submit',
+  });
+  form.append(input, consent, save);
+  setup.append(setupCopy, form);
+
+  const status = element('div', 'guide-status', { 'aria-live': 'polite' });
+  const grid = element('div', 'guide-grid');
+  view.append(header, setup, status, grid);
+  return { view, setup, form, input, checkbox, status, grid, refresh };
+}
+
+function renderGuideCards(container, channels, t) {
+  const fragment = document.createDocumentFragment();
+  normaliseArray(channels).forEach((channel) => {
+    const schedule = channelSchedule(channel);
+    const now = Date.now();
+    const card = element('article', 'guide-channel');
+    const identity = element('button', 'guide-channel__identity', {
+      type: 'button', dataset: { action: 'open-channel', channelId: safeId(channel?.channelId || channel?.id) },
+    });
+    const logo = element('span', 'channel-logo guide-channel__logo');
+    renderLogo(logo, channel, t);
+    const copy = element('span');
+    const name = element('strong');
+    name.textContent = safeText(channel?.name, translate(t, 'channel.unknown', 'Unknown channel'));
+    copy.append(name, channelMeta(channel, 'guide-channel__meta'));
+    identity.append(logo, copy, icon('play'));
+    const timeline = element('div', 'guide-channel__timeline');
+    if (!schedule.length) {
+      timeline.append(textNode('p', 'guide-channel__empty', t, 'guide.noData', 'No current programme data for this channel.'));
+    } else {
+      schedule.slice(0, 6).forEach((programme) => {
+        const isNow = Number(programme.start) <= now && Number(programme.stop) > now;
+        const item = element('article', `programme-card${isNow ? ' is-now' : ''}`);
+        const times = element('time', 'programme-card__time mono');
+        times.textContent = `${formatProgrammeTime(programme.start)}–${formatProgrammeTime(programme.stop)}`;
+        const title = element('strong');
+        title.textContent = safeText(programme.title);
+        item.append(times, title);
+        if (isNow) item.append(textNode('span', 'programme-card__badge', t, 'guide.nowPlaying', 'Now playing'));
+        if (programme.description) {
+          const description = element('p');
+          description.textContent = programme.description;
+          item.append(description);
+        }
+        timeline.append(item);
+      });
+    }
+    card.append(identity, timeline);
+    fragment.append(card);
+  });
+  container.replaceChildren(fragment);
+}
+
 function createSourcesView(t) {
   const view = element('section', 'page page--sources', { dataset: { page: 'sources' }, hidden: true });
   const heading = element('div', 'page-heading');
@@ -1118,7 +1238,7 @@ function createPlayer(t) {
   toolbar.append(left, right);
 
   const body = element('div', 'player-body');
-  const stage = element('div', 'player-stage');
+  const stage = element('div', 'player-stage', { dataset: { action: 'toggle-player-chrome' } });
   const video = element('video', 'player-video', {
     playsInline: true,
     preload: 'metadata',
@@ -1160,7 +1280,12 @@ function createPlayer(t) {
   });
   volume.append(volumeValue, range);
   controls.append(labButton, rewind, playPause, forward, volume);
-  transport.append(identity, controls);
+  const programmeStrip = element('section', 'player-programmes');
+  const localTime = element('div', 'player-programmes__clock');
+  localTime.append(textNode('span', null, t, 'guide.localTime', 'Local time'), element('strong', 'mono'));
+  const programmeList = element('div', 'player-programmes__list');
+  programmeStrip.append(localTime, programmeList);
+  transport.append(identity, programmeStrip, controls);
   overlay.append(toolbar, body, transport);
   return {
     overlay,
@@ -1180,6 +1305,8 @@ function createPlayer(t) {
     playPause,
     volume: range,
     volumeValue,
+    programmeList,
+    localTime: localTime.querySelector('strong'),
   };
 }
 
@@ -1976,6 +2103,7 @@ export function mountAppUI(root, options = {}) {
   const header = createHeader(t);
   const home = createHomeView(t);
   const countries = createCountriesView(t);
+  const guide = createGuideView(t);
   const library = createLibraryView(t);
   const sources = createSourcesView(t);
   const player = createPlayer(t);
@@ -1987,7 +2115,7 @@ export function mountAppUI(root, options = {}) {
 
   const shell = element('div', 'catodo-shell');
   const main = element('main', 'app-content');
-  main.append(home.view, countries.view, library.view, sources.view);
+  main.append(home.view, countries.view, guide.view, library.view, sources.view);
   shell.append(header.header, main, signalBar.bar);
   root.classList.add('catodo-app');
   root.replaceChildren(shell, player.overlay, multiview.overlay, multiviewSignalLab.backdrop, channelPicker.backdrop, importDialog.backdrop);
@@ -2001,6 +2129,7 @@ export function mountAppUI(root, options = {}) {
   const views = {
     home: home.view,
     countries: countries.view,
+    guide: guide.view,
     library: library.view,
     sources: sources.view,
   };
@@ -2048,6 +2177,9 @@ export function mountAppUI(root, options = {}) {
       countryMap: countries.map,
       countryShape: countries.shape,
       countryTableBody: countries.tableBody,
+      guide: guide.view,
+      guideInput: guide.input,
+      guideGrid: guide.grid,
       library: library.view,
       libraryGrid: library.grid,
       libraryLoadMore: library.loadMore,
@@ -2160,7 +2292,7 @@ export function mountAppUI(root, options = {}) {
       setTranslatedText(home.countryCount, t, 'home.countryCount', '{count} COUNTRIES', {
         count: safeText(state.countryCount ?? state.totalCountries ?? 0),
       });
-      renderChannelTiles(home.nearbyGrid, channels.filter((channel) => channel !== featured).slice(0, 6), t);
+      renderChannelTiles(home.nearbyGrid, channels.filter((channel) => channel !== featured).slice(0, 9), t, { schedule: true });
       if (favorites.length) renderChannelTiles(home.favoriteGrid, favorites, t);
       else renderEmpty(
         home.favoriteGrid,
@@ -2178,6 +2310,23 @@ export function mountAppUI(root, options = {}) {
         counts: state.countryCounts,
       });
       if (state.time !== undefined) api.updateHeader({ time: state.time });
+      return api;
+    },
+
+    renderGuide(state = {}) {
+      if (shouldActivateShellView(root.dataset.mode, state.activate)) activateShellView('guide');
+      const channels = normaliseArray(state.channels);
+      guide.setup.hidden = Boolean(state.configured);
+      guide.refresh.hidden = !state.configured;
+      if (state.sources) guide.input.value = normaliseArray(state.sources).join('\n');
+      if (state.loading) setTranslatedText(guide.status, t, 'guide.loading', 'Loading live schedules…');
+      else if (state.error) guide.status.textContent = safeText(state.error);
+      else if (state.configured && !channels.some((channel) => channelSchedule(channel).length)) {
+        setTranslatedText(guide.status, t, 'guide.empty', 'No matching programme data was returned. Check the guide URL and channel tvg-id values.');
+      } else if (state.configured) {
+        setTranslatedText(guide.status, t, 'guide.updated', 'Schedules cached locally · times shown in your timezone');
+      } else guide.status.textContent = '';
+      renderGuideCards(guide.grid, channels, t);
       return api;
     },
 
@@ -2268,6 +2417,7 @@ export function mountAppUI(root, options = {}) {
       setViewVisible(multiview.overlay, false);
       setViewVisible(player.overlay, true);
       root.dataset.mode = 'player';
+      player.overlay.classList.toggle('is-chrome-visible', Boolean(state.chromeVisible));
       api.updatePlayer(state);
       return api;
     },
@@ -2283,7 +2433,33 @@ export function mountAppUI(root, options = {}) {
         player.number.textContent = channelNumber(channel, Number(channel.position || 0));
         player.name.textContent = safeText(channel.name, translate(t, 'channel.unknown', 'Unknown channel'));
         updateChannelMeta(player.meta, channel);
+        player.favoriteButton.classList.toggle('is-active', Boolean(channel.favorite || channel.isFavorite));
+        setTranslatedText(
+          player.favoriteButton.querySelector('.button__label'),
+          t,
+          channel.favorite || channel.isFavorite ? 'favorite.remove' : 'favorite.add',
+          channel.favorite || channel.isFavorite ? 'Remove favorite' : 'Favorite',
+        );
+        player.programmeList.replaceChildren();
+        const programmes = channelSchedule(channel).slice(0, 4);
+        if (!programmes.length) {
+          player.programmeList.append(textNode('p', 'player-programmes__empty', t, 'guide.noData', 'No current programme data for this channel.'));
+        } else {
+          programmes.forEach((programme) => {
+            const isNow = Number(programme.start) <= Date.now() && Number(programme.stop) > Date.now();
+            const item = element('article', `player-programme${isNow ? ' is-now' : ''}`);
+            const time = element('time', 'mono');
+            time.textContent = formatProgrammeTime(programme.start);
+            const title = element('strong');
+            title.textContent = safeText(programme.title);
+            item.append(time, title);
+            if (isNow) item.append(textNode('span', null, t, 'guide.now', 'Now'));
+            player.programmeList.append(item);
+          });
+        }
       }
+      if (state.chromeVisible !== undefined) player.overlay.classList.toggle('is-chrome-visible', Boolean(state.chromeVisible));
+      player.localTime.textContent = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(new Date());
       if (state.loading !== undefined) {
         player.status.hidden = !state.loading && !state.error;
         setTranslatedText(player.statusText, t, state.error ? 'player.error' : 'player.loading', state.error ? 'Signal unavailable' : 'Tuning signal…');

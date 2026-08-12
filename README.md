@@ -23,7 +23,7 @@ The Settings page promotes **World — all countries**, the official complete wo
 
 Multiple sources may be connected safely. CATODO merges records by stable channel identity (`tvg-id` when available, otherwise a conservative fingerprint) and canonical endpoint identity. Matching channels remain one library item while unique mirrors and source provenance are retained. After import, the UI reports how many channels were newly added and how many matched existing records.
 
-CATODO uses the official iptv-org JSON directory as optional metadata: channels, feeds, streams, logos, categories, languages, guides and the upstream blocklist. Guide records are discovery mappings only; CATODO does not bundle or redistribute programme data. Blocklisted sources are excluded and adult content is hidden from default discovery and random playback.
+CATODO uses the official iptv-org JSON directory as optional metadata: channels, feeds, streams, logos, categories, languages, guides and the upstream blocklist. Guide records are discovery mappings; CATODO can also read user-approved XMLTV URLs, cache parsed schedules locally for six hours, and never bundles or redistributes programme data. Blocklisted sources are excluded and adult content is hidden from default discovery and random playback.
 
 Users are responsible for ensuring they may access a source in their jurisdiction. See [CONTENT_POLICY.md](CONTENT_POLICY.md), [TAKEDOWN.md](TAKEDOWN.md), and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 

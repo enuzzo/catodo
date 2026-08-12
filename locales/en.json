@@ -8,6 +8,7 @@
     "countries": "Countries",
     "categories": "Categories",
     "multiview": "Multiview",
+    "guide": "TV Guide",
     "archive": "Archive",
     "settings": "Settings",
     "search": "Search"
@@ -80,6 +81,27 @@
     "favorite": "Add to favorites",
     "unfavorite": "Remove from favorites",
     "nextEndpoint": "Try another stream"
+  },
+  "guide": {
+    "eyebrow": "Live schedules",
+    "title": "TV Guide",
+    "description": "Now and next across your imported channels. Times are shown in your local timezone.",
+    "refresh": "Refresh guide",
+    "setupTitle": "Connect an XMLTV guide",
+    "setupBody": "Paste one or more XMLTV URLs. Catodo only contacts them after you save, then caches schedules locally for six hours.",
+    "sourcePlaceholder": "https://example.org/guide.xml",
+    "sourceAriaLabel": "XMLTV guide URLs",
+    "consent": "I understand these schedules come from third-party providers and Catodo will contact the URLs above.",
+    "now": "Now",
+    "next": "Next",
+    "nowPlaying": "Now playing",
+    "localTime": "Local time",
+    "programmeValue": "{time} · {title}",
+    "noDataShort": "Guide unavailable",
+    "noData": "No current programme data for this channel.",
+    "loading": "Loading live schedules…",
+    "empty": "No matching programme data was returned. Check the guide URL and channel tvg-id values.",
+    "updated": "Schedules cached locally · times shown in your timezone"
   },
   "multiview": {
     "random": "Random",

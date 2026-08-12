@@ -12,6 +12,7 @@ import {
 import i18n from "./i18n/index.js";
 import { MultiviewController, PlayerManager } from "./player/index.js";
 import { mountAppUI } from "./ui/markup.js";
+import { EpgService } from "./epg/index.js";
 import { filterChannelPicker } from "./ui/channel-picker-filter.js";
 import { multiviewTelemetry, singleTelemetry } from "./ui/telemetry-model.js";
 import { resetWorldMapView, zoomWorldMap } from "./ui/world-map.js";
@@ -52,6 +53,11 @@ const state = {
   lastCatalog: null,
   throughputHistory: [],
   multiviewTelemetry: null,
+  epgSources: [],
+  schedules: new Map(),
+  guideLoading: false,
+  guideError: "",
+  playerChromeVisible: false,
 };
 
 let catalog;
@@ -59,11 +65,13 @@ let ui;
 let homePlayer;
 let mainPlayer;
 let multiview;
+let epg;
 let unsubscribeCatalog;
 let metricTimer;
 let clockTimer;
 let lastRememberedId = "";
 let directoryMaps = { byCode: new Map(), byName: new Map() };
+let playerChromeTimer = 0;
 
 function legacyStorage() {
   try { return globalThis.localStorage || undefined; }
@@ -188,6 +196,8 @@ function decorateChannel(channel, index = 0) {
     tone: TONE_BY_COUNTRY[(country.charCodeAt?.(0) || index) % TONE_BY_COUNTRY.length],
     favorite: state.lastCatalog?.favorites.has(channelId(channel)) || false,
     poster: channel.poster || channel.image || channel.thumbnail || channel.logo || "",
+    schedule: state.schedules.get(channelId(channel))?.programmes || [],
+    guideStatus: state.schedules.get(channelId(channel))?.status || "unconfigured",
   };
 }
 
@@ -445,10 +455,23 @@ function renderSources() {
   });
 }
 
+function renderGuide() {
+  const channels = playableChannels().slice(0, 48).map(decorateChannel);
+  ui.renderGuide({
+    activate: state.view === "guide",
+    channels,
+    sources: state.epgSources,
+    configured: state.epgSources.length > 0,
+    loading: state.guideLoading,
+    error: state.guideError,
+  });
+}
+
 function renderAll() {
   renderHome();
   renderCountries();
   renderLibrary();
+  renderGuide();
   renderSources();
   ui.updateHeader({
     view: state.view,
@@ -475,10 +498,42 @@ async function openPlayer(channel) {
   state.homeMuted = true;
   homePlayer.setMuted(true);
   state.currentId = channelId(channel);
-  ui.showPlayer({ channel: decorateChannel(channel), muted: true, loading: true, playing: false });
+  state.playerChromeVisible = false;
+  ui.showPlayer({ channel: decorateChannel(channel), muted: true, loading: true, playing: false, chromeVisible: false });
+  void loadSchedules([channel]).then(() => ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)) }));
   await mainPlayer.tune(playbackSource(channel), { muted: true }).catch((error) => {
     ui.updatePlayer({ channel: decorateChannel(channel), loading: false, error: error.message, playing: false });
   });
+}
+
+async function loadSchedules(channels, { force = false } = {}) {
+  const values = (Array.isArray(channels) ? channels : []).filter(Boolean);
+  if (!values.length || (!state.epgSources.length && !values.some((channel) => channel?.hasGuide || channel?.guides?.length || channel?.endpoints?.some((endpoint) => endpoint?.guides?.length)))) return;
+  if (!force && values.every((channel) => state.schedules.has(channelId(channel)))) return;
+  state.guideLoading = true;
+  state.guideError = "";
+  renderGuide();
+  try {
+    const schedules = await epg.schedules(values);
+    schedules.forEach((value, key) => state.schedules.set(key, value));
+  } catch (error) {
+    state.guideError = error.message || "TV guide is unavailable.";
+  } finally {
+    state.guideLoading = false;
+    renderHome();
+    renderGuide();
+    if (state.currentId) ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)) });
+  }
+}
+
+function showPlayerChrome() {
+  state.playerChromeVisible = !state.playerChromeVisible;
+  ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)), chromeVisible: state.playerChromeVisible });
+  window.clearTimeout(playerChromeTimer);
+  if (state.playerChromeVisible) playerChromeTimer = window.setTimeout(() => {
+    state.playerChromeVisible = false;
+    ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)), chromeVisible: false });
+  }, 8000);
 }
 
 function fillMultiview(seed) {
@@ -662,6 +717,7 @@ async function handleAction(action, detail) {
 
       renderAll();
       ui.showView(state.view);
+      if (state.view === "guide") void loadSchedules(playableChannels().slice(0, 48));
       if (explore) {
         ui.focusExplore();
         if (nextExploreChannel) tuneHome(nextExploreChannel);
@@ -740,8 +796,38 @@ async function handleAction(action, detail) {
     }
     case "toggle-favorite":
     case "add-favorite":
-    case "remove-favorite":
-      if (id) await catalog.toggleFavorite(id);
+    case "remove-favorite": {
+      if (!id) break;
+      const wasFavorite = state.lastCatalog?.favorites.has(id);
+      if (action === "add-favorite" && wasFavorite) break;
+      if (action === "remove-favorite" && !wasFavorite) break;
+      await catalog.toggleFavorite(id);
+      if (ui.refs.root.dataset.mode === "player" && id === state.currentId) {
+        ui.updatePlayer({ channel: decorateChannel(findChannel(state.currentId)), chromeVisible: state.playerChromeVisible });
+      }
+      break;
+    }
+    case "toggle-player-chrome":
+      showPlayerChrome();
+      break;
+    case "save-guide-sources": {
+      if (!detail.formData?.get("guideConsent")) {
+        ui.toast("Confirm third-party guide access before saving.", { tone: "error" });
+        break;
+      }
+      try {
+        state.epgSources = await epg.setSources(String(detail.formData.get("guideSources") || "").split(/\n+/));
+        state.schedules.clear();
+        renderGuide();
+        await loadSchedules(playableChannels().slice(0, 48), { force: true });
+      } catch (error) {
+        ui.toast(error.message, { tone: "error" });
+      }
+      break;
+    }
+    case "refresh-guide":
+      state.schedules.clear();
+      await loadSchedules(playableChannels().slice(0, 48), { force: true });
       break;
     case "select-country":
       state.selectedCountry = String(detail.dataset.iso2 || "").toUpperCase();
@@ -1053,6 +1139,9 @@ async function boot() {
   catalog = new CatalogService({ proxy: state.proxy || undefined, localStorage: legacyStorage() });
   await catalog.init();
   state.proxy = await catalog.getSetting("proxy", "");
+  epg = new EpgService({ catalog, proxy: proxyUrl });
+  await epg.init();
+  state.epgSources = epg.getSources();
   unsubscribeCatalog = catalog.subscribe((snapshot) => {
     state.lastCatalog = snapshot;
     rebuildCountryDirectoryMaps(snapshot.countries);
@@ -1069,7 +1158,10 @@ async function boot() {
     ui.showImportDialog({ url: deepLink.url, provider: "Deep link", host: new URL(deepLink.url).host, source: "External playlist" });
   }
 
-  if (state.featuredId) await tuneHome(findChannel(state.featuredId));
+  if (state.featuredId) {
+    await tuneHome(findChannel(state.featuredId));
+    void loadSchedules(state.worldMixIds.map(findChannel).filter(Boolean));
+  }
   clockTimer = window.setInterval(() => ui.updateHeader({ time: formatClock() }), 30_000);
   metricTimer = window.setInterval(() => {
     const metrics = mainPlayer.getMetrics();
