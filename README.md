@@ -19,7 +19,9 @@ It is a vanilla ES-module application with no framework. Pinned runtime assets a
 
 CATODO ships software and a directory of external source links. It does **not** include playlist snapshots, stream media, video, permanent logo packs, or EPG data. The iptv-org catalog is fetched only after the user has confirmed the provider and disclaimer; no playlist is imported before that consent.
 
-The Add Playlist dialog includes ready-to-review iptv-org presets for the complete worldwide directory, country/language/category groupings, major regions, news, sports, movies and music. These are canonical external links, not bundled playlist copies. Selecting a preset only fills the consent dialog; CATODO contacts the source after explicit confirmation.
+The Settings page promotes **World — all countries**, the official complete worldwide directory, as the broadest one-step default. The Add Playlist dialog also includes country/language/category groupings, major regions, news, sports, movies and music. These are canonical external links, not bundled playlist copies. Selecting a preset only fills the consent dialog; CATODO contacts the source after explicit confirmation.
+
+Multiple sources may be connected safely. CATODO merges records by stable channel identity (`tvg-id` when available, otherwise a conservative fingerprint) and canonical endpoint identity. Matching channels remain one library item while unique mirrors and source provenance are retained. After import, the UI reports how many channels were newly added and how many matched existing records.
 
 CATODO uses the official iptv-org JSON directory as optional metadata: channels, feeds, streams, logos, categories, languages, guides and the upstream blocklist. Guide records are discovery mappings only; CATODO does not bundle or redistribute programme data. Blocklisted sources are excluded and adult content is hidden from default discovery and random playback.
 

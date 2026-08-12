@@ -837,6 +837,37 @@ function createSourcesView(t) {
   });
   heading.append(copy, back);
 
+  const worldCatalog = element('article', 'world-catalog-callout');
+  const worldIcon = element('div', 'world-catalog-callout__icon');
+  worldIcon.append(icon('globe-hemisphere-west'));
+  const worldCopy = element('div', 'world-catalog-callout__copy');
+  worldCopy.append(
+    textNode('p', 'eyebrow', t, 'settings.worldEyebrow', 'Ready-to-import default'),
+    textNode('h2', null, t, 'settings.worldTitle', 'World catalog · all countries'),
+    textNode('p', null, t, 'settings.worldBody', 'Import the complete public directory in one step. Add other playlists later: matching channels and identical stream endpoints are merged automatically.'),
+  );
+  const worldFacts = element('div', 'world-catalog-callout__facts');
+  [
+    ['broadcast', 'settings.worldChannels', '12,000+ public channels'],
+    ['arrows-merge', 'settings.worldDedup', 'Automatic deduplication'],
+    ['shield-check', 'settings.worldConsent', 'Consent always required'],
+  ].forEach(([iconName, key, fallback]) => {
+    const fact = element('span');
+    fact.append(icon(iconName), textNode('span', null, t, key, fallback));
+    worldFacts.append(fact);
+  });
+  worldCopy.append(worldFacts);
+  const worldAction = actionButton({
+    t,
+    action: 'open-import-dialog',
+    iconName: 'download-simple',
+    key: 'settings.worldAction',
+    fallback: 'Review world import',
+    className: 'button--primary',
+    dataset: { presetId: 'world-all' },
+  });
+  worldCatalog.append(worldIcon, worldCopy, worldAction);
+
   const layout = element('div', 'sources-layout');
   const sourcePanel = element('section', 'panel sources-panel');
   const sourceHeader = createSectionTitle(
@@ -900,7 +931,7 @@ function createSourcesView(t) {
   proxyForm.append(proxyLabel, proxyFooter);
   guide.append(guideList, proxyForm);
   layout.append(sourcePanel, guide);
-  view.append(heading, layout);
+  view.append(heading, worldCatalog, layout);
   return { view, list, proxyForm, proxyInput };
 }
 
@@ -1456,7 +1487,7 @@ function renderSourcePresets(container, presets, t, selectedId = '') {
       action: 'select-source-preset',
       iconName: safeText(preset.icon, 'broadcast'),
       fallback: safeText(preset.name, 'Playlist'),
-      className: `source-preset${preset.id === selectedId ? ' is-active' : ''}`,
+      className: `source-preset${preset.featured ? ' source-preset--featured' : ''}${preset.id === selectedId ? ' is-active' : ''}`,
       dataset: { presetId: safeId(preset.id) },
     });
     const label = button.querySelector('.button__label');
@@ -1466,6 +1497,19 @@ function renderSourcePresets(container, presets, t, selectedId = '') {
       const description = element('span');
       description.textContent = safeText(preset.description);
       label.replaceChildren(name, description);
+      if (preset.meta || preset.recommended) {
+        const meta = element('small', 'source-preset__meta');
+        if (preset.recommended) {
+          const badge = textNode('b', null, t, 'import.recommended', 'Recommended');
+          meta.append(badge);
+        }
+        if (preset.meta) {
+          const details = element('span');
+          details.textContent = safeText(preset.meta);
+          meta.append(details);
+        }
+        label.append(meta);
+      }
     }
     fragment.append(button);
   });
@@ -2381,6 +2425,24 @@ export function mountAppUI(root, options = {}) {
       importDialog.confirm.dataset.sourceId = safeId(source.sourceId || source.id || source.url);
       importDialog.sourceLink.dataset.url = safeMediaUrl(source.sourceUrl || source.url);
       scheduleFrame(() => importDialog.dialog.querySelector('button, input')?.focus());
+      return api;
+    },
+
+    setImportBusy(busy) {
+      const active = Boolean(busy);
+      importDialog.form.setAttribute('aria-busy', active ? 'true' : 'false');
+      importDialog.confirm.disabled = active;
+      importDialog.consent.disabled = active;
+      importDialog.urlInput.disabled = active;
+      const label = importDialog.confirm.querySelector('.button__label');
+      if (label) label.textContent = active
+        ? translate(t, 'import.importing', 'Importing catalog…')
+        : translate(t, 'import.addPlaylist', 'Add playlist');
+      importDialog.confirm.replaceChildren(
+        icon(active ? 'spinner-gap' : 'download-simple'),
+        label || textNode('span', 'button__label', t, active ? 'import.importing' : 'import.addPlaylist', active ? 'Importing catalog…' : 'Add playlist'),
+      );
+      importDialog.confirm.classList.toggle('is-loading', active);
       return api;
     },
 

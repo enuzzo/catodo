@@ -51,12 +51,21 @@
   "settings": {
     "eyebrow": "Setup & preferences",
     "title": "Settings",
-    "description": "Manage channel sources, playback routing, and device preferences."
+    "description": "Manage channel sources, playback routing, and device preferences.",
+    "worldEyebrow": "Ready-to-import default",
+    "worldTitle": "World catalog · all countries",
+    "worldBody": "Import the complete public directory in one step. Add other playlists later: matching channels and identical stream endpoints are merged automatically.",
+    "worldChannels": "12,000+ public channels",
+    "worldDedup": "Automatic deduplication",
+    "worldConsent": "Consent always required",
+    "worldAction": "Review world import"
   },
   "import": {
     "presetsTitle": "Recommended playlists",
     "presetsHint": "Official iptv-org directories — choose one to review before importing.",
-    "presetTitle": "Add {playlist}"
+    "presetTitle": "Add {playlist}",
+    "recommended": "Recommended",
+    "importing": "Importing catalog…"
   },
   "library": {
     "loadMore": "Load more channels",

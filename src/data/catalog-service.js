@@ -50,7 +50,7 @@ export class CatalogService {
         if (safety.updated) catalog = await hydrateCatalog(this.#db);
       }
       this.#state = { ...this.#state, countries };
-      this.#applyCatalog(catalog);
+      this.#applyCatalog(catalog, { emit: false });
       this.#set({ ready: true, loading: false });
       const state = this.getState();
       if (this.#options.autoEnrichMetadata !== false && state.channels.some((channel) => channel.metadataRevision !== IPTV_ORG_METADATA_REVISION || channel.endpoints?.some((endpoint) => endpoint.metadataRevision !== IPTV_ORG_METADATA_REVISION))) this.#scheduleMetadataEnrichment();
@@ -144,7 +144,7 @@ export class CatalogService {
         const safety = await this.#enrichSafety(stagedCatalog.channels, { ...options, strict: true });
         if (safety.updated) stagedCatalog = await hydrateCatalog(this.#db);
       }
-      this.#applyCatalog(stagedCatalog);
+      this.#applyCatalog(stagedCatalog, { emit: false });
       this.#set({ loading: false });
       if (this.#options.autoEnrichMetadata !== false) this.#scheduleMetadataEnrichment(options);
       return (await get(this.#db, "sources", sourceId));
@@ -253,14 +253,14 @@ export class CatalogService {
 
   async #reload() { this.#applyCatalog(await hydrateCatalog(this.#db)); }
 
-  #applyCatalog(catalog) {
+  #applyCatalog(catalog, { emit = true } = {}) {
     const countryNames = new Map(this.#state.countries.map((country) => [country.code, country.name]));
     catalog.channels = catalog.channels.map((channel) => ({ ...channel, countryNames: channel.countries.map((code) => countryNames.get(code)).filter(Boolean) }));
     const favorites = new Set(catalog.favorites.filter((item) => item.channelId).map((item) => item.channelId));
     const history = [...catalog.history].sort((a, b) => b.rememberedAt - a.rememberedAt);
     this.#state = { ...this.#state, ...catalog, favorites, history };
     this.#search.index(this.list());
-    this.#emit();
+    if (emit) this.#emit();
   }
 
   async #enrichSafety(channels, options = {}) {
@@ -281,8 +281,13 @@ export class CatalogService {
 
   #scheduleMetadataEnrichment(options = {}) {
     const start = () => { if (this.#db) void this.enrichMetadata(options); };
-    if (this.#metadataEnrichment) void this.#metadataEnrichment.finally(start);
-    else start();
+    const defer = (callback) => {
+      if (typeof globalThis.requestIdleCallback === "function") {
+        globalThis.requestIdleCallback(callback, { timeout: 5_000 });
+      } else globalThis.setTimeout(callback, 1_500);
+    };
+    if (this.#metadataEnrichment) void this.#metadataEnrichment.finally(() => defer(start));
+    else defer(start);
   }
 
   async #restoreSourceSnapshot(source, endpointRows, relationRows, channelRows, error) {

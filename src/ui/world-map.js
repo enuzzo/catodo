@@ -3,7 +3,7 @@ import worldMap from '../../assets/vendor/map/world-map.js';
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const instances = new WeakMap();
 const MIN_ZOOM = 1;
-const MAX_ZOOM = 2.45;
+export const MAX_ZOOM = 12;
 
 const clamp = (value, minimum, maximum) => Math.max(minimum, Math.min(maximum, value));
 
@@ -180,7 +180,19 @@ function applyZoom(instance, nextZoom, focusPoint, focusRatio) {
   instance.zoom = result.zoom;
   instance.viewBox = result.viewBox;
   instance.svg.setAttribute('viewBox', result.viewBox.join(' '));
+  rescaleMarkers(instance);
   return instance;
+}
+
+function rescaleMarkers(instance) {
+  const scale = 1 / Math.max(MIN_ZOOM, instance.zoom);
+  [...instance.markers.children].forEach((marker) => {
+    const x = Number(marker.dataset.mapX);
+    const y = Number(marker.dataset.mapY);
+    if (Number.isFinite(x) && Number.isFinite(y)) {
+      marker.setAttribute('transform', `translate(${x} ${y}) scale(${scale})`);
+    }
+  });
 }
 
 function touchDistance(first, second) {
@@ -268,6 +280,8 @@ function renderMarkers(instance, values, t) {
         ? translate(t, 'map.marker.selectAriaLabel', 'Select signal cluster {label}', { label })
         : undefined,
     });
+    group.dataset.mapX = String(point.x);
+    group.dataset.mapY = String(point.y);
     if (marker.tone) group.dataset.tone = String(marker.tone);
 
     const circle = svgElement('circle', { r: marker.radius || 16 });
@@ -279,6 +293,7 @@ function renderMarkers(instance, values, t) {
     group.append(circle, text);
     instance.markers.append(group);
   });
+  rescaleMarkers(instance);
 }
 
 /**
@@ -320,8 +335,8 @@ export function zoomWorldMap(container, direction = 'in') {
   const instance = instances.get(container);
   if (!instance || instance.baseViewBox.length !== 4) return null;
   const nextZoom = direction === 'out'
-    ? instance.zoom / 1.25
-    : instance.zoom * 1.25;
+    ? instance.zoom / 1.5
+    : instance.zoom * 1.5;
   return applyZoom(instance, nextZoom);
 }
 
@@ -331,6 +346,7 @@ export function resetWorldMapView(container) {
   instance.zoom = 1;
   instance.viewBox = [...instance.baseViewBox];
   instance.svg.setAttribute('viewBox', worldMap.viewBox);
+  rescaleMarkers(instance);
   return instance;
 }
 

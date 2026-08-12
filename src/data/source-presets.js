@@ -1,6 +1,6 @@
 const IPTV_ORG_BASE = "https://iptv-org.github.io/iptv";
 
-const preset = (id, name, description, path, dimension, icon) => Object.freeze({
+const preset = (id, name, description, path, dimension, icon, options = {}) => Object.freeze({
   id,
   name,
   description,
@@ -11,10 +11,19 @@ const preset = (id, name, description, path, dimension, icon) => Object.freeze({
   sourceUrl: "https://github.com/iptv-org/iptv/blob/master/PLAYLISTS.md",
   dimension,
   icon,
+  ...options,
 });
 
 export const SOURCE_PRESETS = Object.freeze([
-  preset("world-all", "Worldwide — all channels", "The complete public directory, grouped by country.", "index.m3u", "global", "globe-hemisphere-west"),
+  preset(
+    "world-all",
+    "World — all countries",
+    "The largest ready-to-use catalog: every country in one regularly updated playlist.",
+    "index.m3u",
+    "global",
+    "globe-hemisphere-west",
+    { featured: true, recommended: true, meta: "12,000+ channels · all countries" },
+  ),
   preset("world-country", "Worldwide by country", "The complete directory with country groupings.", "index.country.m3u", "global", "map-trifold"),
   preset("world-language", "Worldwide by language", "The complete directory arranged by broadcast language.", "index.language.m3u", "global", "translate"),
   preset("world-category", "Worldwide by category", "The complete directory arranged by genre and category.", "index.category.m3u", "global", "squares-four"),

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateZoomedViewBox } from '../../src/ui/world-map.js';
+import { calculateZoomedViewBox, MAX_ZOOM } from '../../src/ui/world-map.js';
 
 test('cursor-focused map zoom preserves the focused point position', () => {
   const base = [0, 0, 1000, 500];
@@ -13,9 +13,15 @@ test('cursor-focused map zoom preserves the focused point position', () => {
 });
 
 test('map zoom clamps its viewBox to world bounds', () => {
-  const result = calculateZoomedViewBox([0, 0, 1000, 500], [0, 0, 1000, 500], 2.45, { x: 0, y: 0 }, { x: 1, y: 1 });
+  const result = calculateZoomedViewBox([0, 0, 1000, 500], [0, 0, 1000, 500], MAX_ZOOM, { x: 0, y: 0 }, { x: 1, y: 1 });
   assert.deepEqual(result.viewBox.slice(0, 2), [0, 0]);
-  assert.equal(result.zoom, 2.45);
+  assert.equal(result.zoom, 12);
+});
+
+test('map zoom reaches country-level detail and clamps excessive input', () => {
+  const result = calculateZoomedViewBox([0, 0, 1200, 600], [0, 0, 1200, 600], 100, { x: 600, y: 300 });
+  assert.equal(result.zoom, MAX_ZOOM);
+  assert.deepEqual(result.viewBox.slice(2), [100, 50]);
 });
 
 test('map zoom returns to the exact base viewBox', () => {

@@ -63,6 +63,7 @@ let unsubscribeCatalog;
 let metricTimer;
 let clockTimer;
 let lastRememberedId = "";
+let directoryMaps = { byCode: new Map(), byName: new Map() };
 
 function legacyStorage() {
   try { return globalThis.localStorage || undefined; }
@@ -104,15 +105,19 @@ function normalizedCountryLabel(value) {
 }
 
 function countryDirectoryMaps() {
+  return directoryMaps;
+}
+
+function rebuildCountryDirectoryMaps(countries = []) {
   const byCode = new Map();
   const byName = new Map();
-  for (const country of state.lastCatalog?.countries || []) {
+  for (const country of countries) {
     const code = String(country.code || "").toUpperCase();
     if (!/^[A-Z]{2}$/.test(code)) continue;
     byCode.set(code, country);
     byName.set(normalizedCountryLabel(country.name), code);
   }
-  return { byCode, byName };
+  directoryMaps = { byCode, byName };
 }
 
 function countryFromSource(source) {
@@ -604,13 +609,21 @@ async function performImport(detail) {
     return;
   }
   ui.toast("Importing playlist…", { icon: "arrows-clockwise", duration: 1800 });
+  ui.setImportBusy(true);
   try {
-    if (code) await catalog.importCountry(code, { confirmed: true, proxy: state.proxy || undefined });
-    else await catalog.importUrl(url, { confirmed: true, name: preset?.name, proxy: state.proxy || undefined });
+    const beforeCount = catalog.getState().channels.length;
+    const importedSource = code
+      ? await catalog.importCountry(code, { confirmed: true, proxy: state.proxy || undefined })
+      : await catalog.importUrl(url, { confirmed: true, name: preset?.name, proxy: state.proxy || undefined });
+    const afterCount = catalog.getState().channels.length;
+    const newChannels = Math.max(0, afterCount - beforeCount);
+    const mergedChannels = Math.max(0, Number(importedSource?.count || 0) - newChannels);
     ui.showImportDialog(false);
-    ui.toast("Playlist imported and kept on this device.");
+    ui.toast(`${newChannels.toLocaleString("en-US")} new channels · ${mergedChannels.toLocaleString("en-US")} matched and merged.`, { duration: 5200 });
   } catch (error) {
     ui.toast(error.message, { tone: "error", duration: 5200 });
+  } finally {
+    ui.setImportBusy(false);
   }
 }
 
@@ -771,7 +784,10 @@ async function handleAction(action, detail) {
       renderLibrary();
       break;
     case "open-import-dialog":
-      if (detail.dataset.iso2) {
+      if (detail.dataset.presetId) {
+        const preset = sourcePreset(detail.dataset.presetId);
+        if (preset) ui.showImportDialog({ ...preset, presetId: preset.id, presets: SOURCE_PRESETS });
+      } else if (detail.dataset.iso2) {
         const country = importCountryModel(detail.dataset.iso2);
         if (country) ui.showImportDialog({ source: country, country });
       } else {
@@ -1039,6 +1055,7 @@ async function boot() {
   state.proxy = await catalog.getSetting("proxy", "");
   unsubscribeCatalog = catalog.subscribe((snapshot) => {
     state.lastCatalog = snapshot;
+    rebuildCountryDirectoryMaps(snapshot.countries);
     const first = playableChannels(snapshot.channels)[0];
     if (!state.featuredId && first) state.featuredId = channelId(first);
     renderAll();

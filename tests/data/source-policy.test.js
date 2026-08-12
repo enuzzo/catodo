@@ -38,4 +38,8 @@ test("recommended source presets are unique official trusted URLs", () => {
   assert.equal(new Set(SOURCE_PRESETS.map((preset) => preset.id)).size, SOURCE_PRESETS.length);
   assert.equal(new Set(SOURCE_PRESETS.map((preset) => preset.url)).size, SOURCE_PRESETS.length);
   SOURCE_PRESETS.forEach((preset) => assert.equal(inspectSourceUrl(preset.url).trusted, true, preset.id));
+  const world = SOURCE_PRESETS.find((preset) => preset.id === "world-all");
+  assert.equal(world.url, "https://iptv-org.github.io/iptv/index.m3u");
+  assert.equal(world.recommended, true);
+  assert.equal(world.featured, true);
 });
