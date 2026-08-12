@@ -346,17 +346,17 @@ function createHeader(t) {
   });
   searchForm.append(searchInput);
 
-  const sources = iconButton({
+  const settings = iconButton({
     t,
     action: 'navigate',
-    iconName: 'squares-four',
-    key: 'nav.sources',
-    fallback: 'Sources',
-    className: 'app-switcher',
+    iconName: 'gear-six',
+    key: 'nav.settings',
+    fallback: 'Settings',
+    className: 'app-switcher app-switcher--settings',
     dataset: { view: 'sources' },
   });
-  header.append(brand, nav, searchForm, sources);
-  return { header, brand, nav, navButtons, searchForm, searchInput, sources };
+  header.append(brand, nav, searchForm, settings);
+  return { header, brand, nav, navButtons, searchForm, searchInput, settings };
 }
 
 function createHomeView(t) {
@@ -821,9 +821,9 @@ function createSourcesView(t) {
   const heading = element('div', 'page-heading');
   const copy = element('div');
   copy.append(
-    textNode('p', 'eyebrow', t, 'sources.eyebrow', 'Signal inputs'),
-    textNode('h1', null, t, 'sources.title', 'Sources'),
-    textNode('p', 'page-heading__description', t, 'sources.description', 'Connect playlists you are allowed to access. Catodo never hosts the streams.'),
+    textNode('p', 'eyebrow', t, 'settings.eyebrow', 'Setup & preferences'),
+    textNode('h1', null, t, 'settings.title', 'Settings'),
+    textNode('p', 'page-heading__description', t, 'settings.description', 'Manage channel sources, playback routing, and device preferences.'),
   );
   const back = actionButton({
     t,
@@ -1976,7 +1976,8 @@ export function mountAppUI(root, options = {}) {
       button.classList.toggle('is-active', active);
       button.toggleAttribute('aria-current', active);
     });
-    header.sources.classList.toggle('is-active', viewName === 'sources');
+    header.settings.classList.toggle('is-active', viewName === 'sources');
+    header.settings.setAttribute('aria-current', viewName === 'sources' ? 'page' : 'false');
     return viewName;
   };
 

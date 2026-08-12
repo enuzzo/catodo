@@ -630,10 +630,36 @@ textarea {
   font-size: 29px;
 }
 
+.app-switcher--settings {
+  border-radius: 50%;
+  background: var(--paper-raised);
+  color: var(--signal);
+}
+
+.app-switcher--settings i {
+  transition: transform 320ms var(--ease-out);
+}
+
 .app-switcher:hover,
 .app-switcher.is-active {
   border-color: var(--signal-hover);
   background: var(--signal-hover);
+}
+
+.app-switcher--settings:hover i,
+.app-switcher--settings.is-active i {
+  transform: rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-switcher--settings i {
+    transition: none;
+  }
+
+  .app-switcher--settings:hover i,
+  .app-switcher--settings.is-active i {
+    transform: none;
+  }
 }
 
 .signal-bar {
@@ -3739,7 +3765,7 @@ textarea {
   }
 
   .app-header {
-    grid-template-columns: 155px minmax(0, 1fr) 52px;
+    grid-template-columns: 155px minmax(0, 1fr) 58px;
     grid-template-rows: 68px 68px;
   }
 

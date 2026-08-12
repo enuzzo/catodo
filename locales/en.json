@@ -48,6 +48,11 @@
     "consentRequired": "Confirm before CATODO contacts this source",
     "channelsImported": "{count} channels imported"
   },
+  "settings": {
+    "eyebrow": "Setup & preferences",
+    "title": "Settings",
+    "description": "Manage channel sources, playback routing, and device preferences."
+  },
   "import": {
     "presetsTitle": "Recommended playlists",
     "presetsHint": "Official iptv-org directories — choose one to review before importing.",
