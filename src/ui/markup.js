@@ -74,12 +74,16 @@ function setTranslatedText(node, t, key, fallback, vars) {
 }
 
 function actionButton({ t, action, iconName, key, fallback, className = '', dataset = {}, type = 'button' }) {
+  const label = translate(t, key, fallback);
   const button = element('button', `button ${className}`.trim(), {
     type,
+    'aria-label': label,
     dataset: { action, ...dataset },
   });
   if (iconName) button.append(icon(iconName));
-  button.append(textNode('span', 'button__label', t, key, fallback));
+  const visibleLabel = element('span', 'button__label');
+  visibleLabel.textContent = label;
+  button.append(visibleLabel);
   return button;
 }
 
@@ -2780,6 +2784,7 @@ export function mountAppUI(root, options = {}) {
       library.stats.sources.textContent = safeText(state.sourceCount ?? 0);
       setLibrarySelectOptions(library.category, state.categories, translate(t, 'library.allCategories', 'All categories'), state.category);
       setLibrarySelectOptions(library.language, state.languages, translate(t, 'library.allLanguages', 'All languages'), state.language);
+      if (state.query !== undefined) library.search.value = safeText(state.query);
       const favoritesOnly = Boolean(state.favoritesOnly);
       library.favorites.classList.toggle('is-active', favoritesOnly);
       library.favorites.setAttribute('aria-pressed', favoritesOnly ? 'true' : 'false');
@@ -2805,13 +2810,17 @@ export function mountAppUI(root, options = {}) {
         'Saved playlists could not be downloaded',
         'Shared storage is connected, but one or more third-party playlists failed on this browser. Open Settings to refresh those sources.',
       );
-      else renderEmpty(
+      else {
+        const isFiltered = Boolean(safeText(state.query).trim() || safeText(state.category).trim() || safeText(state.language).trim() || favoritesOnly);
+        renderEmpty(
           library.grid,
           t,
-          'library.empty',
-          'Your library is waiting',
-          'Add a playlist or favorite a live channel to keep it close.',
-          actionButton({
+          isFiltered ? 'library.noMatches' : 'library.empty',
+          isFiltered ? 'No channels match' : 'Your library is waiting',
+          isFiltered
+            ? 'Try a different search or clear one of the active filters.'
+            : 'Add a playlist or favorite a live channel to keep it close.',
+          isFiltered ? null : actionButton({
             t,
             action: 'open-import-dialog',
             iconName: 'plus',
@@ -2820,6 +2829,7 @@ export function mountAppUI(root, options = {}) {
             className: 'button--primary',
           }),
         );
+      }
       const visibleCount = Number(state.visibleCount ?? channels.length) || 0;
       const filteredCount = Number(state.filteredCount ?? visibleCount) || 0;
       library.loadMore.hidden = visibleCount >= filteredCount;

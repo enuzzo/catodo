@@ -585,6 +585,7 @@ function renderLibrary() {
     languages: [...new Set(allChannels.flatMap((channel) => channel.languages || []))].sort(),
     category: state.libraryCategory,
     language: state.libraryLanguage,
+    query: state.libraryQuery,
     favoritesOnly: state.libraryFavoritesOnly,
     visibleCount: channels.length,
     filteredCount: matchingChannels.length,
