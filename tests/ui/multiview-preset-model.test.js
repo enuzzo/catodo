@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  defaultMultiviewPresetState,
   deleteMultiviewPreset,
   findMultiviewPreset,
   renameMultiviewPreset,
@@ -23,4 +24,25 @@ test('finds, renames and trims a selected Multiview preset without changing its 
 test('deletes only the selected Multiview preset', () => {
   assert.deepEqual(deleteMultiviewPreset(presets, 'morning').map((preset) => preset.id), ['sports']);
   assert.deepEqual(deleteMultiviewPreset(presets, 'missing'), presets);
+});
+
+test('normal Multiview entry loads the first saved preset', () => {
+  const entry = defaultMultiviewPresetState(presets);
+  assert.equal(entry.preset.id, 'morning');
+  assert.deepEqual(entry.channelIds, ['a', 'b']);
+  assert.equal(entry.customized, false);
+});
+
+test('a channel added from fullscreen replaces the first preset slot without duplicates', () => {
+  const replaced = defaultMultiviewPresetState(presets, 'live-news');
+  assert.deepEqual(replaced.channelIds, ['live-news', 'b']);
+  assert.equal(replaced.customized, true);
+
+  const alreadyPresent = defaultMultiviewPresetState(presets, 'b');
+  assert.deepEqual(alreadyPresent.channelIds, ['a', 'b']);
+  assert.equal(alreadyPresent.customized, false);
+});
+
+test('Multiview keeps its existing fallback when there are no presets', () => {
+  assert.equal(defaultMultiviewPresetState([], 'live-news'), null);
 });

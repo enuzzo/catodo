@@ -3,11 +3,12 @@ import { isPrimaryNavActive, shouldActivateShellView } from './view-mode.js';
 import { EXPLORE_CATEGORIES } from './explore-model.js';
 import { featuredChannelIdentity } from './channel-identity.js';
 import { APP_VERSION } from '../version.js';
-import { formatGuideDateTime, formatGuideTime } from './time-format.js';
+import { channelLocalTime, formatGuideDateTime, formatGuideTime } from './time-format.js';
 import { enableGuideTimelineDrag } from './guide-timeline-drag.js';
-import { resolveFavoriteEffectHost } from './favorite-effect-host.js';
+import { favoriteEffectPosition, resolveFavoriteEffectHost } from './favorite-effect-host.js';
 import { programmeCardNeedsExpansion } from './guide-programme-card.js';
 import { countryGuideControlState, guideProgrammeFallback } from './country-guide-model.js';
+import { channelMetadataBadges } from './channel-meta-model.js';
 
 const FLAG_URLS = import.meta.glob('../../assets/vendor/flags/4x3/*.svg', {
   eager: true,
@@ -129,9 +130,11 @@ function playFavoriteEffect(root, anchor, mode) {
   if (!(anchor instanceof Element) || !root) return Promise.resolve();
   const rect = anchor.getBoundingClientRect();
   const host = resolveFavoriteEffectHost(root, anchor);
-  const effect = element('span', `favorite-effect favorite-effect--${mode}`, { 'aria-hidden': 'true' });
-  effect.style.left = `${rect.left + rect.width / 2}px`;
-  effect.style.top = `${rect.top + rect.height / 2}px`;
+  const isPlayerToolbar = Boolean(anchor.closest('.player-toolbar'));
+  const position = favoriteEffectPosition(rect, { playerToolbar: isPlayerToolbar });
+  const effect = element('span', `favorite-effect favorite-effect--${mode}${isPlayerToolbar ? ' favorite-effect--player' : ''}`, { 'aria-hidden': 'true' });
+  effect.style.left = `${position.left}px`;
+  effect.style.top = `${position.top}px`;
   if (mode === 'add') {
     effect.append(filledFavoriteIcon('favorite-effect__heart'));
     [
@@ -149,9 +152,9 @@ function playFavoriteEffect(root, anchor, mode) {
     effect.append(element('span', 'favorite-effect__bolt'), element('span', 'favorite-effect__flash'));
   }
   host.append(effect);
-  const duration = mode === 'remove' ? 330 : 680;
+  const duration = mode === 'remove' ? 560 : 940;
   window.setTimeout(() => effect.remove(), duration + 80);
-  return new Promise((resolve) => window.setTimeout(resolve, mode === 'remove' ? 270 : 0));
+  return new Promise((resolve) => window.setTimeout(resolve, mode === 'remove' ? 390 : 0));
 }
 
 function normaliseArray(value) {
@@ -274,33 +277,54 @@ function renderLogo(container, channel, t) {
   container.append(image);
 }
 
-function channelCountry(channel) {
-  return safeText(channel?.countryName || channel?.country || channel?.countries?.[0] || channel?.countryCode || channel?.iso2);
-}
-
-function channelLanguage(channel) {
-  return safeText(channel?.languageName || channel?.language || channel?.languages?.[0] || channel?.languageCode);
-}
-
-function channelQuality(channel) {
-  return safeText(channel?.quality || channel?.streamQuality || channel?.resolution || channel?.feedFormat);
-}
-
 function metadataDivider() {
   const node = element('span', 'meta-divider', { 'aria-hidden': 'true' });
   node.textContent = '–';
   return node;
 }
 
-function channelMeta(channel, className = 'channel-meta') {
-  const row = element('div', className);
-  const values = [channelCountry(channel), channelLanguage(channel), channelQuality(channel)].filter(Boolean);
-  values.forEach((value, index) => {
-    if (index) row.append(metadataDivider());
-    const item = element('span');
-    item.textContent = value;
-    row.append(item);
+function channelMetaValue(channel, type) {
+  return safeText(channelMetadataBadges(channel).find((badge) => badge.type === type)?.value);
+}
+
+function channelCountry(channel) {
+  return channelMetaValue(channel, 'country');
+}
+
+function channelLanguage(channel) {
+  return channelMetaValue(channel, 'language');
+}
+
+function channelQuality(channel) {
+  return channelMetaValue(channel, 'quality');
+}
+
+const CHANNEL_META_LABELS = {
+  country: ['channelMeta.country', 'Country'],
+  language: ['channelMeta.language', 'Language'],
+  quality: ['channelMeta.quality', 'Resolution'],
+  genre: ['channelMeta.genre', 'Genre'],
+};
+
+function appendChannelMeta(container, channel, t) {
+  channelMetadataBadges(channel).forEach((badge) => {
+    const [key, fallback] = CHANNEL_META_LABELS[badge.type];
+    const label = translate(t, key, fallback);
+    const item = element('span', `channel-meta__item channel-meta__item--${badge.type}`, {
+      title: `${label}: ${badge.value}`,
+      'aria-label': `${label}: ${badge.value}`,
+    });
+    const value = element('span', 'channel-meta__value');
+    value.textContent = safeText(badge.value);
+    item.append(icon(badge.icon), value);
+    container.append(item);
   });
+}
+
+function channelMeta(channel, className = 'channel-meta', t) {
+  const classes = className === 'channel-meta' ? className : `channel-meta ${className}`;
+  const row = element('div', classes);
+  appendChannelMeta(row, channel, t);
   return row;
 }
 
@@ -343,7 +367,7 @@ function renderChannelTiles(container, channels, t, options = {}) {
     main.append(masthead);
     const name = element('strong', 'channel-tile__name');
     name.textContent = safeText(channel?.name, translate(t, 'channel.unknown', 'Unknown channel'));
-    main.append(name, channelMeta(channel));
+    main.append(name, channelMeta(channel, 'channel-meta', t));
     if (options.schedule === true) {
       const schedule = channelSchedule(channel);
       const now = schedule.find((programme) => Number(programme.start) <= Date.now() && Number(programme.stop) > Date.now());
@@ -684,8 +708,15 @@ function createExploreView(t) {
     muted: true, autoplay: true, playsInline: true, preload: 'metadata', dataset: { mediaRole: 'explore-live' },
   });
   const heroLive = element('span', 'explore-hero__live');
-  heroLive.append(element('i', 'live-dot', { 'aria-hidden': 'true' }), textNode('span', null, t, 'status.liveMuted', 'LIVE · MUTED'));
-  heroStage.append(video, heroLive);
+  const heroLiveText = textNode('span', null, t, 'status.liveMuted', 'LIVE · MUTED');
+  heroLive.append(element('i', 'live-dot', { 'aria-hidden': 'true' }), heroLiveText);
+  const mute = iconButton({
+    t, action: 'toggle-explore-audio', iconName: 'speaker-slash', key: 'player.unmute', fallback: 'Unmute', className: 'explore-hero__mute media-control',
+  });
+  const fullscreen = iconButton({
+    t, action: 'open-player', iconName: 'corners-out', key: 'player.open', fallback: 'Open full player', className: 'explore-hero__fullscreen media-control',
+  });
+  heroStage.append(video, heroLive, mute, fullscreen);
   const heroCopy = element('div', 'explore-hero__copy');
   const heroCollection = textNode('span', 'explore-hero__collection', t, 'explore.featuredCollection', 'Featured collection');
   const heroName = textNode('h2', null, t, 'channel.unknown', 'Unknown channel');
@@ -717,7 +748,7 @@ function createExploreView(t) {
 
   const collections = element('div', 'explore-collections');
   view.append(intro, hero, filters, collections);
-  return { view, video, hero, heroCollection, heroName, heroMeta, heroSchedule, watch, random, surprise, filters, filterButtons, collections };
+  return { view, video, hero, heroCollection, heroName, heroMeta, heroSchedule, heroLiveText, mute, fullscreen, watch, random, surprise, filters, filterButtons, collections };
 }
 
 function setExploreHero(refs, channel, collection, t) {
@@ -725,10 +756,11 @@ function setExploreHero(refs, channel, collection, t) {
   const id = safeId(value.channelId || value.id || value.tvgId || value.url);
   refs.hero.dataset.channelId = id;
   refs.watch.dataset.channelId = id;
+  refs.fullscreen.dataset.channelId = id;
   refs.random.dataset.currentChannelId = id;
   refs.heroCollection.textContent = safeText(collection?.title, translate(t, 'explore.featuredCollection', 'Featured collection'));
   refs.heroName.textContent = safeText(value.name, translate(t, 'channel.unknown', 'Unknown channel'));
-  refs.heroMeta.replaceChildren(channelMeta(value));
+  refs.heroMeta.replaceChildren(channelMeta(value, 'channel-meta', t));
   const schedule = channelSchedule(value);
   const now = schedule.find((programme) => Number(programme.start) <= Date.now() && Number(programme.stop) > Date.now());
   const next = schedule.find((programme) => Number(programme.start) > Date.now());
@@ -743,7 +775,12 @@ function setExploreHero(refs, channel, collection, t) {
     );
     refs.heroSchedule.append(row);
   });
-  setMedia(refs.video, { ...value, muted: true, autoplay: value.autoplay !== false });
+  setMedia(refs.video, { ...value, muted: value.muted !== false, autoplay: value.autoplay !== false });
+  const muted = refs.video.muted;
+  setTranslatedText(refs.heroLiveText, t, muted ? 'status.liveMuted' : 'status.live', muted ? 'LIVE · MUTED' : 'LIVE');
+  refs.mute.replaceChildren(icon(muted ? 'speaker-slash' : 'speaker-high'));
+  refs.mute.setAttribute('aria-label', translate(t, muted ? 'player.unmute' : 'player.mute', muted ? 'Unmute' : 'Mute'));
+  refs.mute.title = refs.mute.getAttribute('aria-label');
 }
 
 function renderExploreCollections(container, collections, t) {
@@ -821,7 +858,12 @@ function renderExploreCollections(container, collections, t) {
     header.append(copy, controls);
     const rail = element('div', `channel-grid explore-collection__rail explore-collection__rail--${mode}`);
     const channels = normaliseArray(collection?.channels);
-    if (channels.length) renderChannelTiles(rail, channels, t, { schedule: true });
+    if (channels.length) renderChannelTiles(rail, channels, t, {
+      schedule: true,
+      action: 'tune-explore-channel',
+      ariaLabelKey: 'channel.tuneExploreAriaLabel',
+      ariaLabelFallback: 'Tune {name} in Explore preview',
+    });
     else renderEmpty(
       rail,
       t,
@@ -1144,10 +1186,27 @@ function createLibraryView(t) {
   const view = element('section', 'page page--library', { dataset: { page: 'library' }, hidden: true });
   const header = element('div', 'page-heading');
   const copy = element('div');
+  const summary = element('dl', 'library-summary', {
+    'aria-label': translate(t, 'library.summaryAriaLabel', 'Library summary'),
+  });
+  const statNodes = {};
+  [
+    ['favorites', 'favorites.title', 'Favorites'],
+    ['channels', 'library.importedChannels', 'Imported channels'],
+    ['sources', 'library.activeSources', 'Active sources'],
+  ].forEach(([name, key, fallback]) => {
+    const item = element('div', 'library-summary__item');
+    const value = element('dd', 'library-summary__value mono');
+    value.textContent = '0';
+    item.append(value, textNode('dt', null, t, key, fallback));
+    summary.append(item);
+    statNodes[name] = value;
+  });
   copy.append(
     textNode('p', 'eyebrow', t, 'library.eyebrow', 'Your signal collection'),
     textNode('h1', null, t, 'library.title', 'Library'),
     textNode('p', 'page-heading__description', t, 'library.description', 'Favorites and imported channels, ready whenever you tune in.'),
+    summary,
   );
   const actions = element('div', 'page-heading__actions');
   actions.append(
@@ -1170,21 +1229,6 @@ function createLibraryView(t) {
     }),
   );
   header.append(copy, actions);
-
-  const stats = element('dl', 'library-stats');
-  const statNodes = {};
-  [
-    ['favorites', 'favorites.title', 'Favorites'],
-    ['channels', 'library.importedChannels', 'Imported channels'],
-    ['sources', 'library.activeSources', 'Active sources'],
-  ].forEach(([name, key, fallback]) => {
-    const item = element('div', 'stat-card');
-    const value = element('dd', 'stat-card__value');
-    value.textContent = '0';
-    item.append(textNode('dt', null, t, key, fallback), value);
-    stats.append(item);
-    statNodes[name] = value;
-  });
 
   const toolbar = element('div', 'library-toolbar');
   const title = textNode('h2', null, t, 'library.channels', 'Saved channels');
@@ -1232,7 +1276,7 @@ function createLibraryView(t) {
   const recentGrid = element('div', 'channel-grid library-recent__grid');
   recent.append(recentGrid);
   recent.hidden = true;
-  view.append(header, stats, recent, toolbar, grid, loadMore);
+  view.append(header, recent, toolbar, grid, loadMore);
   return { view, stats: statNodes, search, category, language, favorites, recent, recentGrid, grid, loadMore };
 }
 
@@ -1310,7 +1354,7 @@ function renderGuideCards(container, channels, t) {
     const copy = element('span');
     const name = element('strong');
     name.textContent = safeText(channel?.name, translate(t, 'channel.unknown', 'Unknown channel'));
-    copy.append(name, channelMeta(channel, 'guide-channel__meta'));
+    copy.append(name, channelMeta(channel, 'guide-channel__meta', t));
     identity.append(logo, copy, icon('play'));
     const timeline = element('div', 'guide-channel__timeline');
     const nowLine = element('span', 'guide-channel__now', { 'aria-hidden': 'true' });
@@ -2321,7 +2365,7 @@ function renderChannelPickerResults(container, channels, t) {
     const copy = element('span', 'channel-picker__copy');
     const name = element('strong');
     name.textContent = safeText(channel?.name, translate(t, 'channel.unknown', 'Unknown channel'));
-    copy.append(name, channelMeta(channel, 'channel-picker__meta'));
+    copy.append(name, channelMeta(channel, 'channel-picker__meta', t));
     button.append(logo, copy, icon('caret-right'));
     fragment.append(button);
   });
@@ -2772,15 +2816,28 @@ function setCountryChannels(refs, state, selected, selectedIso2, t) {
   setTranslatedText(refs.channelLoadAll.querySelector('.button__label'), t, 'countries.loadAllChannelsCount', 'Load all channels · {count} remaining', { count: remaining });
 }
 
-function updateChannelMeta(container, channel) {
+function updateChannelMeta(container, channel, options = {}) {
   container.replaceChildren();
-  const values = [channelCountry(channel), channelLanguage(channel), channelQuality(channel)].filter(Boolean);
-  values.forEach((value, index) => {
-    if (index) container.append(metadataDivider());
-    const item = element('span');
-    item.textContent = value;
-    container.append(item);
+  appendChannelMeta(container, channel, options.t);
+  if (!options.localClock) return;
+  const local = channelLocalTime(channel, options.now, { locale: options.locale });
+  if (!local) return;
+  if (container.children.length) container.append(metadataDivider());
+  const clock = element('span', 'player-identity__local-clock mono', {
+    title: local.timeZone,
+    'aria-label': translate(
+      options.t,
+      'player.localTimeIn',
+      'Local time in {place}: {time}',
+      { place: local.place, time: local.time },
+    ),
   });
+  const place = element('span');
+  place.textContent = local.place;
+  const time = element('strong');
+  time.textContent = local.time;
+  clock.append(icon('clock'), place, time);
+  container.append(clock);
 }
 
 function drawSignalChart(canvas, values, maximum) {
@@ -3354,6 +3411,8 @@ export function mountAppUI(root, options = {}) {
       setExploreHero(explore, featured, featuredCollection, t);
       const playable = Boolean(safeId(featured.channelId || featured.id || featured.tvgId || featured.url));
       explore.watch.disabled = !playable;
+      explore.fullscreen.disabled = !playable;
+      explore.mute.disabled = !playable;
       explore.random.disabled = !playable;
       explore.surprise.disabled = !playable;
       explore.hero.classList.toggle('is-restoring', Boolean(state.restoring || state.syncError || state.restoreError));
@@ -3574,7 +3633,12 @@ export function mountAppUI(root, options = {}) {
         setMedia(player.video, { ...channel, muted: state.muted ?? channel.muted, autoplay: state.autoplay ?? channel.autoplay });
         player.number.textContent = channelNumber(channel, Number(channel.position || 0));
         player.name.textContent = safeText(channel.name, translate(t, 'channel.unknown', 'Unknown channel'));
-        updateChannelMeta(player.meta, channel);
+        updateChannelMeta(player.meta, channel, {
+          localClock: true,
+          locale: document.documentElement.lang,
+          now: Date.now(),
+          t,
+        });
         const isFavorite = Boolean(channel.favorite || channel.isFavorite);
         player.favoriteButton.classList.toggle('is-active', isFavorite);
         player.favoriteButton.setAttribute('aria-pressed', isFavorite ? 'true' : 'false');
@@ -3716,7 +3780,7 @@ export function mountAppUI(root, options = {}) {
           setMedia(refs.video, { ...feed, muted: !isListening, autoplay: state.autoplay !== false });
           refs.number.textContent = String(index + 1).padStart(2, '0');
           refs.channelName.textContent = safeText(feed.name, translate(t, 'channel.unknown', 'Unknown channel'));
-          updateChannelMeta(refs.meta, feed);
+          updateChannelMeta(refs.meta, feed, { t });
           refs.slot.dataset.channelId = safeId(feed.channelId || feed.id || feed.tvgId || feed.url);
         } else {
           refs.channelName.textContent = translate(t, 'channel.emptySlot', 'Empty feed');
@@ -3848,6 +3912,14 @@ export function mountAppUI(root, options = {}) {
       const copy = element('span');
       copy.textContent = safeText(message, translate(t, 'toast.done', 'Done'));
       node.append(copy);
+      if (options.action?.name && options.action?.label) {
+        const action = element('button', 'toast__action', {
+          type: 'button',
+          dataset: { action: options.action.name, ...(options.action.dataset || {}) },
+        });
+        action.textContent = safeText(options.action.label);
+        node.append(action);
+      }
       toastRegion.replaceChildren(node);
       scheduleFrame(() => node.classList.add('is-visible'));
       toastTimer = window.setTimeout(() => {

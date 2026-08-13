@@ -82,6 +82,12 @@
     "notAlwaysOn": "Not always on",
     "geoRestricted": "Geo-restricted"
   },
+  "channelMeta": {
+    "country": "Country",
+    "language": "Language",
+    "quality": "Resolution",
+    "genre": "Genre"
+  },
   "sources": {
     "title": "Sources",
     "add": "Add source",
@@ -135,6 +141,7 @@
     "importing": "Importing catalog…"
   },
   "library": {
+    "summaryAriaLabel": "Library summary",
     "recent": "Recently watched",
     "loadMore": "Load more channels",
     "loadMoreCount": "Load more channels · {count} remaining",
@@ -194,6 +201,7 @@
     "favorite": "Add to favorites",
     "unfavorite": "Remove from favorites",
     "nextEndpoint": "Try another stream",
+    "localTimeIn": "Local time in {place}: {time}",
     "fullscreenExitFailed": "Could not exit full screen. Playback stayed in the player."
   },
   "guide": {
@@ -231,7 +239,7 @@
     "now": "Now",
     "next": "Next",
     "nowPlaying": "Now playing",
-    "localTime": "Local time",
+    "localTime": "Your time",
     "programmeValue": "{time} · {title}",
     "noDataShort": "Guide unavailable",
     "dataOutdatedShort": "Guide outdated",

@@ -158,6 +158,22 @@ export function randomizeExploreChannels(channels, { limit = 8, previousIds = []
   return diverse([...fresh, ...repeated], Math.max(0, Number(limit) || 0));
 }
 
+export function randomizeExploreCollectionSamples(collections, {
+  limit = 8,
+  previousSamples = new Map(),
+  rng = Math.random,
+} = {}) {
+  const samples = new Map();
+  (Array.isArray(collections) ? collections : []).filter(Boolean).forEach((collection) => {
+    const id = String(collection?.id || '');
+    if (!id) return;
+    const previousIds = previousSamples instanceof Map ? previousSamples.get(id) || [] : [];
+    const sample = randomizeExploreChannels(collection.channels, { limit, previousIds, rng });
+    samples.set(id, sample.map(channelId));
+  });
+  return samples;
+}
+
 export function buildExploreCollections(channels, { activeCategory = "all", limit = 12 } = {}) {
   const values = Array.isArray(channels) ? channels.filter(Boolean) : [];
   const categories = activeCategory === "all"

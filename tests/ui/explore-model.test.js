@@ -8,6 +8,7 @@ import {
   matchesExploreCategory,
   pickExploreFeatured,
   pickExploreFeaturedForView,
+  randomizeExploreCollectionSamples,
   randomizeExploreChannels,
   sortExploreChannels,
 } from "../../src/ui/explore-model.js";
@@ -90,6 +91,20 @@ test("Explore randomization prefers unseen channels and keeps the requested prev
     second.slice(0, unseen.length).map((channel) => channel.channelId).sort(),
     unseen.map((channel) => channel.channelId).sort(),
   );
+});
+
+test("Explore refreshes every overview rail with up to eight random channels", () => {
+  const collections = ['news', 'sports'].map((id) => ({
+    id,
+    channels: Array.from({ length: 12 }, (_, index) => ({ channelId: `${id}-${index}`, countryCode: `${id}-${index}` })),
+  }));
+  const first = randomizeExploreCollectionSamples(collections, { limit: 8, rng: () => 0.5 });
+  const second = randomizeExploreCollectionSamples(collections, { limit: 8, previousSamples: first, rng: () => 0.5 });
+  assert.deepEqual([...first.keys()], ['news', 'sports']);
+  assert.equal(first.get('news').length, 8);
+  assert.equal(first.get('sports').length, 8);
+  assert.notDeepEqual(second.get('news'), first.get('news'));
+  assert.notDeepEqual(second.get('sports'), first.get('sports'));
 });
 
 test("Explore sorts complete collections by name, country and descending quality", () => {

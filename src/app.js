@@ -20,6 +20,7 @@ import {
   filterExploreChannelsByCountry,
   matchesExploreCategory,
   pickExploreFeaturedForView,
+  randomizeExploreCollectionSamples,
   randomizeExploreChannels,
   sortExploreChannels,
 } from "./ui/explore-model.js";
@@ -27,7 +28,8 @@ import { multiviewTelemetry, singleTelemetry } from "./ui/telemetry-model.js";
 import { advanceConnection, connectionView, startConnection } from "./ui/connection-model.js";
 import { resolvePlayerReturnView } from "./ui/view-mode.js";
 import { selectInitialHomeChannel } from "./ui/home-selection.js";
-import { deleteMultiviewPreset, findMultiviewPreset, renameMultiviewPreset } from "./ui/multiview-preset-model.js";
+import { favoriteGuidePlan } from "./ui/favorite-guide-model.js";
+import { defaultMultiviewPresetState, deleteMultiviewPreset, findMultiviewPreset, renameMultiviewPreset } from "./ui/multiview-preset-model.js";
 import { resetWorldMapView, zoomWorldMap } from "./ui/world-map.js";
 
 const UI_CHANNEL_LIMIT = 72;
@@ -43,6 +45,7 @@ const state = {
   view: "home",
   exploreCategory: "all",
   exploreFeaturedId: "",
+  exploreMuted: true,
   exploreCategorySort: "relevance",
   exploreCountry: "",
   exploreCategoryLimit: EXPLORE_PAGE_SIZE,
@@ -147,7 +150,7 @@ function writeLocalJson(key, value) {
 function updatePresetOptions() {
   const select = ui?.refs.multiviewPresets;
   if (!select) return;
-  const current = state.selectedMultiviewPresetId || select.value;
+  const current = state.selectedMultiviewPresetId || "";
   select.replaceChildren(new Option(t("multiview.presets", "Presets"), ""), ...state.multiviewPresets.map((preset) => new Option(preset.name, preset.id)));
   const selected = findMultiviewPreset(state.multiviewPresets, current);
   state.selectedMultiviewPresetId = selected?.id || "";
@@ -641,6 +644,13 @@ function exploreCollections(collections = fullExploreCollections()) {
   });
 }
 
+function refreshExploreCollectionSamples() {
+  state.exploreCollectionSamples = randomizeExploreCollectionSamples(fullExploreCollections("all"), {
+    limit: EXPLORE_PREVIEW_LIMIT,
+    previousSamples: state.exploreCollectionSamples,
+  });
+}
+
 function renderExplore() {
   const fullCollections = fullExploreCollections();
   const collections = exploreCollections(fullCollections);
@@ -664,7 +674,7 @@ function renderExplore() {
     activate: state.view === "explore",
     category: state.exploreCategory,
     collections,
-    featured: featured ? { ...featured, muted: true, autoplay: state.view === "explore" } : null,
+    featured: featured ? { ...featured, muted: state.exploreMuted, autoplay: state.view === "explore" } : null,
     featuredCollection,
     restoring: !featured && Number(state.lastCatalog?.installationSync?.hydrating) > 0,
     syncError: !featured && state.lastCatalog?.installationSync?.status === "error",
@@ -932,6 +942,14 @@ async function tuneHome(channel) {
   });
 }
 
+async function tuneExplore(channel) {
+  if (!channel || !isPlayableChannel(channel)) return;
+  ui.refs.exploreVideo.muted = state.exploreMuted;
+  await explorePlayer.tune(playbackSource(channel), { muted: state.exploreMuted }).catch((error) => {
+    ui.toast(error.message, { tone: "error" });
+  });
+}
+
 async function syncShellPreview() {
   if (state.view === "home") {
     ui.refs.exploreVideo.pause();
@@ -942,7 +960,7 @@ async function syncShellPreview() {
   ui.refs.homeVideo.pause();
   if (state.view === "explore") {
     const channel = findChannel(state.exploreFeaturedId);
-    if (channel) await explorePlayer.tune(playbackSource(channel), { muted: true }).catch(() => {});
+    if (channel) await tuneExplore(channel);
     return;
   }
   ui.refs.exploreVideo.pause();
@@ -1029,6 +1047,56 @@ async function loadCountrySchedules(iso2 = state.selectedCountry, { force = fals
   if (state.selectedCountry === code) renderCountries();
 }
 
+async function connectFavoriteGuide(channel) {
+  if (!channel) return;
+  const id = channelId(channel);
+  const countryCode = inferredCountryCode(channel);
+  const mappedSources = guideUrlsForChannels([channel]);
+  const countrySources = guideSourcesForCountry(countryCode);
+  const customSources = groupGuideSources(state.epgSources)
+    .filter((group) => group.id === "custom")
+    .flatMap((group) => group.sources.map((source) => source.url));
+  const configuredSources = [...new Set([...countrySources, ...customSources])];
+  const currentSchedule = state.schedules.get(id);
+
+  if (currentSchedule?.status === "unconfigured") state.schedules.delete(id);
+  if (!state.schedules.has(id) && (mappedSources.length || configuredSources.length)) {
+    await loadSchedules([channel], {
+      preferMapped: mappedSources.length > 0,
+      sourceUrls: mappedSources.length ? undefined : configuredSources,
+    });
+  }
+
+  const plan = favoriteGuidePlan({
+    schedule: state.schedules.get(id),
+    mappedSources,
+    configuredSources,
+    countryCode,
+  });
+  const countryName = countryDirectoryMaps().byCode.get(countryCode)?.name || countryCode;
+  const messages = {
+    ready: "Favorite saved · TV guide ready.",
+    stale: "Favorite saved · the connected guide data is outdated.",
+    unmatched: "Favorite saved · the connected guide has no match for this channel.",
+    error: "Favorite saved · the guide could not be refreshed.",
+    loading: "Favorite saved · guide connection is in progress.",
+    "needs-country-guide": `Favorite saved · connect the ${countryName || "country"} guide to add schedules.`,
+    "needs-manual-guide": "Favorite saved · no guide provider is associated with this channel.",
+  };
+  const actionLabels = {
+    "open-favorite-guide-setup": "Connect guide",
+    "open-guide-settings": "Guide settings",
+  };
+  ui.toast(messages[plan.status], {
+    duration: plan.action ? 7200 : 3600,
+    action: plan.action ? {
+      label: actionLabels[plan.action],
+      name: plan.action,
+      dataset: { iso2: countryCode },
+    } : undefined,
+  });
+}
+
 function scheduleGuideRefresh() {
   window.clearInterval(epgTimer);
   epgTimer = 0;
@@ -1083,6 +1151,16 @@ function fillMultiview(seed) {
     }
   }
   state.multiviewFeeds = state.multiviewFeeds.slice(0, MULTIVIEW_MAX);
+}
+
+function applyDefaultMultiviewPreset(incomingChannel = null) {
+  const entry = defaultMultiviewPresetState(state.multiviewPresets, channelId(incomingChannel));
+  if (!entry) return false;
+  state.multiviewLayout = Math.max(2, Math.min(4, Number(entry.preset.layout) || 4));
+  state.multiviewFeeds = entry.channelIds.map(findChannel).filter(Boolean);
+  state.selectedMultiviewPresetId = entry.customized ? "" : entry.preset.id;
+  updatePresetOptions();
+  return true;
 }
 
 function createMultiviewController() {
@@ -1154,7 +1232,8 @@ async function addCurrentPlayerToMultiview() {
     if (!await releaseMainPlayer()) return;
     state.playerReturnMode = "shell";
     state.currentId = "";
-    await openMultiview(seed);
+    const loadedPreset = applyDefaultMultiviewPreset(seed);
+    await openMultiview(loadedPreset ? null : seed);
   } finally {
     playerTransitioning = false;
   }
@@ -1221,6 +1300,10 @@ function closeOverlays() {
   state.multiviewAudioIndex = null;
   ui.showMultiviewSignalLab(false);
   ui.showChannelPicker(false);
+  if (state.view === "explore") {
+    refreshExploreCollectionSamples();
+    renderExplore();
+  }
   ui.showView(state.view);
   void syncShellPreview();
 }
@@ -1362,6 +1445,7 @@ async function handleAction(action, detail) {
       if (ui.refs.moreMenu) ui.refs.moreMenu.hidden = true;
       const targetView = detail.dataset.mode === "explore" ? "explore" : detail.dataset.view || "home";
       const shouldRandomizeHome = targetView === "home";
+      const shouldRandomizeExplore = targetView === "explore";
       const opensFavoriteLibrary = targetView === "library" && detail.dataset.libraryFilter === "favorites";
       state.view = targetView;
       if (opensFavoriteLibrary) {
@@ -1376,6 +1460,7 @@ async function handleAction(action, detail) {
         const randomHome = nextRandomHomeChannel();
         if (randomHome) state.featuredId = channelId(randomHome);
       }
+      if (shouldRandomizeExplore) refreshExploreCollectionSamples();
       renderAll();
       ui.showView(state.view);
       if (state.view === "guide") void loadSchedules(guideCandidateChannels());
@@ -1393,7 +1478,7 @@ async function handleAction(action, detail) {
       renderExplore();
       ui.refs.views.explore.scrollTop = 0;
       const channel = findChannel(state.exploreFeaturedId);
-      if (channel) await explorePlayer.tune(playbackSource(channel), { muted: true }).catch(() => {});
+      if (channel) await tuneExplore(channel);
       break;
     }
     case "randomize-explore-collection": {
@@ -1427,7 +1512,7 @@ async function handleAction(action, detail) {
       state.exploreCategoryLimit = EXPLORE_PAGE_SIZE;
       renderExplore();
       const channel = findChannel(state.exploreFeaturedId);
-      if (channel) await explorePlayer.tune(playbackSource(channel), { muted: true }).catch(() => {});
+      if (channel) await tuneExplore(channel);
       break;
     }
     case "load-more-explore": {
@@ -1447,7 +1532,23 @@ async function handleAction(action, detail) {
       state.exploreFeaturedId = channelId(channel);
       renderExplore();
       const source = findChannel(state.exploreFeaturedId);
-      if (source) await explorePlayer.tune(playbackSource(source), { muted: true }).catch(() => {});
+      if (source) await tuneExplore(source);
+      break;
+    }
+    case "tune-explore-channel": {
+      const channel = findChannel(id);
+      if (!channel || !isPlayableChannel(channel)) break;
+      state.exploreFeaturedId = channelId(channel);
+      renderExplore();
+      ui.refs.views.explore.scrollTop = 0;
+      await tuneExplore(channel);
+      break;
+    }
+    case "toggle-explore-audio": {
+      state.exploreMuted = !ui.refs.exploreVideo.muted;
+      explorePlayer.setMuted(state.exploreMuted);
+      if (!state.exploreMuted) await ui.refs.exploreVideo.play().catch(() => {});
+      renderExplore();
       break;
     }
     case "explore-surprise": {
@@ -1565,8 +1666,46 @@ async function handleAction(action, detail) {
       if (ui.refs.root.dataset.mode === "player" && id === state.currentId) {
         ui.updatePlayer(playerUiState({ chromeVisible: state.playerChromeVisible }));
       }
+      if (effect === "add") void connectFavoriteGuide(findChannel(id));
       break;
     }
+    case "open-favorite-guide-setup": {
+      if (ui.refs.root.dataset.mode === "player") {
+        await closePlayerOverlay();
+        if (ui.refs.root.dataset.mode === "player") break;
+      }
+      const iso2 = String(detail.dataset.iso2 || "").toUpperCase();
+      if (!/^[A-Z]{2}$/.test(iso2)) {
+        state.view = "sources";
+        renderAll();
+        ui.showView("sources");
+        break;
+      }
+      state.selectedCountry = iso2;
+      state.countryChannelQuery = "";
+      state.countryChannelCategory = "";
+      state.countryChannelLanguage = "";
+      state.countryChannelLimit = UI_CHANNEL_LIMIT;
+      state.view = "countries";
+      renderAll();
+      ui.showView("countries");
+      void loadCountrySchedules(iso2);
+      window.requestAnimationFrame(() => {
+        ui.refs.views.countries.scrollTop = 0;
+        ui.refs.views.countries.querySelector('.country-detail__guide-consent input')?.focus();
+      });
+      break;
+    }
+    case "open-guide-settings":
+      if (ui.refs.root.dataset.mode === "player") {
+        await closePlayerOverlay();
+        if (ui.refs.root.dataset.mode === "player") break;
+      }
+      state.view = "sources";
+      renderAll();
+      ui.showView("sources");
+      if (!state.guideCatalogCountries.length) void loadGuideCatalog();
+      break;
     case "toggle-player-chrome":
       showPlayerChrome();
       break;
@@ -1987,7 +2126,7 @@ async function handleAction(action, detail) {
       await addCurrentPlayerToMultiview();
       break;
     case "open-multiview":
-      await openMultiview(findChannel(id || state.featuredId));
+      await openMultiview(applyDefaultMultiviewPreset() ? null : findChannel(id || state.featuredId));
       break;
     case "toggle-multiview-chrome":
       setMultiviewChrome(!state.multiviewChromeVisible);

@@ -36,8 +36,49 @@ or real-device validation. It is intentionally concrete and ordered by value.
 - Fullscreen playback fetches only the tuned channel's mapped guide on demand,
   with request deduplication and configured-source fallback.
 
-## Implemented and verified under Unreleased
+## Implemented and verified in 2.3.0–2.4.0
 
+- Library now presents Favorites, imported-channel and active-source counts as
+  a compact inline summary beneath the heading instead of three large statistic
+  cards, preserving the useful overview while returning vertical space to
+  recent and saved channels.
+- Channel metadata now uses a shared badge renderer across Home, Explore,
+  Countries, Library, TV Guide, the Multiview picker and the immersive player.
+  Country, language, resolution and the first available genre keep neutral pill
+  backgrounds while only their compact icons carry a stable type color; absent
+  genre metadata is omitted rather than inferred.
+- The immersive player now adds a compact 24-hour local clock for the streaming
+  location, sourced from the feed's official IANA timezone metadata and labelled
+  by timezone city to disambiguate multi-zone countries. It remains hidden when
+  metadata is absent rather than guessing from a country code. Rendered QA at
+  1600×900 verified live channel changes from `Amsterdam 00:02` to `Rome 00:02`,
+  complete containment with Guide visible, and automatic omission at 390×844
+  where the transport does not have enough horizontal space.
+- Player Favorite feedback now uses a top-layer-safe stacking level, keeps its
+  burst inside the viewport instead of centering it against the top edge, and
+  gives both add and removal states enough time to remain perceptible. Rendered
+  verification covers the actual player overlay; native Fullscreen API entry
+  remains a physical/connected-browser check where automation denies top-layer
+  permission.
+- Favorites now request an already mapped guide immediately after being saved,
+  reuse country/custom XMLTV sources that the user previously accepted, and
+  expose a direct country-guide consent action when coverage is not configured.
+  Provider `unmatched`, `stale` and `error` outcomes remain visible instead of
+  being presented as guaranteed programme coverage. Focused decision-model
+  tests pass; rendered browser verification at 1600×900 followed an Australian
+  Favorite from Home to the unchecked GlobeTV/provider consent in Countries.
+  At 390×844 the actionable toast remained fully inside the viewport. No
+  provider acceptance or new guide installation was performed during this QA.
+- Explore refreshes its eight-channel category rails on every view entry, tunes
+  channel-card selections in the embedded preview instead of opening the player,
+  and exposes preview audio plus full-player controls matching Home. Verified in
+  rendered Chromium at 1600×900 and 390×844, including rail refresh after player
+  return, exact preview/player channel identity, audio state and mobile containment.
+- Multiview now treats the first saved preset as its default entry state. A
+  channel added from fullscreen replaces the preset's first slot while keeping
+  the saved preset itself unchanged and avoiding duplicate feeds. Verified in
+  rendered Chromium at an exact 1600×900 viewport, including the neutral preset
+  selector for the temporary layout and restoration on the next normal entry.
 - Explore now chooses Euronews Italian as the initial hero when it exists in the
   imported catalog. Fullscreen Favorite feedback is mounted inside the active
   fullscreen element, and Guide programme cards keep `Now playing` within

@@ -10,6 +10,21 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-08-14
+
+### 🐛 Fixed
+
+- Player and fullscreen Favorite feedback now renders above the video layer, stays clear of the top viewport edge and remains visible long enough for the star burst and lightning removal to read clearly.
+
+### 🛠 Changed
+
+- Library replaces its three oversized statistic cards with a compact inline summary beneath the heading, keeping Favorites, imported-channel and active-source counts visible while returning the space to channel discovery.
+- Channel cards now include the first available TV genre and use one restrained badge language everywhere: neutral pills with small, consistently colored icons for country, language, resolution and genre.
+- The immersive player now shows the streaming location's current time beside channel metadata, using the feed's official timezone and an unambiguous city label in 24-hour format; channels without trustworthy timezone metadata remain uncluttered.
+- Adding a Favorite now resolves its mapped TV Guide immediately, reuses already accepted country sources, and offers a direct consent-first country-guide action when no provider has been connected yet; unmatched and stale provider results remain explicit.
+- Multiview now opens with the first saved preset by default; adding a channel from fullscreen uses that preset as its base, replaces the first slot without duplicating a feed, and clears the preset selection until the customized layout is saved.
+- Explore now refreshes every category rail with eight random channels whenever the view opens. Channel cards tune the in-page preview first, which now includes direct mute/unmute and full-player controls with a contained small-screen layout.
+
 ## [2.3.0] - 2026-08-13
 
 ### 🛠 Changed
@@ -116,7 +131,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.3.0...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.4.0...HEAD
+[2.4.0]: https://github.com/enuzzo/catodo/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/enuzzo/catodo/compare/v2.2.1...v2.3.0
 [2.2.1]: https://github.com/enuzzo/catodo/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/enuzzo/catodo/compare/v2.1.1...v2.2.0
