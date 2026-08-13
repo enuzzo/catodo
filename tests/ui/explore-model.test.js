@@ -1,6 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildExploreCollections, matchesExploreCategory, pickExploreFeatured } from "../../src/ui/explore-model.js";
+import {
+  buildExploreCollections,
+  exploreQualityScore,
+  matchesExploreCategory,
+  pickExploreFeatured,
+  randomizeExploreChannels,
+  sortExploreChannels,
+} from "../../src/ui/explore-model.js";
 
 const channels = [
   { channelId: "news-it", countryCode: "IT", categories: ["news"] },
@@ -21,8 +28,46 @@ test("Explore builds real non-empty collections and preserves a selected hero", 
   assert.equal(pickExploreFeatured(collections, "sport-it").channelId, "sport-it");
 });
 
-test("Explore falls back to a country-diverse world rail when a category is empty", () => {
+test("Explore keeps a selected empty category honest", () => {
   const [collection] = buildExploreCollections(channels, { activeCategory: "kids", limit: 3 });
+  assert.equal(collection.id, "kids");
+  assert.deepEqual(collection.channels, []);
+});
+
+test("Explore falls back to a country-diverse world collection only when the whole catalog is empty", () => {
+  const [collection] = buildExploreCollections([], { activeCategory: "all", limit: 3 });
   assert.equal(collection.id, "world");
-  assert.deepEqual(collection.channels.map((channel) => channel.channelId), ["news-it", "news-us", "culture-fr"]);
+  assert.deepEqual(collection.channels, []);
+});
+
+test("Explore randomization prefers unseen channels and keeps the requested preview size", () => {
+  const values = Array.from({ length: 12 }, (_, index) => ({
+    channelId: `channel-${index}`,
+    countryCode: `C${index}`,
+  }));
+  const first = randomizeExploreChannels(values, { limit: 8, rng: () => 0.5 });
+  const second = randomizeExploreChannels(values, {
+    limit: 8,
+    previousIds: first.map((channel) => channel.channelId),
+    rng: () => 0.5,
+  });
+  assert.equal(first.length, 8);
+  assert.equal(second.length, 8);
+  const unseen = values.filter((channel) => !first.some((item) => item.channelId === channel.channelId));
+  assert.deepEqual(
+    second.slice(0, unseen.length).map((channel) => channel.channelId).sort(),
+    unseen.map((channel) => channel.channelId).sort(),
+  );
+});
+
+test("Explore sorts complete collections by name, country and descending quality", () => {
+  const values = [
+    { channelId: 'b', name: 'Beta', country: 'Italy', quality: '720p' },
+    { channelId: 'a', name: 'Alpha', country: 'United States', quality: '4K' },
+    { channelId: 'c', name: 'Cinema', country: 'France', quality: '1080p' },
+  ];
+  assert.deepEqual(sortExploreChannels(values, 'name').map((channel) => channel.channelId), ['a', 'b', 'c']);
+  assert.deepEqual(sortExploreChannels(values, 'country').map((channel) => channel.channelId), ['c', 'b', 'a']);
+  assert.deepEqual(sortExploreChannels(values, 'quality').map((channel) => channel.channelId), ['a', 'c', 'b']);
+  assert.equal(exploreQualityScore({ quality: 'Full HD' }), 1080);
 });

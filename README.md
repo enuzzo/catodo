@@ -8,13 +8,15 @@ It is a vanilla ES-module application with no framework. Pinned runtime assets a
 
 - **Soft Signal Grid:** an editorial broadcast UI with electric-blue and EBU accents.
 - **Home Live Anchor:** when a cached catalog is available, the first tile at left starts muted and stays live while you explore. Use **Random** beside it to switch quickly to another playable channel.
-- **Explore collections:** Explore is a separate editorial surface built entirely from real catalog metadata. Filter ready-made rails for News, Sports, Movies, Music, Kids, Culture, and Local television; preview one live feed muted or use **Surprise me** to jump into a world-random channel.
+- **Explore collections:** Explore is a separate editorial surface built entirely from real catalog metadata. **All** shows eight-channel previews that can be randomized independently; category views expose the complete News, Sports, Movies, Music, Kids, Culture, or Local catalog with progressive loading and sorting by relevance, name, quality, or country.
 - **Signal Atlas:** explore every country exposed by the upstream catalog, with global search and country discovery.
+- **Country directories and guides:** load country channels progressively or reveal the complete filtered collection in one action. When enriched catalog metadata exposes listed XMLTV URLs, a country guide can be connected directly from its profile; the sources are saved in Settings and keep the existing refresh cadence.
 - **Country flags:** the Countries index and country detail use self-hosted SVG artwork from the MIT-licensed `flag-icons` collection, with an ISO-code fallback.
-- **Multiview:** 2-, 3-, or 4-feed layouts with a remembered four-feed default, user presets, and exactly one selected audio feed.
+- **Multiview:** 2-, 3-, or 4-feed layouts with a remembered four-feed default, renameable/deletable user presets, and exactly one selected audio feed.
 - **Signal Lab:** playback diagnostics separate measured, estimated, and manifest-declared values.
 - **Channel profiles:** when upstream metadata is available, Signal Lab also surfaces canonical channel, network, owner, category, feed, coverage, language, format, quality, availability, lifecycle, website, logo, and guide descriptors without inventing missing values.
 - **Analog boot:** EBU colour bars descend, split around the Catodo ident, then open onto the live dashboard; reduced-motion users get a short static reveal.
+- **Home Screen web app:** iPhone, iPad and compatible desktop/mobile browsers receive a standalone manifest plus purpose-built CATODO artwork: a minimal vintage CRT carrying EBU colour bars. Apple-specific 152, 167 and 180 px touch icons complement 192, 512 and 1024 px manifest assets.
 
 ## Content boundary
 
@@ -24,9 +26,9 @@ The Settings page promotes **World — all countries**, the official complete wo
 
 Multiple sources may be connected safely. CATODO merges records by stable channel identity (`tvg-id` when available, otherwise a conservative fingerprint) and canonical endpoint identity. Matching channels remain one library item while unique mirrors and source provenance are retained. After import, the UI reports how many channels were newly added and how many matched existing records.
 
-CATODO uses the official iptv-org JSON directory as optional metadata: channels, feeds, streams, logos, categories, languages, guides and the upstream blocklist. Guide records are discovery mappings; CATODO can also read user-approved XMLTV URLs, cache parsed schedules locally, and never bundles or redistributes programme data. Settings offers manual, 30-minute, hourly, six-hour and daily refresh cadences. A manual or due refresh revalidates through the browser HTTP cache, so providers that publish ETag or Last-Modified metadata do not need to resend unchanged XML. Automatic refresh runs while CATODO is open and checks again when the page becomes visible. Blocklisted sources are excluded and adult content is hidden from default discovery and random playback.
+CATODO uses the official iptv-org JSON directory as optional metadata: channels, feeds, streams, logos, categories, languages, guides and the upstream blocklist. Guide records are discovery mappings; CATODO can also read user-approved XMLTV URLs, cache parsed schedules locally, and never bundles or redistributes programme data. Settings offers manual, 30-minute, hourly, six-hour and daily refresh cadences. A manual or due refresh sends ETag and Last-Modified validators when the provider supplies them, so unchanged XML can return a compact `304` response. Automatic refresh runs while CATODO is open and checks again when the page becomes visible. Blocklisted sources are excluded and adult content is hidden from default discovery and random playback.
 
-The recommended free EPG preset links to [GlobeTV's country-organised XMLTV repository](https://github.com/globetvapp/epg) (GPL-3.0, updated daily). CATODO currently provides the five Italy XML files as a one-click, consent-gated preset and links to the provider's worldwide country catalog. It deliberately does not ship or automatically contact a universal mega-feed: those archives can be hundreds of megabytes and are not appropriate for a browser/Tesla client. The [iptv-org EPG project](https://github.com/iptv-org/epg) supplies grabber tooling and channel mappings, not a hosted universal programme database; run its tools yourself if you need a controlled custom feed.
+The recommended free EPG catalog reads [GlobeTV's country-organised XMLTV repository](https://github.com/globetvapp/epg) (GPL-3.0, updated daily). Settings caches the country directory for 24 hours, searches it locally, and fetches a selected country's plain `.xml` file list only when the user installs it. `.xml.gz` files are intentionally excluded because the browser parser does not decompress them. It deliberately does not ship or automatically contact a universal mega-feed: those archives can be hundreds of megabytes and are not appropriate for a browser/Tesla client. The [iptv-org EPG project](https://github.com/iptv-org/epg) supplies grabber tooling and channel mappings, not a hosted universal programme database; run its tools yourself if you need a controlled custom feed.
 
 Users are responsible for ensuring they may access a source in their jurisdiction. See [CONTENT_POLICY.md](CONTENT_POLICY.md), [TAKEDOWN.md](TAKEDOWN.md), and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
@@ -91,6 +93,12 @@ which must remain blocked from HTTP access and preserved across deploys.
 - HLS, codecs, CORS policy, mixed-content blocking, hotlink protection, and geoblocking are controlled by external sources and may change without notice.
 - The analog boot sequence is decorative, uses lightweight CSS transforms and respects reduced-motion preferences.
 
+CATODO can be added to the Home Screen from the browser's system share/install
+flow. On iOS and iPadOS the browser owns that command; a website cannot invoke
+the native **Add to Home Screen** sheet directly. The manifest and touch icons
+ensure that the installed item opens standalone and uses CATODO artwork instead
+of a page screenshot or generated monogram.
+
 ## Locales
 
 English is the current product locale. Add future locales as `locales/<language-tag>.json`, mirror them under `public/locales/` for the production bundle, keep keys aligned with `locales/en.json`, and register/select the locale through the i18n service. UI layouts intentionally allow for strings roughly 30–40% longer than English.
@@ -109,5 +117,6 @@ Treat every imported playlist and stream endpoint as untrusted input. Read [SECU
   installation synchronization, EPG, security invariants and pressure points.
 - [Operations and gotchas](docs/OPERATIONS.md): development, release, migration
   and symptom-oriented troubleshooting.
+- [Roadmap](docs/ROADMAP.md): shipped scope, remaining validation and future work.
 - [Independent review brief](docs/REVIEW_BRIEF.md): scope and output contract for
   code, product and UI/UX inspections.

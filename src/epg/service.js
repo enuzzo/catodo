@@ -1,12 +1,16 @@
-import { parseXmltv, programmesForChannel } from "./xmltv.js";
+import { guideChannelIdsFor, parseXmltvDocument } from "./xmltv.js";
 import { MAX_EPG_SOURCES } from "../data/installation-sync.js";
 
 const CACHE_TTL = 6 * 60 * 60 * 1000;
-const WINDOW_MS = 4 * 60 * 60 * 1000;
+const WINDOW_MS = 8 * 60 * 60 * 1000;
 const REFRESH_INTERVALS = new Set([0, 30, 60, 360, 1440]);
 
 function unique(values) {
   return [...new Set(values.map((value) => String(value || "").trim()).filter(Boolean))];
+}
+
+function latestProgrammeAt(programmes) {
+  return (Array.isArray(programmes) ? programmes : []).reduce((latest, item) => Math.max(latest, Number(item?.stop) || 0), 0);
 }
 
 function guidesFor(channel) {
@@ -21,6 +25,10 @@ export function guideUrlsForChannel(channel) {
   return unique(guidesFor(channel).flatMap((guide) => (guide?.sources || [])
     .filter((source) => String(source?.format || "XML").toUpperCase() === "XML")
     .map((source) => source?.url)));
+}
+
+export function guideUrlsForChannels(channels) {
+  return unique((Array.isArray(channels) ? channels : []).flatMap(guideUrlsForChannel));
 }
 
 export function guideIdsForChannel(channel) {
@@ -53,6 +61,7 @@ export class EpgService {
   #customSources = [];
   #refreshMinutes = 360;
   #lastRefresh = 0;
+  #sourceStatus = new Map();
 
   constructor({ catalog, fetchImpl = globalThis.fetch, proxy = null } = {}) {
     this.#catalog = catalog;
@@ -65,12 +74,20 @@ export class EpgService {
     const refreshMinutes = Number(await this.#catalog?.getSetting?.("epg:refreshMinutes", 360));
     this.#refreshMinutes = REFRESH_INTERVALS.has(refreshMinutes) ? refreshMinutes : 360;
     this.#lastRefresh = Number(await this.#catalog?.getSetting?.("epg:lastRefresh", 0)) || 0;
+    const statuses = await this.#catalog?.getSetting?.("epg:sourceStatus", []) || [];
+    this.#sourceStatus = new Map((Array.isArray(statuses) ? statuses : []).map((item) => [item.url, item]));
     return this;
   }
 
   getSources() { return [...this.#customSources]; }
   getRefreshMinutes() { return this.#refreshMinutes; }
   getLastRefresh() { return this.#lastRefresh; }
+  getSourceStatuses() { return this.#customSources.map((url) => ({ url, ...(this.#sourceStatus.get(url) || {}) })); }
+
+  async #rememberSourceStatus(url, status) {
+    this.#sourceStatus.set(url, { url, ...(this.#sourceStatus.get(url) || {}), ...status });
+    await this.#catalog?.setSetting?.("epg:sourceStatus", [...this.#sourceStatus.values()].slice(-MAX_EPG_SOURCES));
+  }
 
   async setSources(sources) {
     const next = unique(Array.isArray(sources) ? sources : String(sources || "").split(/[\n,]+/));
@@ -94,14 +111,16 @@ export class EpgService {
 
   async #loadOnce(url, { force = false } = {}) {
     const memory = this.#memory.get(url);
-    if (!force && memory && Date.now() - memory.fetchedAt < CACHE_TTL) return memory.programmes;
+    if (!force && memory && Array.isArray(memory.channels) && Date.now() - memory.fetchedAt < CACHE_TTL) return memory;
     const key = cacheKey(url);
     const persisted = await this.#catalog?.getSetting?.(key, null);
-    if (!force && persisted?.url === url && Date.now() - Number(persisted.fetchedAt || 0) < CACHE_TTL) {
+    if (!force && persisted?.url === url && Array.isArray(persisted.channels) && Date.now() - Number(persisted.fetchedAt || 0) < CACHE_TTL) {
       this.#memory.set(url, persisted);
-      return persisted.programmes || [];
+      return persisted;
     }
-    const cached = memory?.url === url ? memory : persisted?.url === url ? persisted : null;
+    const cached = memory?.url === url && Array.isArray(memory.channels)
+      ? memory
+      : persisted?.url === url && Array.isArray(persisted.channels) ? persisted : null;
     const candidates = [url];
     const proxied = typeof this.#proxy === "function" ? this.#proxy(url) : "";
     if (proxied) candidates.push(proxied);
@@ -111,9 +130,13 @@ export class EpgService {
         const timeout = timeoutSignal();
         let response;
         try {
+          const headers = {};
+          if (cached?.etag) headers["If-None-Match"] = cached.etag;
+          if (cached?.lastModified) headers["If-Modified-Since"] = cached.lastModified;
           response = await this.#fetch(target, {
             signal: timeout.signal,
             cache: force ? "no-cache" : "default",
+            headers,
           });
         }
         finally { timeout.cancel(); }
@@ -121,25 +144,34 @@ export class EpgService {
           const record = { ...cached, fetchedAt: Date.now() };
           this.#memory.set(url, record);
           await this.#catalog?.setSetting?.(key, record);
-          return record.programmes;
+          await this.#rememberSourceStatus(url, { state: "ready", fetchedAt: record.fetchedAt, programmeCount: record.programmes?.length || 0, channelCount: record.channels?.length || 0, latestProgrammeAt: latestProgrammeAt(record.programmes) });
+          return record;
         }
         if (!response.ok) throw new Error(`TV guide request failed (${response.status})`);
         const length = Number(response.headers?.get?.("content-length") || 0);
         if (length > 20 * 1024 * 1024) throw new RangeError("TV guide is larger than 20 MB");
-        const programmes = parseXmltv(await response.text());
+        const document = parseXmltvDocument(await response.text());
         const record = {
           url,
           fetchedAt: Date.now(),
-          programmes,
+          programmes: document.programmes,
+          channels: document.channels,
           etag: response.headers?.get?.("etag") || "",
           lastModified: response.headers?.get?.("last-modified") || "",
         };
         this.#memory.set(url, record);
         await this.#catalog?.setSetting?.(key, record);
-        return programmes;
-      } catch (error) { lastError = error; }
+        await this.#rememberSourceStatus(url, { state: "ready", error: "", fetchedAt: record.fetchedAt, programmeCount: record.programmes.length, channelCount: record.channels.length, latestProgrammeAt: latestProgrammeAt(record.programmes) });
+        return record;
+      } catch (error) {
+        lastError = error;
+        await this.#rememberSourceStatus(url, { state: "error", error: error?.message || String(error), checkedAt: Date.now() });
+      }
     }
-    if (persisted?.programmes) return persisted.programmes;
+    if (persisted?.programmes) {
+      await this.#rememberSourceStatus(url, { state: "cached", error: lastError?.message || "Refresh failed", fetchedAt: persisted.fetchedAt, programmeCount: persisted.programmes.length, channelCount: persisted.channels?.length || 0, latestProgrammeAt: latestProgrammeAt(persisted.programmes) });
+      return persisted;
+    }
     throw lastError || new Error("TV guide is unavailable");
   }
 
@@ -152,26 +184,53 @@ export class EpgService {
   }
 
   async schedule(channel, options = {}) {
-    const from = Number(options.from ?? Date.now());
-    const to = Number(options.to ?? from + WINDOW_MS);
-    const urls = unique([...this.#customSources, ...guideUrlsForChannel(channel)]).slice(0, 8);
-    if (!urls.length) return { programmes: [], status: "unconfigured", sources: [] };
-    const settled = await Promise.allSettled(urls.map((url) => this.#load(url, { force: options.force === true })));
-    const programmes = settled.flatMap((result) => result.status === "fulfilled" ? result.value : []);
-    return {
-      programmes: programmesForChannel(programmes, guideIdsForChannel(channel), { from, to }),
-      status: settled.some((result) => result.status === "fulfilled") ? "ready" : "error",
-      sources: urls,
-    };
+    const schedules = await this.schedules([channel], options);
+    return schedules.get(String(channel?.channelId || channel?.id || "")) || { programmes: [], status: "unconfigured", sources: [], matched: false };
   }
 
   async schedules(channels, options = {}) {
-    const entries = await Promise.all((Array.isArray(channels) ? channels : []).map(async (channel) => [
-      String(channel?.channelId || channel?.id || ""),
-      await this.schedule(channel, options),
-    ]));
+    const from = Number(options.from ?? Date.now());
+    const to = Number(options.to ?? from + WINDOW_MS);
+    const values = Array.isArray(channels) ? channels : [];
+    const urls = unique([...values.flatMap(guideUrlsForChannel), ...this.#customSources]);
+    if (!urls.length) return new Map(values.map((channel) => [String(channel?.channelId || channel?.id || ""), { programmes: [], status: "unconfigured", sources: [], matched: false }]));
+    const settled = await Promise.allSettled(urls.map((url) => this.#load(url, { force: options.force === true })));
+    const documents = settled.flatMap((result, index) => {
+      if (result.status !== "fulfilled") return [];
+      const record = { url: urls[index], ...result.value };
+      const programmesByChannel = new Map();
+      for (const programme of record.programmes || []) {
+        const key = String(programme.channel || "").toLocaleLowerCase("en-US");
+        if (!programmesByChannel.has(key)) programmesByChannel.set(key, []);
+        programmesByChannel.get(key).push(programme);
+      }
+      return [{ ...record, programmesByChannel, registryIds: new Set((record.channels || []).map((entry) => String(entry.id).toLocaleLowerCase("en-US"))) }];
+    });
+    const matchCounts = new Map(urls.map((url) => [url, 0]));
+    const entries = values.map((channel) => {
+      const directIds = guideIdsForChannel(channel);
+      let matched = false;
+      const programmes = documents.flatMap((document) => {
+        const ids = unique([...directIds, ...guideChannelIdsFor(channel, document.channels)]);
+        const normalizedIds = [...new Set(ids.map((id) => String(id).toLocaleLowerCase("en-US")))];
+        const sourceMatched = normalizedIds.some((id) => document.registryIds.has(id) || document.programmesByChannel.has(id));
+        if (sourceMatched) {
+          matched = true;
+          matchCounts.set(document.url, (matchCounts.get(document.url) || 0) + 1);
+        }
+        return normalizedIds.flatMap((id) => document.programmesByChannel.get(id) || [])
+          .filter((item) => item.stop > from && item.start < to);
+      });
+      return [String(channel?.channelId || channel?.id || ""), {
+        programmes: programmes.sort((a, b) => a.start - b.start || a.stop - b.stop),
+        status: documents.length ? (matched ? "ready" : "unmatched") : "error",
+        sources: urls,
+        matched,
+      }];
+    });
+    await Promise.all([...matchCounts].map(([url, matchedChannels]) => this.#rememberSourceStatus(url, { matchedChannels })));
     const schedules = new Map(entries);
-    if ([...schedules.values()].some((value) => value.status === "ready")) {
+    if (documents.length) {
       this.#lastRefresh = Date.now();
       await this.#catalog?.setSetting?.("epg:lastRefresh", this.#lastRefresh);
     }

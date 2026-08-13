@@ -19,6 +19,8 @@
     "countryCount": "{count} countries",
     "nowLive": "Live now",
     "random": "Random",
+    "randomChannels": "Random channels",
+    "randomizeSuggestions": "Randomize",
     "randomHint": "Play another live channel",
     "explore": "Explore the world",
     "restoringTitle": "Restoring shared channels",
@@ -51,6 +53,7 @@
     "global": "Global",
     "download": "Down",
     "upload": "Up",
+    "received": "Received",
     "buffer": "Buffer"
   },
   "catalog": {

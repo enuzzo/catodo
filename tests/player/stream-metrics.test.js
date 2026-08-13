@@ -12,8 +12,14 @@ test("StreamMetrics does not double count fragments or repeated waiting events",
   metrics.setRoute("proxy", true);
 
   const fragment = {
-    frag: { level: 0, cc: 1, sn: 42, urlId: 0 },
-    stats: { loaded: 1_000_000, loading: { start: 100, end: 1100 } }
+    frag: {
+      level: 0,
+      cc: 1,
+      sn: 42,
+      urlId: 0,
+      stats: { loaded: 1_000_000, loading: { start: 100, end: 1100 } },
+    },
+    payload: new Uint8Array(1_000_000),
   };
   hls.emit(FakeHls.Events.FRAG_LOADED, fragment);
   hls.emit(FakeHls.Events.FRAG_LOADED, fragment);

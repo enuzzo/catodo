@@ -1,7 +1,29 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parseXmltv, parseXmltvDate, programmesForChannel } from "../../src/epg/xmltv.js";
-import { EpgService } from "../../src/epg/service.js";
+import { guideChannelIdsFor, parseXmltv, parseXmltvDate, parseXmltvDocument, programmesForChannel } from "../../src/epg/xmltv.js";
+import { EpgService, guideUrlsForChannels } from "../../src/epg/service.js";
+import { epgPresetsForCountry } from "../../src/epg/presets.js";
+import { GlobeTvCatalog, globeTvCountryFromUrl, groupGuideSources } from "../../src/epg/catalog.js";
+
+test("collects unique catalog-listed XMLTV URLs from country channel mappings", () => {
+  const channels = [
+    { guides: [{ sources: [{ url: "https://guide.test/italy.xml", format: "XML" }] }] },
+    { endpoints: [{ guides: [{ sources: [
+      { url: "https://guide.test/italy.xml", format: "XML" },
+      { url: "https://guide.test/italy.json", format: "JSON" },
+      { url: "https://guide.test/italy-2.xml" },
+    ] }] }] },
+  ];
+  assert.deepEqual(guideUrlsForChannels(channels), [
+    "https://guide.test/italy.xml",
+    "https://guide.test/italy-2.xml",
+  ]);
+});
+
+test("resolves only explicitly configured country presets", () => {
+  assert.equal(epgPresetsForCountry("it")[0]?.id, "globetv-italy");
+  assert.deepEqual(epgPresetsForCountry("FR"), []);
+});
 
 test("parses XMLTV dates with offsets", () => {
   assert.equal(parseXmltvDate("20260812143000 +0200"), Date.UTC(2026, 7, 12, 12, 30));
@@ -44,6 +66,31 @@ test("TV Guide invokes browser fetch with the global receiver", async () => {
     to: Date.UTC(2026, 7, 12, 13, 30),
   });
   assert.equal(schedule.programmes[0].title, "Bound fetch");
+});
+
+test("channel-mapped guide sources take priority over generic Settings sources", async () => {
+  const settings = new Map();
+  const requests = [];
+  const catalog = {
+    getSetting: async (key, fallback) => settings.has(key) ? settings.get(key) : fallback,
+    setSetting: async (key, value) => { settings.set(key, value); return value; },
+  };
+  const service = await new EpgService({
+    catalog,
+    fetchImpl: async (url) => {
+      requests.push(url);
+      return new Response("<tv></tv>");
+    },
+  }).init();
+  await service.setSources(["https://guide.test/generic.xml"]);
+  await service.schedule({
+    channelId: "mapped",
+    guides: [{ sources: [{ url: "https://guide.test/country.xml", format: "XML" }] }],
+  });
+  assert.deepEqual(requests, [
+    "https://guide.test/country.xml",
+    "https://guide.test/generic.xml",
+  ]);
 });
 
 test("forced refresh revalidates once, preserves a 304 cache and persists cadence", async () => {
@@ -99,4 +146,50 @@ test("parses, decodes and filters current XMLTV programmes", () => {
     from: Date.UTC(2026, 7, 12, 12, 30),
     to: Date.UTC(2026, 7, 12, 14, 30),
   }).length, 2);
+});
+
+test("uses XMLTV channel display names to match provider-specific IDs", async () => {
+  const xml = `<tv>
+    <channel id="Canale 5 HD.it"><display-name>Canale 5 HD.it</display-name></channel>
+    <programme start="20260812140000 +0200" stop="20260812150000 +0200" channel="Canale 5 HD.it"><title>Telegiornale</title></programme>
+  </tv>`;
+  const document = parseXmltvDocument(xml);
+  assert.deepEqual(guideChannelIdsFor({ channelId: "stable", name: "Canale 5" }, document.channels), ["stable", "Canale 5 HD.it"]);
+  const settings = new Map([["epg:sources", ["https://example.org/italy.xml"]]]);
+  const catalog = {
+    getSetting: async (key, fallback) => settings.has(key) ? settings.get(key) : fallback,
+    setSetting: async (key, value) => { settings.set(key, value); return value; },
+  };
+  const service = await new EpgService({ catalog, fetchImpl: async () => new Response(xml) }).init();
+  const schedule = await service.schedule({ channelId: "stable", name: "Canale 5" }, {
+    from: Date.UTC(2026, 7, 12, 12, 30), to: Date.UTC(2026, 7, 12, 13, 30),
+  });
+  assert.equal(schedule.matched, true);
+  assert.equal(schedule.programmes[0].title, "Telegiornale");
+  assert.equal(service.getSourceStatuses()[0].matchedChannels, 1);
+});
+
+test("groups GlobeTV guide sources by country with persistent diagnostics", () => {
+  const url = "https://raw.githubusercontent.com/globetvapp/epg/main/Italy/italy1.xml";
+  assert.deepEqual(globeTvCountryFromUrl(url), { id: "Italy", name: "Italy", file: "italy1.xml" });
+  assert.equal(groupGuideSources([url], [{ url, state: "ready", matchedChannels: 12 }])[0].sources[0].matchedChannels, 12);
+});
+
+test("GlobeTV catalog loads countries once and lazily requests plain XML files", async () => {
+  const settings = new Map();
+  const requests = [];
+  const catalog = {
+    getSetting: async (key, fallback) => settings.has(key) ? settings.get(key) : fallback,
+    setSetting: async (key, value) => { settings.set(key, value); return value; },
+  };
+  const service = new GlobeTvCatalog({ catalog, fetchImpl: async (url) => {
+    requests.push(url);
+    return new Response(JSON.stringify(url.endsWith('/Italy')
+      ? [{ type: 'file', name: 'italy1.xml', size: 10, download_url: 'https://raw.test/italy1.xml' }, { type: 'file', name: 'italy1.xml.gz', download_url: 'https://raw.test/italy1.xml.gz' }]
+      : [{ type: 'dir', name: 'Italy', url: 'https://api.test/Italy', html_url: 'https://github.test/Italy' }, { type: 'file', name: 'README.md' }]));
+  } });
+  assert.equal((await service.countries())[0].name, 'Italy');
+  assert.equal((await service.countries())[0].name, 'Italy');
+  assert.deepEqual(await service.country('Italy'), [{ name: 'italy1.xml', url: 'https://raw.test/italy1.xml', size: 10 }]);
+  assert.equal(requests.length, 2);
 });

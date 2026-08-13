@@ -11,7 +11,7 @@ export const EXPLORE_CATEGORIES = Object.freeze([
 
 const COLLECTION_COPY = Object.freeze({
   news: ["News around the clock", "Live reporting and perspectives across borders."],
-  sports: ["Sports & events", "Live matches, analysis and specialist channels."],
+  sports: ["Sports & events", "Live matches, events, analysis and specialist channels."],
   movies: ["Cinema & series", "Movie, series and entertainment channels on air now."],
   music: ["Music television", "Performances, videos and music culture from around the world."],
   kids: ["Kids & animation", "Family-friendly channels from the imported catalog."],
@@ -52,6 +52,75 @@ function diverse(values, limit) {
   return [...output, ...deferred].slice(0, limit);
 }
 
+function channelId(channel) {
+  return String(channel?.channelId || channel?.id || channel?.tvgId || channel?.url || '');
+}
+
+function channelName(channel) {
+  return String(channel?.name || channel?.tvgName || '').trim();
+}
+
+function channelCountry(channel) {
+  return String(channel?.country || channel?.countryName || channel?.countryCode || channel?.countries?.[0] || '').trim();
+}
+
+export function exploreQualityScore(channel) {
+  const value = String(channel?.quality || channel?.streamQuality || channel?.resolution || channel?.feedFormat || '')
+    .trim()
+    .toLocaleLowerCase('en-US');
+  if (!value) return 0;
+  if (/\b8k\b/.test(value)) return 4320;
+  if (/\b(?:4k|uhd)\b/.test(value)) return 2160;
+  if (/\b(?:fhd|full\s*hd)\b/.test(value)) return 1080;
+  const numeric = value.match(/\b(\d{3,4})\s*p?\b/);
+  if (numeric) return Number(numeric[1]) || 0;
+  if (/\bhd\b/.test(value)) return 720;
+  if (/\bsd\b/.test(value)) return 480;
+  return 0;
+}
+
+export function sortExploreChannels(channels, sort = 'relevance') {
+  const values = Array.isArray(channels) ? channels.filter(Boolean) : [];
+  if (sort === 'relevance') return [...values];
+  return values
+    .map((channel, index) => ({ channel, index }))
+    .sort((left, right) => {
+      if (sort === 'name') {
+        return channelName(left.channel).localeCompare(channelName(right.channel), 'en', { sensitivity: 'base' })
+          || left.index - right.index;
+      }
+      if (sort === 'quality') {
+        return exploreQualityScore(right.channel) - exploreQualityScore(left.channel)
+          || channelName(left.channel).localeCompare(channelName(right.channel), 'en', { sensitivity: 'base' })
+          || left.index - right.index;
+      }
+      if (sort === 'country') {
+        return channelCountry(left.channel).localeCompare(channelCountry(right.channel), 'en', { sensitivity: 'base' })
+          || channelName(left.channel).localeCompare(channelName(right.channel), 'en', { sensitivity: 'base' })
+          || left.index - right.index;
+      }
+      return left.index - right.index;
+    })
+    .map(({ channel }) => channel);
+}
+
+function shuffled(values, rng) {
+  const output = [...values];
+  for (let index = output.length - 1; index > 0; index -= 1) {
+    const target = Math.floor(Math.max(0, Math.min(0.999999, Number(rng()) || 0)) * (index + 1));
+    [output[index], output[target]] = [output[target], output[index]];
+  }
+  return output;
+}
+
+export function randomizeExploreChannels(channels, { limit = 8, previousIds = [], rng = Math.random } = {}) {
+  const values = Array.isArray(channels) ? channels.filter(Boolean) : [];
+  const previous = new Set(Array.isArray(previousIds) ? previousIds.map(String) : []);
+  const fresh = shuffled(values.filter((channel) => !previous.has(channelId(channel))), rng);
+  const repeated = shuffled(values.filter((channel) => previous.has(channelId(channel))), rng);
+  return diverse([...fresh, ...repeated], Math.max(0, Number(limit) || 0));
+}
+
 export function buildExploreCollections(channels, { activeCategory = "all", limit = 12 } = {}) {
   const values = Array.isArray(channels) ? channels.filter(Boolean) : [];
   const categories = activeCategory === "all"
@@ -68,6 +137,13 @@ export function buildExploreCollections(channels, { activeCategory = "all", limi
   }).filter((collection) => collection.channels.length);
 
   if (collections.length) return collections;
+  if (activeCategory !== 'all') {
+    const definition = EXPLORE_CATEGORIES.find((item) => item.id === activeCategory);
+    if (definition) {
+      const [title, description] = COLLECTION_COPY[definition.id] || [definition.label, 'Live channels from your catalog.'];
+      return [{ ...definition, title, description, channels: [] }];
+    }
+  }
   return [{
     id: "world",
     label: "World",

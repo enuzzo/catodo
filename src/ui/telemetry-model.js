@@ -11,7 +11,8 @@ function formatBytes(value) {
 }
 
 function formatRate(value) {
-  return `${(number(value) / 1_000_000).toFixed(2)} Mbps`;
+  const rate = number(value);
+  return rate > 0 ? `${(rate / 1_000_000).toFixed(2)} Mbps` : 'Measuring…';
 }
 
 function formatBuffer(value) {
@@ -26,8 +27,8 @@ function resolution(metrics) {
 export function singleTelemetry(metrics = {}) {
   const detail = [resolution(metrics), `${number(metrics.frames?.dropped)} drop`].join(' · ');
   return {
-    download: formatRate(metrics.downloadThroughput),
-    upload: 'N/A',
+    download: formatRate(metrics.downloadThroughput || metrics.bandwidthEstimate || metrics.bitrate),
+    received: formatBytes(metrics.loadedBytes),
     buffer: formatBuffer(metrics.bufferSeconds),
     detail,
     issue: Boolean(metrics.waiting),
@@ -52,7 +53,6 @@ export function multiviewTelemetry(aggregate = {}, channels = []) {
     download: formatRate(aggregate.downloadThroughput),
     received: formatBytes(aggregate.loadedBytes),
     buffer: formatBuffer(slots.reduce((sum, entry) => sum + number(entry.metrics?.bufferSeconds), 0)),
-    upload: 'N/A',
     feeds,
   };
 }

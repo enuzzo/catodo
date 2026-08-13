@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { isPrimaryNavActive, shouldActivateShellView } from '../../src/ui/view-mode.js';
+import { isPrimaryNavActive, resolvePlayerReturnView, shouldActivateShellView } from '../../src/ui/view-mode.js';
 
 test('catalog rerenders cannot dismiss the player overlay', () => {
   assert.equal(shouldActivateShellView('player', true), false);
@@ -24,4 +24,16 @@ test('Explore and Live are independent shell destinations', () => {
   assert.equal(isPrimaryNavActive('home', 'explore'), false);
   assert.equal(isPrimaryNavActive('explore', 'explore'), true);
   assert.equal(isPrimaryNavActive('countries', 'countries'), true);
+});
+
+test('player return preserves every shell destination', () => {
+  for (const view of ['home', 'explore', 'countries', 'guide', 'library', 'sources']) {
+    assert.equal(resolvePlayerReturnView(view), view);
+  }
+});
+
+test('player return rejects overlay and unknown destinations', () => {
+  assert.equal(resolvePlayerReturnView('player', 'countries'), 'countries');
+  assert.equal(resolvePlayerReturnView('multiview'), 'home');
+  assert.equal(resolvePlayerReturnView('unknown', 'unknown'), 'home');
 });

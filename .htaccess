@@ -6,6 +6,8 @@
 
 DirectoryIndex index.php
 
+AddType application/manifest+json .webmanifest
+
 <Files "app.html">
   Require all denied
 </Files>

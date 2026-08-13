@@ -43,11 +43,41 @@ export function parseXmltvDate(value) {
 }
 
 export function parseXmltv(xml, options = {}) {
+  return parseXmltvDocument(xml, options).programmes;
+}
+
+export function normalizeGuideIdentity(value) {
+  return decodeEntities(value)
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\.(?:[a-z]{2,3})$/i, "")
+    .replace(/\b(?:uhd|fhd|full\s*hd|hd|sd|dtt)\b/gi, "")
+    .replace(/[^a-z0-9]+/gi, "")
+    .toLocaleLowerCase("en-US");
+}
+
+export function parseXmltvDocument(xml, options = {}) {
   const limits = { ...DEFAULT_XMLTV_LIMITS, ...(options.limits || {}) };
   const source = String(xml ?? "");
   if (new TextEncoder().encode(source).byteLength > limits.maxBytes) {
     throw new RangeError(`TV guide exceeds ${limits.maxBytes} bytes`);
   }
+  const channels = [];
+  const channelPattern = /<channel\b([^>]*)>([\s\S]*?)<\/channel>/gi;
+  let channelMatch;
+  while ((channelMatch = channelPattern.exec(source))) {
+    const id = attr(channelMatch[1], "id");
+    if (!id) continue;
+    const names = [];
+    const displayPattern = /<display-name(?:\s[^>]*)?>([\s\S]*?)<\/display-name>/gi;
+    let displayMatch;
+    while ((displayMatch = displayPattern.exec(channelMatch[2]))) {
+      const name = decodeEntities(displayMatch[1]).slice(0, limits.maxTextLength);
+      if (name && !names.includes(name)) names.push(name);
+    }
+    channels.push({ id, names });
+  }
+
   const programmes = [];
   const pattern = /<programme\b([^>]*)>([\s\S]*?)<\/programme>/gi;
   let match;
@@ -73,7 +103,36 @@ export function parseXmltv(xml, options = {}) {
       category: childText(body, "category", 256),
     });
   }
-  return programmes;
+  return { channels, programmes };
+}
+
+export function guideChannelIdsFor(channel, registry = []) {
+  const explicit = [
+    channel?.tvgId,
+    channel?.id,
+    channel?.channelId,
+    channel?.officialChannelId,
+    channel?.official_channel_id,
+    ...(Array.isArray(channel?.guideIds) ? channel.guideIds : []),
+  ].map((value) => String(value || "").trim()).filter(Boolean);
+  const exact = new Set(explicit.map((value) => value.toLocaleLowerCase("en-US")));
+  const labels = new Set([
+    ...explicit,
+    channel?.name,
+    channel?.tvgName,
+    channel?.officialName,
+    channel?.title,
+  ].map(normalizeGuideIdentity).filter(Boolean));
+  const resolved = new Set(explicit);
+  for (const entry of Array.isArray(registry) ? registry : []) {
+    const id = String(entry?.id || "").trim();
+    if (!id) continue;
+    const aliases = [id, ...(Array.isArray(entry?.names) ? entry.names : [])];
+    if (exact.has(id.toLocaleLowerCase("en-US")) || aliases.some((value) => labels.has(normalizeGuideIdentity(value)))) {
+      resolved.add(id);
+    }
+  }
+  return [...resolved];
 }
 
 export function programmesForChannel(programmes, channelIds, options = {}) {

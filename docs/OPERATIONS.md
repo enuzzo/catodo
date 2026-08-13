@@ -32,6 +32,9 @@ production data source. Use real imported channels for playback validation.
    git diff --check
    ```
 
+   Confirm that `dist/manifest.webmanifest` and the complete `dist/icons/`
+   family exist. All icon PNGs must be square and opaque.
+
 3. Smoke-test the production bundle in a real Chromium browser:
    navigation, search, favourites, a single player, volume/mute, player chrome,
    Multiview audio focus, channel replacement and return navigation.
@@ -44,12 +47,17 @@ production data source. Use real imported channels for playback validation.
    curl -sI https://catodo.netmilk.dev/logo-cache.php
    curl -sI https://catodo.netmilk.dev/.catodo-data/installation-state.json
    curl -sI https://catodo.netmilk.dev/app.html
+   curl -sI https://catodo.netmilk.dev/manifest.webmanifest
+   curl -sI https://catodo.netmilk.dev/icons/apple-touch-icon-180.png
    ```
 
    Expected: authenticated services return `401`; private storage and direct
-   `app.html` return `403`.
+   `app.html` return `403`; the manifest and touch icon return `200`.
 7. Sign in normally and verify that the built app loads. The official deployment
    is SiteGround; GitHub Pages is intentionally not the release target.
+8. On a real iPhone or iPad, use Share → **Add to Home Screen**, confirm the CRT
+   icon is sharp and centered, then launch it and verify standalone navigation,
+   safe-area padding, playback and return behavior.
 
 The deploy script uploads protective `.htaccess` and the versioned PHP login
 gate before `dist/`. It does not delete the remote directory, `.htpasswd`, login

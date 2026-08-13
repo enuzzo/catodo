@@ -18,20 +18,25 @@ function bufferedAhead(video) {
 function fragmentKey(data) {
   const fragment = data && data.frag ? data.frag : {};
   if (fragment.sn !== undefined) {
-    return [fragment.level, fragment.cc, fragment.sn, fragment.urlId].join(":");
+    const partIndex = data?.part?.index;
+    return [fragment.level, fragment.cc, fragment.sn, fragment.urlId, partIndex ?? "full"].join(":");
   }
   return fragment.url || (data && data.url) || null;
 }
 
+function fragmentStats(data) {
+  return data?.part?.stats || data?.frag?.stats || data?.stats || {};
+}
+
 function fragmentBytes(data) {
-  const stats = data && data.stats ? data.stats : {};
+  const stats = fragmentStats(data);
   if (finite(stats.loaded, -1) >= 0) return stats.loaded;
   if (data && data.payload && finite(data.payload.byteLength, -1) >= 0) return data.payload.byteLength;
   return 0;
 }
 
 function fragmentDurationSeconds(data) {
-  const stats = data && data.stats ? data.stats : {};
+  const stats = fragmentStats(data);
   const start = finite(stats.loading && stats.loading.start, finite(stats.trequest, 0));
   const end = finite(stats.loading && stats.loading.end, finite(stats.tload, 0));
   return end > start ? (end - start) / 1000 : 0;

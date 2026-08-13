@@ -19,6 +19,8 @@
     "countryCount": "{count} countries",
     "nowLive": "Live now",
     "random": "Random",
+    "randomChannels": "Random channels",
+    "randomizeSuggestions": "Randomize",
     "randomHint": "Play another live channel",
     "explore": "Explore the world",
     "restoringTitle": "Restoring shared channels",
@@ -36,6 +38,17 @@
     "surprise": "Surprise me",
     "filterAriaLabel": "Explore categories",
     "channelCount": "{count} channels",
+    "randomizeCollection": "Randomize",
+    "sortLabel": "Sort by",
+    "sortAriaLabel": "Sort this collection",
+    "loadMore": "Load more channels",
+    "emptyCategory": "No matching channels yet",
+    "sort": {
+      "relevance": "Relevance",
+      "name": "Name",
+      "quality": "Quality",
+      "country": "Country"
+    },
     "categories": {
       "all": "All",
       "news": "News",
@@ -51,6 +64,7 @@
     "global": "Global",
     "download": "Down",
     "upload": "Up",
+    "received": "Received",
     "buffer": "Buffer"
   },
   "catalog": {
@@ -148,7 +162,16 @@
     "noChannelMatches": {
       "title": "No channels match these filters",
       "body": "Try a different search, category, or language."
-    }
+    },
+    "loadAllChannels": "Load all channels",
+    "loadAllChannelsCount": "Load all channels · {count} remaining",
+    "loadGuide": "Load guide",
+    "loadingGuide": "Loading guide…",
+    "guideLoaded": "Guide loaded",
+    "guideUnavailable": "Guide unavailable",
+    "guideAvailableHint": "{count} known XMLTV sources available. Loading saves them in Settings and contacts those third-party providers.",
+    "guideLoadedHint": "{count} guide sources saved in Settings.",
+    "guideUnavailableHint": "No known XMLTV source is available for this country."
   },
   "player": {
     "play": "Play",
@@ -207,6 +230,8 @@
   "multiview": {
     "presets": "Presets",
     "savePreset": "Save preset",
+    "renamePreset": "Rename preset",
+    "deletePreset": "Delete preset",
     "random": "Random",
     "listenToFeed": "Listen to this feed",
     "muteFeed": "Mute this feed",

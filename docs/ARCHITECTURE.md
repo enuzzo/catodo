@@ -215,20 +215,32 @@ stronger secret or authenticated edge architecture.
 from enriched channel/feed metadata. It:
 
 - accepts HTTP(S) sources only;
-- limits each response to 20 MB and eight candidate sources per channel;
-- caches parsed programmes for six hours in IndexedDB;
+- limits each response to 20 MB;
+- parses both the XMLTV channel registry and programmes, then caches them for six hours in IndexedDB;
 - deduplicates concurrent fetches and uses stale cached programmes on failure;
 - supports manual, 30-minute, hourly, six-hour and daily refresh preferences;
-- returns a four-hour display window by default.
+- returns an eight-hour schedule window by default.
 
-Channel matching considers `tvgId`, internal identity and guide site IDs. EPG
-coverage is inherently incomplete, and matching accuracy depends on provider
-identifiers. Do not display invented programme titles when a mapping is absent.
+Channel matching first considers explicit `tvgId`, internal identity and guide
+site IDs, then compares conservative normalized channel names with XMLTV
+`display-name` aliases. `HD`, `FHD`, `DTT`, punctuation and a trailing country
+suffix are ignored; aggressive fuzzy matching is intentionally avoided. Source
+diagnostics separately report download success, registry matches and the latest
+programme timestamp, because a valid XML file can contain stale schedules.
 
-The TV Guide exposes search, a Favorites-only view, honest coverage counts and a
-consent-gated path to add country XMLTV sources. Settings can export a versioned
+The TV Guide exposes a shared horizontal timeline, search, a Favorites-only
+view, honest coverage counts and only channels with a resolved guide mapping.
+The GlobeTV catalog is cached for 24 hours and country file lists are loaded
+lazily; installed URLs remain installation-wide settings while source status
+and programme bodies stay local to each browser. Settings can export a versioned
 JSON configuration backup and merge a validated backup into the installation;
 runtime caches, credentials, logs and programme bodies are excluded.
+
+Country profiles expose guide loading only when enriched channel metadata lists
+real XMLTV source URLs. Activating it merges those URLs into the installation's
+existing EPG sources, preserves the chosen refresh cadence and immediately
+refreshes a bounded first set of country schedules. Missing mappings remain an
+explicit unavailable state rather than generating provider URLs heuristically.
 
 ## UI, navigation and localization
 
@@ -254,6 +266,20 @@ Interactive targets must remain comfortable on Tesla touch displays.
 
 The boot ident is CSS/DOM animation controlled by `AnalogBoot`; it is skippable,
 has a reduced-motion path and must not delay data initialization unnecessarily.
+
+### Home Screen installation
+
+`public/manifest.webmanifest` is the cross-platform Home Screen contract. It
+keeps the production start URL on `/`, because the authenticated PHP gate is the
+only legal entry point and direct access to `app.html` is denied. The manifest
+requests standalone display and provides 192, 512 and 1024 px square PNGs.
+
+`app.html` and the PHP login gate also declare Apple touch icons at 152, 167 and
+180 px. Artwork remains square, opaque and unmasked; iOS/iPadOS applies the
+platform corner treatment. The same centered vintage-TV silhouette is retained
+at every size so the installed app remains recognizable. Do not point the
+manifest at `app.html`, add a pre-rounded mask to the source artwork, or cache
+the authenticated shell in a service worker without a separate security review.
 
 ## Security and content boundaries
 

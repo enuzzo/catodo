@@ -99,11 +99,51 @@ function iconButton({ t, action, iconName, key, fallback, className = '', datase
   return button;
 }
 
+function filledFavoriteIcon(className = 'favorite-glyph') {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', `${className} favorite-glyph--filled`);
+  svg.setAttribute('viewBox', '0 0 1024 1024');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', 'M960 408c0 280-415.16 506.64-432.84 516-4.385 2.405-9.607 3.819-15.16 3.819s-10.775-1.414-15.327-3.903l.167.084C479.16 914.64 64 688 64 408c.159-136.903 111.097-247.841 247.985-248H312c82.6 0 154.92 35.52 200 95.56C557.08 195.52 629.4 160 712 160c136.903.159 247.841 111.097 248 247.985V408z');
+  svg.append(path);
+  return svg;
+}
+
 function setFavoriteGlyph(button, isFavorite) {
-  const glyph = button?.querySelector('i');
+  const glyph = button?.querySelector('.favorite-glyph, i');
   if (!glyph) return;
-  glyph.className = isFavorite ? 'favorite-glyph' : 'ph ph-heart';
-  glyph.textContent = isFavorite ? '\u2665' : '';
+  if (isFavorite) glyph.replaceWith(filledFavoriteIcon());
+  else glyph.replaceWith(icon('heart', 'favorite-glyph'));
+}
+
+function playFavoriteEffect(root, anchor, mode) {
+  if (!(anchor instanceof Element) || !root) return Promise.resolve();
+  const rect = anchor.getBoundingClientRect();
+  const effect = element('span', `favorite-effect favorite-effect--${mode}`, { 'aria-hidden': 'true' });
+  effect.style.left = `${rect.left + rect.width / 2}px`;
+  effect.style.top = `${rect.top + rect.height / 2}px`;
+  if (mode === 'add') {
+    effect.append(filledFavoriteIcon('favorite-effect__heart'));
+    [
+      [-25, -25, 0], [0, -34, 35], [27, -22, 70], [34, 4, 20],
+      [22, 27, 60], [-8, 34, 10], [-31, 19, 45], [-35, -6, 80],
+    ].forEach(([x, y, delay], index) => {
+      const star = element('span', 'favorite-effect__star');
+      star.style.setProperty('--burst-x', `${x}px`);
+      star.style.setProperty('--burst-y', `${y}px`);
+      star.style.setProperty('--burst-delay', `${delay}ms`);
+      star.style.setProperty('--burst-scale', index % 3 === 0 ? '0.72' : '1');
+      effect.append(star);
+    });
+  } else {
+    effect.append(element('span', 'favorite-effect__bolt'), element('span', 'favorite-effect__flash'));
+  }
+  root.append(effect);
+  const duration = mode === 'remove' ? 330 : 680;
+  window.setTimeout(() => effect.remove(), duration + 80);
+  return new Promise((resolve) => window.setTimeout(resolve, mode === 'remove' ? 270 : 0));
 }
 
 function normaliseArray(value) {
@@ -283,7 +323,12 @@ function renderChannelTiles(container, channels, t, options = {}) {
     const main = element('button', 'channel-tile__main', {
       type: 'button',
       dataset: { action: options.action || 'open-channel', channelId: id },
-      'aria-label': translate(t, 'channel.openAriaLabel', 'Open {name}', { name: safeText(channel?.name) }),
+      'aria-label': translate(
+        t,
+        options.ariaLabelKey || 'channel.openAriaLabel',
+        options.ariaLabelFallback || 'Open {name}',
+        { name: safeText(channel?.name) },
+      ),
     });
     const masthead = element('span', 'channel-tile__masthead');
     masthead.append(textNode('span', 'channel-tile__number', t, 'channel.number', '{number}', {
@@ -335,6 +380,17 @@ function renderChannelTiles(container, channels, t, options = {}) {
       favorite.setAttribute('aria-pressed', isFavorite ? 'true' : 'false');
       setFavoriteGlyph(favorite, isFavorite);
       tile.append(favorite);
+    }
+    if (channel?.guideAvailable) {
+      tile.append(iconButton({
+        t,
+        action: 'open-channel-guide',
+        iconName: 'calendar-dots',
+        key: 'guide.openChannelGuide',
+        fallback: `Open ${safeText(channel?.name)} guide`,
+        className: 'channel-tile__guide',
+        dataset: { channelId: id },
+      }));
     }
     fragment.append(tile);
   });
@@ -445,7 +501,7 @@ function createHomeView(t) {
 
   const top = element('div', 'home-top');
   const directory = element('div', 'home-directory');
-  const liveCard = element('article', 'live-anchor', { dataset: { tone: 'blue' } });
+  const liveCard = element('article', 'live-anchor');
   const liveStage = element('div', 'live-anchor__stage');
   const video = element('video', 'live-anchor__video', {
     muted: true,
@@ -497,10 +553,10 @@ function createHomeView(t) {
   favorite.setAttribute('aria-pressed', 'false');
   const fullscreen = iconButton({
     t,
-    action: 'toggle-home-fullscreen',
+    action: 'open-player',
     iconName: 'corners-out',
-    key: 'player.fullscreen',
-    fallback: 'Full screen',
+    key: 'player.open',
+    fallback: 'Open full player',
     className: 'live-anchor__fullscreen',
   });
   const random = iconButton({
@@ -535,8 +591,22 @@ function createHomeView(t) {
 
   liveCard.append(liveStage, liveInfo);
 
+  const suggestions = element('section', 'home-suggestions');
+  const suggestionsHeader = element('header', 'home-suggestions__header');
+  suggestionsHeader.append(
+    textNode('h2', null, t, 'home.randomChannels', 'Random channels'),
+    actionButton({
+      t,
+      action: 'refresh-home-suggestions',
+      iconName: 'shuffle',
+      key: 'home.randomizeSuggestions',
+      fallback: 'Randomize',
+      className: 'button--ghost button--small home-suggestions__refresh',
+    }),
+  );
   const nearbyGrid = element('div', 'channel-grid channel-grid--nearby');
-  directory.append(liveCard, nearbyGrid);
+  suggestions.append(suggestionsHeader, nearbyGrid);
+  directory.append(liveCard, suggestions);
   top.append(directory);
 
   const bottom = element('div', 'home-bottom');
@@ -574,6 +644,8 @@ function createHomeView(t) {
     facts: factNodes,
     openPlayer,
     random,
+    suggestions,
+    suggestionsRefresh: suggestionsHeader.querySelector('[data-action="refresh-home-suggestions"]'),
     nearbyGrid,
     favoriteGrid,
   };
@@ -663,7 +735,10 @@ function setExploreHero(refs, channel, collection, t) {
 function renderExploreCollections(container, collections, t) {
   const fragment = document.createDocumentFragment();
   normaliseArray(collections).forEach((collection) => {
-    const section = element('section', 'explore-collection', { dataset: { collection: safeId(collection?.id) } });
+    const mode = collection?.mode === 'catalog' ? 'catalog' : 'overview';
+    const section = element('section', `explore-collection explore-collection--${mode}`, {
+      dataset: { collection: safeId(collection?.id) },
+    });
     const header = element('div', 'explore-collection__header');
     const copy = element('div');
     const title = element('h2');
@@ -671,12 +746,65 @@ function renderExploreCollections(container, collections, t) {
     const description = element('p');
     description.textContent = safeText(collection?.description);
     copy.append(title, description);
+    const controls = element('div', 'explore-collection__controls');
     const count = element('span', 'explore-collection__count mono');
-    count.textContent = translate(t, 'explore.channelCount', '{count} channels', { count: normaliseArray(collection?.channels).length });
-    header.append(copy, count);
-    const rail = element('div', 'channel-grid explore-collection__rail');
-    renderChannelTiles(rail, normaliseArray(collection?.channels), t, { schedule: true });
+    count.textContent = translate(t, 'explore.channelCount', '{count} channels', {
+      count: safeText(collection?.totalCount ?? normaliseArray(collection?.channels).length),
+    });
+    controls.append(count);
+    if (mode === 'overview') {
+      controls.append(actionButton({
+        t,
+        action: 'randomize-explore-collection',
+        iconName: 'shuffle',
+        key: 'explore.randomizeCollection',
+        fallback: 'Randomize',
+        className: 'button--ghost explore-collection__randomize',
+        dataset: { collection: safeId(collection?.id) },
+      }));
+    } else {
+      const sortWrap = element('label', 'explore-collection__sort');
+      sortWrap.append(textNode('span', null, t, 'explore.sortLabel', 'Sort by'));
+      const select = element('select', 'field', {
+        'aria-label': translate(t, 'explore.sortAriaLabel', 'Sort this collection'),
+        dataset: { action: 'sort-explore' },
+      });
+      [
+        ['relevance', 'explore.sort.relevance', 'Relevance'],
+        ['name', 'explore.sort.name', 'Name'],
+        ['quality', 'explore.sort.quality', 'Quality'],
+        ['country', 'explore.sort.country', 'Country'],
+      ].forEach(([value, key, fallback]) => {
+        const option = element('option', null, { value });
+        option.textContent = translate(t, key, fallback);
+        option.selected = value === safeText(collection?.sort, 'relevance');
+        select.append(option);
+      });
+      sortWrap.append(select);
+      controls.append(sortWrap);
+    }
+    header.append(copy, controls);
+    const rail = element('div', `channel-grid explore-collection__rail explore-collection__rail--${mode}`);
+    const channels = normaliseArray(collection?.channels);
+    if (channels.length) renderChannelTiles(rail, channels, t, { schedule: true });
+    else renderEmpty(
+      rail,
+      t,
+      'explore.emptyCategory',
+      `No ${safeText(collection?.label, 'matching')} channels yet`,
+      'Import another playlist to expand this collection.',
+    );
     section.append(header, rail);
+    if (mode === 'catalog' && collection?.hasMore) {
+      section.append(actionButton({
+        t,
+        action: 'load-more-explore',
+        iconName: 'arrow-down',
+        key: 'explore.loadMore',
+        fallback: 'Load more channels',
+        className: 'button--ghost explore-collection__load-more',
+      }));
+    }
     fragment.append(section);
   });
   container.replaceChildren(fragment);
@@ -764,8 +892,20 @@ function createCountriesView(t) {
     fallback: 'Load more channels',
     className: 'button--ghost country-channels__load-more',
   });
+  const channelLoadAll = actionButton({
+    t,
+    action: 'load-all-country-channels',
+    iconName: 'stack-simple',
+    key: 'countries.loadAllChannels',
+    fallback: 'Load all channels',
+    className: 'button--ghost country-channels__load-all',
+  });
+  const channelLoadActions = element('div', 'country-channels__load-actions');
+  channelLoadActions.append(channelLoadMore, channelLoadAll);
   channelLoadMore.hidden = true;
-  channelPanel.append(channelHeader, channelToolbar, channelGrid, channelLoadMore);
+  channelLoadAll.hidden = true;
+  channelLoadActions.hidden = true;
+  channelPanel.append(channelHeader, channelToolbar, channelGrid, channelLoadActions);
   atlas.append(atlasMap, channelPanel);
 
   const directory = element('div', 'country-directory');
@@ -818,7 +958,16 @@ function createCountriesView(t) {
     fallback: 'Add country channels',
     className: 'button--primary',
   });
-  detailActions.append(importButton);
+  const guideButton = actionButton({
+    t,
+    action: 'load-country-guide',
+    iconName: 'calendar-plus',
+    key: 'countries.loadGuide',
+    fallback: 'Load guide',
+    className: 'button--ghost country-detail__guide-button',
+  });
+  const guideStatus = element('p', 'country-detail__guide-status');
+  detailActions.append(importButton, guideButton, guideStatus);
   detailGrid.append(detailCopy, shape, detailActions);
   detail.append(detailBack, detailGrid);
 
@@ -918,7 +1067,9 @@ function createCountriesView(t) {
     channelCategory,
     channelLanguage,
     channelGrid,
+    channelLoadActions,
     channelLoadMore,
+    channelLoadAll,
     map,
     mapMode,
     mapButton,
@@ -934,6 +1085,8 @@ function createCountriesView(t) {
     categoriesList,
     shape,
     importButton,
+    guideButton,
+    guideStatus,
     regionButtons,
     search,
     sort,
@@ -1067,18 +1220,42 @@ function createGuideView(t) {
   });
   searchWrap.append(search);
   const favorites = actionButton({ t, action: 'filter-guide-favorites', iconName: 'heart', key: 'guide.favoritesOnly', fallback: 'Favorites only', className: 'button--ghost' });
-  filters.append(searchWrap, favorites);
+  const now = actionButton({ t, action: 'guide-now', iconName: 'crosshair', key: 'guide.jumpNow', fallback: 'Now', className: 'button--ghost' });
+  filters.append(searchWrap, favorites, now);
   const grid = element('div', 'guide-grid');
   view.append(header, status, filters, grid);
-  return { view, status, grid, refresh, search, favorites };
+  return { view, status, grid, refresh, search, favorites, now };
 }
 
 function renderGuideCards(container, channels, t) {
-  const fragment = document.createDocumentFragment();
-  normaliseArray(channels).forEach((channel) => {
+  const values = normaliseArray(channels);
+  if (!values.length) {
+    renderEmpty(container, t, 'guide.filteredEmpty', 'No covered channels found', 'Only channels matched to an installed TV Guide source appear here. Try another search or review Guide settings.');
+    return;
+  }
+  const now = Date.now();
+  const halfHour = 30 * 60 * 1000;
+  const windowStart = Math.floor((now - 15 * 60 * 1000) / halfHour) * halfHour;
+  const windowMs = 6 * 60 * 60 * 1000;
+  const timelineWidth = 1440;
+  const viewport = element('div', 'guide-timeline');
+  const canvas = element('div', 'guide-timeline__canvas');
+  canvas.style.setProperty('--guide-track-width', `${timelineWidth}px`);
+  const axis = element('div', 'guide-timeline__axis');
+  const corner = element('div', 'guide-timeline__corner');
+  corner.append(textNode('span', null, t, 'guide.channels', 'Channels'));
+  const ticks = element('div', 'guide-timeline__ticks');
+  for (let cursor = windowStart; cursor <= windowStart + windowMs; cursor += halfHour) {
+    const tick = element('time');
+    tick.textContent = formatProgrammeTime(cursor);
+    tick.style.left = `${((cursor - windowStart) / windowMs) * 100}%`;
+    ticks.append(tick);
+  }
+  axis.append(corner, ticks);
+  canvas.append(axis);
+  values.forEach((channel) => {
     const schedule = channelSchedule(channel);
-    const now = Date.now();
-    const card = element('article', 'guide-channel');
+    const card = element('article', 'guide-channel', { dataset: { channelId: safeId(channel?.channelId || channel?.id) } });
     const identity = element('button', 'guide-channel__identity', {
       type: 'button', dataset: { action: 'open-channel', channelId: safeId(channel?.channelId || channel?.id) },
     });
@@ -1090,35 +1267,113 @@ function renderGuideCards(container, channels, t) {
     copy.append(name, channelMeta(channel, 'guide-channel__meta'));
     identity.append(logo, copy, icon('play'));
     const timeline = element('div', 'guide-channel__timeline');
+    const nowLine = element('span', 'guide-channel__now', { 'aria-hidden': 'true' });
+    nowLine.style.left = `${Math.max(0, Math.min(100, ((now - windowStart) / windowMs) * 100))}%`;
+    timeline.append(nowLine);
     if (!schedule.length) {
       const empty = element('div', 'guide-channel__empty');
-      empty.append(
-        textNode('p', null, t, 'guide.noData', 'No current programme data for this channel.'),
-        actionButton({ t, action: 'add-channel-guide', iconName: 'plus', key: 'guide.addGuide', fallback: 'Add guide', className: 'button--ghost button--small', dataset: { channelId: safeId(channel?.channelId || channel?.id), country: safeIso2(channel?.countries?.[0] || channel?.countryCode) } }),
-      );
+      empty.append(textNode('p', null, t, 'guide.noWindowData', 'Guide matched · no programmes in this time window'));
       timeline.append(empty);
     } else {
-      schedule.slice(0, 6).forEach((programme) => {
+      schedule.filter((programme) => Number(programme.stop) > windowStart && Number(programme.start) < windowStart + windowMs).forEach((programme) => {
         const isNow = Number(programme.start) <= now && Number(programme.stop) > now;
-        const item = element('article', `programme-card${isNow ? ' is-now' : ''}`);
+        const start = Math.max(windowStart, Number(programme.start));
+        const stop = Math.min(windowStart + windowMs, Number(programme.stop));
+        const item = element('button', `programme-card${isNow ? ' is-now' : ''}`, {
+          type: 'button', dataset: { action: 'open-channel-guide', channelId: safeId(channel?.channelId || channel?.id) },
+        });
+        item.style.left = `${((start - windowStart) / windowMs) * 100}%`;
+        item.style.width = `${Math.max(2.2, ((stop - start) / windowMs) * 100)}%`;
         const times = element('time', 'programme-card__time mono');
         times.textContent = `${formatProgrammeTime(programme.start)}–${formatProgrammeTime(programme.stop)}`;
         const title = element('strong');
         title.textContent = safeText(programme.title);
         item.append(times, title);
         if (isNow) item.append(textNode('span', 'programme-card__badge', t, 'guide.nowPlaying', 'Now playing'));
-        if (programme.description) {
-          const description = element('p');
-          description.textContent = programme.description;
-          item.append(description);
-        }
         timeline.append(item);
       });
     }
     card.append(identity, timeline);
-    fragment.append(card);
+    canvas.append(card);
   });
-  container.replaceChildren(fragment);
+  viewport.append(canvas);
+  container.replaceChildren(viewport);
+}
+
+function renderGuideSourceManager(refs, state, t) {
+  const groups = normaliseArray(state.guideSourceGroups);
+  const countries = normaliseArray(state.guideCatalogCountries).slice(0, 10);
+  refs.catalogSearch.value = safeText(state.guideCatalogQuery);
+  refs.catalogResults.replaceChildren();
+  if (state.guideCatalogLoading) {
+    refs.catalogResults.append(textNode('p', 'guide-catalog__message', t, 'guide.catalogLoading', 'Loading the country catalog from GitHub…'));
+  } else if (state.guideCatalogError) {
+    const error = element('p', 'guide-catalog__message is-error');
+    error.textContent = safeText(state.guideCatalogError);
+    refs.catalogResults.append(error);
+  } else if (state.guideCatalogQuery && !countries.length) {
+    refs.catalogResults.append(textNode('p', 'guide-catalog__message', t, 'guide.catalogEmpty', 'No guide country matches this search.'));
+  } else {
+    countries.forEach((country) => {
+      const row = element('button', 'guide-catalog__country', {
+        type: 'button', dataset: { action: 'add-guide-country', countryId: safeId(country.id) },
+      });
+      const copy = element('span');
+      const name = element('strong');
+      name.textContent = safeText(country.name);
+      copy.append(name, textNode('small', null, t, 'guide.catalogCountryHint', 'Add the available XMLTV feeds'));
+      row.append(icon('plus-circle'), copy, icon('caret-right'));
+      refs.catalogResults.append(row);
+    });
+  }
+
+  refs.installed.replaceChildren();
+  if (!groups.length) {
+    refs.installed.append(textNode('p', 'guide-sources-empty', t, 'guide.noInstalledSources', 'No TV Guide country installed yet. Search on the left or add a manual XMLTV URL.'));
+    return;
+  }
+  groups.forEach((group) => {
+    const matches = group.sources.reduce((sum, source) => sum + (Number(source.matchedChannels) || 0), 0);
+    const card = element('article', 'guide-country-source');
+    const header = element('header', 'guide-country-source__header');
+    const title = element('div');
+    const name = element('h3');
+    name.textContent = safeText(group.name);
+    const summary = element('p');
+    summary.textContent = `${group.sources.length} feed${group.sources.length === 1 ? '' : 's'} · ${matches} channel matches`;
+    title.append(name, summary);
+    header.append(title, iconButton({
+      t, action: 'remove-guide-country', iconName: 'trash', key: 'guide.removeCountry', fallback: `Remove ${group.name}`,
+      className: 'guide-country-source__remove', dataset: { countryId: safeId(group.id) },
+    }));
+    const list = element('div', 'guide-country-source__list');
+    group.sources.forEach((source) => {
+      const zeroMatches = Boolean(source.fetchedAt) && (Number(source.matchedChannels) || 0) === 0;
+      const row = element('div', 'guide-source-file', { dataset: { state: source.state === 'error' ? 'error' : zeroMatches ? 'unmatched' : source.state || 'idle' } });
+      const stateIcon = icon(source.state === 'error' || zeroMatches ? 'warning-circle' : source.state === 'cached' ? 'cloud-slash' : 'check-circle');
+      const copy = element('div');
+      const file = element('strong');
+      file.textContent = safeText(source.file || source.url);
+      const meta = element('span');
+      if (source.fetchedAt) {
+        const checked = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(source.fetchedAt));
+        const dataThrough = source.latestProgrammeAt
+          ? ` · data through ${new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(source.latestProgrammeAt))}`
+          : '';
+        meta.textContent = source.state === 'error'
+          ? `Refresh failed · cached copy from ${checked}`
+          : `Downloaded ${checked} · ${Number(source.matchedChannels) || 0} matches · ${Number(source.programmeCount) || 0} programmes${dataThrough}`;
+      } else meta.textContent = 'Never downloaded';
+      copy.append(file, meta);
+      row.append(stateIcon, copy, iconButton({
+        t, action: 'remove-guide-source', iconName: 'x', key: 'guide.removeSource', fallback: `Remove ${source.file || 'source'}`,
+        className: 'guide-source-file__remove', dataset: { url: safeText(source.url) },
+      }));
+      list.append(row);
+    });
+    card.append(header, list);
+    refs.installed.append(card);
+  });
 }
 
 function createSourcesView(t) {
@@ -1236,6 +1491,24 @@ function createSourcesView(t) {
   );
   provider.append(providerIcon, providerCopy, providerActions);
 
+  const sourceManager = element('div', 'guide-source-manager');
+  const catalogPane = element('section', 'guide-catalog');
+  catalogPane.append(textNode('h3', null, t, 'guide.findCountry', 'Add another country'));
+  const catalogSearchWrap = element('label', 'field field--icon guide-catalog__search');
+  catalogSearchWrap.append(icon('magnifying-glass'));
+  const catalogSearch = element('input', null, {
+    type: 'search', placeholder: translate(t, 'guide.countrySearchPlaceholder', 'Search the GitHub country catalog…'),
+    'aria-label': translate(t, 'guide.countrySearchAria', 'Search TV Guide countries'), dataset: { action: 'filter-guide-catalog' },
+  });
+  catalogSearchWrap.append(catalogSearch);
+  const catalogResults = element('div', 'guide-catalog__results');
+  catalogPane.append(catalogSearchWrap, catalogResults);
+  const installedPane = element('section', 'guide-installed');
+  installedPane.append(textNode('h3', null, t, 'guide.installedGuides', 'Installed guides'));
+  const installed = element('div', 'guide-installed__list');
+  installedPane.append(installed);
+  sourceManager.append(catalogPane, installedPane);
+
   const guideForm = element('form', 'guide-settings__form', { dataset: { action: 'save-guide-sources' } });
   const sourceLabel = element('label', 'field-stack guide-settings__sources');
   sourceLabel.append(textNode('span', null, t, 'guide.sourceLabel', 'XMLTV source URLs'));
@@ -1245,6 +1518,8 @@ function createSourcesView(t) {
     'aria-label': translate(t, 'guide.sourceAriaLabel', 'XMLTV guide URLs'),
   });
   sourceLabel.append(guideInput);
+  const advanced = element('details', 'guide-settings__advanced');
+  advanced.append(textNode('summary', null, t, 'guide.advancedSources', 'Advanced · add or edit XMLTV URLs manually'), sourceLabel);
   const cadenceLabel = element('label', 'field-stack guide-settings__cadence');
   cadenceLabel.append(textNode('span', null, t, 'guide.refreshCadence', 'Automatic refresh'));
   const cadence = element('select', 'select', { name: 'guideRefreshMinutes' });
@@ -1266,8 +1541,8 @@ function createSourcesView(t) {
       t, action: 'save-guide-sources', iconName: 'floppy-disk', key: 'common.save', fallback: 'Save guide settings', className: 'button--primary', type: 'submit',
     }),
   );
-  guideForm.append(sourceLabel, cadenceLabel, consent, formFooter);
-  guideSettings.append(guideHeader, provider, guideForm);
+  guideForm.append(advanced, cadenceLabel, consent, formFooter);
+  guideSettings.append(guideHeader, provider, sourceManager, guideForm);
 
   const layout = element('div', 'sources-layout');
   const sourcePanel = element('section', 'panel sources-panel');
@@ -1358,6 +1633,9 @@ function createSourcesView(t) {
     guideCadence: cadence,
     guideCheckbox: checkbox,
     guideStatus,
+    guideCatalogSearch: catalogSearch,
+    guideCatalogResults: catalogResults,
+    guideInstalled: installed,
     syncStatus,
     syncIcon,
     syncTitle,
@@ -1546,7 +1824,6 @@ function createPlayer(t) {
   );
   const right = element('div', 'player-toolbar__group');
   right.append(
-    actionButton({ t, action: 'toggle-player-fit', iconName: 'arrows-out', key: 'player.fit', fallback: 'Fit', className: 'button--ghost' }),
     actionButton({ t, action: 'toggle-fullscreen', iconName: 'corners-out', key: 'player.fullscreen', fallback: 'Full screen', className: 'button--ghost' }),
   );
   toolbar.append(left, right);
@@ -1672,9 +1949,76 @@ function createPlayer(t) {
     volumeMute,
     volumeValue,
     audioStatus,
+    transport,
+    programmeStrip,
     programmeList,
     localTime: localTime.querySelector('strong'),
   };
+}
+
+function createProgrammeOverlay(t) {
+  const backdrop = element('div', 'programme-overlay-backdrop', { hidden: true });
+  const panel = element('aside', 'programme-overlay', {
+    role: 'dialog', 'aria-modal': 'true', 'aria-label': translate(t, 'guide.channelSchedule', 'Channel schedule'),
+  });
+  const header = element('header', 'programme-overlay__header');
+  const identity = element('div', 'programme-overlay__identity');
+  const logo = element('span', 'channel-logo programme-overlay__logo');
+  const copy = element('div');
+  const name = element('h2');
+  const meta = element('p');
+  copy.append(name, meta);
+  identity.append(logo, copy);
+  const close = iconButton({ t, action: 'close-channel-guide', iconName: 'x', key: 'common.close', fallback: 'Close programme guide' });
+  header.append(identity, close);
+  const now = element('section', 'programme-overlay__now');
+  const list = element('div', 'programme-overlay__list');
+  const watch = actionButton({ t, action: 'open-channel', iconName: 'play', key: 'channel.watch', fallback: 'Watch channel', className: 'button--primary programme-overlay__watch' });
+  panel.append(header, now, list, watch);
+  backdrop.append(panel);
+  return { backdrop, panel, logo, name, meta, now, list, watch, close };
+}
+
+function setProgrammeOverlay(refs, channel, t) {
+  const id = safeId(channel?.channelId || channel?.id);
+  refs.panel.dataset.channelId = id;
+  refs.watch.dataset.channelId = id;
+  renderLogo(refs.logo, channel, t);
+  refs.name.textContent = safeText(channel?.name, translate(t, 'channel.unknown', 'Unknown channel'));
+  refs.meta.textContent = [channel?.country, channel?.quality].map((value) => safeText(value)).filter(Boolean).join(' · ');
+  const schedule = channelSchedule(channel);
+  const currentTime = Date.now();
+  const current = schedule.find((programme) => Number(programme.start) <= currentTime && Number(programme.stop) > currentTime);
+  refs.now.replaceChildren();
+  if (current) {
+    const eyebrow = textNode('p', 'eyebrow', t, 'guide.onNow', 'On now');
+    const title = element('h3');
+    title.textContent = safeText(current.title);
+    const range = element('p', 'mono');
+    range.textContent = `${formatProgrammeTime(current.start)}–${formatProgrammeTime(current.stop)}`;
+    const progress = element('div', 'programme-overlay__progress');
+    const bar = element('span');
+    bar.style.width = `${Math.max(0, Math.min(100, ((currentTime - current.start) / (current.stop - current.start)) * 100))}%`;
+    progress.append(bar);
+    refs.now.append(eyebrow, title, range, progress);
+    if (current.description) {
+      const description = element('p');
+      description.textContent = current.description;
+      refs.now.append(description);
+    }
+  } else refs.now.append(textNode('p', null, t, 'guide.noWindowData', 'Guide matched · no programmes in this time window'));
+  refs.list.replaceChildren();
+  schedule.filter((programme) => Number(programme.stop) > currentTime).slice(0, 8).forEach((programme) => {
+    const row = element('article', 'programme-overlay__item');
+    const time = element('time', 'mono');
+    time.textContent = formatProgrammeTime(programme.start);
+    const title = element('strong');
+    title.textContent = safeText(programme.title);
+    const detail = element('span');
+    detail.textContent = safeText(programme.category || programme.subtitle);
+    row.append(time, title, detail);
+    refs.list.append(row);
+  });
 }
 
 function createMultiview(t) {
@@ -1716,8 +2060,28 @@ function createMultiview(t) {
     'aria-label': translate(t, 'multiview.presets', 'Multiview presets'), dataset: { action: 'load-multiview-preset' },
   });
   presets.append(element('option', null, { value: '', textContent: translate(t, 'multiview.presets', 'Presets') }));
+  const renamePreset = iconButton({
+    t,
+    action: 'rename-multiview-preset',
+    iconName: 'pencil-simple',
+    key: 'multiview.renamePreset',
+    fallback: 'Rename preset',
+    className: 'multiview-preset-action',
+  });
+  const deletePreset = iconButton({
+    t,
+    action: 'delete-multiview-preset',
+    iconName: 'trash',
+    key: 'multiview.deletePreset',
+    fallback: 'Delete preset',
+    className: 'multiview-preset-action multiview-preset-action--delete',
+  });
+  renamePreset.hidden = true;
+  deletePreset.hidden = true;
   toolbarActions.append(
     presets,
+    renamePreset,
+    deletePreset,
     actionButton({ t, action: 'save-multiview-preset', iconName: 'floppy-disk', key: 'multiview.savePreset', fallback: 'Save preset', className: 'button--ghost' }),
     actionButton({ t, action: 'add-multiview-channel', iconName: 'plus', key: 'multiview.addChannel', fallback: 'Add channel', className: 'button--ghost' }),
     actionButton({ t, action: 'toggle-fullscreen', iconName: 'corners-out', key: 'player.fullscreen', fallback: 'Full screen', className: 'button--ghost' }),
@@ -1842,7 +2206,7 @@ function createMultiview(t) {
     className: 'button--primary multiview-status__lab',
   }));
   overlay.append(toolbar, grid, footer);
-  return { overlay, toolbar, layout, grid, slots, presets, status: statusNodes };
+  return { overlay, toolbar, layout, grid, slots, presets, renamePreset, deletePreset, status: statusNodes };
 }
 
 function createChannelPicker(t) {
@@ -2044,15 +2408,15 @@ function createSignalBar(t) {
   const downLabel = textNode('span', 'signal-bar__telemetry-label', t, 'footer.download', 'Down');
   const downValue = element('strong', 'mono');
   downValue.textContent = '0.00 Mbps';
-  const upLabel = textNode('span', 'signal-bar__telemetry-label', t, 'footer.upload', 'Up');
-  const upValue = element('strong', 'mono');
-  upValue.textContent = 'N/A';
-  network.append(downLabel, downValue, upLabel, upValue);
+  const receivedLabel = textNode('span', 'signal-bar__telemetry-label', t, 'footer.received', 'Received');
+  const receivedValue = element('strong', 'mono');
+  receivedValue.textContent = '0 B';
+  network.append(downLabel, downValue, receivedLabel, receivedValue);
   const statusMeta = element('span', 'signal-bar__status-meta mono');
   statusMeta.textContent = 'Waiting';
   status.append(icon('waveform'), statusLabel, statusText, statusMeta, network);
   bar.append(region, clock, bars, status);
-  return { bar, clock, status, statusText, statusMeta, network, downValue, upValue };
+  return { bar, clock, status, statusText, statusMeta, network, downValue, receivedValue };
 }
 
 function renderCountryRows(container, countries, t, selectedIso2) {
@@ -2209,7 +2573,7 @@ function setFeatured(refs, channel, t) {
   refs.mute.title = refs.mute.getAttribute('aria-label');
 }
 
-function setCountryDetail(refs, country, t) {
+function setCountryDetail(refs, country, t, guideState = {}) {
   const value = country && typeof country === 'object' ? country : {};
   const iso2 = safeIso2(value.iso2 || value.code);
   const previousIso2 = refs.detail.dataset.iso2;
@@ -2240,6 +2604,29 @@ function setCountryDetail(refs, country, t) {
   refs.categories.hidden = !categoryValues.length;
   if (previousIso2 !== iso2) refs.categories.open = false;
   refs.importButton.hidden = !iso2 || Boolean(value.imported);
+  const sourceCount = Math.max(0, Number(guideState.sourceCount) || 0);
+  const configuredCount = Math.max(0, Number(guideState.configuredCount) || 0);
+  const loading = Boolean(guideState.loading);
+  const connected = sourceCount > 0 && configuredCount >= sourceCount;
+  const guideLabel = loading
+    ? translate(t, 'countries.loadingGuide', 'Loading guide…')
+    : connected
+      ? translate(t, 'countries.guideLoaded', 'Guide loaded')
+      : sourceCount
+        ? translate(t, 'countries.loadGuide', 'Load guide')
+        : translate(t, 'countries.guideUnavailable', 'Guide unavailable');
+  refs.guideButton.hidden = !iso2;
+  refs.guideButton.disabled = loading || connected || sourceCount === 0;
+  refs.guideButton.dataset.iso2 = iso2;
+  refs.guideButton.classList.toggle('is-active', connected);
+  refs.guideButton.setAttribute('aria-label', guideLabel);
+  refs.guideButton.querySelector('.button__label').textContent = guideLabel;
+  refs.guideStatus.hidden = !iso2;
+  refs.guideStatus.textContent = !sourceCount
+    ? translate(t, 'countries.guideUnavailableHint', 'No known XMLTV source is available for this country.')
+    : connected
+      ? translate(t, 'countries.guideLoadedHint', '{count} guide sources saved in Settings.', { count: sourceCount })
+      : translate(t, 'countries.guideAvailableHint', '{count} known XMLTV sources available. Loading saves them in Settings and contacts those third-party providers.', { count: sourceCount });
   renderCountryShape(refs.shape, iso2, { t });
 }
 
@@ -2302,8 +2689,11 @@ function setCountryChannels(refs, state, selected, selectedIso2, t) {
     );
   }
   const remaining = Math.max(0, filteredTotal - channels.length);
+  refs.channelLoadActions.hidden = remaining === 0;
   refs.channelLoadMore.hidden = remaining === 0;
+  refs.channelLoadAll.hidden = remaining === 0;
   setTranslatedText(refs.channelLoadMore.querySelector('.button__label'), t, 'library.loadMoreCount', 'Load more channels · {count} remaining', { count: remaining });
+  setTranslatedText(refs.channelLoadAll.querySelector('.button__label'), t, 'countries.loadAllChannelsCount', 'Load all channels · {count} remaining', { count: remaining });
 }
 
 function updateChannelMeta(container, channel) {
@@ -2587,6 +2977,7 @@ export function mountAppUI(root, options = {}) {
   const library = createLibraryView(t);
   const sources = createSourcesView(t);
   const player = createPlayer(t);
+  const programmeOverlay = createProgrammeOverlay(t);
   const multiview = createMultiview(t);
   const multiviewSignalLab = createMultiviewSignalLab(t);
   const channelPicker = createChannelPicker(t);
@@ -2598,7 +2989,7 @@ export function mountAppUI(root, options = {}) {
   main.append(home.view, explore.view, countries.view, guide.view, library.view, sources.view);
   shell.append(header.header, main, signalBar.bar);
   root.classList.add('catodo-app');
-  root.replaceChildren(shell, player.overlay, multiview.overlay, multiviewSignalLab.backdrop, channelPicker.backdrop, importDialog.backdrop);
+  root.replaceChildren(shell, player.overlay, multiview.overlay, programmeOverlay.backdrop, multiviewSignalLab.backdrop, channelPicker.backdrop, importDialog.backdrop);
 
   const toastRegion = element('div', 'toast-region', {
     'aria-live': 'polite',
@@ -2616,6 +3007,20 @@ export function mountAppUI(root, options = {}) {
   };
   let toastTimer = 0;
   let activeShellView = 'home';
+  let exploreLoadScheduled = false;
+  const loadMoreExploreNearEnd = () => {
+    if (exploreLoadScheduled) return;
+    const button = explore.collections.querySelector('[data-action="load-more-explore"]');
+    if (!button || button.disabled) return;
+    const remaining = explore.view.scrollHeight - explore.view.scrollTop - explore.view.clientHeight;
+    if (remaining > 520) return;
+    exploreLoadScheduled = true;
+    scheduleFrame(() => {
+      button.click();
+      exploreLoadScheduled = false;
+    });
+  };
+  explore.view.addEventListener('scroll', loadMoreExploreNearEnd, { passive: true });
 
   const activateShellView = (name) => {
     const viewName = VIEW_NAMES.includes(name) ? name : 'home';
@@ -2673,6 +3078,7 @@ export function mountAppUI(root, options = {}) {
       player: player.overlay,
       playerStage: player.stage,
       playerVideo: player.video,
+      programmeOverlay: programmeOverlay.backdrop,
       signalLab: player.signalLab.panel,
       signalChart: player.signalLab.canvas,
       multiview: multiview.overlay,
@@ -2680,6 +3086,8 @@ export function mountAppUI(root, options = {}) {
       multiviewSlots: multiview.slots,
       multiviewVideos: multiview.slots.map((slot) => slot.video),
       multiviewPresets: multiview.presets,
+      multiviewPresetRename: multiview.renamePreset,
+      multiviewPresetDelete: multiview.deletePreset,
       multiviewSignalLab: multiviewSignalLab.backdrop,
       channelPicker: channelPicker.backdrop,
       channelPickerInput: channelPicker.input,
@@ -2711,7 +3119,7 @@ export function mountAppUI(root, options = {}) {
       if (state.network !== undefined) signalBar.network.dataset.state = safeText(state.network).toLowerCase();
       if (state.telemetry) {
         signalBar.downValue.textContent = safeText(state.telemetry.download, '0.00 Mbps');
-        signalBar.upValue.textContent = safeText(state.telemetry.upload, 'N/A');
+        signalBar.receivedValue.textContent = safeText(state.telemetry.received, '0 B');
         signalBar.statusText.textContent = safeText(state.telemetry.buffer, '—');
         signalBar.statusMeta.textContent = safeText(state.telemetry.detail, 'Waiting');
         signalBar.status.classList.toggle('is-error', Boolean(state.telemetry.issue));
@@ -2804,8 +3212,30 @@ export function mountAppUI(root, options = {}) {
       setTranslatedText(home.countryCount, t, 'home.countryCount', '{count} COUNTRIES', {
         count: safeText(state.countryCount ?? state.totalCountries ?? 0),
       });
-      renderChannelTiles(home.nearbyGrid, channels.filter((channel) => channel !== featured).slice(0, 9), t, { schedule: true });
-      if (favorites.length) renderChannelTiles(home.favoriteGrid, favorites, t);
+      const featuredId = safeId(featured.channelId || featured.id || featured.tvgId || featured.url);
+      const suggestions = channels.filter((channel) => safeId(channel?.channelId || channel?.id || channel?.tvgId || channel?.url) !== featuredId).slice(0, 9);
+      home.suggestionsRefresh.disabled = !suggestions.length;
+      renderChannelTiles(home.nearbyGrid, suggestions.map((channel) => ({ ...channel, active: false })), t, {
+        schedule: true,
+        action: 'tune-home-channel',
+        ariaLabelKey: 'channel.tuneDashboardAriaLabel',
+        ariaLabelFallback: 'Tune {name} in dashboard',
+      });
+      if (favorites.length) {
+        renderChannelTiles(
+          home.favoriteGrid,
+          favorites.map((channel) => ({
+            ...channel,
+            active: safeId(channel?.channelId || channel?.id || channel?.tvgId || channel?.url) === featuredId,
+          })),
+          t,
+          {
+            action: 'tune-home-channel',
+            ariaLabelKey: 'channel.tuneDashboardAriaLabel',
+            ariaLabelFallback: 'Tune {name} in dashboard',
+          },
+        );
+      }
       else renderEmpty(
         home.favoriteGrid,
         t,
@@ -2820,7 +3250,7 @@ export function mountAppUI(root, options = {}) {
     renderExplore(state = {}) {
       if (shouldActivateShellView(root.dataset.mode, state.activate)) activateShellView('explore');
       const collections = normaliseArray(state.collections);
-      const featuredCollection = collections.find((collection) => normaliseArray(collection.channels).some((channel) =>
+      const featuredCollection = state.featuredCollection || collections.find((collection) => normaliseArray(collection.channels).some((channel) =>
         safeId(channel?.channelId || channel?.id) === safeId(state.featured?.channelId || state.featured?.id))) || collections[0];
       const placeholder = state.restoring
         ? { name: translate(t, 'home.restoringTitle', 'Restoring shared channels'), autoplay: false, clearSource: true }
@@ -2860,8 +3290,10 @@ export function mountAppUI(root, options = {}) {
       guide.favorites.setAttribute('aria-pressed', state.favoritesOnly ? 'true' : 'false');
       if (state.loading) setTranslatedText(guide.status, t, 'guide.loading', 'Loading live schedules…');
       else if (state.error) guide.status.textContent = safeText(state.error);
-      else if (state.configured && !channels.some((channel) => channelSchedule(channel).length)) {
-        setTranslatedText(guide.status, t, 'guide.empty', 'No matching programme data was returned. Check the guide URL and channel tvg-id values.');
+      else if (state.configured && Number(state.covered) > 0 && !channels.some((channel) => channelSchedule(channel).length)) {
+        guide.status.textContent = translate(t, 'guide.matchedNoCurrent', '{covered} channels matched · no current programmes were found in this time window', { covered: state.covered });
+      } else if (state.configured && Number(state.covered) === 0) {
+        setTranslatedText(guide.status, t, 'guide.empty', 'Sources downloaded, but no channels matched. Review source diagnostics in Settings.');
       } else if (state.configured) {
         guide.status.textContent = translate(t, 'guide.coverage', 'Guide coverage: {covered}/{total} channels · times shown in your timezone', { covered: state.covered ?? 0, total: state.total ?? channels.length });
       } else setTranslatedText(guide.status, t, 'guide.unconfigured', 'Connect an XMLTV source in Settings to add live programme data.');
@@ -2882,7 +3314,11 @@ export function mountAppUI(root, options = {}) {
         markers: state.markers,
         counts: state.countryCounts,
       });
-      setCountryDetail(countries, selected, t);
+      setCountryDetail(countries, selected, t, {
+        sourceCount: state.countryGuideSourceCount,
+        configuredCount: state.countryGuideConfiguredCount,
+        loading: state.countryGuideLoading,
+      });
       setCountryChannels(countries, state, selected, selectedIso2, t);
       renderCountryRows(countries.tableBody, values, t, selectedIso2);
       if (state.query !== undefined) countries.search.value = safeText(state.query);
@@ -2976,6 +3412,11 @@ export function mountAppUI(root, options = {}) {
     renderSources(state = {}) {
       if (shouldActivateShellView(root.dataset.mode, state.activate)) activateShellView('sources');
       renderSources(sources.list, state.sources || state.playlists, t);
+      renderGuideSourceManager({
+        catalogSearch: sources.guideCatalogSearch,
+        catalogResults: sources.guideCatalogResults,
+        installed: sources.guideInstalled,
+      }, state, t);
       const sync = state.installationSync || {};
       const hydrating = Math.max(0, Number(sync.hydrating) || 0);
       const hydrationFailed = Math.max(0, Number(sync.hydrationFailed) || 0);
@@ -3055,13 +3496,17 @@ export function mountAppUI(root, options = {}) {
           isFavorite ? 'Remove favorite' : 'Favorite',
         );
         player.programmeList.replaceChildren();
-        const programmes = channelSchedule(channel).slice(0, 4);
+        const programmes = channelSchedule(channel).slice(0, 8);
+        player.programmeStrip.hidden = !programmes.length;
+        player.transport.classList.toggle('has-guide', programmes.length > 0);
         if (!programmes.length) {
-          player.programmeList.append(textNode('p', 'player-programmes__empty', t, 'guide.noData', 'No current programme data for this channel.'));
+          player.programmeList.replaceChildren();
         } else {
           programmes.forEach((programme) => {
             const isNow = Number(programme.start) <= Date.now() && Number(programme.stop) > Date.now();
-            const item = element('article', `player-programme${isNow ? ' is-now' : ''}`);
+            const item = element('button', `player-programme${isNow ? ' is-now' : ''}`, {
+              type: 'button', dataset: { action: 'open-channel-guide', channelId: id },
+            });
             const time = element('time', 'mono');
             time.textContent = formatProgrammeTime(programme.start);
             const title = element('strong');
@@ -3321,8 +3766,26 @@ export function mountAppUI(root, options = {}) {
       return api;
     },
 
+    showProgrammeOverlay(channel) {
+      if (!channel) return api;
+      setProgrammeOverlay(programmeOverlay, channel, t);
+      programmeOverlay.backdrop.hidden = false;
+      programmeOverlay.close.focus();
+      return api;
+    },
+
+    hideProgrammeOverlay() {
+      programmeOverlay.backdrop.hidden = true;
+      return api;
+    },
+
+    playFavoriteEffect(anchor, mode = 'add') {
+      return playFavoriteEffect(root, anchor, mode === 'remove' ? 'remove' : 'add');
+    },
+
     destroy() {
       window.clearTimeout(toastTimer);
+      explore.view.removeEventListener('scroll', loadMoreExploreNearEnd);
       dispatcher.destroy();
       root.replaceChildren();
       root.classList.remove('catodo-app');

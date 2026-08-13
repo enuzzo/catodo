@@ -11,10 +11,16 @@ export const EPG_PRESETS = Object.freeze([
     cadence: "Daily at 03:00 UTC",
     license: "GPL-3.0",
     sourceUrl: "https://github.com/globetvapp/epg",
+    countryCodes: Object.freeze(["IT"]),
     urls: GLOBETV_ITALY_URLS,
   }),
 ]);
 
 export function epgPreset(id) {
   return EPG_PRESETS.find((preset) => preset.id === String(id || "")) || null;
+}
+
+export function epgPresetsForCountry(iso2) {
+  const code = String(iso2 || "").trim().toUpperCase();
+  return EPG_PRESETS.filter((preset) => preset.countryCodes?.includes(code));
 }

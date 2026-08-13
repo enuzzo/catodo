@@ -153,8 +153,17 @@ if ($authed) {
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#F2F1EA">
+<meta name="application-name" content="CATODO">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CATODO">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>CATODO</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><rect width='4' height='28' x='0' fill='%23BFBFBF'/><rect width='4' height='28' x='4' fill='%23BFBF00'/><rect width='4' height='28' x='8' fill='%2300BFBF'/><rect width='4' height='28' x='12' fill='%2300BF00'/><rect width='4' height='28' x='16' fill='%23BF00BF'/><rect width='4' height='28' x='20' fill='%23BF0000'/><rect width='4' height='28' x='24' fill='%230000BF'/></svg>">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="./icons/catodo-tv-32.png">
+<link rel="apple-touch-icon" sizes="152x152" href="./icons/apple-touch-icon-152.png">
+<link rel="apple-touch-icon" sizes="167x167" href="./icons/apple-touch-icon-167.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-180.png">
 <style>
 :root{
   --ebu-white:#BFBFBF; --ebu-yellow:#BFBF00; --ebu-cyan:#00BFBF; --ebu-green:#00BF00;
