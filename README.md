@@ -1,6 +1,23 @@
-# CATODO 2.1.1
+# CATODO 2.2.0
 
-CATODO is an open-source, Tesla-first web player for discovering and watching public live television sources. It is licensed under [AGPL-3.0-or-later](LICENSE).
+<img src="public/icons/catodo-netmilk-tv-transparent-512.png" alt="CATODO horned CRT" width="150" align="right">
+
+[![Worldwide signal](https://img.shields.io/badge/Signal-worldwide-0866FF?style=for-the-badge)](#experience)
+[![Tesla first](https://img.shields.io/badge/Tesla-first-111111?style=for-the-badge&logo=tesla&logoColor=white)](#local-setup)
+[![HLS player](https://img.shields.io/badge/HLS-live_player-F72C5B?style=for-the-badge)](#experience)
+[![Zero illegal](https://img.shields.io/badge/ZERO_ILLEGAL-zero_pezzotto-00A86B?style=for-the-badge)](#zero-illegal-zero-pezzotto)
+[![AGPL 3.0](https://img.shields.io/badge/License-AGPL--3.0-6B21A8?style=for-the-badge)](LICENSE)
+
+**Public world television with a big-screen attitude.** CATODO is an open-source, Tesla-first web player for discovering user-approved live TV sources, crossing countries in a tap, loading XMLTV guides only when they are useful, and putting up to four signals on screen when one is clearly not enough.
+
+*Why “CATODO”?* Because the cathode-ray tube was television before television became a row of anonymous black rectangles. CATODO keeps the zap, the colour bars, the oversized controls and a slightly unreasonable love for broadcast graphics — then gives the whole thing HLS, Multiview and a world map.
+
+> [!IMPORTANT]
+> **ZERO ILLEGAL. Zero pezzotto.** CATODO ships no channels, media, playlist snapshots, pirate subscriptions, credentials or DRM tricks. It is a player and discovery interface for external public directories and sources explicitly approved by the user. No decoderino sotto la TV, no guy on Telegram, no “trust me bro” annual renewal.
+
+[Open the official installation](https://catodo.netmilk.dev/) · [Read the changelog](CHANGELOG.md) · [See the roadmap](docs/ROADMAP.md)
+
+CATODO is licensed under [AGPL-3.0-or-later](LICENSE).
 
 It is a vanilla ES-module application with no framework. Pinned runtime assets are vendored, so a CDN is not required to boot; Vite is used for the verified production bundle.
 
@@ -22,9 +39,9 @@ the version source of truth; maintainers prepare releases with
 - **Analog boot:** EBU colour bars descend, split around the Catodo ident, then open onto the live dashboard; reduced-motion users get a short static reveal.
 - **Home Screen web app:** iPhone, iPad and compatible desktop/mobile browsers receive a standalone manifest plus purpose-built CATODO artwork: a full-canvas vintage CRT carrying EBU colour bars and Netmilk's unmistakable cow horns. Apple-specific 152, 167 and 180 px touch icons complement 192, 512 and 1024 px manifest assets.
 
-## Content boundary
+## ZERO ILLEGAL. Zero pezzotto.
 
-CATODO ships software and a directory of external source links. It does **not** include playlist snapshots, stream media, video, permanent logo packs, or EPG data. The iptv-org catalog is fetched only after the user has confirmed the provider and disclaimer; no playlist is imported before that consent.
+This boundary is not decorative legal confetti. CATODO ships software and a directory of external source links. It does **not** include playlist snapshots, stream media, video, permanent logo packs, pirate credentials, access-control bypasses, or EPG data. The iptv-org catalog is fetched only after the user has confirmed the provider and disclaimer; no playlist is imported before that consent.
 
 The Settings page promotes **World — all countries**, the official complete worldwide directory, as the broadest one-step default. The Add Playlist dialog also includes country/language/category groupings, major regions, news, sports, movies and music. These are canonical external links, not bundled playlist copies. Selecting a preset only fills the consent dialog; CATODO contacts the source after explicit confirmation.
 
@@ -34,7 +51,7 @@ CATODO uses the official iptv-org JSON directory as optional metadata: channels,
 
 The Italy preset uses the eight current plain-XML feeds published by [Open EPG](https://www.open-epg.com/app/epgguide.php). CATODO automatically replaces the expired 2025 GlobeTV Italy mirror URLs in existing installations; an allowlisted same-origin cache bridges the provider's browser CORS policy without becoming a general-purpose proxy. The broader country picker still reads [GlobeTV's country-organised XMLTV repository](https://github.com/globetvapp/epg) and reports stale programme windows explicitly instead of treating a syntactically valid download as current coverage. Settings caches that country directory for 24 hours and fetches a selected country's plain `.xml` file list only after user consent. `.xml.gz` files remain excluded because the browser parser does not decompress them. CATODO deliberately does not ship or automatically contact a universal mega-feed: those archives can be hundreds of megabytes and are not appropriate for a browser/Tesla client. The [iptv-org EPG project](https://github.com/iptv-org/epg) supplies grabber tooling and channel mappings, not a hosted universal programme database; run its tools yourself if you need a controlled custom feed.
 
-Users are responsible for ensuring they may access a source in their jurisdiction. See [CONTENT_POLICY.md](CONTENT_POLICY.md), [TAKEDOWN.md](TAKEDOWN.md), and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Publicly listed does not automatically mean universally licensed in every jurisdiction. Users remain responsible for ensuring they may access a source where they are. CATODO does not bypass DRM, subscriptions, authentication, geoblocking or provider controls. See [CONTENT_POLICY.md](CONTENT_POLICY.md), [TAKEDOWN.md](TAKEDOWN.md), and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Data and privacy
 

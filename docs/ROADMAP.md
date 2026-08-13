@@ -17,7 +17,9 @@ or real-device validation. It is intentionally concrete and ordered by value.
 - Explore All shows eight items per collection with independent randomization.
   Dedicated categories expose progressively loaded full grids and sorting.
 - Countries supports Load more, Load all and known-country guide connection.
-  Country cards reserve enough width and height for long titles and metadata.
+  Country cards reserve enough width and height for long titles and metadata;
+  guide sources are discovered dynamically from GlobeTV instead of requiring a
+  hand-written country allowlist.
 - Multiview saved presets expose Rename and Delete actions.
 - TV Guide sources can be searched and installed by country, grouped and
   removed by country/source, and report download time, programme counts and
@@ -29,6 +31,10 @@ or real-device validation. It is intentionally concrete and ordered by value.
 - The production package includes a standalone web-app manifest and original
   full-canvas vintage-TV/EBU artwork with Netmilk cow horns for iPhone, iPad and
   other installable browsers.
+- Website branding and the animated splash use a true-alpha naked CRT mark with
+  silhouette-aware depth, while installable iOS/PWA icons keep their backing.
+- Fullscreen playback fetches only the tuned channel's mapped guide on demand,
+  with request deduplication and configured-source fallback.
 
 ## Next work
 

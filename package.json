@@ -1,7 +1,21 @@
 {
   "name": "catodo",
-  "version": "2.1.1",
-  "description": "A Tesla-first, open-source player for discovering public live television sources.",
+  "version": "2.2.0",
+  "description": "Tesla-first world TV explorer for user-approved public IPTV sources — zero bundled streams, zero DRM bypass, zero pezzotto.",
+  "keywords": [
+    "iptv",
+    "hls",
+    "tesla",
+    "web-player",
+    "internet-tv",
+    "xmltv",
+    "epg",
+    "multiview",
+    "pwa",
+    "vanilla-javascript",
+    "open-source",
+    "agpl"
+  ],
   "private": false,
   "license": "AGPL-3.0-or-later",
   "repository": {

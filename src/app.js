@@ -56,6 +56,8 @@ const state = {
   countryChannelLanguage: "",
   countryChannelLimit: UI_CHANNEL_LIMIT,
   countryGuideLoading: "",
+  countryGuideCatalogUrls: new Map(),
+  countryGuideAvailability: new Map(),
   featuredId: "",
   currentId: "",
   homeMuted: true,
@@ -91,6 +93,7 @@ const state = {
   guideCatalogCountries: [],
   guideCatalogLoading: false,
   guideCatalogError: "",
+  playerGuideLoadingId: "",
   multiviewPresets: [],
   selectedMultiviewPresetId: "",
   playerChromeVisible: false,
@@ -112,6 +115,7 @@ let metricTimer;
 let clockTimer;
 let epgTimer;
 let lastRememberedId = "";
+const countryGuideDiscoveryPromises = new Map();
 let directoryMaps = { byCode: new Map(), byName: new Map() };
 let playerChromeTimer = 0;
 let multiviewChromeTimer = 0;
@@ -457,11 +461,13 @@ function playerAudioStatus(metrics = mainPlayer?.getMetrics?.() || {}) {
 }
 
 function playerUiState(extra = {}) {
+  const currentId = state.currentId;
   return {
-    channel: decorateChannel(findChannel(state.currentId)),
+    channel: decorateChannel(findChannel(currentId)),
     muted: state.playerMuted,
     volume: state.playerVolume,
     audioStatus: playerAudioStatus(),
+    guideLoading: Boolean(currentId) && state.playerGuideLoadingId === currentId,
     ...extra,
   };
 }
@@ -657,6 +663,47 @@ function knownCountryGuideUrls(iso2, channels) {
   ])];
 }
 
+function countryGuideUrls(iso2, channels) {
+  const code = String(iso2 || "").toUpperCase();
+  return [...new Set([
+    ...knownCountryGuideUrls(code, channels),
+    ...(state.countryGuideCatalogUrls.get(code) || []),
+  ])];
+}
+
+async function discoverCountryGuideUrls(iso2, { force = false } = {}) {
+  const code = String(iso2 || "").toUpperCase();
+  if (!code || !guideCatalog) return [];
+  const channels = catalog.list({ country: code }).filter(isPlayableChannel);
+  const knownUrls = knownCountryGuideUrls(code, channels);
+  if (knownUrls.length) return countryGuideUrls(code, channels);
+  const availability = state.countryGuideAvailability.get(code);
+  if (!force && (availability === "ready" || availability === "unavailable")) return countryGuideUrls(code, channels);
+  if (countryGuideDiscoveryPromises.has(code)) return countryGuideDiscoveryPromises.get(code);
+
+  const country = countryModels().find((item) => item.code === code);
+  if (!country) return [];
+  state.countryGuideAvailability.set(code, "loading");
+  if (state.selectedCountry === code) renderCountries();
+  const discovery = (async () => {
+    try {
+      const files = await guideCatalog.countryFor(country, { force });
+      const urls = files.map((file) => file.url).filter(Boolean);
+      state.countryGuideCatalogUrls.set(code, urls);
+      state.countryGuideAvailability.set(code, urls.length ? "ready" : "unavailable");
+      return countryGuideUrls(code, channels);
+    } catch (error) {
+      state.countryGuideAvailability.set(code, "error");
+      throw error;
+    } finally {
+      countryGuideDiscoveryPromises.delete(code);
+      if (state.selectedCountry === code) renderCountries();
+    }
+  })();
+  countryGuideDiscoveryPromises.set(code, discovery);
+  return discovery;
+}
+
 function renderCountries() {
   let countries = countryModels();
   countries = filterCountriesByRegion(countries, state.countryRegion);
@@ -677,7 +724,8 @@ function renderCountries() {
     language: state.countryChannelLanguage || undefined,
   } : null;
   const selectedCountryChannels = selected ? catalog.list({ country: selected.code }).filter(isPlayableChannel) : [];
-  const countryGuideUrls = knownCountryGuideUrls(selected?.code, selectedCountryChannels);
+  const selectedCountryGuideUrls = countryGuideUrls(selected?.code, selectedCountryChannels);
+  const countryGuideAvailability = state.countryGuideAvailability.get(selected?.code);
   const configuredGuideUrls = new Set(state.epgSources);
   const matchingCountryChannels = selectedChannelFilters
     ? catalog.list(selectedChannelFilters).filter(isPlayableChannel)
@@ -703,9 +751,11 @@ function renderCountries() {
     countryChannelLanguage: state.countryChannelLanguage,
     countryChannelCategories: [...new Set(selectedCountryChannels.flatMap((channel) => channel.categories || []))].sort(),
     countryChannelLanguages: [...new Set(selectedCountryChannels.flatMap((channel) => channel.languages || []))].sort(),
-    countryGuideSourceCount: countryGuideUrls.length,
-    countryGuideConfiguredCount: countryGuideUrls.filter((url) => configuredGuideUrls.has(url)).length,
+    countryGuideSourceCount: selectedCountryGuideUrls.length,
+    countryGuideConfiguredCount: selectedCountryGuideUrls.filter((url) => configuredGuideUrls.has(url)).length,
     countryGuideLoading: state.countryGuideLoading === selected?.code,
+    countryGuideChecking: countryGuideAvailability === "loading",
+    countryGuideLookupError: countryGuideAvailability === "error",
   });
 }
 
@@ -893,13 +943,15 @@ async function openPlayer(channel, { returnMode = "shell" } = {}) {
   const openedChannelId = channelId(channel);
   const session = ++playerSession;
   state.currentId = openedChannelId;
+  state.playerGuideLoadingId = openedChannelId;
   state.playerChromeVisible = false;
   state.playerMuted = state.playerVolume === 0;
   ui.refs.playerVideo.volume = state.playerVolume / 100;
   const source = playbackSource(channel);
   const connection = beginPlayerConnection(source);
   ui.showPlayer(playerUiState({ loading: true, playing: false, chromeVisible: false, connection }));
-  void loadSchedules([channel]).then(() => {
+  void loadSchedules([channel], { preferMapped: true }).finally(() => {
+    if (state.playerGuideLoadingId === openedChannelId) state.playerGuideLoadingId = "";
     if (isActivePlayerSession(session, openedChannelId)) ui.updatePlayer(playerUiState());
   });
   await mainPlayer.tune(source, { muted: state.playerMuted }).catch((error) => {
@@ -921,7 +973,7 @@ function isPlayerSurfaceActive() {
     && ui?.refs?.root?.dataset?.mode === "player";
 }
 
-async function loadSchedules(channels, { force = false } = {}) {
+async function loadSchedules(channels, { force = false, preferMapped = false } = {}) {
   const values = (Array.isArray(channels) ? channels : []).filter(Boolean);
   if (!values.length || (!state.epgSources.length && !values.some((channel) => channel?.hasGuide || channel?.guides?.length || channel?.endpoints?.some((endpoint) => endpoint?.guides?.length)))) return;
   if (!force && values.every((channel) => state.schedules.has(channelId(channel)))) return;
@@ -929,7 +981,7 @@ async function loadSchedules(channels, { force = false } = {}) {
   state.guideError = "";
   renderGuide();
   try {
-    const schedules = await epg.schedules(values, { force });
+    const schedules = await epg.schedules(values, { force, preferMapped });
     schedules.forEach((value, key) => state.schedules.set(key, value));
     state.epgLastRefresh = epg.getLastRefresh();
   } catch (error) {
@@ -1062,6 +1114,7 @@ async function releaseMainPlayer() {
   }
   finishPlayerConnection();
   playerSession += 1;
+  state.playerGuideLoadingId = "";
   mainPlayer = createMainPlayer();
   return true;
 }
@@ -1591,6 +1644,7 @@ async function handleAction(action, detail) {
       state.countryChannelLanguage = "";
       state.countryChannelLimit = UI_CHANNEL_LIMIT;
       state.view = "countries";
+      void discoverCountryGuideUrls(state.selectedCountry).catch(() => {});
       renderCountries();
       void loadCountrySchedules();
       break;
@@ -1632,6 +1686,7 @@ async function handleAction(action, detail) {
     case "view-country-channels":
       state.selectedCountry = String(detail.dataset.iso2 || state.selectedCountry || "").toUpperCase();
       state.countryChannelLimit = UI_CHANNEL_LIMIT;
+      void discoverCountryGuideUrls(state.selectedCountry).catch(() => {});
       renderCountries();
       void loadCountrySchedules();
       break;
@@ -1661,19 +1716,19 @@ async function handleAction(action, detail) {
     case "load-country-guide": {
       const iso2 = String(detail.dataset.iso2 || state.selectedCountry || "").toUpperCase();
       const channels = iso2 ? catalog.list({ country: iso2 }).filter(isPlayableChannel) : [];
-      const guideUrls = knownCountryGuideUrls(iso2, channels);
-      if (!guideUrls.length) {
-        ui.toast("No known XMLTV source is available for this country.", { tone: "error" });
-        break;
-      }
-      const merged = [...new Set([...state.epgSources, ...guideUrls])];
-      if (merged.length === state.epgSources.length) {
-        ui.toast("This country guide is already connected in Settings.");
-        break;
-      }
       state.countryGuideLoading = iso2;
       renderCountries();
       try {
+        const guideUrls = await discoverCountryGuideUrls(iso2, { force: state.countryGuideAvailability.get(iso2) === "error" });
+        if (!guideUrls.length) {
+          ui.toast("GlobeTV does not currently publish an XMLTV source for this country.", { tone: "error" });
+          break;
+        }
+        const merged = [...new Set([...state.epgSources, ...guideUrls])];
+        if (merged.length === state.epgSources.length) {
+          ui.toast("This country guide is already connected in Settings.");
+          break;
+        }
         state.epgSources = await epg.setSources(merged);
         scheduleGuideRefresh();
         channels.forEach((channel) => state.schedules.delete(channelId(channel)));

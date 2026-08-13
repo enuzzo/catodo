@@ -1,7 +1,7 @@
 {
   "name": "CATODO — World television",
   "short_name": "CATODO",
-  "description": "Discover and watch public live television from around the world.",
+  "description": "Tesla-first world TV explorer for user-approved public IPTV sources. Zero bundled streams, zero DRM bypass, zero pezzotto.",
   "id": "/",
   "start_url": "/",
   "scope": "/",

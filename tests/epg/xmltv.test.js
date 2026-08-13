@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { guideChannelIdsFor, parseXmltv, parseXmltvDate, parseXmltvDocument, programmesForChannel } from "../../src/epg/xmltv.js";
 import { EpgService, guideUrlsForChannels } from "../../src/epg/service.js";
 import { epgPresetsForCountry, migrateKnownEpgSources, OPEN_EPG_ITALY_URLS } from "../../src/epg/presets.js";
-import { GlobeTvCatalog, globeTvCountryFromUrl, groupGuideSources } from "../../src/epg/catalog.js";
+import { GlobeTvCatalog, globeTvCatalogCountryFor, globeTvCountryFromUrl, groupGuideSources } from "../../src/epg/catalog.js";
 
 test("collects unique catalog-listed XMLTV URLs from country channel mappings", () => {
   const channels = [
@@ -100,6 +100,40 @@ test("channel-mapped guide sources take priority over generic Settings sources",
   ]);
 });
 
+test("on-demand player guide loads only the mapped source and deduplicates concurrent requests", async () => {
+  const settings = new Map();
+  const requests = [];
+  const catalog = {
+    getSetting: async (key, fallback) => settings.has(key) ? settings.get(key) : fallback,
+    setSetting: async (key, value) => { settings.set(key, value); return value; },
+  };
+  const service = await new EpgService({
+    catalog,
+    fetchImpl: async (url) => {
+      requests.push(url);
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      return new Response("<tv></tv>");
+    },
+  }).init();
+  await service.setSources(["https://guide.test/generic.xml"]);
+  const mapped = {
+    channelId: "mapped",
+    guides: [{ sources: [{ url: "https://guide.test/country.xml", format: "XML" }] }],
+  };
+
+  await Promise.all([
+    service.schedule(mapped, { preferMapped: true }),
+    service.schedule(mapped, { preferMapped: true }),
+  ]);
+  assert.deepEqual(requests, ["https://guide.test/country.xml"]);
+
+  await service.schedule({ channelId: "manual-only" }, { preferMapped: true });
+  assert.deepEqual(requests, [
+    "https://guide.test/country.xml",
+    "https://guide.test/generic.xml",
+  ]);
+});
+
 test("forced refresh revalidates once, preserves a 304 cache and persists cadence", async () => {
   const settings = new Map();
   const catalog = {
@@ -176,6 +210,35 @@ test("uses XMLTV channel display names to match provider-specific IDs", async ()
   assert.equal(service.getSourceStatuses()[0].matchedChannels, 1);
 });
 
+test("selects one coherent schedule when multiple guide feeds match the same channel", async () => {
+  const settings = new Map([["epg:sources", ["https://example.org/sparse.xml", "https://example.org/complete.xml"]]]);
+  const catalog = {
+    getSetting: async (key, fallback) => settings.has(key) ? settings.get(key) : fallback,
+    setSetting: async (key, value) => { settings.set(key, value); return value; },
+  };
+  const sparse = `<tv>
+    <channel id="20.it"><display-name>20 Mediaset</display-name></channel>
+    <programme start="20260812120000 +0200" stop="20260812235900 +0200" channel="20.it"><title>All-day placeholder</title></programme>
+  </tv>`;
+  const complete = `<tv>
+    <channel id="20.it"><display-name>20 Mediaset</display-name></channel>
+    <programme start="20260812140000 +0200" stop="20260812143000 +0200" channel="20.it"><title>News</title></programme>
+    <programme start="20260812143000 +0200" stop="20260812150000 +0200" channel="20.it"><title>Weather</title></programme>
+    <programme start="20260812150000 +0200" stop="20260812160000 +0200" channel="20.it"><title>Film</title></programme>
+  </tv>`;
+  const service = await new EpgService({
+    catalog,
+    fetchImpl: async (url) => new Response(url.endsWith("complete.xml") ? complete : sparse),
+  }).init();
+  const schedule = await service.schedule({ channelId: "20", tvgId: "20.it", name: "20 Mediaset" }, {
+    from: Date.UTC(2026, 7, 12, 12),
+    to: Date.UTC(2026, 7, 12, 14),
+  });
+
+  assert.deepEqual(schedule.programmes.map((programme) => programme.title), ["News", "Weather", "Film"]);
+  assert.equal(schedule.matched, true);
+});
+
 test("marks matched channels and sources as stale when programme data ended before the requested window", async () => {
   const xml = `<tv>
     <channel id="Canale 5.it"><display-name>Canale 5</display-name></channel>
@@ -240,4 +303,32 @@ test("GlobeTV catalog loads countries once and lazily requests plain XML files",
   assert.equal((await service.countries())[0].name, 'Italy');
   assert.deepEqual(await service.country('Italy'), [{ name: 'italy1.xml', url: 'https://raw.test/italy1.xml', size: 10 }]);
   assert.equal(requests.length, 2);
+});
+
+test("GlobeTV catalog resolves country models to their published feeds", async () => {
+  const settings = new Map();
+  const catalog = {
+    getSetting: async (key, fallback) => settings.has(key) ? settings.get(key) : fallback,
+    setSetting: async (key, value) => { settings.set(key, value); return value; },
+  };
+  const directory = [
+    { type: "dir", name: "France", url: "https://api.test/France", html_url: "https://github.test/France" },
+    { type: "dir", name: "Germany", url: "https://api.test/Germany", html_url: "https://github.test/Germany" },
+    { type: "dir", name: "Korea", url: "https://api.test/Korea", html_url: "https://github.test/Korea" },
+  ];
+  const service = new GlobeTvCatalog({ catalog, fetchImpl: async (url) => new Response(JSON.stringify(
+    url.endsWith("/France")
+      ? [{ type: "file", name: "france1.xml", size: 10, download_url: "https://raw.test/france1.xml" }]
+      : url.endsWith("/Germany")
+        ? [{ type: "file", name: "germany1.xml", size: 20, download_url: "https://raw.test/germany1.xml" }]
+        : directory,
+  )) });
+
+  assert.deepEqual(await service.countryFor({ code: "FR", name: "France" }), [
+    { name: "france1.xml", url: "https://raw.test/france1.xml", size: 10 },
+  ]);
+  assert.deepEqual(await service.countryFor({ code: "DE", name: "Germany" }), [
+    { name: "germany1.xml", url: "https://raw.test/germany1.xml", size: 20 },
+  ]);
+  assert.equal(globeTvCatalogCountryFor({ code: "KR", name: "South Korea" }, await service.countries()).id, "Korea");
 });

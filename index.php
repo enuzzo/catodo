@@ -171,13 +171,14 @@ $appVersion = readAppVersion();
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#F2F1EA">
 <meta name="application-name" content="CATODO">
+<meta name="description" content="Tesla-first world TV explorer for user-approved public IPTV sources. Zero bundled streams, zero DRM bypass, zero pezzotto.">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="CATODO">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>CATODO</title>
 <link rel="manifest" href="./manifest.webmanifest">
-<link rel="icon" type="image/png" sizes="32x32" href="./icons/catodo-netmilk-tv-32.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./icons/catodo-netmilk-tv-transparent-32.png">
 <link rel="apple-touch-icon" sizes="152x152" href="./icons/apple-touch-icon-netmilk-152.png">
 <link rel="apple-touch-icon" sizes="167x167" href="./icons/apple-touch-icon-netmilk-167.png">
 <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-netmilk-180.png">
@@ -189,7 +190,7 @@ $appVersion = readAppVersion();
   --glass:#F2F1EA; --cabinet:#FFFFFF; --line:#D8D5CA; --dim:#6E6D68; --ink:#0A0B0D;
   --mono: ui-monospace, "SF Mono", "Roboto Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "DejaVu Sans", Arial, sans-serif;
-  --tap:72px; --r:2px;
+  --tap:84px; --r:2px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
@@ -198,27 +199,42 @@ body{background:var(--glass);color:var(--ink);font-family:var(--sans);font-size:
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 input{font:inherit;color:inherit}
 input::placeholder{color:var(--dim)}
-#gate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:20px;max-width:360px}
+#gate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;width:min(92vw,460px);padding:24px}
 .login-brand{display:flex;flex-direction:column;align-items:center}
-.login-logo{width:132px;height:132px;border-radius:30px;box-shadow:0 0 0 1px rgba(10,11,13,.08),0 18px 42px rgba(10,11,13,.12);object-fit:cover;margin-bottom:18px}
-h1{font-size:38px;font-weight:760;line-height:1;letter-spacing:-.045em;text-align:center}
-.login-version{margin-top:9px;color:var(--dim);font-family:var(--mono);font-size:9px;font-weight:650;letter-spacing:.18em;text-align:center}
-.sub{font-size:10.5px;letter-spacing:.24em;color:var(--dim);margin-top:10px;text-align:center}
+.login-logo{width:210px;height:210px;object-fit:contain;margin-bottom:18px;
+  filter:drop-shadow(2px 5px 3px rgba(20,17,13,.24)) drop-shadow(0 13px 10px rgba(20,17,13,.18))}
+h1{font-size:60px;font-weight:780;line-height:.94;letter-spacing:-.05em;text-align:center}
+.login-version{margin-top:11px;color:var(--dim);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.18em;text-align:center}
+.sub{font-size:13px;font-weight:700;letter-spacing:.24em;color:var(--dim);margin-top:12px;text-align:center}
 .sub.bad{color:var(--c-red);letter-spacing:.1em;max-width:360px;line-height:1.6}
 form{display:flex;flex-direction:column;gap:12px;width:100%}
-input[type=text],input[type=password]{height:var(--tap);border:1px solid var(--line);border-radius:12px;
-  background:var(--cabinet);font-family:var(--mono);font-size:18px;padding:0 16px;width:100%}
+input[type=text],input[type=password]{height:var(--tap);border:2px solid var(--line);border-radius:16px;
+  background:var(--cabinet);font-family:var(--mono);font-size:22px;font-weight:600;padding:0 22px;width:100%}
 input[type=text]:focus,input[type=password]:focus{border-color:var(--c-amber)}
-button[type=submit]{height:var(--tap);border:1px solid #1457FF;border-radius:12px;background:#1457FF;color:#fff;
-  font-family:var(--mono);font-size:15px;letter-spacing:.1em;transition:background .07s,color .07s,border-color .07s}
+button[type=submit]{height:var(--tap);border:2px solid #1457FF;border-radius:16px;background:#1457FF;color:#fff;
+  font-family:var(--mono);font-size:18px;font-weight:700;letter-spacing:.1em;transition:background .07s,color .07s,border-color .07s}
 button[type=submit]:active{background:var(--c-amber);border-color:var(--c-amber);color:#000}
 #note{font-size:11px;color:var(--dim);max-width:340px;text-align:center;line-height:1.6}
+@media (max-width:520px){
+  :root{--tap:76px}
+  #gate{gap:22px;width:min(94vw,420px);padding:16px}
+  .login-logo{width:170px;height:170px;margin-bottom:14px}
+  h1{font-size:50px}
+  input[type=text],input[type=password]{font-size:20px;padding-inline:19px}
+}
+@media (max-height:720px){
+  :root{--tap:70px}
+  #gate{gap:16px;padding-block:12px}
+  .login-logo{width:142px;height:142px;margin-bottom:10px}
+  h1{font-size:46px}
+  #note{display:none}
+}
 </style>
 </head>
 <body>
 <div id="gate">
   <div class="login-brand">
-    <img class="login-logo" src="./icons/catodo-netmilk-tv-192.png" alt="" aria-hidden="true">
+    <img class="login-logo" src="./icons/catodo-netmilk-tv-transparent-512.png" alt="" aria-hidden="true">
     <h1>Catodo</h1>
     <?php if ($appVersion !== ''): ?><div class="login-version">VERSION <?= htmlspecialchars($appVersion, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
     <div class="sub<?= $error !== '' ? ' bad' : '' ?>"><?= $error !== '' ? htmlspecialchars($error, ENT_QUOTES, 'UTF-8') : 'SIGN IN' ?></div>

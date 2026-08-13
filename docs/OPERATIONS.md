@@ -37,7 +37,8 @@ production data source. Use real imported channels for playback validation.
    ```
 
    Confirm that `dist/manifest.webmanifest` and the complete `dist/icons/`
-   family exist. All icon PNGs must be square and opaque.
+   family exist. Installable iOS/PWA icon PNGs must be square and opaque; the
+   website brand/favicons must remain true RGBA with transparent corners.
 
 4. Smoke-test the production bundle in a real Chromium browser:
    navigation, search, favourites, a single player, volume/mute, player chrome,

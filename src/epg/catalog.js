@@ -3,16 +3,65 @@ const CACHE_TTL = 24 * 60 * 60 * 1000;
 
 function countryLabel(value) {
   const known = {
+    Bosnia: "Bosnia and Herzegovina",
     Costarica: "Costa Rica",
+    Czech: "Czech Republic",
+    Dominican: "Dominican Republic",
+    Elsalvador: "El Salvador",
+    Hongkong: "Hong Kong",
+    Ivorycoast: "Côte d’Ivoire",
+    Korea: "South Korea",
+    Newcaledonia: "New Caledonia",
     Newzealand: "New Zealand",
+    Puertorico: "Puerto Rico",
     Saudiarabia: "Saudi Arabia",
     Southafrica: "South Africa",
     Southkorea: "South Korea",
+    Uae: "United Arab Emirates",
     Unitedarabemirates: "United Arab Emirates",
     Unitedkingdom: "United Kingdom",
     Usa: "United States",
   };
   return known[value] || String(value || "").replace(/([a-z])([A-Z])/g, "$1 $2");
+}
+
+const COUNTRY_IDS_BY_ISO = {
+  AE: "Uae",
+  BA: "Bosnia",
+  CI: "Ivorycoast",
+  CR: "Costarica",
+  CZ: "Czech",
+  DO: "Dominican",
+  GB: "Unitedkingdom",
+  HK: "Hongkong",
+  KR: "Korea",
+  MO: "Macau",
+  NC: "Newcaledonia",
+  NZ: "Newzealand",
+  PR: "Puertorico",
+  SA: "Saudiarabia",
+  SV: "Elsalvador",
+  US: "Usa",
+  ZA: "Southafrica",
+};
+
+function normalizedCountryName(value) {
+  return String(value || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/gi, "")
+    .toLocaleLowerCase("en-US");
+}
+
+export function globeTvCatalogCountryFor(country, countries = []) {
+  const iso2 = String(country?.code || country?.iso2 || "").trim().toUpperCase();
+  const preferredId = COUNTRY_IDS_BY_ISO[iso2];
+  if (preferredId) {
+    const preferred = countries.find((item) => String(item?.id || "").toLocaleLowerCase("en-US") === preferredId.toLocaleLowerCase("en-US"));
+    if (preferred) return preferred;
+  }
+  const names = new Set([country?.name, country?.localName, country?.nativeName].map(normalizedCountryName).filter(Boolean));
+  return countries.find((item) => names.has(normalizedCountryName(item?.name)) || names.has(normalizedCountryName(countryLabel(item?.id)))) || null;
 }
 
 export function globeTvCountryFromUrl(value) {
@@ -84,5 +133,10 @@ export class GlobeTvCatalog {
     return this.#read(`epg:globetv:country:v1:${id}`, `${ROOT_URL}/${encodeURIComponent(id)}`, (items) => (Array.isArray(items) ? items : [])
       .filter((item) => item?.type === "file" && /\.xml$/i.test(item.name) && item.download_url)
       .map((item) => ({ name: item.name, url: item.download_url, size: Number(item.size) || 0 })), options.force === true);
+  }
+
+  async countryFor(country, options = {}) {
+    const match = globeTvCatalogCountryFor(country, await this.countries(options));
+    return match ? this.country(match, options) : [];
   }
 }

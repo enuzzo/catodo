@@ -14,6 +14,30 @@ function latestProgrammeAt(programmes) {
   return (Array.isArray(programmes) ? programmes : []).reduce((latest, item) => Math.max(latest, Number(item?.stop) || 0), 0);
 }
 
+function programmeKey(programme) {
+  return [programme?.start, programme?.stop, programme?.title, programme?.subtitle].map((value) => String(value || "")).join("\u0000");
+}
+
+function uniqueProgrammes(programmes) {
+  const seen = new Set();
+  return (Array.isArray(programmes) ? programmes : []).filter((programme) => {
+    const key = programmeKey(programme);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).sort((a, b) => a.start - b.start || a.stop - b.stop);
+}
+
+function preferProgrammeCandidate(current, candidate) {
+  if (!current) return candidate;
+  if (candidate.direct !== current.direct) return candidate.direct ? candidate : current;
+  if (candidate.programmes.length !== current.programmes.length) {
+    return candidate.programmes.length > current.programmes.length ? candidate : current;
+  }
+  if (candidate.sourceIndex !== current.sourceIndex) return candidate.sourceIndex < current.sourceIndex ? candidate : current;
+  return candidate.idIndex < current.idIndex ? candidate : current;
+}
+
 function builtInProxyUrl(url) {
   try {
     const parsed = new URL(url);
@@ -209,7 +233,11 @@ export class EpgService {
     const from = Number(options.from ?? Date.now());
     const to = Number(options.to ?? from + WINDOW_MS);
     const values = Array.isArray(channels) ? channels : [];
-    const urls = unique([...values.flatMap(guideUrlsForChannel), ...this.#customSources]);
+    const mappedUrls = unique(values.flatMap(guideUrlsForChannel));
+    const urls = unique([
+      ...mappedUrls,
+      ...(options.preferMapped === true && mappedUrls.length ? [] : this.#customSources),
+    ]);
     if (!urls.length) return new Map(values.map((channel) => [String(channel?.channelId || channel?.id || ""), { programmes: [], status: "unconfigured", sources: [], matched: false }]));
     const settled = await Promise.allSettled(urls.map((url) => this.#load(url, { force: options.force === true })));
     const documents = settled.flatMap((result, index) => {
@@ -233,9 +261,11 @@ export class EpgService {
     const matchCounts = new Map(urls.map((url) => [url, 0]));
     const entries = values.map((channel) => {
       const directIds = guideIdsForChannel(channel);
+      const normalizedDirectIds = new Set(directIds.map((id) => String(id).toLocaleLowerCase("en-US")));
       let matched = false;
       const matchedDataStates = [];
-      const programmes = documents.flatMap((document) => {
+      let selectedProgrammeCandidate = null;
+      documents.forEach((document, sourceIndex) => {
         const ids = unique([...directIds, ...guideChannelIdsFor(channel, document.channels)]);
         const normalizedIds = [...new Set(ids.map((id) => String(id).toLocaleLowerCase("en-US")))];
         const sourceMatched = normalizedIds.some((id) => document.registryIds.has(id) || document.programmesByChannel.has(id));
@@ -244,11 +274,20 @@ export class EpgService {
           matchedDataStates.push(document.dataState);
           matchCounts.set(document.url, (matchCounts.get(document.url) || 0) + 1);
         }
-        return normalizedIds.flatMap((id) => document.programmesByChannel.get(id) || [])
-          .filter((item) => item.stop > from && item.start < to);
+        normalizedIds.forEach((id, idIndex) => {
+          const programmes = uniqueProgrammes((document.programmesByChannel.get(id) || [])
+            .filter((item) => item.stop > from && item.start < to));
+          if (!programmes.length) return;
+          selectedProgrammeCandidate = preferProgrammeCandidate(selectedProgrammeCandidate, {
+            direct: normalizedDirectIds.has(id),
+            idIndex,
+            programmes,
+            sourceIndex,
+          });
+        });
       });
       return [String(channel?.channelId || channel?.id || ""), {
-        programmes: programmes.sort((a, b) => a.start - b.start || a.stop - b.stop),
+        programmes: selectedProgrammeCandidate?.programmes || [],
         status: documents.length
           ? matched
             ? matchedDataStates.some((state) => state === "current") ? "ready" : "stale"

@@ -14,7 +14,7 @@ const FLAG_URLS = import.meta.glob('../../assets/vendor/flags/4x3/*.svg', {
 const TONES = ['white', 'red', 'green', 'yellow', 'cyan', 'magenta', 'blue'];
 const VIEW_NAMES = ['home', 'explore', 'countries', 'guide', 'library', 'sources'];
 const MULTIVIEW_SIZE = 4;
-const CATODO_LOGO_URL = './icons/catodo-netmilk-tv-192.png';
+const CATODO_LOGO_URL = './icons/catodo-netmilk-tv-transparent-512.png';
 const mountedApps = new WeakMap();
 
 function translate(t, key, fallback, vars = {}) {
@@ -2619,26 +2619,36 @@ function setCountryDetail(refs, country, t, guideState = {}) {
   const sourceCount = Math.max(0, Number(guideState.sourceCount) || 0);
   const configuredCount = Math.max(0, Number(guideState.configuredCount) || 0);
   const loading = Boolean(guideState.loading);
+  const checking = Boolean(guideState.checking);
+  const lookupError = Boolean(guideState.error);
   const connected = sourceCount > 0 && configuredCount >= sourceCount;
   const guideLabel = loading
     ? translate(t, 'countries.loadingGuide', 'Loading guide…')
-    : connected
-      ? translate(t, 'countries.guideLoaded', 'Guide loaded')
-      : sourceCount
-        ? translate(t, 'countries.loadGuide', 'Load guide')
-        : translate(t, 'countries.guideUnavailable', 'Guide unavailable');
+    : checking
+      ? translate(t, 'countries.checkingGuide', 'Checking guide…')
+      : connected
+        ? translate(t, 'countries.guideLoaded', 'Guide loaded')
+        : sourceCount
+          ? translate(t, 'countries.loadGuide', 'Load guide')
+          : lookupError
+            ? translate(t, 'countries.guideRetry', 'Retry guide check')
+            : translate(t, 'countries.guideUnavailable', 'Guide unavailable');
   refs.guideButton.hidden = !iso2;
-  refs.guideButton.disabled = loading || connected || sourceCount === 0;
+  refs.guideButton.disabled = loading || checking || connected || (sourceCount === 0 && !lookupError);
   refs.guideButton.dataset.iso2 = iso2;
   refs.guideButton.classList.toggle('is-active', connected);
   refs.guideButton.setAttribute('aria-label', guideLabel);
   refs.guideButton.querySelector('.button__label').textContent = guideLabel;
   refs.guideStatus.hidden = !iso2;
-  refs.guideStatus.textContent = !sourceCount
-    ? translate(t, 'countries.guideUnavailableHint', 'No known XMLTV source is available for this country.')
-    : connected
-      ? translate(t, 'countries.guideLoadedHint', '{count} guide sources saved in Settings.', { count: sourceCount })
-      : translate(t, 'countries.guideAvailableHint', '{count} known XMLTV sources available. Loading saves them in Settings and contacts those third-party providers.', { count: sourceCount });
+  refs.guideStatus.textContent = checking
+    ? translate(t, 'countries.guideCheckingHint', 'Checking the GlobeTV country catalog…')
+    : lookupError
+      ? translate(t, 'countries.guideLookupFailedHint', 'The GlobeTV catalog could not be checked. Retry when the connection is available.')
+      : !sourceCount
+        ? translate(t, 'countries.guideUnavailableHint', 'No known XMLTV source is available for this country.')
+        : connected
+          ? translate(t, 'countries.guideLoadedHint', '{count} guide sources saved in Settings.', { count: sourceCount })
+          : translate(t, 'countries.guideAvailableHint', '{count} known XMLTV sources available. Loading saves them in Settings and contacts those third-party providers.', { count: sourceCount });
   renderCountryShape(refs.shape, iso2, { t });
 }
 
@@ -3332,6 +3342,8 @@ export function mountAppUI(root, options = {}) {
         sourceCount: state.countryGuideSourceCount,
         configuredCount: state.countryGuideConfiguredCount,
         loading: state.countryGuideLoading,
+        checking: state.countryGuideChecking,
+        error: state.countryGuideLookupError,
       });
       setCountryChannels(countries, state, selected, selectedIso2, t);
       renderCountryRows(countries.tableBody, values, t, selectedIso2);
@@ -3511,10 +3523,16 @@ export function mountAppUI(root, options = {}) {
         );
         player.programmeList.replaceChildren();
         const programmes = channelSchedule(channel).slice(0, 8);
-        player.programmeStrip.hidden = !programmes.length;
-        player.transport.classList.toggle('has-guide', programmes.length > 0);
+        const guideLoading = Boolean(state.guideLoading);
+        const showGuide = guideLoading || programmes.length > 0;
+        player.programmeStrip.hidden = !showGuide;
+        player.transport.classList.toggle('has-guide', showGuide);
         if (!programmes.length) {
-          player.programmeList.replaceChildren();
+          if (guideLoading) {
+            const loading = textNode('p', 'player-programmes__empty', t, 'guide.loadingChannel', 'Loading this channel’s guide…');
+            loading.setAttribute('role', 'status');
+            player.programmeList.append(loading);
+          }
         } else {
           programmes.forEach((programme) => {
             const isNow = Number(programme.start) <= Date.now() && Number(programme.stop) > Date.now();

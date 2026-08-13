@@ -8,6 +8,7 @@
   <meta name="theme-color" content="#F2F1EA">
   <meta name="color-scheme" content="light">
   <meta name="application-name" content="CATODO">
+  <meta name="description" content="Tesla-first world TV explorer for user-approved public IPTV sources. Zero bundled streams, zero DRM bypass, zero pezzotto.">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="CATODO">
@@ -15,7 +16,7 @@
   <meta name="application-version" content="__CATODO_VERSION__">
   <title>CATODO — World television</title>
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" type="image/png" sizes="32x32" href="./icons/catodo-netmilk-tv-32.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/catodo-netmilk-tv-transparent-32.png">
   <link rel="apple-touch-icon" sizes="152x152" href="./icons/apple-touch-icon-netmilk-152.png">
   <link rel="apple-touch-icon" sizes="167x167" href="./icons/apple-touch-icon-netmilk-167.png">
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-netmilk-180.png">
@@ -31,7 +32,10 @@
       <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
     </div>
     <div class="boot-lockup" aria-hidden="true">
-      <strong>Catodo</strong>
+      <div class="boot-lockup__identity">
+        <img class="boot-lockup__logo" src="./icons/catodo-netmilk-tv-transparent-512.png" width="512" height="512" alt="" draggable="false">
+        <strong>Catodo</strong>
+      </div>
       <span>VERSION __CATODO_VERSION__</span>
     </div>
     <button id="boot-skip" type="button">Skip intro</button>

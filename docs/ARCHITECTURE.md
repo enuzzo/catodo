@@ -1,6 +1,6 @@
 # CATODO architecture
 
-This document is the maintainer map for CATODO 2.1.1. It describes the runtime
+This document is the maintainer map for CATODO 2.2.0. It describes the runtime
 boundaries, the data flow, and the invariants that should survive future UI and
 feature work. For operational procedures and failure symptoms, see
 [OPERATIONS.md](OPERATIONS.md).

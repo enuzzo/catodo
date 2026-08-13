@@ -1,69 +1,97 @@
-# Changelog
+# Changelog 📡
 
-All notable changes to CATODO are documented in this file.
+All notable changes to CATODO are documented here: new signals, sharper pixels,
+fewer ghosts in the machine.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
+`🐛` fixed things and `🔐` security work.
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-08-13
+
+*The next signal is tuning.*
+
+### ✨ Added
+
+- Full-screen playback now loads only the tuned channel's mapped TV Guide on demand — cached, deduplicated and without waking the whole XMLTV planet. Configured sources remain the fallback for unmapped channels.
+
+### 🛠 Changed
+
+- The website now wears the naked, transparent horned CRT mark — including the animated EBU splash — with soft RGBA depth behind its horns and beneath the cabinet. CATODO identity and login controls are bigger across phone, iPad and Tesla, while iOS Home Screen icons sensibly keep their backing.
+- README and project metadata now have the ScryBar-family swagger: chunky badges, a sharper short description, discoverability tags and an impossible-to-miss **ZERO ILLEGAL / zero pezzotto** boundary.
+
+### 🐛 Fixed
+
+- TV Guide now chooses one coherent schedule when multiple XMLTV feeds match, instead of stacking duplicate programmes like broadcast lasagna.
+- Country details now discover GlobeTV feeds dynamically. France, Germany and every mapped upstream country no longer need a hand-written permission slip.
+
 ## [2.1.1] - 2026-08-13
 
-### Changed
+*The guide learned to tell time and stopped pretending stale data was live.*
 
-- Home's Favorites “View all” action now opens Library with the Favorites filter already selected.
-- TV Guide times now use the local timezone with unambiguous 24-hour notation.
-- Channel metadata uses spaced dashes instead of compressed pipe separators.
+### 🛠 Changed
 
-### Fixed
+- Home's **Favorites → View all** now lands in Library with Favorites already selected. One tap means one tap.
+- TV Guide times now respect the local timezone and use unambiguous 24-hour notation.
+- Channel metadata traded compressed pipe separators for properly breathing dashes.
 
-- Replaced the expired Italian EPG mirror with current Open EPG feeds, including automatic migration, a development bridge and an authenticated production cache.
-- TV Guide now distinguishes stale matches from live schedule coverage and only lists channels with programme data in the current window.
-- Prevented the Guide filter row from stretching when “Favorites only” leaves a short result set.
+### 🐛 Fixed
+
+- Replaced the expired Italian EPG mirror with current Open EPG feeds, plus automatic migration, a narrow development bridge and an authenticated production cache.
+- TV Guide now tells stale matches from actual live coverage and lists only channels with programmes in the current window. A valid XML file is not automatically a time machine.
+- The Guide filter row no longer stretches into modern art when **Favorites only** returns a short list.
 
 ## [2.1.0] - 2026-08-13
 
-### Added
+*CATODO stopped being a player page and became a worldwide television cockpit.*
 
-- Netmilk TV logo on the login gate and application header.
-- Build-owned version metadata shared by the splash screen, frontend and PHP login.
-- Automated release and version-consistency checks.
-- Installable iPhone and iPad Home Screen package with a horned CRT icon.
-- Complete country directories, country guide setup and editorial Explore collections.
-- TV Guide, XMLTV source management and an immersive player guide surface.
-- Multiview layouts, channel picker and saved preset management.
-- Recently watched channels, stream telemetry and installation-wide source synchronization.
+### ✨ Added
 
-### Changed
+- Netmilk TV identity on the login gate and application header.
+- One build-owned version shared by splash screen, frontend and PHP login, because three disagreeing version numbers are how hauntings begin.
+- Automated release and version-consistency gates.
+- Installable iPhone and iPad Home Screen package with the horned CRT icon.
+- Complete country directories, country-guide setup and editorial Explore collections.
+- TV Guide, XMLTV source management and an immersive in-player guide.
+- Two-, three- and four-feed Multiview layouts, channel picker and named presets.
+- Recently watched channels, real stream telemetry and installation-wide source synchronization.
 
-- Rebuilt the application as a worldwide, Tesla-first television explorer.
-- Made Home preview-first so channel changes do not force fullscreen playback.
+### 🛠 Changed
+
+- Rebuilt the application as a worldwide, Tesla-first television explorer with controls that do not require tweezers.
+- Made Home preview-first, so channel changes no longer throw the viewer into fullscreen without asking.
 - Unified favourite language, states and feedback across the interface.
-- Refined player navigation, responsive channel cards and in-car touch targets.
-- Replaced the original app icon with the larger Netmilk horned television mark.
+- Refined player navigation, responsive channel cards and properly chunky in-car touch targets.
+- Replaced the original app icon with Netmilk's larger horned television mark.
 
-### Fixed
+### 🐛 Fixed
 
-- Preserved playback and fullscreen state during catalogue and UI refreshes.
-- Restored player audio and hardened weak-network playback.
-- Prevented stale icon caches after Home Screen icon updates.
+- Preserved playback and fullscreen state while catalogues and UI refresh underneath them.
+- Restored player audio and made weak-network playback less inclined to faint dramatically.
+- Prevented stale icon caches after Home Screen artwork updates.
 - Hardened shared-state recovery, catalogue hydration and player transitions.
-- Corrected compressed country-card typography and inconsistent channel metadata.
+- Gave country-card typography room to breathe and normalized channel metadata.
 
 ## [2.0.0] - 2026-08-11
 
-### Added
+*First carrier wave.*
 
-- Initial open-source CATODO web player with public M3U discovery and playback.
+### ✨ Added
+
+- Initial open-source CATODO web player with consented public M3U discovery and HLS playback.
 - PHP authentication gate, persistent lockout protection and signed login cookies.
-- English interface, channel logo resolution and production deployment tooling.
-- Tesla-oriented controls, weak-connection handling and security headers.
+- English interface, resilient channel-logo resolution and production deployment tooling.
+- Tesla-oriented controls, weak-connection handling and defensive security headers.
 
-### Security
+### 🔐 Security
 
-- Closed the unrestricted proxy and moved the entire application behind the server-side login boundary.
+- Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.1.1...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/enuzzo/catodo/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/enuzzo/catodo/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/enuzzo/catodo/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/enuzzo/catodo/releases/tag/v2.0.0
