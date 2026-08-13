@@ -98,6 +98,13 @@ function iconButton({ t, action, iconName, key, fallback, className = '', datase
   return button;
 }
 
+function setFavoriteGlyph(button, isFavorite) {
+  const glyph = button?.querySelector('i');
+  if (!glyph) return;
+  glyph.className = isFavorite ? 'favorite-glyph' : 'ph ph-heart';
+  glyph.textContent = isFavorite ? '\u2665' : '';
+}
+
 function normaliseArray(value) {
   return Array.isArray(value) ? value : [];
 }
@@ -325,9 +332,7 @@ function renderChannelTiles(container, channels, t, options = {}) {
         dataset: { channelId: id },
       });
       favorite.setAttribute('aria-pressed', isFavorite ? 'true' : 'false');
-      const glyph = favorite.querySelector('i');
-      glyph.className = 'channel-tile__favorite-glyph';
-      glyph.textContent = isFavorite ? '\u2665' : '\u2661';
+      setFavoriteGlyph(favorite, isFavorite);
       tile.append(favorite);
     }
     fragment.append(tile);
@@ -1533,7 +1538,7 @@ function createPlayer(t) {
   const left = element('div', 'player-toolbar__group');
   left.append(
     actionButton({ t, action: 'close-player', iconName: 'caret-left', key: 'common.back', fallback: 'Back', className: 'button--ghost' }),
-    actionButton({ t, action: 'toggle-favorite', iconName: 'heart', key: 'favorite.add', fallback: 'Favorite', className: 'button--ghost' }),
+    actionButton({ t, action: 'toggle-favorite', iconName: 'heart', key: 'favorite.add', fallback: 'Favorite', className: 'button--ghost player-toolbar__favorite' }),
     actionButton({ t, action: 'add-to-multiview', iconName: 'grid-four', key: 'multiview.add', fallback: 'Add to Multiview', className: 'button--ghost' }),
   );
   const right = element('div', 'player-toolbar__group');
@@ -2177,6 +2182,7 @@ function setFeatured(refs, channel, t) {
   refs.favorite.setAttribute('aria-label', translate(t, isFavorite ? 'favorite.remove' : 'favorite.add', isFavorite ? 'Remove from favorites' : 'Add to favorites'));
   refs.favorite.title = refs.favorite.getAttribute('aria-label');
   refs.favorite.replaceChildren(icon('heart'));
+  setFavoriteGlyph(refs.favorite, isFavorite);
   refs.description.textContent = safeText(
     value.description || value.tagline,
     translate(t, 'home.liveDescriptionFallback', 'Live television from around the world'),
@@ -3028,12 +3034,15 @@ export function mountAppUI(root, options = {}) {
         player.number.textContent = channelNumber(channel, Number(channel.position || 0));
         player.name.textContent = safeText(channel.name, translate(t, 'channel.unknown', 'Unknown channel'));
         updateChannelMeta(player.meta, channel);
-        player.favoriteButton.classList.toggle('is-active', Boolean(channel.favorite || channel.isFavorite));
+        const isFavorite = Boolean(channel.favorite || channel.isFavorite);
+        player.favoriteButton.classList.toggle('is-active', isFavorite);
+        player.favoriteButton.setAttribute('aria-pressed', isFavorite ? 'true' : 'false');
+        setFavoriteGlyph(player.favoriteButton, isFavorite);
         setTranslatedText(
           player.favoriteButton.querySelector('.button__label'),
           t,
-          channel.favorite || channel.isFavorite ? 'favorite.remove' : 'favorite.add',
-          channel.favorite || channel.isFavorite ? 'Remove favorite' : 'Favorite',
+          isFavorite ? 'favorite.remove' : 'favorite.add',
+          isFavorite ? 'Remove favorite' : 'Favorite',
         );
         player.programmeList.replaceChildren();
         const programmes = channelSchedule(channel).slice(0, 4);
