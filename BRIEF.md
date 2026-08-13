@@ -1,4 +1,4 @@
-# CATODO 2.4.0 — product brief
+# CATODO 2.5.0 — product brief
 
 CATODO is an open-source, Tesla-first web player for discovering and watching
 public live television sources from around the world.

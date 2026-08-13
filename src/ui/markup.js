@@ -502,7 +502,11 @@ function createHeader(t) {
   more.append(moreSummary, moreMenu);
   nav.append(more);
 
-  const searchForm = element('form', 'global-search', { dataset: { action: 'search' }, role: 'search' });
+  const searchForm = element('form', 'global-search', {
+    id: 'global-search-panel',
+    dataset: { action: 'search' },
+    role: 'search',
+  });
   searchForm.append(icon('magnifying-glass'));
   const searchInput = element('input', 'global-search__input', {
     type: 'search',
@@ -514,6 +518,33 @@ function createHeader(t) {
     dataset: { action: 'search-query' },
   });
   searchForm.append(searchInput);
+  const searchClose = iconButton({
+    t,
+    action: 'close-mobile-search',
+    iconName: 'x',
+    key: 'search.close',
+    fallback: 'Close search',
+    className: 'global-search__close',
+  });
+  searchForm.append(searchClose);
+
+  const searchToggle = iconButton({
+    t,
+    action: 'toggle-mobile-search',
+    iconName: 'magnifying-glass',
+    key: 'search.open',
+    fallback: 'Open search',
+    className: 'global-search-toggle',
+  });
+  searchToggle.setAttribute('aria-controls', 'global-search-panel');
+  searchToggle.setAttribute('aria-expanded', 'false');
+
+  searchInput.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !searchForm.classList.contains('is-open')) return;
+    searchForm.classList.remove('is-open');
+    searchToggle.setAttribute('aria-expanded', 'false');
+    searchToggle.focus();
+  });
 
   const settings = iconButton({
     t,
@@ -524,8 +555,21 @@ function createHeader(t) {
     className: 'app-switcher app-switcher--settings',
     dataset: { view: 'sources' },
   });
-  header.append(brand, nav, searchForm, settings);
-  return { header, brand, nav, navButtons, searchForm, searchInput, settings, more, moreSummary, moreMenu };
+  header.append(brand, nav, searchForm, searchToggle, settings);
+  return {
+    header,
+    brand,
+    nav,
+    navButtons,
+    searchForm,
+    searchInput,
+    searchToggle,
+    searchClose,
+    settings,
+    more,
+    moreSummary,
+    moreMenu,
+  };
 }
 
 function createHomeView(t) {
@@ -567,12 +611,14 @@ function createHomeView(t) {
     fallback: 'Unmute',
     className: 'live-anchor__mute media-control',
   });
+  const statusControls = element('div', 'live-anchor__status-controls');
+  statusControls.append(liveBadge, mute);
   const nowBar = element('div', 'live-anchor__now');
   nowBar.append(
     textNode('span', 'status-chip', t, 'status.live', 'LIVE'),
     textNode('time', 'live-clock', t, 'time.placeholder', '--:-- CET'),
   );
-  liveStage.append(video, openPlayer, liveBadge, mute, nowBar);
+  liveStage.append(video, openPlayer, statusControls, nowBar);
 
   const liveInfo = element('div', 'live-anchor__info');
   const channelHeading = element('div', 'live-anchor__heading');
@@ -3194,6 +3240,8 @@ export function mountAppUI(root, options = {}) {
       moreSummary: header.moreSummary,
       searchForm: header.searchForm,
       searchInput: header.searchInput,
+      searchToggle: header.searchToggle,
+      searchClose: header.searchClose,
       main,
       views,
       home: home.view,

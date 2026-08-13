@@ -6,6 +6,12 @@
   "brand": {
     "name": "Catodo"
   },
+  "search": {
+    "open": "Open search",
+    "close": "Close search",
+    "placeholder": "Search channels, countries, languages…",
+    "ariaLabel": "Search channels, countries, and languages"
+  },
   "nav": {
     "live": "Live",
     "countries": "Countries",

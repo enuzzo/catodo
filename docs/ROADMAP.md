@@ -83,6 +83,7 @@ or real-device validation. It is intentionally concrete and ordered by value.
   imported catalog. Fullscreen Favorite feedback is mounted inside the active
   fullscreen element, and Guide programme cards keep `Now playing` within
   bounds while allowing clipped short-programme titles to expand temporarily.
+
   Focused model tests cover the Explore choice and fullscreen host selection;
   rendered 1600×900 browser verification covers Guide geometry, expansion,
   second-click details and automatic collapse. Browser automation did not grant
@@ -97,6 +98,18 @@ or real-device validation. It is intentionally concrete and ordered by value.
   totals, hero replacement and quality sorting all updated coherently with no
   console errors or framework overlay. Native Tesla/mobile touch remains a
   device-owner check rather than a simulator claim.
+
+## Implemented and verified in 2.5.0
+
+- The phone header replaces its permanently open global search field with an
+  anchored search dropdown, gives the primary navigation an explicit safe
+  leading gutter and one shared control baseline, and groups Home preview live
+  and audio status into a contained overlay inset from the video edge. Rendered
+  Chromium QA at 402×874 and 390×844 verified focus/close behavior, zero page or
+  navigation overflow, a visible 18 px leading menu gutter, equal-height menu
+  items and full containment of both overlay controls. The supplied iPhone 17
+  Pro screenshot is real-device evidence for the original regressions; the
+  corrected build still requires a final Safari real-device confirmation.
 
 ## Next work
 

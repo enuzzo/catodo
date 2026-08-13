@@ -578,6 +578,7 @@ textarea {
 /* Persistent shell ------------------------------------------------------ */
 
 .app-header {
+  position: relative;
   z-index: 20;
   display: grid;
   grid-template-columns: 320px minmax(560px, 1fr) minmax(330px, 440px) 82px;
@@ -711,6 +712,11 @@ textarea {
 .global-search__input::placeholder {
   color: var(--ink-soft);
   opacity: 1;
+}
+
+.global-search__close,
+.global-search-toggle {
+  display: none;
 }
 
 .app-switcher {
@@ -1002,6 +1008,8 @@ textarea {
 .live-anchor__stage {
   position: relative;
   grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
   min-height: 220px;
   overflow: hidden;
   border-radius: 0;
@@ -1056,16 +1064,21 @@ textarea {
   outline-offset: -7px;
 }
 
-.live-badge,
-.live-anchor__now,
-.live-anchor__mute {
+.live-anchor__status-controls,
+.live-anchor__now {
   position: absolute;
   z-index: 2;
 }
 
-.live-badge {
+.live-anchor__status-controls {
   top: 12px;
   right: 12px;
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
+
+.live-badge {
   display: flex;
   align-items: center;
   gap: 7px;
@@ -1087,8 +1100,6 @@ textarea {
 }
 
 .live-anchor__mute {
-  top: 54px;
-  right: 12px;
   width: 50px;
   height: 50px;
   min-width: 50px;
@@ -5714,18 +5725,20 @@ textarea {
   .guide-channel { grid-template-columns: 190px var(--guide-track-width); }
 
   :root {
-    --header-height: 152px;
+    --header-height: 148px;
     --signal-bar-height: 52px;
   }
 
   .app-header {
-    grid-template-columns: 220px minmax(0, 1fr);
-    grid-template-rows: 84px 68px;
+    grid-template-columns: minmax(0, 1fr) 50px 50px;
+    grid-template-rows: 84px 64px;
   }
 
   .brand {
+    grid-column: 1;
+    min-width: 0;
     gap: 10px;
-    padding-inline: 12px;
+    padding-inline: 14px 10px;
   }
 
   .brand__logo {
@@ -5742,8 +5755,23 @@ textarea {
   }
 
   .global-search {
-    height: 48px;
-    padding-inline: 12px;
+    position: absolute;
+    grid-column: 1 / -1;
+    grid-row: 1;
+    top: 74px;
+    right: 12px;
+    left: 12px;
+    z-index: 90;
+    display: none;
+    height: 60px;
+    padding: 7px 7px 7px 14px;
+    border-color: var(--line-strong);
+    background: var(--paper-raised);
+    box-shadow: 0 18px 48px rgb(0 0 0 / 18%);
+  }
+
+  .global-search.is-open {
+    display: flex;
   }
 
   .global-search > i {
@@ -5751,10 +5779,40 @@ textarea {
   }
 
   .global-search__input {
-    font-size: 13px;
+    font-size: 16px;
+  }
+
+  .global-search__close,
+  .global-search-toggle {
+    display: inline-flex;
+  }
+
+  .global-search__close {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .global-search-toggle {
+    grid-column: 2;
+    grid-row: 1;
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    align-self: center;
+    justify-self: center;
+    border-color: var(--line-strong);
+    border-radius: 50%;
+    background: var(--paper-raised);
+    color: var(--ink);
+    font-size: 21px;
   }
 
   .app-switcher {
+    grid-column: 3;
+    grid-row: 1;
     width: 46px;
     height: 46px;
     min-width: 46px;
@@ -5762,15 +5820,46 @@ textarea {
   }
 
   .primary-nav {
+    height: 64px;
     justify-content: flex-start;
-    gap: 22px;
-    padding-inline: 16px;
+    gap: 0;
+    padding-inline: max(18px, env(safe-area-inset-left)) max(18px, env(safe-area-inset-right));
+    scroll-padding-inline: 18px;
     scroll-snap-type: x proximity;
   }
 
   .primary-nav__item {
-    min-height: 60px;
+    display: inline-flex;
+    height: 64px;
+    min-height: 64px;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 44px;
+    padding: 0 7px;
+    line-height: 1;
+    white-space: nowrap;
     scroll-snap-align: start;
+  }
+
+  .primary-nav__more {
+    height: 64px;
+    align-self: stretch;
+  }
+
+  .primary-nav__more > .primary-nav__item {
+    height: 64px;
+  }
+
+  .primary-nav__item::after {
+    right: 7px;
+    bottom: 0;
+    left: 7px;
+  }
+
+  .primary-nav__more-menu {
+    top: 140px;
+    right: 12px;
   }
 
   .signal-bar {
@@ -6135,8 +6224,19 @@ textarea {
   .explore-collection__separator { display: none; }
   .explore-collection__count { align-self: flex-end; }
   .explore-collection__rail { grid-template-columns: 1fr; }
-  .global-search__input::placeholder {
-    color: transparent;
+  .live-anchor__status-controls {
+    right: 12px;
+    left: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .live-anchor__mute {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
   }
 
   .home-headline {

@@ -1441,8 +1441,23 @@ async function handleAction(action, detail) {
       ui.refs.moreSummary.setAttribute("aria-expanded", String(open));
       break;
     }
+    case "toggle-mobile-search": {
+      const open = !ui.refs.searchForm.classList.contains("is-open");
+      ui.refs.searchForm.classList.toggle("is-open", open);
+      ui.refs.searchToggle.setAttribute("aria-expanded", String(open));
+      if (open) requestAnimationFrame(() => ui.refs.searchInput.focus());
+      break;
+    }
+    case "close-mobile-search": {
+      ui.refs.searchForm.classList.remove("is-open");
+      ui.refs.searchToggle.setAttribute("aria-expanded", "false");
+      ui.refs.searchToggle.focus();
+      break;
+    }
     case "navigate": {
       if (ui.refs.moreMenu) ui.refs.moreMenu.hidden = true;
+      ui.refs.searchForm.classList.remove("is-open");
+      ui.refs.searchToggle.setAttribute("aria-expanded", "false");
       const targetView = detail.dataset.mode === "explore" ? "explore" : detail.dataset.view || "home";
       const shouldRandomizeHome = targetView === "home";
       const shouldRandomizeExplore = targetView === "explore";
@@ -1575,6 +1590,8 @@ async function handleAction(action, detail) {
       state.view = "library";
       renderLibrary();
       ui.updateHeader({ view: "library", query: state.query });
+      ui.refs.searchForm.classList.remove("is-open");
+      ui.refs.searchToggle.setAttribute("aria-expanded", "false");
       break;
     }
     case "filter-library":

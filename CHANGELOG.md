@@ -10,6 +10,17 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-08-14
+
+### 🐛 Fixed
+
+- Mobile navigation now has a reliable leading gutter and one shared vertical alignment for every primary item, including the More trigger.
+- Home preview live/audio controls now share one contained status group, and the video stage can no longer exceed its mobile grid track and clip them against the edge.
+
+### 🛠 Changed
+
+- Mobile global search now opens from a compact header button into an anchored dropdown, preserving dashboard space while keeping the full search field one tap away.
+
 ## [2.4.0] - 2026-08-14
 
 ### 🐛 Fixed
@@ -131,7 +142,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.4.0...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.5.0...HEAD
+[2.5.0]: https://github.com/enuzzo/catodo/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/enuzzo/catodo/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/enuzzo/catodo/compare/v2.2.1...v2.3.0
 [2.2.1]: https://github.com/enuzzo/catodo/compare/v2.2.0...v2.2.1
