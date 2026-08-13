@@ -277,7 +277,9 @@ requests standalone display and provides 192, 512 and 1024 px square PNGs.
 `app.html` and the PHP login gate also declare Apple touch icons at 152, 167 and
 180 px. Artwork remains square, opaque and unmasked; iOS/iPadOS applies the
 platform corner treatment. The same centered vintage-TV silhouette is retained
-at every size so the installed app remains recognizable. Do not point the
+at every size so the installed app remains recognizable; substantial cow horns
+replace thin antenna strokes and make the Netmilk signature survive small Home
+Screen sizes. Do not point the
 manifest at `app.html`, add a pre-rounded mask to the source artwork, or cache
 the authenticated shell in a service worker without a separate security review.
 

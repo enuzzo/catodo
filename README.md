@@ -16,7 +16,7 @@ It is a vanilla ES-module application with no framework. Pinned runtime assets a
 - **Signal Lab:** playback diagnostics separate measured, estimated, and manifest-declared values.
 - **Channel profiles:** when upstream metadata is available, Signal Lab also surfaces canonical channel, network, owner, category, feed, coverage, language, format, quality, availability, lifecycle, website, logo, and guide descriptors without inventing missing values.
 - **Analog boot:** EBU colour bars descend, split around the Catodo ident, then open onto the live dashboard; reduced-motion users get a short static reveal.
-- **Home Screen web app:** iPhone, iPad and compatible desktop/mobile browsers receive a standalone manifest plus purpose-built CATODO artwork: a minimal vintage CRT carrying EBU colour bars. Apple-specific 152, 167 and 180 px touch icons complement 192, 512 and 1024 px manifest assets.
+- **Home Screen web app:** iPhone, iPad and compatible desktop/mobile browsers receive a standalone manifest plus purpose-built CATODO artwork: a full-canvas vintage CRT carrying EBU colour bars and Netmilk's unmistakable cow horns. Apple-specific 152, 167 and 180 px touch icons complement 192, 512 and 1024 px manifest assets.
 
 ## Content boundary
 

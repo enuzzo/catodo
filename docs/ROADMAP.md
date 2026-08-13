@@ -27,7 +27,8 @@ or real-device validation. It is intentionally concrete and ordered by value.
   browser or HLS runtime reports them; unavailable upload telemetry is labelled
   honestly instead of displaying a false zero.
 - The production package includes a standalone web-app manifest and original
-  vintage-TV/EBU artwork for iPhone, iPad and other installable browsers.
+  full-canvas vintage-TV/EBU artwork with Netmilk cow horns for iPhone, iPad and
+  other installable browsers.
 
 ## Next work
 
