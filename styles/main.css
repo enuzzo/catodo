@@ -2005,6 +2005,7 @@ textarea {
   flex: 0 0 auto;
   align-items: center;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 12px;
 }
 
@@ -2013,6 +2014,7 @@ textarea {
   padding-inline: 14px;
 }
 
+.explore-collection__country,
 .explore-collection__sort {
   display: flex;
   align-items: center;
@@ -2023,14 +2025,63 @@ textarea {
   text-transform: uppercase;
 }
 
-.explore-collection__sort .field {
+.explore-collection__country .field {
   width: auto;
-  min-width: 155px;
+  min-width: 180px;
   min-height: 44px;
   background: var(--paper);
   color: var(--ink);
   font-size: 12px;
   text-transform: none;
+}
+
+.explore-collection__sort {
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+}
+
+.explore-collection__sort-label {
+  padding: 0 11px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.explore-sort-option {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.explore-sort-option span {
+  display: grid;
+  min-height: 42px;
+  padding: 0 11px;
+  place-items: center;
+  border-left: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 11px;
+  text-transform: none;
+  transition: background 140ms ease, color 140ms ease;
+}
+
+.explore-sort-option[aria-checked="true"] span {
+  background: var(--signal);
+  color: #fff;
+}
+
+.explore-sort-option:focus-visible span {
+  outline: 2px solid var(--signal);
+  outline-offset: -3px;
+}
+
+.explore-collection__separator {
+  width: 1px;
+  height: 28px;
+  background: var(--line);
 }
 
 .explore-collection__rail {
@@ -2578,6 +2629,18 @@ textarea {
   font-size: 11px;
 }
 
+.country-detail__guide-consent {
+  flex: 1 0 100%;
+  margin: 2px 0;
+  color: var(--ink-soft);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.country-detail__guide-consent input {
+  flex: 0 0 auto;
+}
+
 .country-detail__guide-button.is-active {
   border-color: rgb(48 115 76 / 24%);
   background: rgb(48 115 76 / 9%);
@@ -3033,8 +3096,14 @@ textarea {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: var(--paper-raised);
+  cursor: grab;
   scrollbar-color: var(--line-strong) transparent;
   touch-action: pan-x pan-y;
+}
+.guide-timeline.is-dragging,
+.guide-timeline.is-dragging * {
+  cursor: grabbing !important;
+  user-select: none;
 }
 .guide-timeline__canvas { width: calc(248px + var(--guide-track-width)); min-width: 100%; }
 .guide-timeline__axis,
@@ -5318,6 +5387,8 @@ textarea {
 @media (max-width: 1180px) {
   .explore-hero { grid-template-columns: minmax(0, 1.25fr) minmax(330px, 0.75fr); }
   .explore-filters { grid-template-columns: repeat(8, minmax(120px, 1fr)); }
+  .explore-collection__header { align-items: start; flex-direction: column; }
+  .explore-collection__controls { width: 100%; justify-content: flex-start; }
   .explore-collection__rail { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   :root {
     --header-height: 152px;
@@ -5490,7 +5561,7 @@ textarea {
   .explore-hero__stage { min-height: 320px; aspect-ratio: 16 / 9; }
   .explore-hero__copy { border-top: 1px solid var(--line); border-left: 0; }
   .explore-collection { padding: 14px; }
-  .explore-collection__controls { width: 100%; justify-content: space-between; }
+  .explore-collection__controls { width: 100%; justify-content: flex-start; }
   .explore-collection__rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .guide-setup,
   .guide-settings__form { grid-template-columns: 1fr; }
@@ -5891,8 +5962,13 @@ textarea {
   .explore-hero__actions { grid-template-columns: 1fr; }
   .explore-collection__header { align-items: start; flex-direction: column; }
   .explore-collection__controls { align-items: stretch; flex-direction: column; }
-  .explore-collection__sort { align-items: stretch; flex-direction: column; }
-  .explore-collection__sort .field { width: 100%; }
+  .explore-collection__country { align-items: stretch; flex-direction: column; }
+  .explore-collection__country .field { width: 100%; }
+  .explore-collection__sort { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .explore-collection__sort-label { grid-column: 1 / -1; padding-block: 9px; text-align: center; }
+  .explore-sort-option span { padding-inline: 5px; border-top: 1px solid var(--line); }
+  .explore-collection__separator { display: none; }
+  .explore-collection__count { align-self: flex-end; }
   .explore-collection__rail { grid-template-columns: 1fr; }
   .global-search__input::placeholder {
     color: transparent;

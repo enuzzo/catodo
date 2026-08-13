@@ -15,7 +15,9 @@ import { mountAppUI } from "./ui/markup.js";
 import { EpgService, GlobeTvCatalog, epgPreset, epgPresetsForCountry, groupGuideSources, guideUrlsForChannels } from "./epg/index.js";
 import { filterChannelPicker } from "./ui/channel-picker-filter.js";
 import {
+  buildExploreCountryOptions,
   buildExploreCollections,
+  filterExploreChannelsByCountry,
   matchesExploreCategory,
   pickExploreFeatured,
   randomizeExploreChannels,
@@ -24,6 +26,7 @@ import {
 import { multiviewTelemetry, singleTelemetry } from "./ui/telemetry-model.js";
 import { advanceConnection, connectionView, startConnection } from "./ui/connection-model.js";
 import { resolvePlayerReturnView } from "./ui/view-mode.js";
+import { selectInitialHomeChannel } from "./ui/home-selection.js";
 import { deleteMultiviewPreset, findMultiviewPreset, renameMultiviewPreset } from "./ui/multiview-preset-model.js";
 import { resetWorldMapView, zoomWorldMap } from "./ui/world-map.js";
 
@@ -41,6 +44,7 @@ const state = {
   exploreCategory: "all",
   exploreFeaturedId: "",
   exploreCategorySort: "relevance",
+  exploreCountry: "",
   exploreCategoryLimit: EXPLORE_PAGE_SIZE,
   exploreCollectionSamples: new Map(),
   query: "",
@@ -621,7 +625,9 @@ function exploreCollections(collections = fullExploreCollections()) {
     });
   }
   return collections.map((collection) => {
-    const sorted = sortExploreChannels(collection.channels, state.exploreCategorySort);
+    const countryOptions = buildExploreCountryOptions(collection.channels);
+    const filtered = filterExploreChannelsByCountry(collection.channels, state.exploreCountry);
+    const sorted = sortExploreChannels(filtered, state.exploreCategorySort);
     return {
       ...collection,
       channels: sorted.slice(0, state.exploreCategoryLimit),
@@ -629,6 +635,8 @@ function exploreCollections(collections = fullExploreCollections()) {
       hasMore: state.exploreCategoryLimit < sorted.length,
       mode: "catalog",
       sort: state.exploreCategorySort,
+      country: state.exploreCountry,
+      countryOptions,
     };
   });
 }
@@ -637,7 +645,11 @@ function renderExplore() {
   const fullCollections = fullExploreCollections();
   const collections = exploreCollections(fullCollections);
   const existing = decorateChannel(findChannel(state.exploreFeaturedId));
-  const featured = existing && (state.exploreCategory === "all" || matchesExploreCategory(existing, state.exploreCategory))
+  const featuredMatchesCountry = !state.exploreCountry
+    || filterExploreChannelsByCountry([existing], state.exploreCountry).length > 0;
+  const featured = existing
+    && (state.exploreCategory === "all" || matchesExploreCategory(existing, state.exploreCategory))
+    && featuredMatchesCountry
     ? existing
     : pickExploreFeatured(collections, state.exploreFeaturedId);
   const featuredCollection = fullCollections.find((collection) =>
@@ -756,6 +768,7 @@ function renderCountries() {
     countryGuideLoading: state.countryGuideLoading === selected?.code,
     countryGuideChecking: countryGuideAvailability === "loading",
     countryGuideLookupError: countryGuideAvailability === "error",
+    countryGuideUnavailable: countryGuideAvailability === "unavailable",
   });
 }
 
@@ -860,6 +873,14 @@ function countryCodeForGuideName(name) {
     if (label.replace(/\s+/g, "") === compact) return code;
   }
   return "";
+}
+
+function guideSourcesForCountry(iso2) {
+  const code = String(iso2 || "").trim().toUpperCase();
+  if (!code) return [];
+  return groupGuideSources(state.epgSources)
+    .filter((group) => countryCodeForGuideName(group.name) === code)
+    .flatMap((group) => group.sources.map((source) => source.url));
 }
 
 function guideCandidateChannels() {
@@ -973,7 +994,7 @@ function isPlayerSurfaceActive() {
     && ui?.refs?.root?.dataset?.mode === "player";
 }
 
-async function loadSchedules(channels, { force = false, preferMapped = false } = {}) {
+async function loadSchedules(channels, { force = false, preferMapped = false, sourceUrls } = {}) {
   const values = (Array.isArray(channels) ? channels : []).filter(Boolean);
   if (!values.length || (!state.epgSources.length && !values.some((channel) => channel?.hasGuide || channel?.guides?.length || channel?.endpoints?.some((endpoint) => endpoint?.guides?.length)))) return;
   if (!force && values.every((channel) => state.schedules.has(channelId(channel)))) return;
@@ -981,7 +1002,7 @@ async function loadSchedules(channels, { force = false, preferMapped = false } =
   state.guideError = "";
   renderGuide();
   try {
-    const schedules = await epg.schedules(values, { force, preferMapped });
+    const schedules = await epg.schedules(values, { force, preferMapped, sourceUrls });
     schedules.forEach((value, key) => state.schedules.set(key, value));
     state.epgLastRefresh = epg.getLastRefresh();
   } catch (error) {
@@ -999,7 +1020,7 @@ async function loadCountrySchedules(iso2 = state.selectedCountry, { force = fals
   const code = String(iso2 || "").toUpperCase();
   if (!code) return;
   const channels = catalog.list({ country: code }).filter(isPlayableChannel).slice(0, UI_CHANNEL_LIMIT);
-  await loadSchedules(channels, { force });
+  await loadSchedules(channels, { force, sourceUrls: guideSourcesForCountry(code) });
   if (state.selectedCountry === code) renderCountries();
 }
 
@@ -1362,6 +1383,7 @@ async function handleAction(action, detail) {
       state.exploreCategory = detail.dataset.category || "all";
       state.exploreFeaturedId = "";
       state.exploreCategorySort = "relevance";
+      state.exploreCountry = "";
       state.exploreCategoryLimit = EXPLORE_PAGE_SIZE;
       renderExplore();
       ui.refs.views.explore.scrollTop = 0;
@@ -1390,12 +1412,21 @@ async function handleAction(action, detail) {
       break;
     }
     case "sort-explore":
-      state.exploreCategorySort = detail.value || "relevance";
+      state.exploreCategorySort = detail.dataset.sort || detail.value || "relevance";
       state.exploreCategoryLimit = EXPLORE_PAGE_SIZE;
       renderExplore();
       break;
+    case "filter-explore-country": {
+      state.exploreCountry = detail.value || "";
+      state.exploreFeaturedId = "";
+      state.exploreCategoryLimit = EXPLORE_PAGE_SIZE;
+      renderExplore();
+      const channel = findChannel(state.exploreFeaturedId);
+      if (channel) await explorePlayer.tune(playbackSource(channel), { muted: true }).catch(() => {});
+      break;
+    }
     case "load-more-explore": {
-      const total = fullExploreCollections()[0]?.channels?.length || 0;
+      const total = exploreCollections(fullExploreCollections())[0]?.totalCount || 0;
       if (state.exploreCategory !== "all" && state.exploreCategoryLimit < total) {
         state.exploreCategoryLimit += EXPLORE_PAGE_SIZE;
         renderExplore();
@@ -1582,7 +1613,7 @@ async function handleAction(action, detail) {
         renderSources();
         const code = countryCodeForGuideName(country.name);
         const candidates = playableChannels().filter((channel) => !code || inferredCountryCode(channel) === code);
-        await loadSchedules(candidates, { force: true });
+        await loadSchedules(candidates, { force: true, sourceUrls: files.map((file) => file.url) });
         const matched = candidates.filter((channel) => state.schedules.get(channelId(channel))?.matched).length;
         ui.toast(`${country.name}: ${added.length} source${added.length === 1 ? "" : "s"} downloaded · ${matched} channels matched.`);
       } catch (error) {
@@ -1644,7 +1675,6 @@ async function handleAction(action, detail) {
       state.countryChannelLanguage = "";
       state.countryChannelLimit = UI_CHANNEL_LIMIT;
       state.view = "countries";
-      void discoverCountryGuideUrls(state.selectedCountry).catch(() => {});
       renderCountries();
       void loadCountrySchedules();
       break;
@@ -1686,7 +1716,6 @@ async function handleAction(action, detail) {
     case "view-country-channels":
       state.selectedCountry = String(detail.dataset.iso2 || state.selectedCountry || "").toUpperCase();
       state.countryChannelLimit = UI_CHANNEL_LIMIT;
-      void discoverCountryGuideUrls(state.selectedCountry).catch(() => {});
       renderCountries();
       void loadCountrySchedules();
       break;
@@ -1716,10 +1745,19 @@ async function handleAction(action, detail) {
     case "load-country-guide": {
       const iso2 = String(detail.dataset.iso2 || state.selectedCountry || "").toUpperCase();
       const channels = iso2 ? catalog.list({ country: iso2 }).filter(isPlayableChannel) : [];
+      const accepted = Boolean(detail.element
+        ?.closest('.country-detail__actions')
+        ?.querySelector('[data-country-guide-consent]')?.checked);
+      if (!accepted) {
+        ui.toast("Accept the third-party guide notice before connecting this country.", { tone: "error" });
+        break;
+      }
       state.countryGuideLoading = iso2;
       renderCountries();
       try {
-        const guideUrls = await discoverCountryGuideUrls(iso2, { force: state.countryGuideAvailability.get(iso2) === "error" });
+        const guideUrls = await discoverCountryGuideUrls(iso2, {
+          force: ["error", "unavailable"].includes(state.countryGuideAvailability.get(iso2)),
+        });
         if (!guideUrls.length) {
           ui.toast("GlobeTV does not currently publish an XMLTV source for this country.", { tone: "error" });
           break;
@@ -2178,7 +2216,11 @@ async function boot() {
     const first = playableChannels(snapshot.channels)[0];
     if (!initialHomeSelectionDone && first) {
       refreshWorldMix();
-      const initial = nextRandomHomeChannel() || first;
+      const initial = selectInitialHomeChannel({
+        favorites: catalog.list({ favorite: true }).filter(isPlayableChannel),
+        pickRandom: nextRandomHomeChannel,
+        fallback: first,
+      });
       state.featuredId = channelId(initial);
       initialHomeSelectionDone = true;
     }

@@ -10,6 +10,20 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.2.1] - 2026-08-13
+
+### 🛠 Changed
+
+- Home now starts each app session on a randomly selected playable Favorite when one is available; later Home returns and Random presses keep using the full catalog.
+- Country guide discovery now starts only after an explicit third-party acceptance, remains available for every GlobeTV country instead of presenting an inert unavailable state, and distinguishes outdated, unmatched and unconfigured guide data on channel cards.
+- Dedicated Explore categories now expose inline sort choices, a country filter with per-country channel counts, and a separated filtered-total indicator.
+
+### 🐛 Fixed
+
+- TV Guide timelines can now be dragged horizontally with a mouse or pointer while preserving ordinary programme-card clicks and native touch panning.
+- Country-specific TV Guide loads now contact only that country's installed feeds, preserving match diagnostics for other countries and avoiding unrelated provider refreshes.
+- Form controls no longer dispatch their action on the opening click, so Explore and other select menus stay open until the user makes a choice.
+
 ## [2.2.0] - 2026-08-13
 
 *The next signal is tuning.*
@@ -90,7 +104,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.2.1...HEAD
+[2.2.1]: https://github.com/enuzzo/catodo/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/enuzzo/catodo/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/enuzzo/catodo/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/enuzzo/catodo/compare/v2.0.0...v2.1.0

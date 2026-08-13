@@ -234,9 +234,13 @@ export class EpgService {
     const to = Number(options.to ?? from + WINDOW_MS);
     const values = Array.isArray(channels) ? channels : [];
     const mappedUrls = unique(values.flatMap(guideUrlsForChannel));
+    const sourceScope = Array.isArray(options.sourceUrls) ? new Set(unique(options.sourceUrls)) : null;
+    const scopedSources = sourceScope
+      ? this.#customSources.filter((url) => sourceScope.has(url))
+      : this.#customSources;
     const urls = unique([
       ...mappedUrls,
-      ...(options.preferMapped === true && mappedUrls.length ? [] : this.#customSources),
+      ...(options.preferMapped === true && mappedUrls.length ? [] : scopedSources),
     ]);
     if (!urls.length) return new Map(values.map((channel) => [String(channel?.channelId || channel?.id || ""), { programmes: [], status: "unconfigured", sources: [], matched: false }]));
     const settled = await Promise.allSettled(urls.map((url) => this.#load(url, { force: options.force === true })));

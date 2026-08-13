@@ -4,6 +4,8 @@ import { EXPLORE_CATEGORIES } from './explore-model.js';
 import { featuredChannelIdentity } from './channel-identity.js';
 import { APP_VERSION } from '../version.js';
 import { formatGuideDateTime, formatGuideTime } from './time-format.js';
+import { enableGuideTimelineDrag } from './guide-timeline-drag.js';
+import { countryGuideControlState, guideProgrammeFallback } from './country-guide-model.js';
 
 const FLAG_URLS = import.meta.glob('../../assets/vendor/flags/4x3/*.svg', {
   eager: true,
@@ -343,11 +345,12 @@ function renderChannelTiles(container, channels, t, options = {}) {
       const schedule = channelSchedule(channel);
       const now = schedule.find((programme) => Number(programme.start) <= Date.now() && Number(programme.stop) > Date.now());
       const next = schedule.find((programme) => Number(programme.start) > Date.now());
+      const fallback = guideProgrammeFallback(channel?.guideStatus);
       const strip = element('div', 'channel-tile__schedule');
       const nowRow = element('div');
       nowRow.append(
         textNode('span', 'channel-tile__schedule-label', t, 'guide.now', 'Now'),
-        textNode('strong', null, t, now ? 'guide.programmeValue' : 'guide.noDataShort', now ? '{time} · {title}' : 'Guide unavailable', {
+        textNode('strong', null, t, now ? 'guide.programmeValue' : fallback.key, now ? '{time} · {title}' : fallback.fallback, {
           time: now ? formatProgrammeTime(now.start) : '', title: now?.title || '',
         }),
       );
@@ -756,12 +759,12 @@ function renderExploreCollections(container, collections, t) {
     copy.append(title, description);
     const controls = element('div', 'explore-collection__controls');
     const count = element('span', 'explore-collection__count mono');
-    count.textContent = translate(t, 'explore.channelCount', '{count} channels', {
-      count: safeText(collection?.totalCount ?? normaliseArray(collection?.channels).length),
+    const channelCount = Number(collection?.totalCount ?? normaliseArray(collection?.channels).length) || 0;
+    count.textContent = translate(t, channelCount === 1 ? 'explore.channelCountOne' : 'explore.channelCount', channelCount === 1 ? '{count} channel' : '{count} channels', {
+      count: safeText(channelCount),
     });
-    controls.append(count);
     if (mode === 'overview') {
-      controls.append(actionButton({
+      controls.append(count, actionButton({
         t,
         action: 'randomize-explore-collection',
         iconName: 'shuffle',
@@ -771,25 +774,46 @@ function renderExploreCollections(container, collections, t) {
         dataset: { collection: safeId(collection?.id) },
       }));
     } else {
-      const sortWrap = element('label', 'explore-collection__sort');
-      sortWrap.append(textNode('span', null, t, 'explore.sortLabel', 'Sort by'));
-      const select = element('select', 'field', {
-        'aria-label': translate(t, 'explore.sortAriaLabel', 'Sort this collection'),
-        dataset: { action: 'sort-explore' },
+      const countryWrap = element('label', 'explore-collection__country');
+      countryWrap.append(textNode('span', null, t, 'explore.countryLabel', 'Country'));
+      const countrySelect = element('select', 'field', {
+        'aria-label': translate(t, 'explore.countryAriaLabel', 'Filter this collection by country'),
+        dataset: { action: 'filter-explore-country' },
       });
+      const allCountries = element('option', null, { value: '' });
+      allCountries.textContent = translate(t, 'explore.allCountries', 'All countries');
+      allCountries.selected = !safeText(collection?.country);
+      countrySelect.append(allCountries);
+      normaliseArray(collection?.countryOptions).forEach((country) => {
+        const option = element('option', null, { value: safeText(country?.code) });
+        option.textContent = `${safeText(country?.label, country?.code)} · ${safeText(country?.count, 0)}`;
+        option.selected = safeText(country?.code) === safeText(collection?.country);
+        countrySelect.append(option);
+      });
+      countryWrap.append(countrySelect);
+
+      const sortGroup = element('div', 'explore-collection__sort', {
+        role: 'radiogroup',
+        'aria-label': translate(t, 'explore.sortAriaLabel', 'Sort this collection'),
+      });
+      sortGroup.append(textNode('span', 'explore-collection__sort-label', t, 'explore.sortLabel', 'Sort by'));
       [
         ['relevance', 'explore.sort.relevance', 'Relevance'],
         ['name', 'explore.sort.name', 'Name'],
         ['quality', 'explore.sort.quality', 'Quality'],
         ['country', 'explore.sort.country', 'Country'],
       ].forEach(([value, key, fallback]) => {
-        const option = element('option', null, { value });
-        option.textContent = translate(t, key, fallback);
-        option.selected = value === safeText(collection?.sort, 'relevance');
-        select.append(option);
+        const option = element('button', 'explore-sort-option', {
+          type: 'button',
+          role: 'radio',
+          'aria-checked': value === safeText(collection?.sort, 'relevance') ? 'true' : 'false',
+          dataset: { action: 'sort-explore', sort: value },
+        });
+        option.append(textNode('span', null, t, key, fallback));
+        sortGroup.append(option);
       });
-      sortWrap.append(select);
-      controls.append(sortWrap);
+      const separator = element('span', 'explore-collection__separator', { 'aria-hidden': 'true' });
+      controls.append(countryWrap, sortGroup, separator, count);
     }
     header.append(copy, controls);
     const rail = element('div', `channel-grid explore-collection__rail explore-collection__rail--${mode}`);
@@ -974,8 +998,17 @@ function createCountriesView(t) {
     fallback: 'Load guide',
     className: 'button--ghost country-detail__guide-button',
   });
+  const guideConsent = element('label', 'check-field country-detail__guide-consent');
+  const guideConsentInput = element('input', null, {
+    type: 'checkbox',
+    dataset: { countryGuideConsent: 'true' },
+  });
+  guideConsent.append(
+    guideConsentInput,
+    textNode('span', null, t, 'countries.guideConsent', 'I accept checking the public GlobeTV GitHub catalog and contacting the selected third-party XMLTV providers.'),
+  );
   const guideStatus = element('p', 'country-detail__guide-status');
-  detailActions.append(importButton, guideButton, guideStatus);
+  detailActions.append(importButton, guideConsent, guideButton, guideStatus);
   detailGrid.append(detailCopy, shape, detailActions);
   detail.append(detailBack, detailGrid);
 
@@ -1093,6 +1126,8 @@ function createCountriesView(t) {
     categoriesList,
     shape,
     importButton,
+    guideConsent,
+    guideConsentInput,
     guideButton,
     guideStatus,
     regionButtons,
@@ -1305,6 +1340,7 @@ function renderGuideCards(container, channels, t) {
     canvas.append(card);
   });
   viewport.append(canvas);
+  enableGuideTimelineDrag(viewport);
   container.replaceChildren(viewport);
 }
 
@@ -2618,35 +2654,44 @@ function setCountryDetail(refs, country, t, guideState = {}) {
   refs.importButton.hidden = !iso2 || Boolean(value.imported);
   const sourceCount = Math.max(0, Number(guideState.sourceCount) || 0);
   const configuredCount = Math.max(0, Number(guideState.configuredCount) || 0);
-  const loading = Boolean(guideState.loading);
-  const checking = Boolean(guideState.checking);
-  const lookupError = Boolean(guideState.error);
-  const connected = sourceCount > 0 && configuredCount >= sourceCount;
-  const guideLabel = loading
-    ? translate(t, 'countries.loadingGuide', 'Loading guide…')
-    : checking
-      ? translate(t, 'countries.checkingGuide', 'Checking guide…')
-      : connected
-        ? translate(t, 'countries.guideLoaded', 'Guide loaded')
-        : sourceCount
-          ? translate(t, 'countries.loadGuide', 'Load guide')
-          : lookupError
-            ? translate(t, 'countries.guideRetry', 'Retry guide check')
-            : translate(t, 'countries.guideUnavailable', 'Guide unavailable');
+  const control = countryGuideControlState({
+    sourceCount,
+    configuredCount,
+    loading: guideState.loading,
+    checking: guideState.checking,
+    error: guideState.error,
+    unavailable: guideState.unavailable,
+  });
+  const labels = {
+    loading: ['countries.loadingGuide', 'Loading guide…'],
+    checking: ['countries.checkingGuide', 'Checking guide…'],
+    connected: ['countries.guideLoaded', 'Guide loaded'],
+    available: ['countries.loadGuide', 'Load guide'],
+    error: ['countries.guideRetry', 'Retry guide check'],
+    unavailable: ['countries.guideCheckAgain', 'Check again'],
+    idle: ['countries.findGuide', 'Find & load guide'],
+  };
+  const [guideLabelKey, guideLabelFallback] = labels[control.status];
+  const guideLabel = translate(t, guideLabelKey, guideLabelFallback);
+  if (previousIso2 !== iso2) refs.guideConsentInput.checked = false;
+  refs.guideConsent.hidden = !iso2 || control.connected;
+  refs.guideConsentInput.disabled = control.disabled;
   refs.guideButton.hidden = !iso2;
-  refs.guideButton.disabled = loading || checking || connected || (sourceCount === 0 && !lookupError);
+  refs.guideButton.disabled = control.disabled;
   refs.guideButton.dataset.iso2 = iso2;
-  refs.guideButton.classList.toggle('is-active', connected);
+  refs.guideButton.classList.toggle('is-active', control.connected);
   refs.guideButton.setAttribute('aria-label', guideLabel);
   refs.guideButton.querySelector('.button__label').textContent = guideLabel;
   refs.guideStatus.hidden = !iso2;
-  refs.guideStatus.textContent = checking
+  refs.guideStatus.textContent = control.status === 'checking'
     ? translate(t, 'countries.guideCheckingHint', 'Checking the GlobeTV country catalog…')
-    : lookupError
+    : control.status === 'error'
       ? translate(t, 'countries.guideLookupFailedHint', 'The GlobeTV catalog could not be checked. Retry when the connection is available.')
-      : !sourceCount
-        ? translate(t, 'countries.guideUnavailableHint', 'No known XMLTV source is available for this country.')
-        : connected
+      : control.status === 'unavailable'
+        ? translate(t, 'countries.guideUnavailableHint', 'No XMLTV feed was found in the current GlobeTV catalog. You can check again later.')
+        : control.status === 'idle'
+          ? translate(t, 'countries.guideConsentHint', 'Accept the third-party notice, then CATODO will search GlobeTV and connect any country feeds it finds.')
+          : control.connected
           ? translate(t, 'countries.guideLoadedHint', '{count} guide sources saved in Settings.', { count: sourceCount })
           : translate(t, 'countries.guideAvailableHint', '{count} known XMLTV sources available. Loading saves them in Settings and contacts those third-party providers.', { count: sourceCount });
   renderCountryShape(refs.shape, iso2, { t });
@@ -2944,6 +2989,7 @@ function makeActionDispatcher(root, onAction) {
     const source = event.target.closest?.('[data-action]');
     if (!source || !root.contains(source)) return;
     if (source.tagName === 'FORM') return;
+    if (['INPUT', 'SELECT', 'TEXTAREA'].includes(source.tagName)) return;
     if (source.tagName === 'BUTTON' && source.type === 'submit' && source.form?.dataset.action) return;
     dispatch(source.dataset.action, event, source);
   };
@@ -2955,6 +3001,13 @@ function makeActionDispatcher(root, onAction) {
   };
   const input = (event) => {
     const source = event.target.closest?.('input[data-action], select[data-action], textarea[data-action]');
+    if (!source || !root.contains(source)) return;
+    if (source.tagName === 'SELECT') return;
+    if (source.tagName === 'INPUT' && ['checkbox', 'radio'].includes(source.type)) return;
+    dispatch(source.dataset.action, event, source);
+  };
+  const change = (event) => {
+    const source = event.target.closest?.('select[data-action], input[type="checkbox"][data-action], input[type="radio"][data-action]');
     if (!source || !root.contains(source)) return;
     dispatch(source.dataset.action, event, source);
   };
@@ -2968,13 +3021,13 @@ function makeActionDispatcher(root, onAction) {
   root.addEventListener('click', click);
   root.addEventListener('submit', submit);
   root.addEventListener('input', input);
-  root.addEventListener('change', input);
+  root.addEventListener('change', change);
   root.addEventListener('keydown', keydown);
   return { dispatch, destroy: () => {
     root.removeEventListener('click', click);
     root.removeEventListener('submit', submit);
     root.removeEventListener('input', input);
-    root.removeEventListener('change', input);
+    root.removeEventListener('change', change);
     root.removeEventListener('keydown', keydown);
   } };
 }
@@ -3344,6 +3397,7 @@ export function mountAppUI(root, options = {}) {
         loading: state.countryGuideLoading,
         checking: state.countryGuideChecking,
         error: state.countryGuideLookupError,
+        unavailable: state.countryGuideUnavailable,
       });
       setCountryChannels(countries, state, selected, selectedIso2, t);
       renderCountryRows(countries.tableBody, values, t, selectedIso2);

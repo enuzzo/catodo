@@ -1,8 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  buildExploreCountryOptions,
   buildExploreCollections,
   exploreQualityScore,
+  filterExploreChannelsByCountry,
   matchesExploreCategory,
   pickExploreFeatured,
   randomizeExploreChannels,
@@ -70,4 +72,22 @@ test("Explore sorts complete collections by name, country and descending quality
   assert.deepEqual(sortExploreChannels(values, 'country').map((channel) => channel.channelId), ['c', 'b', 'a']);
   assert.deepEqual(sortExploreChannels(values, 'quality').map((channel) => channel.channelId), ['a', 'c', 'b']);
   assert.equal(exploreQualityScore({ quality: 'Full HD' }), 1080);
+});
+
+test("Explore builds category country options and filters without losing the full set", () => {
+  const values = [
+    { channelId: 'news-it-1', countryCode: 'IT', country: 'Italy' },
+    { channelId: 'news-it-2', countryCode: 'it', country: 'Italy' },
+    { channelId: 'news-fr', countryCode: 'FR', country: 'France' },
+    { channelId: 'news-unknown' },
+  ];
+  assert.deepEqual(buildExploreCountryOptions(values), [
+    { code: 'FR', label: 'France', count: 1 },
+    { code: 'IT', label: 'Italy', count: 2 },
+  ]);
+  assert.deepEqual(
+    filterExploreChannelsByCountry(values, 'it').map((channel) => channel.channelId),
+    ['news-it-1', 'news-it-2'],
+  );
+  assert.equal(filterExploreChannelsByCountry(values).length, values.length);
 });

@@ -134,6 +134,34 @@ test("on-demand player guide loads only the mapped source and deduplicates concu
   ]);
 });
 
+test("country-scoped guide loads do not refetch or overwrite diagnostics for other countries", async () => {
+  const settings = new Map();
+  const requests = [];
+  const italyUrl = "https://guide.test/italy.xml";
+  const franceUrl = "https://guide.test/france.xml";
+  const catalog = {
+    getSetting: async (key, fallback) => settings.has(key) ? settings.get(key) : fallback,
+    setSetting: async (key, value) => { settings.set(key, value); return value; },
+  };
+  const service = await new EpgService({
+    catalog,
+    fetchImpl: async (url) => {
+      requests.push(url);
+      const channel = url === italyUrl ? "Rai1.it" : "TF1.fr";
+      return new Response(`<tv><channel id="${channel}"><display-name>${channel}</display-name></channel><programme start="20260812140000 +0200" stop="20260812150000 +0200" channel="${channel}"><title>Live</title></programme></tv>`);
+    },
+  }).init();
+  await service.setSources([italyUrl, franceUrl]);
+  const window = { from: Date.UTC(2026, 7, 12, 12, 30), to: Date.UTC(2026, 7, 12, 13, 30) };
+
+  await service.schedule({ channelId: "rai-1", tvgId: "Rai1.it" }, { ...window, sourceUrls: [italyUrl] });
+  await service.schedule({ channelId: "tf1", tvgId: "TF1.fr" }, { ...window, force: true, sourceUrls: [franceUrl] });
+
+  assert.deepEqual(requests, [italyUrl, franceUrl]);
+  assert.equal(service.getSourceStatuses().find((source) => source.url === italyUrl)?.matchedChannels, 1);
+  assert.equal(service.getSourceStatuses().find((source) => source.url === franceUrl)?.matchedChannels, 1);
+});
+
 test("forced refresh revalidates once, preserves a 304 cache and persists cadence", async () => {
   const settings = new Map();
   const catalog = {

@@ -64,6 +64,37 @@ function channelCountry(channel) {
   return String(channel?.country || channel?.countryName || channel?.countryCode || channel?.countries?.[0] || '').trim();
 }
 
+function channelCountryCode(channel) {
+  return String(channel?.countryCode || channel?.tvgCountry || channel?.countries?.[0] || channel?.country || '')
+    .trim()
+    .toLocaleUpperCase('en-US');
+}
+
+export function filterExploreChannelsByCountry(channels, countryCode = '') {
+  const values = Array.isArray(channels) ? channels.filter(Boolean) : [];
+  const selected = String(countryCode || '').trim().toLocaleUpperCase('en-US');
+  if (!selected) return [...values];
+  return values.filter((channel) => channelCountryCode(channel) === selected);
+}
+
+export function buildExploreCountryOptions(channels) {
+  const countries = new Map();
+  (Array.isArray(channels) ? channels : []).filter(Boolean).forEach((channel) => {
+    const code = channelCountryCode(channel);
+    if (!code) return;
+    const label = channelCountry(channel) || code;
+    const existing = countries.get(code);
+    countries.set(code, {
+      code,
+      label: existing?.label || label,
+      count: (existing?.count || 0) + 1,
+    });
+  });
+  return [...countries.values()].sort((left, right) =>
+    left.label.localeCompare(right.label, 'en', { sensitivity: 'base' })
+      || left.code.localeCompare(right.code, 'en', { sensitivity: 'base' }));
+}
+
 export function exploreQualityScore(channel) {
   const value = String(channel?.quality || channel?.streamQuality || channel?.resolution || channel?.feedFormat || '')
     .trim()
