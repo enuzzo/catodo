@@ -117,6 +117,7 @@
     "importing": "Importing catalog…"
   },
   "library": {
+    "recent": "Recently watched",
     "loadMore": "Load more channels",
     "loadMoreCount": "Load more channels · {count} remaining",
     "restoring": {

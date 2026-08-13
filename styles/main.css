@@ -24,6 +24,8 @@
 .backup-settings > div:first-child > p:last-child { max-width: 760px; margin-top: 7px; color: var(--ink-soft); font-size: 13px; line-height: 1.5; }
 .backup-settings__actions { display: flex; flex-wrap: wrap; gap: 9px; }
 .backup-settings__actions .button, .multiview-presets { min-height: 52px; }
+.library-recent { margin-bottom: 22px; }
+.library-recent__grid { grid-auto-columns: minmax(220px, 280px); grid-auto-flow: column; overflow-x: auto; }
 .multiview-presets { min-width: 150px; }
 .page[hidden] { content-visibility: hidden; }
 .channel-grid, .guide-grid, .country-table-wrap { content-visibility: auto; contain-intrinsic-size: 800px; }

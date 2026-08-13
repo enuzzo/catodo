@@ -645,6 +645,8 @@ function renderLibrary() {
   const channels = matchingChannels.slice(0, state.libraryLimit);
   const allChannels = state.lastCatalog?.channels || [];
   const installationSync = state.lastCatalog?.installationSync || {};
+  const recentIds = [...new Set((state.lastCatalog?.history || []).map((entry) => entry.channelId))].slice(0, 20);
+  const recent = recentIds.map(findChannel).filter(Boolean).map(decorateChannel);
   ui.renderLibrary({
     activate: state.view === "library",
     channels: channels.map(decorateChannel),
@@ -662,6 +664,7 @@ function renderLibrary() {
     restoring: Number(installationSync.hydrating) > 0,
     syncError: installationSync.status === 'error',
     restoreError: Number(installationSync.hydrationFailed) > 0,
+    recent,
   });
 }
 

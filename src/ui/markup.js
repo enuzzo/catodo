@@ -1020,8 +1020,13 @@ function createLibraryView(t) {
     className: 'button--ghost library-load-more',
   });
   loadMore.hidden = true;
-  view.append(header, stats, toolbar, grid, loadMore);
-  return { view, stats: statNodes, search, category, language, favorites, grid, loadMore };
+  const recent = element('section', 'library-recent');
+  recent.append(createSectionTitle(t, 'library.recent', 'Recently watched'));
+  const recentGrid = element('div', 'channel-grid library-recent__grid');
+  recent.append(recentGrid);
+  recent.hidden = true;
+  view.append(header, stats, recent, toolbar, grid, loadMore);
+  return { view, stats: statNodes, search, category, language, favorites, recent, recentGrid, grid, loadMore };
 }
 
 function createGuideView(t) {
@@ -2894,6 +2899,9 @@ export function mountAppUI(root, options = {}) {
       const favoritesOnly = Boolean(state.favoritesOnly);
       library.favorites.classList.toggle('is-active', favoritesOnly);
       library.favorites.setAttribute('aria-pressed', favoritesOnly ? 'true' : 'false');
+      const recent = normaliseArray(state.recent);
+      library.recent.hidden = !recent.length;
+      if (recent.length) renderChannelTiles(library.recentGrid, recent.slice(0, 20), t);
       if (channels.length) renderChannelTiles(library.grid, channels, t);
       else if (state.restoring) renderEmpty(
         library.grid,
