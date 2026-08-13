@@ -7,6 +7,7 @@ import {
   filterExploreChannelsByCountry,
   matchesExploreCategory,
   pickExploreFeatured,
+  pickExploreFeaturedForView,
   randomizeExploreChannels,
   sortExploreChannels,
 } from "../../src/ui/explore-model.js";
@@ -41,6 +42,22 @@ test("Explore defaults to Euronews Italian while preserving later user choices",
   }];
   assert.equal(pickExploreFeatured(collections).channelId, 'euronews-it');
   assert.equal(pickExploreFeatured(collections, 'news-selected').channelId, 'news-selected');
+});
+
+test("Explore finds its initial hero in the complete collection, not only the eight-card preview", () => {
+  const preview = [{ id: 'news', channels: [{ channelId: 'news-first', name: 'First News' }] }];
+  const complete = [{
+    id: 'news',
+    channels: [
+      ...preview[0].channels,
+      { channelId: 'euronews-it', name: 'Euronews Italian (720p)' },
+    ],
+  }];
+  assert.equal(pickExploreFeaturedForView({
+    activeCategory: 'all',
+    fullCollections: complete,
+    visibleCollections: preview,
+  }).channelId, 'euronews-it');
 });
 
 test("Explore keeps a selected empty category honest", () => {

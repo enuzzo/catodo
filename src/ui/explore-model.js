@@ -199,3 +199,12 @@ export function pickExploreFeatured(collections, currentId = "") {
     || channels[0]
     || null;
 }
+
+export function pickExploreFeaturedForView({
+  activeCategory = 'all',
+  fullCollections = [],
+  visibleCollections = [],
+  currentId = '',
+} = {}) {
+  return pickExploreFeatured(activeCategory === 'all' ? fullCollections : visibleCollections, currentId);
+}

@@ -19,7 +19,7 @@ import {
   buildExploreCollections,
   filterExploreChannelsByCountry,
   matchesExploreCategory,
-  pickExploreFeatured,
+  pickExploreFeaturedForView,
   randomizeExploreChannels,
   sortExploreChannels,
 } from "./ui/explore-model.js";
@@ -651,7 +651,12 @@ function renderExplore() {
     && (state.exploreCategory === "all" || matchesExploreCategory(existing, state.exploreCategory))
     && featuredMatchesCountry
     ? existing
-    : pickExploreFeatured(collections, state.exploreFeaturedId);
+    : pickExploreFeaturedForView({
+      activeCategory: state.exploreCategory,
+      fullCollections,
+      visibleCollections: collections,
+      currentId: state.exploreFeaturedId,
+    });
   const featuredCollection = fullCollections.find((collection) =>
     collection.channels.some((channel) => channelId(channel) === channelId(featured)));
   if (featured) state.exploreFeaturedId = channelId(featured);
