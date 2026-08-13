@@ -665,7 +665,7 @@ textarea {
 .signal-bar {
   z-index: 15;
   display: grid;
-  grid-template-columns: 230px 250px minmax(230px, 350px) minmax(270px, 1fr) 245px;
+  grid-template-columns: 230px 250px minmax(230px, 350px) minmax(430px, 1fr);
   align-items: stretch;
   border-top: 1px solid var(--line);
   background: var(--paper-raised);
@@ -676,7 +676,6 @@ textarea {
 
 .signal-bar__region,
 .signal-bar__clock,
-.signal-bar__network,
 .signal-bar__status {
   display: flex;
   align-items: center;
@@ -690,7 +689,6 @@ textarea {
 }
 
 .signal-bar__region i,
-.signal-bar__network i,
 .signal-bar__status i {
   font-size: 26px;
 }
@@ -701,7 +699,6 @@ textarea {
 }
 
 .signal-bar__clock::before,
-.signal-bar__network::before,
 .signal-bar__status::before {
   position: absolute;
   left: 0;
@@ -729,19 +726,25 @@ textarea {
 .ebu-bars i:nth-child(7) { background: var(--ebu-blue); }
 .ebu-bars i:nth-child(8) { background: var(--ink); }
 
-.signal-bar__network,
 .signal-bar__status {
   position: relative;
 }
 
 .signal-bar__network {
-  justify-content: center;
-  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 4px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line);
   color: var(--signal);
 }
 
 .signal-bar__status {
   gap: 8px;
+  justify-content: flex-end;
+  min-width: 0;
+  padding: 0 18px;
   color: var(--ink);
 }
 
@@ -1408,100 +1411,11 @@ textarea {
 
 .home-bottom {
   display: grid;
-  grid-template-columns: minmax(430px, 0.85fr) minmax(650px, 1.15fr);
-  gap: 28px;
   margin-top: 16px;
 }
 
-.multiview-promo {
-  display: grid;
-  grid-template-columns: minmax(210px, 0.9fr) 1.4fr;
-  min-width: 0;
-  min-height: 168px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--paper-raised);
-}
-
-.multiview-promo__copy {
-  display: grid;
-  grid-template-columns: 62px 1fr;
-  grid-template-rows: auto auto auto;
-  align-content: center;
-  gap: 2px 14px;
-  padding: 15px 18px;
-}
-
-.multiview-promo__copy h2 {
-  grid-column: 1 / -1;
-  margin: 0 0 17px;
-  color: var(--signal);
-  font-family: var(--font-ui);
-  font-size: 16px;
-  font-weight: 500;
-  text-transform: uppercase;
-}
-
-.multiview-promo__copy > i {
-  grid-row: 2 / 4;
-  color: var(--signal);
-  font-size: 56px;
-}
-
-.multiview-promo__copy strong {
-  align-self: end;
-  color: var(--signal);
-  font-family: var(--font-ui);
-  font-size: 13px;
-  text-transform: uppercase;
-}
-
-.multiview-promo__copy p {
-  margin: 2px 0 0;
-  font-size: 12px;
-  line-height: 1.35;
-}
-
-.multiview-promo__slots {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  padding: 0;
-  border-left: 1px solid var(--line);
-  background: transparent;
-}
-
-.multiview-promo__slots span {
-  display: grid;
-  grid-template-rows: 1fr 1fr;
-  place-items: center;
-  border-right: 1px solid var(--line);
-  color: var(--signal);
-  font-family: var(--font-ui);
-  font-size: 31px;
-  font-weight: 500;
-}
-
-.multiview-promo__slots span b {
-  align-self: end;
-  font-weight: 500;
-}
-
-.multiview-promo__slots span > i {
-  align-self: start;
-  margin-top: 12px;
-  font-size: 25px;
-}
-
-.multiview-promo__slots span:last-child {
-  border-right: 0;
-}
-
-.multiview-promo__slots:hover span {
-  background: var(--signal-soft);
-}
-
 .favorites-shelf {
+  grid-column: 1 / -1;
   min-width: 0;
 }
 
@@ -1510,7 +1424,7 @@ textarea {
 }
 
 .channel-grid--favorites {
-  grid-template-columns: repeat(5, minmax(118px, 1fr));
+  grid-template-columns: repeat(10, minmax(118px, 1fr));
   height: 130px;
   margin-top: 5px;
 }
@@ -1897,15 +1811,8 @@ textarea {
   .home-bottom {
     grid-column: 1 / -1;
     grid-row: 3;
-    grid-template-columns: minmax(560px, 0.86fr) minmax(850px, 1.14fr);
-    gap: 30px;
     height: 177px;
     margin-top: 24px;
-  }
-
-  .multiview-promo {
-    min-height: 177px;
-    grid-template-columns: 240px 1fr;
   }
 
   .channel-grid--favorites {
@@ -1914,7 +1821,7 @@ textarea {
 
   .signal-bar {
     position: relative;
-    grid-template-columns: 242px 250px minmax(0, 1fr) 255px;
+    grid-template-columns: 242px 250px minmax(210px, 366px) minmax(430px, 1fr);
     font-size: 16px;
   }
 
@@ -1930,26 +1837,15 @@ textarea {
   }
 
   .ebu-bars {
-    position: absolute;
-    inset-block: 0;
-    left: 50%;
-    width: 366px;
-    max-width: none;
-    min-width: 0;
-    transform: translateX(-50%);
-  }
-
-  .signal-bar__network {
     grid-column: 3;
-    padding-right: 54px;
-  }
-
-  .signal-bar__network::before {
-    display: none;
+    width: 100%;
+    max-width: 366px;
+    min-width: 210px;
   }
 
   .signal-bar__status {
     grid-column: 4;
+    padding-right: 40px;
   }
 }
 
@@ -2806,6 +2702,90 @@ textarea {
   color: var(--ink-soft);
   font-size: 10px;
   line-height: 1.4;
+}
+
+.installation-sync-status {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper-raised);
+}
+
+.installation-sync-status__icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--signal-soft);
+  color: var(--signal);
+  font-size: 22px;
+}
+
+.installation-sync-status__copy {
+  display: grid;
+  gap: 3px;
+}
+
+.installation-sync-status__copy strong {
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.installation-sync-status__copy span {
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.installation-sync-status__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.installation-sync-status__actions .button {
+  min-height: 48px;
+}
+
+.installation-sync-status[data-status="error"] {
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--line));
+  background: color-mix(in srgb, var(--danger) 6%, var(--paper-raised));
+}
+
+.installation-sync-status[data-status="restore-error"] {
+  border-color: color-mix(in srgb, var(--warning) 42%, var(--line));
+}
+
+@media (max-width: 720px) {
+  .installation-sync-status {
+    grid-template-columns: 46px minmax(0, 1fr);
+  }
+
+  .installation-sync-status__actions {
+    grid-column: 1 / -1;
+    justify-content: stretch;
+  }
+
+  .installation-sync-status__actions .button {
+    flex: 1 1 220px;
+  }
+}
+
+.installation-sync-status[data-status="error"] .installation-sync-status__icon {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+}
+
+.installation-sync-status[data-status="synced"] .installation-sync-status__icon {
+  background: color-mix(in srgb, var(--success) 12%, transparent);
+  color: var(--success);
 }
 
 .world-catalog-callout {
@@ -4448,7 +4428,7 @@ textarea {
   }
 
   .signal-bar {
-    grid-template-columns: 190px 210px minmax(200px, 300px) minmax(230px, 1fr) 210px;
+    grid-template-columns: 190px 210px minmax(200px, 300px) minmax(430px, 1fr);
   }
 
   .page--home {
@@ -4494,14 +4474,11 @@ textarea {
   }
 
   .home-bottom {
-    grid-template-columns: minmax(390px, 0.82fr) minmax(600px, 1.18fr);
-  }
-
-  .multiview-promo {
-    min-height: 146px;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .channel-grid--favorites {
+    grid-template-columns: repeat(10, minmax(100px, 1fr));
     height: 110px;
   }
 
@@ -4601,7 +4578,7 @@ textarea {
   }
 
   .signal-bar {
-    grid-template-columns: 170px 1fr 1fr 190px;
+    grid-template-columns: 170px minmax(180px, 1fr) minmax(430px, 1.5fr);
   }
 
   .signal-bar .ebu-bars {
@@ -4631,6 +4608,14 @@ textarea {
 
   .favorites-shelf {
     min-height: 160px;
+  }
+
+  .channel-grid--favorites {
+    grid-template-columns: repeat(5, minmax(118px, 1fr));
+  }
+
+  .channel-grid--favorites > :nth-child(n + 6) {
+    display: none;
   }
 
   .countries-layout {
@@ -4816,16 +4801,6 @@ textarea {
 
   .atlas-card {
     min-height: 390px;
-  }
-
-  .multiview-promo {
-    grid-template-columns: 1fr;
-  }
-
-  .multiview-promo__slots {
-    min-height: 100px;
-    border-top: 1px solid var(--line);
-    border-left: 0;
   }
 
   .channel-grid--favorites {

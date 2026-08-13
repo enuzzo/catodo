@@ -26,6 +26,24 @@ test("Multiview keeps audio muted until a gesture and switches audio without ret
   controller.destroy();
 });
 
+test("Multiview audio control toggles the active feed back to all-muted", () => {
+  const controller = new MultiviewController({
+    createSlot: (options) => new FakeSlot(options),
+    staggerMs: 0
+  });
+  controller.setLayout(2);
+
+  assert.equal(controller.toggleAudio("slot-1"), true);
+  assert.equal(controller.audioSlotId, "slot-1");
+  assert.equal(controller.slots[0].video.muted, false);
+  assert.equal(controller.slots[1].video.muted, true);
+
+  assert.equal(controller.toggleAudio("slot-1"), false);
+  assert.equal(controller.audioSlotId, null);
+  assert.ok(controller.slots.every((slot) => slot.video.muted));
+  controller.destroy();
+});
+
 test("Multiview starts slots sequentially and isolates a rejected slot", async () => {
   const order = [];
   const degraded = [];

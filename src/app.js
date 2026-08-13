@@ -10,7 +10,7 @@ import {
   sourcePreset,
 } from "./data/index.js";
 import i18n from "./i18n/index.js";
-import { MultiviewController, PlayerManager } from "./player/index.js";
+import { MultiviewController, PlayerManager, releasePlayerForTransition } from "./player/index.js";
 import { mountAppUI } from "./ui/markup.js";
 import { EpgService, epgPreset } from "./epg/index.js";
 import { filterChannelPicker } from "./ui/channel-picker-filter.js";
@@ -19,6 +19,7 @@ import { multiviewTelemetry, singleTelemetry } from "./ui/telemetry-model.js";
 import { resetWorldMapView, zoomWorldMap } from "./ui/world-map.js";
 
 const UI_CHANNEL_LIMIT = 72;
+const HOME_FAVORITES_LIMIT = 10;
 const MULTIVIEW_MAX = 4;
 const PLAYABLE_KINDS = new Set(["hls"]);
 const TONE_BY_COUNTRY = ["blue", "cyan", "green", "yellow", "magenta", "red", "white"];
@@ -89,6 +90,9 @@ let directoryMaps = { byCode: new Map(), byName: new Map() };
 let playerChromeTimer = 0;
 let multiviewChromeTimer = 0;
 let multiviewPointerAt = 0;
+let playerSession = 0;
+let playerTransitioning = false;
+let lastInstallationSyncNotice = "";
 
 function legacyStorage() {
   try { return globalThis.localStorage || undefined; }
@@ -97,6 +101,17 @@ function legacyStorage() {
 
 function t(key, fallback, vars = {}) {
   return i18n.t(key, fallback, vars);
+}
+
+function reportInstallationSyncError(error) {
+  const detail = error?.message || String(error || "Unknown synchronization error");
+  if (detail === lastInstallationSyncNotice) return;
+  lastInstallationSyncNotice = detail;
+  ui?.toast(t(
+    "settings.syncFailureToast",
+    "Shared storage is unavailable. Changes are queued safely in this browser. {error}",
+    { error: detail },
+  ), { tone: "error" });
 }
 
 function channelId(channel) {
@@ -442,7 +457,7 @@ function renderHome() {
   const worldMix = state.worldMixIds.map(findChannel).filter(Boolean);
   const savedFavorites = catalog.list({ favorite: true }).map(decorateChannel).filter(Boolean);
   const favorites = QA_MODE && !savedFavorites.length
-    ? worldMix.slice(0, 5).map(decorateChannel).filter(Boolean)
+    ? worldMix.slice(0, HOME_FAVORITES_LIMIT).map(decorateChannel).filter(Boolean)
     : savedFavorites;
   const mixCountries = new Set(worldMix.map(inferredCountryCode).filter(Boolean));
   const markers = worldMix
@@ -459,11 +474,12 @@ function renderHome() {
     });
   }
   const allPlayableCountries = new Set(allPlayable.map(inferredCountryCode).filter(Boolean));
+  const sync = snapshot.installationSync || {};
   ui.renderHome({
     activate: state.view === "home",
     featured: featured ? { ...decorateChannel(featured), muted: state.homeMuted, autoplay: true } : null,
     channels: worldMix.map(decorateChannel),
-    favorites: favorites.slice(0, 5),
+    favorites: favorites.slice(0, HOME_FAVORITES_LIMIT),
     liveCount: allPlayable.length,
     countryCount: allPlayableCountries.size,
     selectedIso2: inferredCountryCode(featured),
@@ -472,6 +488,9 @@ function renderHome() {
     markers,
     countryCounts: countryCounts(),
     time: formatClock(),
+    restoring: !featured && Number(sync.hydrating) > 0,
+    syncError: !featured && sync.status === "error",
+    restoreError: !featured && Number(sync.hydrationFailed) > 0,
   });
 }
 
@@ -491,6 +510,9 @@ function renderExplore() {
     category: state.exploreCategory,
     collections,
     featured: featured ? { ...featured, muted: true, autoplay: state.view === "explore" } : null,
+    restoring: !featured && Number(state.lastCatalog?.installationSync?.hydrating) > 0,
+    syncError: !featured && state.lastCatalog?.installationSync?.status === "error",
+    restoreError: !featured && Number(state.lastCatalog?.installationSync?.hydrationFailed) > 0,
   });
   if (state.view !== "explore") ui.refs.exploreVideo.pause();
 }
@@ -552,6 +574,7 @@ function renderLibrary() {
   const matchingChannels = catalog.list(filters);
   const channels = matchingChannels.slice(0, state.libraryLimit);
   const allChannels = state.lastCatalog?.channels || [];
+  const installationSync = state.lastCatalog?.installationSync || {};
   ui.renderLibrary({
     activate: state.view === "library",
     channels: channels.map(decorateChannel),
@@ -565,6 +588,9 @@ function renderLibrary() {
     favoritesOnly: state.libraryFavoritesOnly,
     visibleCount: channels.length,
     filteredCount: matchingChannels.length,
+    restoring: Number(installationSync.hydrating) > 0,
+    syncError: installationSync.status === 'error',
+    restoreError: Number(installationSync.hydrationFailed) > 0,
   });
 }
 
@@ -575,6 +601,7 @@ function renderSources() {
     guideSources: state.epgSources,
     guideRefreshMinutes: state.epgRefreshMinutes,
     guideLastRefresh: state.epgLastRefresh,
+    installationSync: state.lastCatalog?.installationSync,
     sources: (state.lastCatalog?.sources || []).map((source) => ({
       ...source,
       channelCount: source.count || 0,
@@ -649,15 +676,33 @@ async function openPlayer(channel, { returnMode = "shell" } = {}) {
     multiview.muteAll();
     ui.refs.multiviewVideos.forEach((video) => video.pause());
   }
-  state.currentId = channelId(channel);
+  const openedChannelId = channelId(channel);
+  const session = ++playerSession;
+  state.currentId = openedChannelId;
   state.playerChromeVisible = false;
   state.playerMuted = state.playerVolume === 0;
   ui.refs.playerVideo.volume = state.playerVolume / 100;
   ui.showPlayer(playerUiState({ loading: true, playing: false, chromeVisible: false }));
-  void loadSchedules([channel]).then(() => ui.updatePlayer(playerUiState()));
-  await mainPlayer.tune(playbackSource(channel), { muted: state.playerMuted }).catch((error) => {
-    ui.updatePlayer(playerUiState({ loading: false, error: error.message, playing: false }));
+  void loadSchedules([channel]).then(() => {
+    if (isActivePlayerSession(session, openedChannelId)) ui.updatePlayer(playerUiState());
   });
+  await mainPlayer.tune(playbackSource(channel), { muted: state.playerMuted }).catch((error) => {
+    if (isActivePlayerSession(session, openedChannelId)) {
+      ui.updatePlayer(playerUiState({ loading: false, error: error.message, playing: false }));
+    }
+  });
+}
+
+function isActivePlayerSession(session, id) {
+  return isPlayerSurfaceActive()
+    && session === playerSession
+    && state.currentId === id;
+}
+
+function isPlayerSurfaceActive() {
+  return !playerTransitioning
+    && Boolean(state.currentId)
+    && ui?.refs?.root?.dataset?.mode === "player";
 }
 
 async function loadSchedules(channels, { force = false } = {}) {
@@ -678,7 +723,7 @@ async function loadSchedules(channels, { force = false } = {}) {
     renderHome();
     renderGuide();
     renderSources();
-    if (state.currentId) ui.updatePlayer(playerUiState());
+    if (isPlayerSurfaceActive()) ui.updatePlayer(playerUiState());
   }
 }
 
@@ -758,12 +803,53 @@ function createMainPlayer() {
 
 async function openMultiview(seed, { fill = true } = {}) {
   homePlayer.setMuted(true);
+  ui.refs.homeVideo.pause();
+  ui.refs.exploreVideo.pause();
+  mainPlayer.setMuted(true);
+  ui.refs.playerVideo.pause();
   if (fill) fillMultiview(seed);
   const feeds = state.multiviewFeeds.slice(0, state.multiviewLayout);
   state.multiviewAudioIndex = null;
   ui.showMultiview({ feeds: feeds.map(decorateChannel), layout: state.multiviewLayout, mutedAll: true, chromeVisible: true });
   setMultiviewChrome(true);
   await multiview.start(feeds.map(playbackSource), { count: state.multiviewLayout, videos: ui.refs.multiviewVideos });
+}
+
+async function releaseMainPlayer() {
+  const result = await releasePlayerForTransition({
+    manager: mainPlayer,
+    video: ui.refs.playerVideo,
+    fullscreenRoot: ui.refs.player,
+    documentRef: document,
+  });
+  if (!result.released) {
+    state.playerChromeVisible = true;
+    ui.updatePlayer(playerUiState({
+      chromeVisible: true,
+      muted: ui.refs.playerVideo.muted,
+      playing: !ui.refs.playerVideo.paused,
+    }));
+    ui.toast(t("player.fullscreenExitFailed", "Could not exit full screen. Playback stayed in the player."), { tone: "error" });
+    return false;
+  }
+  playerSession += 1;
+  mainPlayer = createMainPlayer();
+  return true;
+}
+
+async function addCurrentPlayerToMultiview() {
+  if (playerTransitioning) return;
+  const seed = findChannel(state.currentId);
+  if (!seed || !isPlayableChannel(seed)) return;
+  playerTransitioning = true;
+  try {
+    if (!await releaseMainPlayer()) return;
+    state.playerReturnMode = "shell";
+    state.currentId = "";
+    await openMultiview(seed);
+  } finally {
+    playerTransitioning = false;
+  }
 }
 
 function multiviewPickerChannels() {
@@ -842,31 +928,51 @@ function closeOverlays() {
 }
 
 async function closePlayerOverlay() {
-  mainPlayer.setMuted(true);
-  ui.refs.playerVideo.pause();
-  if (document.fullscreenElement === ui.refs.player) await document.exitFullscreen?.().catch(() => {});
-  mainPlayer.destroy();
-  mainPlayer = createMainPlayer();
-  if (state.playerReturnMode !== "multiview") {
-    closeOverlays();
-    return;
-  }
+  if (playerTransitioning) return;
+  const returnMode = state.playerReturnMode;
+  playerTransitioning = true;
+  try {
+    if (!await releaseMainPlayer()) return;
+    if (returnMode !== "multiview") {
+      state.playerReturnMode = "shell";
+      closeOverlays();
+      return;
+    }
 
-  state.playerReturnMode = "shell";
-  const feeds = state.multiviewFeeds.slice(0, state.multiviewLayout);
-  ui.showMultiview({
-    feeds: feeds.map(decorateChannel),
-    layout: state.multiviewLayout,
-    audioIndex: state.multiviewAudioIndex,
-    chromeVisible: true,
-  });
-  await Promise.all(ui.refs.multiviewVideos.slice(0, state.multiviewLayout).map((video) => video.play().catch(() => {})));
-  if (state.multiviewAudioIndex !== null) {
-    const slotId = `slot-${state.multiviewAudioIndex + 1}`;
-    multiview.registerUserGesture(slotId);
-    multiview.activateAudio(slotId);
+    state.playerReturnMode = "shell";
+    const requestedAudioIndex = state.multiviewAudioIndex;
+    const feeds = state.multiviewFeeds.slice(0, state.multiviewLayout);
+    multiview.muteAll();
+    ui.showMultiview({
+      feeds: feeds.map(decorateChannel),
+      layout: state.multiviewLayout,
+      mutedAll: true,
+      chromeVisible: true,
+    });
+    const resumed = await Promise.all(ui.refs.multiviewVideos.slice(0, state.multiviewLayout).map(async (video) => {
+      try {
+        await video.play();
+        return true;
+      } catch {
+        return false;
+      }
+    }));
+    if (requestedAudioIndex !== null && resumed[requestedAudioIndex]) {
+      state.multiviewAudioIndex = requestedAudioIndex;
+      multiview.registerUserGesture(`slot-${requestedAudioIndex + 1}`);
+    } else {
+      state.multiviewAudioIndex = null;
+      multiview.muteAll();
+    }
+    ui.updateMultiview({
+      feeds: feeds.map(decorateChannel),
+      layout: state.multiviewLayout,
+      audioIndex: state.multiviewAudioIndex,
+    });
+    setMultiviewChrome(true);
+  } finally {
+    playerTransitioning = false;
   }
-  setMultiviewChrome(true);
 }
 
 function showImportForCountry(code) {
@@ -1212,6 +1318,28 @@ async function handleAction(action, detail) {
         ui.toast("Playlist removed.");
       }
       break;
+    case "retry-installation-sync": {
+      const synced = await catalog.retryInstallationSync();
+      renderSources();
+      ui.toast(
+        synced ? t("settings.syncRetrySuccess", "Shared storage is synchronized.") : t("settings.syncRetryFailed", "Shared storage is still unavailable."),
+        { tone: synced ? "success" : "error" },
+      );
+      break;
+    }
+    case "recover-installation-data":
+      if (window.confirm(t(
+        "settings.syncRecoverConfirm",
+        "Merge the retained browser sources and Favorites into the shared library? Existing shared data will be kept.",
+      ))) {
+        const recovered = await catalog.recoverInstallationData();
+        renderAll();
+        ui.toast(
+          recovered ? t("settings.syncRecoverSuccess", "Retained data was merged into the shared library.") : t("settings.syncRecoverFailed", "Recovery is queued and will retry when shared storage reconnects."),
+          { tone: recovered ? "success" : "error" },
+        );
+      }
+      break;
     case "set-proxy": {
       const value = String(detail.formData?.get("proxy") || "").trim();
       if (value) {
@@ -1306,7 +1434,7 @@ async function handleAction(action, detail) {
       break;
     }
     case "add-to-multiview":
-      await openMultiview(findChannel(state.currentId));
+      await addCurrentPlayerToMultiview();
       break;
     case "open-multiview":
       await openMultiview(findChannel(id || state.featuredId));
@@ -1390,14 +1518,21 @@ async function selectMultiviewAudio(slotNumber) {
   const index = Math.max(0, Math.min(3, Number(slotNumber) - 1));
   const slot = multiview.slots?.[index] || multiview.findSlot?.(`slot-${index + 1}`);
   const slotId = slot?.id || `slot-${index + 1}`;
-  multiview.registerUserGesture(slotId);
-  state.multiviewAudioIndex = index;
-  await ui.refs.multiviewVideos[index]?.play().catch(() => {});
-  multiview.activateAudio(slotId);
+  const audible = multiview.toggleAudio(slotId);
+  state.multiviewAudioIndex = audible ? index : null;
+  if (audible) {
+    try {
+      await ui.refs.multiviewVideos[index]?.play();
+    } catch {
+      multiview.muteAll();
+      state.multiviewAudioIndex = null;
+      ui.toast(t("multiview.audioBlocked", "Tap the feed again to enable audio."), { tone: "error" });
+    }
+  }
   ui.updateMultiview({
     feeds: state.multiviewFeeds.slice(0, state.multiviewLayout).map(decorateChannel),
     layout: state.multiviewLayout,
-    audioIndex: index,
+    audioIndex: state.multiviewAudioIndex,
   });
 }
 
@@ -1408,6 +1543,7 @@ function bindVideoEvents() {
     ui.updateHeader({ signalOk: true });
   });
   ui.refs.playerVideo.addEventListener("playing", async () => {
+    if (!isPlayerSurfaceActive()) return;
     ui.updatePlayer(playerUiState({ loading: false, playing: true }));
     if (state.currentId && lastRememberedId !== state.currentId) {
       lastRememberedId = state.currentId;
@@ -1415,9 +1551,11 @@ function bindVideoEvents() {
     }
   });
   ui.refs.playerVideo.addEventListener("pause", () => {
+    if (!isPlayerSurfaceActive()) return;
     ui.updatePlayer(playerUiState({ playing: false }));
   });
   ui.refs.playerVideo.addEventListener("waiting", () => {
+    if (!isPlayerSurfaceActive()) return;
     ui.updatePlayer(playerUiState({ loading: true, playing: false }));
   });
   ui.refs.multiview.addEventListener("pointermove", () => {
@@ -1462,7 +1600,11 @@ async function boot() {
   multiview = createMultiviewController();
   bindVideoEvents();
 
-  catalog = new CatalogService({ proxy: state.proxy || undefined, localStorage: legacyStorage() });
+  catalog = new CatalogService({
+    proxy: state.proxy || undefined,
+    localStorage: legacyStorage(),
+    onSyncError: reportInstallationSyncError,
+  });
   await catalog.init();
   state.proxy = await catalog.getSetting("proxy", "");
   epg = new EpgService({ catalog, proxy: proxyUrl });

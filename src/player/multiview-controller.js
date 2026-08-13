@@ -130,6 +130,17 @@ export class MultiviewController extends EventTarget {
     return true;
   }
 
+  toggleAudio(slotId) {
+    const selected = this.findSlot(slotId);
+    if (!selected) return false;
+    this.userGestureReceived = true;
+    if (this.audioSlotId === selected.id) {
+      this.muteAll();
+      return false;
+    }
+    return this.activateAudio(selected.id);
+  }
+
   muteAll() {
     this.slots.forEach((slot) => slot.setMuted(true));
     this.audioSlotId = null;

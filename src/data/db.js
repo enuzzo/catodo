@@ -22,6 +22,10 @@ function promisify(request) {
   });
 }
 
+export function requestResult(request) {
+  return promisify(request);
+}
+
 export async function openCatalogDb(indexedDBImpl = globalThis.indexedDB) {
   const databaseFactory = await resolveIndexedDb(indexedDBImpl);
   const request = databaseFactory.open(DB_NAME, DB_VERSION);
@@ -113,6 +117,12 @@ export async function replaceSourceSnapshot(db, source, channels, metadata = {})
   const relationStore = transaction.objectStore("channelSources");
   const aliasStore = transaction.objectStore("aliases");
 
+  const currentSource = metadata.requireExisting ? await promisify(sourceStore.get(source.sourceId)) : source;
+  if (!currentSource) {
+    await transactionDone(transaction);
+    return null;
+  }
+
   const oldRelations = await promisify(relationStore.index("sourceId").getAll(source.sourceId));
   oldRelations.forEach((relation) => relationStore.delete(relation.id));
   const oldEndpoints = await promisify(endpointStore.index("sourceId").getAll(source.sourceId));
@@ -187,4 +197,45 @@ export async function applyInstallationState(db, payload = {}) {
   (payload.favorites || []).forEach((favorite) => favoriteStore.put({ ...favorite }));
   Object.entries(payload.settings || {}).forEach(([key, value]) => settingStore.put({ key, value, updatedAt: Date.now(), installation: true }));
   await transactionDone(transaction);
+}
+
+export async function mergeInstallationState(db, payload = {}) {
+  const existingSources = new Map((await getAll(db, 'sources')).map((source) => [source.sourceId, source]));
+  const existingFavorites = new Map((await getAll(db, 'favorites')).map((favorite) => [favorite.channelId || favorite.id, favorite]));
+  const stores = ['sources', 'favorites', 'settings'];
+  const transaction = db.transaction(stores, 'readwrite');
+  const sourceStore = transaction.objectStore('sources');
+  const favoriteStore = transaction.objectStore('favorites');
+  const settingStore = transaction.objectStore('settings');
+  (payload.sources || []).forEach((source) => sourceStore.put({ ...(existingSources.get(source.sourceId) || {}), ...source }));
+  (payload.favorites || []).forEach((favorite) => {
+    const key = favorite.channelId || favorite.id;
+    favoriteStore.put({ ...(existingFavorites.get(key) || {}), ...favorite });
+  });
+  Object.entries(payload.settings || {}).forEach(([key, value]) => settingStore.put({ key, value, updatedAt: Date.now(), installation: true }));
+  await transactionDone(transaction);
+}
+
+export async function applyInstallationProjection(db, remote, { outboxKey, fold, settingKeys = [] }) {
+  const transaction = db.transaction(['sources', 'favorites', 'settings'], 'readwrite');
+  const sourceStore = transaction.objectStore('sources');
+  const favoriteStore = transaction.objectStore('favorites');
+  const settingStore = transaction.objectStore('settings');
+  const [existingSourceRows, outboxRecord] = await Promise.all([
+    promisify(sourceStore.getAll()),
+    promisify(settingStore.get(outboxKey)),
+  ]);
+  const outbox = Array.isArray(outboxRecord?.value) ? outboxRecord.value : [];
+  const projection = fold(remote, outbox);
+  const existingSources = new Map(existingSourceRows.map((source) => [source.sourceId, source]));
+  sourceStore.clear();
+  favoriteStore.clear();
+  (projection.sources || []).forEach((source) => sourceStore.put({ ...(existingSources.get(source.sourceId) || {}), ...source }));
+  (projection.favorites || []).forEach((favorite) => favoriteStore.put({ ...favorite }));
+  settingKeys.forEach((key) => {
+    if (!Object.prototype.hasOwnProperty.call(projection.settings || {}, key)) settingStore.delete(key);
+  });
+  Object.entries(projection.settings || {}).forEach(([key, value]) => settingStore.put({ key, value, updatedAt: Date.now(), installation: true }));
+  await transactionDone(transaction);
+  return { projection, outbox };
 }

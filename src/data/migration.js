@@ -1,6 +1,7 @@
 import { endpointIdFor, channelIdFor, sourceIdFor, stableHash } from "./identity.js";
 import { inferEndpointKind } from "./m3u.js";
 import { get, put, replaceSourceSnapshot } from "./db.js";
+import { installationPayload } from "./installation-sync.js";
 
 export const LEGACY_MIGRATION_ID = "localStorage-catodo-v1";
 
@@ -80,7 +81,36 @@ export function upgradeLegacyChannel(channel, sourceId) {
   return record;
 }
 
-export async function migrateLegacyStorage(db, storage = globalThis.localStorage) {
+export function legacyInstallationPayload(storage) {
+  const legacy = collectLegacyState(storage);
+  const sources = [];
+  const urlToChannelId = new Map();
+  for (const legacySource of Array.isArray(legacy.sources) ? legacy.sources : []) {
+    const sourceId = legacySource?.sourceId || legacySource?.id || sourceIdFor(legacySource || {});
+    const url = String(legacySource?.url || '').trim();
+    if (!sourceId || !url) continue;
+    sources.push({
+      sourceId,
+      kind: 'url',
+      name: legacySource.name || url,
+      url,
+      trusted: Boolean(legacySource.trusted),
+      createdAt: Number(legacySource.ts) || Date.now(),
+    });
+    const cache = legacy[`ch:${legacySource.id}`] || legacy[`ch:${sourceId}`];
+    for (const channel of cache?.ch || []) {
+      const upgraded = upgradeLegacyChannel(channel, sourceId);
+      upgraded.endpoints.forEach((endpoint) => urlToChannelId.set(endpoint.url, upgraded.channelId));
+    }
+  }
+  const favorites = resolveLegacyReferences(legacy.favs || legacy.favorites, urlToChannelId, 'favorite')
+    .filter((favorite) => favorite.channelId);
+  const settings = {};
+  if (typeof legacy.proxy === 'string') settings.proxy = legacy.proxy;
+  return installationPayload({ sources, favorites, settings });
+}
+
+export async function migrateLegacyStorage(db, storage = null) {
   const completed = await get(db, "migrationJournal", LEGACY_MIGRATION_ID);
   if (completed?.status === "complete") return completed;
   const legacy = collectLegacyState(storage);

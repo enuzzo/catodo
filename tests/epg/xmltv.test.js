@@ -54,6 +54,19 @@ test("forced refresh revalidates once, preserves a 304 cache and persists cadenc
   assert.equal(settings.get("epg:refreshMinutes"), 30);
 });
 
+test("rejects more than 32 guide sources before changing persisted or in-memory settings", async () => {
+  const writes = [];
+  const catalog = {
+    getSetting: async (_key, fallback) => fallback,
+    setSetting: async (key, value) => { writes.push([key, value]); },
+  };
+  const service = await new EpgService({ catalog }).init();
+  const sources = Array.from({ length: 33 }, (_, index) => `https://example.org/${index}.xml`);
+  await assert.rejects(service.setSources(sources), /at most 32 sources/);
+  assert.deepEqual(service.getSources(), []);
+  assert.deepEqual(writes, []);
+});
+
 test("parses, decodes and filters current XMLTV programmes", () => {
   const xml = `<?xml version="1.0"?><tv>
     <programme start="20260812140000 +0200" stop="20260812150000 +0200" channel="Rai1.it"><title>News &amp; Weather</title><desc><![CDATA[Live <b>edition</b>]]></desc></programme>

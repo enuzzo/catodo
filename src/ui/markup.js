@@ -509,28 +509,6 @@ function createHomeView(t) {
   top.append(directory);
 
   const bottom = element('div', 'home-bottom');
-  const multiPromo = element('article', 'multiview-promo');
-  const multiCopy = element('div', 'multiview-promo__copy');
-  multiCopy.append(
-    textNode('h2', null, t, 'multiview.titlePlus', 'Multiview +'),
-    icon('grid-four'),
-    textNode('strong', null, t, 'multiview.titlePlus', 'Multiview +'),
-    textNode('p', null, t, 'multiview.promoBody', 'Open 4 channels at the same time'),
-  );
-  const multiSlots = element('button', 'multiview-promo__slots', {
-    type: 'button',
-    dataset: { action: 'open-multiview' },
-    'aria-label': translate(t, 'multiview.openAriaLabel', 'Open Multiview'),
-  });
-  for (let index = 1; index <= 4; index += 1) {
-    const slot = element('span');
-    const number = element('b');
-    number.textContent = String(index);
-    slot.append(number, icon('squares-four'));
-    multiSlots.append(slot);
-  }
-  multiPromo.append(multiCopy, multiSlots);
-
   const favorites = element('section', 'favorites-shelf');
   const favoriteMore = actionButton({
     t,
@@ -543,7 +521,7 @@ function createHomeView(t) {
   });
   const favoriteGrid = element('div', 'channel-grid channel-grid--favorites');
   favorites.append(createSectionTitle(t, 'favorites.title', 'Favorites', favoriteMore), favoriteGrid);
-  bottom.append(multiPromo, favorites);
+  bottom.append(favorites);
   view.append(headline, top, bottom);
 
   return {
@@ -646,7 +624,7 @@ function setExploreHero(refs, channel, collection, t) {
     );
     refs.heroSchedule.append(row);
   });
-  setMedia(refs.video, { ...value, muted: true, autoplay: true });
+  setMedia(refs.video, { ...value, muted: true, autoplay: value.autoplay !== false });
 }
 
 function renderExploreCollections(container, collections, t) {
@@ -1110,6 +1088,37 @@ function createSourcesView(t) {
   });
   heading.append(copy, back);
 
+  const syncStatus = element('section', 'installation-sync-status', {
+    role: 'status',
+    'aria-live': 'polite',
+    dataset: { status: 'loading' },
+  });
+  const syncIcon = element('div', 'installation-sync-status__icon');
+  syncIcon.append(icon('arrows-clockwise'));
+  const syncCopy = element('div', 'installation-sync-status__copy');
+  const syncTitle = element('strong');
+  const syncDetail = element('span');
+  syncCopy.append(syncTitle, syncDetail);
+  const syncActions = element('div', 'installation-sync-status__actions');
+  const syncRetry = actionButton({
+    t,
+    action: 'retry-installation-sync',
+    iconName: 'arrow-clockwise',
+    key: 'settings.syncRetry',
+    fallback: 'Retry shared storage',
+    className: 'button--ghost button--small',
+  });
+  const syncRecover = actionButton({
+    t,
+    action: 'recover-installation-data',
+    iconName: 'lifebuoy',
+    key: 'settings.syncRecover',
+    fallback: 'Recover retained data',
+    className: 'button--ghost button--small',
+  });
+  syncActions.append(syncRetry, syncRecover);
+  syncStatus.append(syncIcon, syncCopy, syncActions);
+
   const worldCatalog = element('article', 'world-catalog-callout');
   const worldIcon = element('div', 'world-catalog-callout__icon');
   worldIcon.append(icon('globe-hemisphere-west'));
@@ -1270,8 +1279,23 @@ function createSourcesView(t) {
   proxyForm.append(proxyLabel, proxyFooter);
   guide.append(guideList, proxyForm);
   layout.append(sourcePanel, guide);
-  view.append(heading, worldCatalog, guideSettings, layout);
-  return { view, list, proxyForm, proxyInput, guideInput, guideCadence: cadence, guideCheckbox: checkbox, guideStatus };
+  view.append(heading, syncStatus, worldCatalog, guideSettings, layout);
+  return {
+    view,
+    list,
+    proxyForm,
+    proxyInput,
+    guideInput,
+    guideCadence: cadence,
+    guideCheckbox: checkbox,
+    guideStatus,
+    syncStatus,
+    syncIcon,
+    syncTitle,
+    syncDetail,
+    syncRetry,
+    syncRecover,
+  };
 }
 
 function createSignalLab(t) {
@@ -1902,22 +1926,22 @@ function createSignalBar(t) {
   const clock = textNode('time', 'signal-bar__clock', t, 'time.placeholder', '--:-- CET');
   const bars = element('div', 'ebu-bars', { 'aria-hidden': 'true' });
   for (let index = 0; index < 8; index += 1) bars.append(element('i'));
-  const network = element('div', 'signal-bar__network');
+  const status = element('div', 'signal-bar__status');
+  const statusLabel = textNode('span', 'signal-bar__telemetry-label', t, 'footer.buffer', 'Buffer');
+  const statusText = element('strong', 'mono');
+  statusText.textContent = '—';
+  const network = element('span', 'signal-bar__network');
   const downLabel = textNode('span', 'signal-bar__telemetry-label', t, 'footer.download', 'Down');
   const downValue = element('strong', 'mono');
   downValue.textContent = '0.00 Mbps';
   const upLabel = textNode('span', 'signal-bar__telemetry-label', t, 'footer.upload', 'Up');
   const upValue = element('strong', 'mono');
   upValue.textContent = 'N/A';
-  network.append(icon('arrow-down'), downLabel, downValue, icon('arrow-up'), upLabel, upValue);
-  const status = element('div', 'signal-bar__status');
-  const statusLabel = textNode('span', 'signal-bar__telemetry-label', t, 'footer.buffer', 'Buffer');
-  const statusText = element('strong', 'mono');
-  statusText.textContent = '—';
+  network.append(downLabel, downValue, upLabel, upValue);
   const statusMeta = element('span', 'signal-bar__status-meta mono');
   statusMeta.textContent = 'Waiting';
-  status.append(icon('waveform'), statusLabel, statusText, statusMeta);
-  bar.append(region, clock, bars, network, status);
+  status.append(icon('waveform'), statusLabel, statusText, statusMeta, network);
+  bar.append(region, clock, bars, status);
   return { bar, clock, status, statusText, statusMeta, network, downValue, upValue };
 }
 
@@ -2604,8 +2628,48 @@ export function mountAppUI(root, options = {}) {
       if (shouldActivateShellView(root.dataset.mode, state.activate)) activateShellView('home');
       const channels = normaliseArray(state.channels || state.nearbyChannels || state.liveChannels);
       const favorites = normaliseArray(state.favorites);
-      const featured = state.featured || state.currentChannel || channels[0] || {};
+      const placeholder = state.restoring
+        ? {
+            name: translate(t, 'home.restoringTitle', 'Restoring shared channels'),
+            description: translate(t, 'home.restoringBody', 'Saved playlists are being downloaded for this browser.'),
+            autoplay: false,
+            muted: true,
+            clearSource: true,
+          }
+        : state.syncError || state.restoreError
+          ? {
+              name: translate(
+                t,
+                state.restoreError ? 'home.restoreErrorTitle' : 'home.syncErrorTitle',
+                state.restoreError ? 'Saved playlists unavailable' : 'Shared library unavailable',
+              ),
+              description: translate(
+                t,
+                state.restoreError ? 'home.restoreErrorBody' : 'home.syncErrorBody',
+                state.restoreError
+                  ? 'The shared list is safe, but its third-party playlists could not be downloaded on this browser.'
+                  : 'Open Settings to retry shared storage. Queued browser changes remain safe.',
+              ),
+              autoplay: false,
+              muted: true,
+              clearSource: true,
+            }
+          : {};
+      const featured = state.featured || state.currentChannel || channels[0] || placeholder;
       setFeatured(home, featured, t);
+      const playable = Boolean(safeId(featured.channelId || featured.id || featured.tvgId || featured.url));
+      home.openPlayer.disabled = !playable;
+      home.random.disabled = !playable;
+      home.favorite.disabled = !playable;
+      home.mute.disabled = !playable;
+      home.liveCard.classList.toggle('is-restoring', Boolean(state.restoring || state.syncError || state.restoreError));
+      if (state.restoring || state.syncError || state.restoreError) {
+        home.liveBadgeText.textContent = translate(
+          t,
+          state.restoring ? 'status.restoring' : 'status.unavailable',
+          state.restoring ? 'RESTORING' : 'UNAVAILABLE',
+        );
+      }
       setTranslatedText(home.liveCount, t, 'home.liveCount', '{count} LIVE', {
         count: safeText(state.liveCount ?? state.totalLive ?? channels.length),
       });
@@ -2630,7 +2694,26 @@ export function mountAppUI(root, options = {}) {
       const collections = normaliseArray(state.collections);
       const featuredCollection = collections.find((collection) => normaliseArray(collection.channels).some((channel) =>
         safeId(channel?.channelId || channel?.id) === safeId(state.featured?.channelId || state.featured?.id))) || collections[0];
-      setExploreHero(explore, state.featured || featuredCollection?.channels?.[0] || {}, featuredCollection, t);
+      const placeholder = state.restoring
+        ? { name: translate(t, 'home.restoringTitle', 'Restoring shared channels'), autoplay: false, clearSource: true }
+        : state.syncError || state.restoreError
+          ? {
+              name: translate(
+                t,
+                state.restoreError ? 'home.restoreErrorTitle' : 'home.syncErrorTitle',
+                state.restoreError ? 'Saved playlists unavailable' : 'Shared library unavailable',
+              ),
+              autoplay: false,
+              clearSource: true,
+            }
+          : {};
+      const featured = state.featured || featuredCollection?.channels?.[0] || placeholder;
+      setExploreHero(explore, featured, featuredCollection, t);
+      const playable = Boolean(safeId(featured.channelId || featured.id || featured.tvgId || featured.url));
+      explore.watch.disabled = !playable;
+      explore.random.disabled = !playable;
+      explore.surprise.disabled = !playable;
+      explore.hero.classList.toggle('is-restoring', Boolean(state.restoring || state.syncError || state.restoreError));
       renderExploreCollections(explore.collections, collections, t);
       Object.entries(explore.filterButtons).forEach(([category, button]) => {
         const active = category === safeText(state.category, 'all');
@@ -2701,21 +2784,42 @@ export function mountAppUI(root, options = {}) {
       library.favorites.classList.toggle('is-active', favoritesOnly);
       library.favorites.setAttribute('aria-pressed', favoritesOnly ? 'true' : 'false');
       if (channels.length) renderChannelTiles(library.grid, channels, t);
-      else renderEmpty(
+      else if (state.restoring) renderEmpty(
         library.grid,
         t,
-        'library.empty',
-        'Your library is waiting',
-        'Add a playlist or favorite a live channel to keep it close.',
-        actionButton({
-          t,
-          action: 'open-import-dialog',
-          iconName: 'plus',
-          key: 'library.addPlaylist',
-          fallback: 'Add playlist',
-          className: 'button--primary',
-        }),
+        'library.restoring',
+        'Restoring your shared library',
+        'CATODO is downloading the saved playlists for this browser. Your Favorites will appear as their channels become available.',
       );
+      else if (state.syncError) renderEmpty(
+        library.grid,
+        t,
+        'library.syncError',
+        'Your shared library could not be restored',
+        'Local data is safe. Open Settings to check the shared-storage status and retry after the connection recovers.',
+      );
+      else if (state.restoreError) renderEmpty(
+        library.grid,
+        t,
+        'library.restoreError',
+        'Saved playlists could not be downloaded',
+        'Shared storage is connected, but one or more third-party playlists failed on this browser. Open Settings to refresh those sources.',
+      );
+      else renderEmpty(
+          library.grid,
+          t,
+          'library.empty',
+          'Your library is waiting',
+          'Add a playlist or favorite a live channel to keep it close.',
+          actionButton({
+            t,
+            action: 'open-import-dialog',
+            iconName: 'plus',
+            key: 'library.addPlaylist',
+            fallback: 'Add playlist',
+            className: 'button--primary',
+          }),
+        );
       const visibleCount = Number(state.visibleCount ?? channels.length) || 0;
       const filteredCount = Number(state.filteredCount ?? visibleCount) || 0;
       library.loadMore.hidden = visibleCount >= filteredCount;
@@ -2732,6 +2836,34 @@ export function mountAppUI(root, options = {}) {
     renderSources(state = {}) {
       if (shouldActivateShellView(root.dataset.mode, state.activate)) activateShellView('sources');
       renderSources(sources.list, state.sources || state.playlists, t);
+      const sync = state.installationSync || {};
+      const hydrating = Math.max(0, Number(sync.hydrating) || 0);
+      const hydrationFailed = Math.max(0, Number(sync.hydrationFailed) || 0);
+      const baseStatus = safeText(sync.status, 'loading');
+      const status = baseStatus === 'error'
+        ? 'error'
+        : hydrating > 0
+          ? 'hydrating'
+          : hydrationFailed > 0
+            ? 'restore-error'
+            : baseStatus;
+      const syncContent = {
+        synced: ['cloud-check', 'settings.syncReady', 'Shared library connected', 'settings.syncReadyDetail', 'Sources, Favorites and guide settings follow this installation.'],
+        pending: ['cloud-arrow-up', 'settings.syncPending', 'Changes waiting to sync', 'settings.syncPendingDetail', '{count} change(s) are safely queued in this browser.'],
+        hydrating: ['cloud-arrow-down', 'settings.syncHydrating', 'Restoring shared channels', 'settings.syncHydratingDetail', '{count} playlist(s) are being downloaded on this browser.'],
+        'restore-error': ['warning-circle', 'settings.restoreError', 'Some playlists could not be restored', 'settings.restoreErrorDetail', '{count} saved playlist(s) could not be downloaded on this browser. Shared storage is still connected.'],
+        error: ['warning-circle', 'settings.syncError', 'Shared storage unavailable', 'settings.syncErrorDetail', 'Queued changes are safe in this browser. Use Retry shared storage when the connection recovers.'],
+        'local-only': ['hard-drives', 'settings.syncLocalOnly', 'Browser-only storage', 'settings.syncLocalOnlyDetail', 'This host does not provide installation-wide synchronization.'],
+        loading: ['arrows-clockwise', 'settings.syncLoading', 'Connecting shared library', 'settings.syncLoadingDetail', 'Checking installation storage…'],
+      }[status] || ['arrows-clockwise', 'settings.syncLoading', 'Connecting shared library', 'settings.syncLoadingDetail', 'Checking installation storage…'];
+      sources.syncStatus.dataset.status = status;
+      sources.syncIcon.replaceChildren(icon(syncContent[0]));
+      sources.syncTitle.textContent = translate(t, syncContent[1], syncContent[2]);
+      sources.syncDetail.textContent = translate(t, syncContent[3], syncContent[4], {
+        count: status === 'restore-error' ? hydrationFailed : status === 'pending' ? Number(sync.pending) || 0 : hydrating,
+      });
+      sources.syncRetry.hidden = !['error', 'pending', 'restore-error'].includes(status);
+      sources.syncRecover.hidden = !sync.recoveryAvailable;
       if (Object.prototype.hasOwnProperty.call(state, 'proxy')) {
         sources.proxyInput.value = safeText(state.proxy);
       }
@@ -2760,7 +2892,9 @@ export function mountAppUI(root, options = {}) {
     },
 
     updatePlayer(state = {}) {
-      const channel = state.channel || state.currentChannel || state;
+      const inlineChannel = ['channelId', 'id', 'tvgId', 'url', 'endpoints']
+        .some((key) => Object.prototype.hasOwnProperty.call(state, key)) ? state : null;
+      const channel = state.channel || state.currentChannel || inlineChannel;
       if (channel && typeof channel === 'object') {
         const id = safeId(channel.channelId || channel.id || channel.tvgId || channel.url);
         player.overlay.dataset.channelId = id;
@@ -2870,6 +3004,14 @@ export function mountAppUI(root, options = {}) {
         refs.video.muted = !isListening;
         refs.listening.hidden = !isListening;
         refs.audio.replaceChildren(icon(isListening ? 'speaker-high' : 'speaker-slash'));
+        const audioLabel = translate(
+          t,
+          isListening ? 'multiview.muteFeed' : 'multiview.listenToFeed',
+          isListening ? 'Mute this feed' : 'Listen to this feed',
+        );
+        refs.audio.setAttribute('aria-label', audioLabel);
+        refs.audio.title = audioLabel;
+        refs.audio.setAttribute('aria-pressed', String(isListening));
         if (feed) {
           setMedia(refs.video, { ...feed, muted: !isListening, autoplay: state.autoplay !== false });
           refs.number.textContent = String(index + 1).padStart(2, '0');

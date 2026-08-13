@@ -40,6 +40,9 @@ export async function fetchPlaylist(url, options = {}) {
   let lastError;
   for (const target of candidates) {
     const controller = new AbortController();
+    const abort = () => controller.abort();
+    options.signal?.addEventListener('abort', abort, { once: true });
+    if (options.signal?.aborted) controller.abort();
     const timer = setTimeout(() => controller.abort(), limits.timeoutMs);
     try {
       const headers = { Accept: "audio/x-mpegurl, application/vnd.apple.mpegurl, text/plain, */*" };
@@ -55,6 +58,7 @@ export async function fetchPlaylist(url, options = {}) {
       lastError = error;
     } finally {
       clearTimeout(timer);
+      options.signal?.removeEventListener('abort', abort);
     }
   }
   throw lastError || new Error("Source is unreachable");

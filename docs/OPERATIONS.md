@@ -51,23 +51,31 @@ production data source. Use real imported channels for playback validation.
 7. Sign in normally and verify that the built app loads. The official deployment
    is SiteGround; GitHub Pages is intentionally not the release target.
 
-The deploy script uploads `dist/` and the versioned `.htaccess`. It does not
-delete the remote directory, `.htpasswd`, login bookkeeping or `.catodo-data/`.
+The deploy script uploads protective `.htaccess` and the versioned PHP login
+gate before `dist/`. It does not delete the remote directory, `.htpasswd`, login
+bookkeeping or `.catodo-data/`.
 
 ## First installation-state migration
 
 After deploying installation synchronization for the first time:
 
-1. Visit CATODO first with the browser that already contains the intended
-   playlists, favourites or settings.
-2. Let the app finish initialization; that browser seeds the private server
-   state.
-3. Open a second browser and confirm that sources and favourites appear. That
-   browser will download and parse each shared playlist into its own IndexedDB.
+1. Before opening CATODO, preserve the profile/storage of the browser that
+   already contains the intended playlists, favourites or settings.
+2. Visit CATODO first with that browser. While the server migration marker is
+   `pending`, its first upgraded visit queues a durable `link-merge`. The server
+   changes the marker to `complete` only after the conditional write succeeds.
+3. Wait for Settings to show **Shared library connected**. If it instead offers
+   **Recover retained data**, inspect and confirm that explicit recovery before
+   opening other browsers.
+4. Open a second browser and confirm that sources and favourites appear. That
+   browser downloads and parses each shared playlist into its own IndexedDB;
+   **Restoring shared channels** is expected during that bounded hydration.
 
 A pristine browser will not seed an empty installation. If every browser is
 empty, import/configure a source normally and the first mutation creates the
-canonical state.
+canonical state. Do not delete `.catodo-data/installation-state.json` to reset a
+library: a deliberate empty state is a revisioned write with `updatedAt > 0`,
+whereas a missing/pristine file intentionally reopens the recovery window.
 
 ## Playback diagnosis
 
@@ -158,9 +166,12 @@ The local Vite server cannot execute PHP. On the official host:
 
 - `401` from `installation-api.php` means the gate cookie is absent/expired;
 - `404`/`405` disables installation sync and the client remains browser-local;
+- `428` means a client attempted an unsafe write without first loading a
+  revision; current clients must never produce it;
 - `409` is an optimistic revision conflict and is reloaded/retried once;
-- repeated save failures are reported through the sync error callback but do
-  not destroy the local catalog.
+- load/save failures are shown as **Shared storage unavailable** and do not
+  destroy the local catalog. Do not treat a browser-local success as proof that
+  another browser can see the change while this status is present.
 
 The canonical file is private server state. Do not edit it manually while the
 app is writing. There is currently no in-product backup/restore UI; back it up

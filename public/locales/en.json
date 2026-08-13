@@ -19,7 +19,13 @@
     "nowLive": "Live now",
     "random": "Random",
     "randomHint": "Play another live channel",
-    "explore": "Explore the world"
+    "explore": "Explore the world",
+    "restoringTitle": "Restoring shared channels",
+    "restoringBody": "Saved playlists are being downloaded for this browser.",
+    "syncErrorTitle": "Shared library unavailable",
+    "syncErrorBody": "Open Settings to retry shared storage. Queued browser changes remain safe.",
+    "restoreErrorTitle": "Saved playlists unavailable",
+    "restoreErrorBody": "The shared list is safe, but its third-party playlists could not be downloaded on this browser."
   },
   "explore": {
     "title": "Explore the signal",
@@ -78,7 +84,29 @@
     "worldChannels": "12,000+ public channels",
     "worldDedup": "Automatic deduplication",
     "worldConsent": "Consent always required",
-    "worldAction": "Review world import"
+    "worldAction": "Review world import",
+    "syncReady": "Shared library connected",
+    "syncReadyDetail": "Sources, Favorites and guide settings follow this installation.",
+    "syncPending": "Changes waiting to sync",
+    "syncPendingDetail": "{count} change(s) are safely queued in this browser.",
+    "syncHydrating": "Restoring shared channels",
+    "syncHydratingDetail": "{count} playlist(s) are being downloaded on this browser.",
+    "restoreError": "Some playlists could not be restored",
+    "restoreErrorDetail": "{count} saved playlist(s) could not be downloaded on this browser. Shared storage is still connected.",
+    "syncError": "Shared storage unavailable",
+    "syncErrorDetail": "Queued changes are safe in this browser. Use Retry shared storage when the connection recovers.",
+    "syncLocalOnly": "Browser-only storage",
+    "syncLocalOnlyDetail": "This host does not provide installation-wide synchronization.",
+    "syncLoading": "Connecting shared library",
+    "syncLoadingDetail": "Checking installation storage…",
+    "syncFailureToast": "Shared storage is unavailable. Changes are queued safely in this browser. {error}",
+    "syncRetry": "Retry shared storage",
+    "syncRetrySuccess": "Shared storage is synchronized.",
+    "syncRetryFailed": "Shared storage is still unavailable.",
+    "syncRecover": "Recover retained data",
+    "syncRecoverConfirm": "Merge the retained browser sources and Favorites into the shared library? Existing shared data will be kept.",
+    "syncRecoverSuccess": "Retained data was merged into the shared library.",
+    "syncRecoverFailed": "Recovery is queued and will retry when shared storage reconnects."
   },
   "import": {
     "presetsTitle": "Recommended playlists",
@@ -89,7 +117,19 @@
   },
   "library": {
     "loadMore": "Load more channels",
-    "loadMoreCount": "Load more channels · {count} remaining"
+    "loadMoreCount": "Load more channels · {count} remaining",
+    "restoring": {
+      "title": "Restoring your shared library",
+      "body": "CATODO is downloading the saved playlists for this browser. Your Favorites will appear as their channels become available."
+    },
+    "syncError": {
+      "title": "Your shared library could not be restored",
+      "body": "Local data is safe. Open Settings to check the shared-storage status and retry after the connection recovers."
+    },
+    "restoreError": {
+      "title": "Saved playlists could not be downloaded",
+      "body": "Shared storage is connected, but one or more third-party playlists failed on this browser. Open Settings to refresh those sources."
+    }
   },
   "countries": {
     "backToWorld": "Back to world map",
@@ -118,7 +158,8 @@
     "fullscreen": "Full screen",
     "favorite": "Add to favorites",
     "unfavorite": "Remove from favorites",
-    "nextEndpoint": "Try another stream"
+    "nextEndpoint": "Try another stream",
+    "fullscreenExitFailed": "Could not exit full screen. Playback stayed in the player."
   },
   "guide": {
     "eyebrow": "Live schedules",
@@ -158,6 +199,9 @@
   },
   "multiview": {
     "random": "Random",
+    "listenToFeed": "Listen to this feed",
+    "muteFeed": "Mute this feed",
+    "audioBlocked": "Tap the feed again to enable audio.",
     "chooseChannel": "Choose channel",
     "expandFeed": "Open feed full screen",
     "pickerTitle": "Choose channel · Slot {slot}",
@@ -220,7 +264,9 @@
     "loading": "Loading",
     "ready": "Ready",
     "error": "Something went wrong",
-    "empty": "Nothing here yet"
+    "empty": "Nothing here yet",
+    "restoring": "RESTORING",
+    "unavailable": "UNAVAILABLE"
   },
   "actions": {
     "cancel": "Cancel",

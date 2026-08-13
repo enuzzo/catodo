@@ -77,7 +77,8 @@ Database `catodo-v2`, schema version 1, contains:
 
 - `sources`, `snapshots`, `channels`, `endpoints`, `channelSources`;
 - `favorites`, `history`, `aliases`;
-- `settings` for browser caches and preferences;
+- `settings` for browser caches and preferences, plus the durable installation
+  outbox, recovery snapshot and short-lived multi-tab lease;
 - `migrationJournal` for one-time legacy localStorage migration.
 
 Changing a store or index requires increasing `DB_VERSION` and writing a safe
@@ -94,9 +95,10 @@ to every authenticated browser:
 - XMLTV source URLs and refresh cadence.
 
 `installation-api.php` stores this in
-`.catodo-data/installation-state.json`. Writes are size-limited, sanitized,
-locked and revision-guarded. The client retries one revision conflict and queues
-a later local mutation if a save is already running.
+`.catodo-data/installation-state.json`. Version 2 state includes a server-owned
+legacy-migration marker. Writes are schema- and size-validated as a whole,
+locked, revision-guarded and atomically renamed. Invalid or corrupt state fails
+closed instead of being interpreted as an empty installation.
 
 IndexedDB is still required. It holds parsed playlists, endpoints, metadata,
 history and EPG caches close to each browser. When a browser sees a shared source
@@ -105,17 +107,37 @@ turning the PHP service into a large catalog database.
 
 ### First migration invariant
 
-If the server has no canonical state, CATODO seeds it only from a browser that
-already has at least one shared source, favourite, or shared setting. A pristine
-browser must not establish an empty server state before the browser containing
-the user's existing library visits the new release.
+New or valid version 1 server state is normalized to version 2 with
+`migration.legacyInstallation = pending`. While pending, CATODO seeds it only
+from a browser that already has at least one shared source, favourite or shared
+setting. A pristine browser does not claim the migration. The first successful
+conditional `link-merge` write changes the marker to `complete` on the server;
+an older client cannot write version 1 state or downgrade the marker.
+
+Once complete, the server is canonical and another browser never performs an
+automatic legacy union. If retained browser data differs, CATODO stores a
+versioned recovery snapshot and offers an explicit, additive recovery action in
+Settings. This prevents a second browser with stale legacy data from silently
+resurrecting a playlist or favourite that was deliberately removed elsewhere.
 
 ### Current synchronization semantics
 
-The installation is a single-user, last-successful-write configuration with
-optimistic revision conflict handling. It is not a multi-user account system or
-a collaborative merge engine. Browser-local history, parsed data, metadata and
-EPG programme bodies are deliberately not synchronized.
+The installation is a single-user configuration with optimistic revisions.
+Every write requires the revision returned by a successful GET. Client
+mutations are committed locally with absolute, idempotent intents in a durable
+FIFO outbox. A failed head stays pending across reloads and blocks later writes;
+Retry reloads the latest server revision and reapplies the same intent. After a
+conflict or acknowledgement, the local projection is reconciled from canonical
+server state plus the remaining outbox. A short IndexedDB lease prevents two
+same-origin tabs from intentionally draining concurrently, while server
+revisions remain the final concurrency guard. A stale full snapshot is never
+replayed.
+
+The PHP service serializes readers and writers through one lock and publishes a
+fully flushed temporary file with an atomic rename. It is not a multi-user
+account system or a general three-way merge engine. Browser-local history,
+parsed data, metadata and EPG programme bodies are deliberately not
+synchronized.
 
 ## Logo cache
 
@@ -159,7 +181,9 @@ until a gesture. The single-channel player may open with the user's retained
 volume after the click that opened it. UI rerenders must preserve `video.muted`
 and `video.volume`; `setMedia()` changes mute only when a caller explicitly
 provides it. Multiview accepts audio only after a user gesture and exactly one
-slot may be audible.
+slot may be audible. Entering Multiview from the single-channel player first
+mutes, pauses and releases that player; the Multiview grid starts muted. Tapping
+the currently audible Multiview slot again returns the grid to all-muted.
 
 Stream diagnostics report manifest codec data plus measured browser counters.
 `webkitAudioDecodedByteCount` is useful evidence in Chromium but is not portable;
@@ -267,8 +291,9 @@ transitions and actual hosting headers.
   focused controllers/renderers instead of adding another broad switch branch.
 - The production application chunk is large; boot-path code splitting and lazy
   loading of country/map or low-frequency surfaces are worthwhile future work.
-- Installation synchronization has no accounts, per-device profiles, backups
-  UI or three-way merge.
+- Installation synchronization has no accounts, per-device profiles or
+  automatic backups; its intent rebase is deliberately narrower than a general
+  three-way merge.
 - The logo cache does not proactively refresh or garbage-collect unused files.
 - Search indexing and full global catalogs can consume meaningful browser memory.
 - EPG programme parsing is client-side and therefore intentionally bounded.

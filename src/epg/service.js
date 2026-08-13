@@ -1,4 +1,5 @@
 import { parseXmltv, programmesForChannel } from "./xmltv.js";
+import { MAX_EPG_SOURCES } from "../data/installation-sync.js";
 
 const CACHE_TTL = 6 * 60 * 60 * 1000;
 const WINDOW_MS = 4 * 60 * 60 * 1000;
@@ -73,20 +74,21 @@ export class EpgService {
 
   async setSources(sources) {
     const next = unique(Array.isArray(sources) ? sources : String(sources || "").split(/[\n,]+/));
+    if (next.length > MAX_EPG_SOURCES) throw new RangeError(`TV Guide accepts at most ${MAX_EPG_SOURCES} sources`);
     next.forEach((value) => {
       const parsed = new URL(value);
       if (!/^https?:$/.test(parsed.protocol)) throw new TypeError("TV guide sources must use HTTP or HTTPS");
     });
-    this.#customSources = next;
     await this.#catalog?.setSetting?.("epg:sources", next);
+    this.#customSources = next;
     return this.getSources();
   }
 
   async setRefreshMinutes(value) {
     const next = Number(value);
     if (!REFRESH_INTERVALS.has(next)) throw new RangeError("Unsupported TV guide refresh interval");
-    this.#refreshMinutes = next;
     await this.#catalog?.setSetting?.("epg:refreshMinutes", next);
+    this.#refreshMinutes = next;
     return next;
   }
 
