@@ -56,7 +56,7 @@ export class EpgService {
 
   constructor({ catalog, fetchImpl = globalThis.fetch, proxy = null } = {}) {
     this.#catalog = catalog;
-    this.#fetch = fetchImpl;
+    this.#fetch = typeof fetchImpl === "function" ? fetchImpl.bind(globalThis) : fetchImpl;
     this.#proxy = proxy;
   }
 

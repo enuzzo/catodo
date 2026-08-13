@@ -27,6 +27,25 @@ test("loads a consented XMLTV source, caches it and resolves the channel schedul
   assert.equal(fetches, 1);
 });
 
+test("TV Guide invokes browser fetch with the global receiver", async () => {
+  const settings = new Map();
+  const catalog = {
+    getSetting: async (key, fallback) => settings.has(key) ? settings.get(key) : fallback,
+    setSetting: async (key, value) => { settings.set(key, value); return value; },
+  };
+  const fetchImpl = async function () {
+    assert.equal(this, globalThis);
+    return new Response(`<tv><programme start="20260812140000 +0200" stop="20260812150000 +0200" channel="Rai1.it"><title>Bound fetch</title></programme></tv>`);
+  };
+  const service = await new EpgService({ catalog, fetchImpl }).init();
+  await service.setSources(["https://example.org/guide.xml"]);
+  const schedule = await service.schedule({ channelId: "stable-id", tvgId: "Rai1.it" }, {
+    from: Date.UTC(2026, 7, 12, 12, 30),
+    to: Date.UTC(2026, 7, 12, 13, 30),
+  });
+  assert.equal(schedule.programmes[0].title, "Bound fetch");
+});
+
 test("forced refresh revalidates once, preserves a 304 cache and persists cadence", async () => {
   const settings = new Map();
   const catalog = {

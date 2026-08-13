@@ -177,7 +177,7 @@ export class InstallationSync {
 
   constructor({ endpoint = DEFAULT_ENDPOINT, fetchImpl = globalThis.fetch } = {}) {
     this.#endpoint = endpoint;
-    this.#fetch = fetchImpl;
+    this.#fetch = typeof fetchImpl === 'function' ? fetchImpl.bind(globalThis) : fetchImpl;
   }
 
   get supported() { return this.#supported; }

@@ -11,7 +11,8 @@ export class I18n {
   constructor(options = {}) {
     this.#locale = options.locale || DEFAULT_LOCALE;
     this.#baseUrl = options.baseUrl || new URL("locales/", globalThis.location?.href || import.meta.url);
-    this.#fetch = options.fetchImpl || globalThis.fetch;
+    const fetchImpl = options.fetchImpl || globalThis.fetch;
+    this.#fetch = typeof fetchImpl === "function" ? fetchImpl.bind(globalThis) : fetchImpl;
   }
 
   get locale() { return this.#locale; }

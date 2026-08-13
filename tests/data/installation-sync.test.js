@@ -50,6 +50,15 @@ test('installation sync loads and saves with same-origin credentials and revisio
   assert.equal(JSON.parse(calls[1].body).favorites[0].channelId, 'channel:1');
 });
 
+test('installation sync invokes browser fetch with the global receiver', async () => {
+  const fetchImpl = async function () {
+    assert.equal(this, globalThis);
+    return new Response(JSON.stringify(serverState({ revision: 'r1', updatedAt: 1 })));
+  };
+  const sync = new InstallationSync({ fetchImpl });
+  assert.equal((await sync.load()).updatedAt, 1);
+});
+
 test('installation sync gracefully disables itself on static hosts', async () => {
   const sync = new InstallationSync({ fetchImpl: async () => new Response('', { status: 404 }) });
   assert.equal(await sync.load(), null);
