@@ -10,6 +10,18 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-08-13
+
+### 🛠 Changed
+
+- Explore now prefers Euronews Italian for its initial featured channel when that signal is available, while later user selections and randomization remain untouched.
+- Short TV Guide programmes can now expand in place on first click so their full title is readable; a second click still opens the complete channel guide.
+
+### 🐛 Fixed
+
+- Fullscreen Favorite changes now show the same star-burst add and lightning remove feedback as the rest of CATODO.
+- TV Guide's `Now playing` badge no longer overflows or gets clipped vertically inside programme cards.
+
 ## [2.2.1] - 2026-08-13
 
 ### 🛠 Changed
@@ -104,7 +116,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.2.1...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/enuzzo/catodo/compare/v2.2.1...v2.3.0
 [2.2.1]: https://github.com/enuzzo/catodo/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/enuzzo/catodo/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/enuzzo/catodo/compare/v2.1.0...v2.1.1

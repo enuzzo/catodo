@@ -1502,6 +1502,7 @@ async function handleAction(action, detail) {
     case "open-channel-guide": {
       const channel = findChannel(id);
       if (!channel) break;
+      if (ui.expandGuideProgrammeCard?.(detail.element)) break;
       if (!state.schedules.has(id)) await loadSchedules([channel]);
       ui.showProgrammeOverlay(decorateChannel(channel));
       break;

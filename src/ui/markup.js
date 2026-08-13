@@ -5,6 +5,8 @@ import { featuredChannelIdentity } from './channel-identity.js';
 import { APP_VERSION } from '../version.js';
 import { formatGuideDateTime, formatGuideTime } from './time-format.js';
 import { enableGuideTimelineDrag } from './guide-timeline-drag.js';
+import { resolveFavoriteEffectHost } from './favorite-effect-host.js';
+import { programmeCardNeedsExpansion } from './guide-programme-card.js';
 import { countryGuideControlState, guideProgrammeFallback } from './country-guide-model.js';
 
 const FLAG_URLS = import.meta.glob('../../assets/vendor/flags/4x3/*.svg', {
@@ -126,6 +128,7 @@ function setFavoriteGlyph(button, isFavorite) {
 function playFavoriteEffect(root, anchor, mode) {
   if (!(anchor instanceof Element) || !root) return Promise.resolve();
   const rect = anchor.getBoundingClientRect();
+  const host = resolveFavoriteEffectHost(root, anchor);
   const effect = element('span', `favorite-effect favorite-effect--${mode}`, { 'aria-hidden': 'true' });
   effect.style.left = `${rect.left + rect.width / 2}px`;
   effect.style.top = `${rect.top + rect.height / 2}px`;
@@ -145,7 +148,7 @@ function playFavoriteEffect(root, anchor, mode) {
   } else {
     effect.append(element('span', 'favorite-effect__bolt'), element('span', 'favorite-effect__flash'));
   }
-  root.append(effect);
+  host.append(effect);
   const duration = mode === 'remove' ? 330 : 680;
   window.setTimeout(() => effect.remove(), duration + 80);
   return new Promise((resolve) => window.setTimeout(resolve, mode === 'remove' ? 270 : 0));
@@ -1324,6 +1327,7 @@ function renderGuideCards(container, channels, t) {
         const stop = Math.min(windowStart + windowMs, Number(programme.stop));
         const item = element('button', `programme-card${isNow ? ' is-now' : ''}`, {
           type: 'button', dataset: { action: 'open-channel-guide', channelId: safeId(channel?.channelId || channel?.id) },
+          'aria-expanded': 'false',
         });
         item.style.left = `${((start - windowStart) / windowMs) * 100}%`;
         item.style.width = `${Math.max(2.2, ((stop - start) / windowMs) * 100)}%`;
@@ -1331,6 +1335,11 @@ function renderGuideCards(container, channels, t) {
         times.textContent = `${formatProgrammeTime(programme.start)}–${formatProgrammeTime(programme.stop)}`;
         const title = element('strong');
         title.textContent = safeText(programme.title);
+        title.title = title.textContent;
+        item.setAttribute('aria-label', translate(t, 'guide.programmeDetails', '{time} · {title}. Programme details', {
+          time: times.textContent,
+          title: title.textContent,
+        }));
         item.append(times, title);
         if (isNow) item.append(textNode('span', 'programme-card__badge', t, 'guide.nowPlaying', 'Now playing'));
         timeline.append(item);
@@ -3081,6 +3090,7 @@ export function mountAppUI(root, options = {}) {
     sources: sources.view,
   };
   let toastTimer = 0;
+  let guideProgrammeTimer = 0;
   let activeShellView = 'home';
   let exploreLoadScheduled = false;
   const loadMoreExploreNearEnd = () => {
@@ -3865,12 +3875,32 @@ export function mountAppUI(root, options = {}) {
       return api;
     },
 
+    expandGuideProgrammeCard(card) {
+      if (!(card instanceof Element) || !card.classList.contains('programme-card')) return false;
+      const clipped = programmeCardNeedsExpansion(card);
+      const expanded = card.classList.contains('is-expanded');
+      guide.grid.querySelectorAll('.programme-card.is-expanded').forEach((item) => {
+        item.classList.remove('is-expanded');
+        item.setAttribute('aria-expanded', 'false');
+      });
+      window.clearTimeout(guideProgrammeTimer);
+      if (expanded || !clipped) return false;
+      card.classList.add('is-expanded');
+      card.setAttribute('aria-expanded', 'true');
+      guideProgrammeTimer = window.setTimeout(() => {
+        card.classList.remove('is-expanded');
+        card.setAttribute('aria-expanded', 'false');
+      }, 5200);
+      return true;
+    },
+
     playFavoriteEffect(anchor, mode = 'add') {
       return playFavoriteEffect(root, anchor, mode === 'remove' ? 'remove' : 'add');
     },
 
     destroy() {
       window.clearTimeout(toastTimer);
+      window.clearTimeout(guideProgrammeTimer);
       explore.view.removeEventListener('scroll', loadMoreExploreNearEnd);
       dispatcher.destroy();
       root.replaceChildren();

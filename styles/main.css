@@ -3185,7 +3185,21 @@ textarea {
 .programme-card.is-now { border-color: #a9bdd9; background: #eaf1fb; box-shadow: inset 0 3px var(--signal); }
 .programme-card__time { display: block; color: var(--signal); font-size: 10px; }
 .programme-card strong { display: block; margin-top: 8px; overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
-.programme-card__badge { display: inline-block; margin-top: 9px; padding: 3px 6px; border-radius: 999px; background: var(--signal); color: #fff; font-size: 8px; text-transform: uppercase; }
+.programme-card__badge { position: absolute; top: 6px; right: 7px; display: inline-block; max-width: calc(100% - 14px); overflow: hidden; padding: 3px 6px; border-radius: 999px; background: var(--signal); color: #fff; font-size: 8px; line-height: 1.2; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.programme-card.is-now .programme-card__time { padding-right: 68px; }
+.programme-card.is-expanded {
+  z-index: 7;
+  bottom: auto;
+  width: clamp(240px, 24vw, 360px) !important;
+  min-height: 68px;
+  height: auto;
+  max-height: 150px;
+  overflow: auto;
+  border-color: var(--signal);
+  background: var(--paper-raised);
+  box-shadow: 0 12px 28px rgb(31 40 51 / 24%);
+}
+.programme-card.is-expanded strong { overflow: visible; padding-right: 4px; line-height: 1.28; text-overflow: clip; white-space: normal; }
 .guide-channel__empty { display: flex; align-items: center; min-height: 82px; margin: 0; padding: 16px; color: var(--ink-soft); font-size: 11px; }
 
 .sources-layout {

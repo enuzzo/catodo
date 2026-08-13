@@ -60,6 +60,12 @@ function channelName(channel) {
   return String(channel?.name || channel?.tvgName || '').trim();
 }
 
+function isDefaultExploreChannel(channel) {
+  return [channel?.name, channel?.tvgName, channel?.channelId, channel?.id, channel?.tvgId]
+    .map((value) => String(value || '').toLocaleLowerCase('en-US').replace(/[^a-z0-9]+/g, ''))
+    .some((value) => value.startsWith('euronewsitalian') || value.startsWith('euronewsitalia'));
+}
+
 function channelCountry(channel) {
   return String(channel?.country || channel?.countryName || channel?.countryCode || channel?.countries?.[0] || '').trim();
 }
@@ -189,6 +195,7 @@ export function pickExploreFeatured(collections, currentId = "") {
   const values = Array.isArray(collections) ? collections : [];
   const channels = values.flatMap((collection) => collection.channels || []);
   return channels.find((channel) => String(channel?.channelId || channel?.id || "") === String(currentId))
+    || channels.find(isDefaultExploreChannel)
     || channels[0]
     || null;
 }

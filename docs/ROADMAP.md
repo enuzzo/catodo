@@ -38,6 +38,16 @@ or real-device validation. It is intentionally concrete and ordered by value.
 
 ## Implemented and verified under Unreleased
 
+- Explore now chooses Euronews Italian as the initial hero when it exists in the
+  imported catalog. Fullscreen Favorite feedback is mounted inside the active
+  fullscreen element, and Guide programme cards keep `Now playing` within
+  bounds while allowing clipped short-programme titles to expand temporarily.
+  Focused model tests cover the Explore choice and fullscreen host selection;
+  rendered 1600×900 browser verification covers Guide geometry, expansion,
+  second-click details and automatic collapse. Browser automation did not grant
+  actual Fullscreen API entry in either the in-app browser or Chrome, so visual
+  confirmation of the fullscreen animation and physical Tesla touch remain
+  device-owner checks.
 - Dedicated Explore categories now use inline radio-style sorting, expose a
   country selector with per-country counts and place the filtered channel total
   after a visual separator. The form-action regression that destroyed a select

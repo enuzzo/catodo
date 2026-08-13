@@ -30,6 +30,19 @@ test("Explore builds real non-empty collections and preserves a selected hero", 
   assert.equal(pickExploreFeatured(collections, "sport-it").channelId, "sport-it");
 });
 
+test("Explore defaults to Euronews Italian while preserving later user choices", () => {
+  const collections = [{
+    id: 'news',
+    channels: [
+      { channelId: 'news-first', name: 'First News' },
+      { channelId: 'euronews-it', name: 'Euronews Italian (1080p)' },
+      { channelId: 'news-selected', name: 'Selected News' },
+    ],
+  }];
+  assert.equal(pickExploreFeatured(collections).channelId, 'euronews-it');
+  assert.equal(pickExploreFeatured(collections, 'news-selected').channelId, 'news-selected');
+});
+
 test("Explore keeps a selected empty category honest", () => {
   const [collection] = buildExploreCollections(channels, { activeCategory: "kids", limit: 3 });
   assert.equal(collection.id, "kids");
