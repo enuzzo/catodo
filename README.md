@@ -11,7 +11,7 @@ It is a vanilla ES-module application with no framework. Pinned runtime assets a
 - **Explore collections:** Explore is a separate editorial surface built entirely from real catalog metadata. Filter ready-made rails for News, Sports, Movies, Music, Kids, Culture, and Local television; preview one live feed muted or use **Surprise me** to jump into a world-random channel.
 - **Signal Atlas:** explore every country exposed by the upstream catalog, with global search and country discovery.
 - **Country flags:** the Countries index and country detail use self-hosted SVG artwork from the MIT-licensed `flag-icons` collection, with an ISO-code fallback.
-- **Multiview:** 2-, 3-, or 4-feed layouts; exactly one selected feed supplies audio.
+- **Multiview:** 2-, 3-, or 4-feed layouts with a remembered four-feed default, user presets, and exactly one selected audio feed.
 - **Signal Lab:** playback diagnostics separate measured, estimated, and manifest-declared values.
 - **Channel profiles:** when upstream metadata is available, Signal Lab also surfaces canonical channel, network, owner, category, feed, coverage, language, format, quality, availability, lifecycle, website, logo, and guide descriptors without inventing missing values.
 - **Analog boot:** EBU colour bars descend, split around the Catodo ident, then open onto the live dashboard; reduced-motion users get a short static reveal.
@@ -87,7 +87,7 @@ which must remain blocked from HTTP access and preserved across deploys.
 ## Limits and compatibility
 
 - Tesla/in-car Chromium variants have constrained CPU, memory, MSE, and codec support. A stream that works in VLC may still fail in the browser.
-- Multiview starts multiple independent decoders. On Tesla hardware, 2 feeds is the practical default; 3 or 4 can exhaust decoder, thermal, or network capacity. CATODO keeps one audio feed to reduce noise, not decoder load.
+- Multiview starts multiple independent decoders. Four feeds are the product default and have been validated on the target Tesla installation; individual vehicles, codecs, thermal conditions, or networks can still reduce capacity. CATODO never silently downgrades the layout and keeps one audio feed to reduce noise, not decoder load.
 - HLS, codecs, CORS policy, mixed-content blocking, hotlink protection, and geoblocking are controlled by external sources and may change without notice.
 - The analog boot sequence is decorative, uses lightweight CSS transforms and respects reduced-motion preferences.
 

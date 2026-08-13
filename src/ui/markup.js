@@ -391,6 +391,16 @@ function createHeader(t) {
     nav.append(button);
     navButtons[view] = button;
   });
+  const more = element('div', 'primary-nav__more');
+  const moreSummary = element('button', 'primary-nav__item', { type: 'button', dataset: { action: 'toggle-more-menu' }, 'aria-expanded': 'false' });
+  moreSummary.append(textNode('span', null, t, 'nav.more', 'More'), icon('caret-down'));
+  const moreMenu = element('div', 'primary-nav__more-menu', { hidden: true });
+  [['guide', 'calendar-blank', 'nav.guide', 'TV Guide'], ['library', 'books', 'nav.library', 'Library'], ['sources', 'gear-six', 'nav.settings', 'Settings']].forEach(([view, iconName, key, fallback]) => {
+    const button = actionButton({ t, action: 'navigate', iconName, key, fallback, className: 'button--ghost', dataset: { view } });
+    moreMenu.append(button);
+  });
+  more.append(moreSummary, moreMenu);
+  nav.append(more);
 
   const searchForm = element('form', 'global-search', { dataset: { action: 'search' }, role: 'search' });
   searchForm.append(icon('magnifying-glass'));
@@ -415,7 +425,7 @@ function createHeader(t) {
     dataset: { view: 'sources' },
   });
   header.append(brand, nav, searchForm, settings);
-  return { header, brand, nav, navButtons, searchForm, searchInput, settings };
+  return { header, brand, nav, navButtons, searchForm, searchInput, settings, more, moreSummary, moreMenu };
 }
 
 function createHomeView(t) {
@@ -469,7 +479,17 @@ function createHomeView(t) {
     className: 'live-anchor__favorite',
   });
   favorite.setAttribute('aria-pressed', 'false');
-  channelHeading.append(channelName, favorite);
+  const fullscreen = iconButton({
+    t,
+    action: 'toggle-home-fullscreen',
+    iconName: 'corners-out',
+    key: 'player.fullscreen',
+    fallback: 'Full screen',
+    className: 'live-anchor__fullscreen',
+  });
+  const channelTools = element('div', 'live-anchor__tools');
+  channelTools.append(favorite, fullscreen);
+  channelHeading.append(channelName, channelTools);
   const description = textNode('p', 'live-anchor__description', t, 'home.liveDescriptionFallback', 'Live television from around the world');
   const facts = element('dl', 'live-anchor__facts');
   const factNodes = {};
@@ -541,6 +561,7 @@ function createHomeView(t) {
     mute,
     channelName,
     favorite,
+    fullscreen,
     description,
     facts: factNodes,
     openPlayer,
@@ -1024,9 +1045,19 @@ function createGuideView(t) {
   header.append(copy, actions);
 
   const status = element('div', 'guide-status', { 'aria-live': 'polite' });
+  const filters = element('div', 'guide-filters');
+  const searchWrap = element('label', 'field field--icon');
+  searchWrap.append(icon('magnifying-glass'));
+  const search = element('input', null, {
+    type: 'search', placeholder: translate(t, 'guide.searchPlaceholder', 'Search channels or countries…'),
+    'aria-label': translate(t, 'guide.searchAriaLabel', 'Search the TV Guide'), dataset: { action: 'filter-guide' },
+  });
+  searchWrap.append(search);
+  const favorites = actionButton({ t, action: 'filter-guide-favorites', iconName: 'heart', key: 'guide.favoritesOnly', fallback: 'Favorites only', className: 'button--ghost' });
+  filters.append(searchWrap, favorites);
   const grid = element('div', 'guide-grid');
-  view.append(header, status, grid);
-  return { view, status, grid, refresh };
+  view.append(header, status, filters, grid);
+  return { view, status, grid, refresh, search, favorites };
 }
 
 function renderGuideCards(container, channels, t) {
@@ -1047,7 +1078,12 @@ function renderGuideCards(container, channels, t) {
     identity.append(logo, copy, icon('play'));
     const timeline = element('div', 'guide-channel__timeline');
     if (!schedule.length) {
-      timeline.append(textNode('p', 'guide-channel__empty', t, 'guide.noData', 'No current programme data for this channel.'));
+      const empty = element('div', 'guide-channel__empty');
+      empty.append(
+        textNode('p', null, t, 'guide.noData', 'No current programme data for this channel.'),
+        actionButton({ t, action: 'add-channel-guide', iconName: 'plus', key: 'guide.addGuide', fallback: 'Add guide', className: 'button--ghost button--small', dataset: { channelId: safeId(channel?.channelId || channel?.id), country: safeIso2(channel?.countries?.[0] || channel?.countryCode) } }),
+      );
+      timeline.append(empty);
     } else {
       schedule.slice(0, 6).forEach((programme) => {
         const isNow = Number(programme.start) <= now && Number(programme.stop) > now;
@@ -1283,7 +1319,23 @@ function createSourcesView(t) {
   proxyForm.append(proxyLabel, proxyFooter);
   guide.append(guideList, proxyForm);
   layout.append(sourcePanel, guide);
-  view.append(heading, syncStatus, worldCatalog, guideSettings, layout);
+  const backup = element('section', 'panel backup-settings');
+  const backupCopy = element('div');
+  backupCopy.append(
+    textNode('p', 'eyebrow', t, 'backup.eyebrow', 'Portable setup'),
+    textNode('h2', null, t, 'backup.title', 'Data & backup'),
+    textNode('p', null, t, 'backup.body', 'Export sources, Favorites, guide settings, preferences, and Multiview presets. Cached media and private browser data stay on this device.'),
+  );
+  const backupActions = element('div', 'backup-settings__actions');
+  const importInput = element('input', 'sr-only', { type: 'file', accept: 'application/json,.json', dataset: { action: 'import-backup' } });
+  const importLabel = element('label', 'button button--ghost');
+  importLabel.append(icon('upload-simple'), textNode('span', 'button__label', t, 'backup.import', 'Restore backup'), importInput);
+  backupActions.append(
+    actionButton({ t, action: 'export-backup', iconName: 'download-simple', key: 'backup.export', fallback: 'Download backup', className: 'button--primary' }),
+    importLabel,
+  );
+  backup.append(backupCopy, backupActions);
+  view.append(heading, syncStatus, worldCatalog, guideSettings, backup, layout);
   return {
     view,
     list,
@@ -1493,10 +1545,37 @@ function createPlayer(t) {
     preload: 'metadata',
     dataset: { mediaRole: 'player' },
   });
-  const status = element('div', 'player-status', { hidden: true, 'aria-live': 'polite' });
-  status.append(icon('spinner-gap', 'is-spinning'));
-  const statusText = textNode('span', null, t, 'player.loading', 'Tuning signal…');
-  status.append(statusText);
+  const status = element('div', 'player-status', { hidden: true });
+  const statusCard = element('div', 'player-status__card');
+  const statusHeader = element('div', 'player-status__header');
+  const statusIcon = icon('spinner-gap', 'is-spinning');
+  const statusKicker = textNode('span', null, t, 'player.connectionStatus', 'Connection status');
+  statusHeader.append(statusIcon, statusKicker);
+  const statusText = textNode('h2', 'player-status__title', t, 'player.loading', 'Contacting stream');
+  const statusDetail = textNode('p', 'player-status__detail', t, 'player.connectionStart', 'Selecting a browser-compatible route to the provider.');
+  const statusCopy = element('div', 'player-status__copy', { role: 'status', 'aria-live': 'polite', 'aria-atomic': 'true' });
+  statusCopy.append(statusText, statusDetail);
+  const statusProgress = element('div', 'player-status__progress', { 'aria-hidden': 'true' });
+  const statusSteps = Array.from({ length: 4 }, () => element('span'));
+  statusProgress.append(...statusSteps);
+  const statusMeta = element('div', 'player-status__meta mono');
+  const statusRoute = element('span');
+  statusRoute.textContent = 'DIRECT · ENDPOINT 1/1';
+  const statusElapsed = element('span');
+  statusElapsed.textContent = '0.0 S';
+  statusMeta.append(statusRoute, statusElapsed);
+  const statusAdvice = textNode('p', 'player-status__advice', t, 'player.connectionNormal', 'This is within the normal startup window.');
+  const statusActions = element('div', 'player-status__actions');
+  const statusCancel = actionButton({
+    t, action: 'close-player', iconName: 'x', key: 'common.cancel', fallback: 'Cancel', className: 'button--ghost',
+  });
+  const statusAlternate = actionButton({
+    t, action: 'random-player-channel', iconName: 'shuffle', key: 'player.tryAnother', fallback: 'Try another', className: 'button--primary',
+  });
+  statusAlternate.hidden = true;
+  statusActions.append(statusCancel, statusAlternate);
+  statusCard.append(statusHeader, statusCopy, statusProgress, statusMeta, statusAdvice, statusActions);
+  status.append(statusCard);
   stage.append(video, status);
   const signalLab = createSignalLab(t);
   body.append(stage, signalLab.panel);
@@ -1559,7 +1638,15 @@ function createPlayer(t) {
     stage,
     video,
     status,
+    statusCard,
+    statusIcon,
     statusText,
+    statusDetail,
+    statusSteps,
+    statusRoute,
+    statusElapsed,
+    statusAdvice,
+    statusAlternate,
     signalLab,
     number,
     name,
@@ -1612,7 +1699,13 @@ function createMultiview(t) {
   });
 
   const toolbarActions = element('div', 'multiview-toolbar__actions');
+  const presets = element('select', 'select multiview-presets', {
+    'aria-label': translate(t, 'multiview.presets', 'Multiview presets'), dataset: { action: 'load-multiview-preset' },
+  });
+  presets.append(element('option', null, { value: '', textContent: translate(t, 'multiview.presets', 'Presets') }));
   toolbarActions.append(
+    presets,
+    actionButton({ t, action: 'save-multiview-preset', iconName: 'floppy-disk', key: 'multiview.savePreset', fallback: 'Save preset', className: 'button--ghost' }),
     actionButton({ t, action: 'add-multiview-channel', iconName: 'plus', key: 'multiview.addChannel', fallback: 'Add channel', className: 'button--ghost' }),
     actionButton({ t, action: 'toggle-fullscreen', iconName: 'corners-out', key: 'player.fullscreen', fallback: 'Full screen', className: 'button--ghost' }),
     actionButton({ t, action: 'close-multiview', iconName: 'sign-out', key: 'common.exit', fallback: 'Exit', className: 'button--ghost' }),
@@ -1736,7 +1829,7 @@ function createMultiview(t) {
     className: 'button--primary multiview-status__lab',
   }));
   overlay.append(toolbar, grid, footer);
-  return { overlay, toolbar, layout, grid, slots, status: statusNodes };
+  return { overlay, toolbar, layout, grid, slots, presets, status: statusNodes };
 }
 
 function createChannelPicker(t) {
@@ -2029,6 +2122,11 @@ function renderSources(container, sources, t) {
       source?.error ? 'sources.needsAttention' : 'sources.connectedState',
       source?.error ? 'Needs attention' : 'Connected',
     ));
+    if (source?.healthLabel) {
+      const health = element('span', source?.error ? 'is-error' : 'is-ok');
+      health.textContent = safeText(source.healthLabel);
+      meta.append(health);
+    }
     info.append(name, host, meta);
     const actions = element('div', 'source-row__actions');
     actions.append(
@@ -2524,12 +2622,15 @@ export function mountAppUI(root, options = {}) {
       header: header.header,
       nav: header.nav,
       navButtons: header.navButtons,
+      moreMenu: header.moreMenu,
+      moreSummary: header.moreSummary,
       searchForm: header.searchForm,
       searchInput: header.searchInput,
       main,
       views,
       home: home.view,
       homeLiveCard: home.liveCard,
+      homeLiveStage: home.liveStage,
       homeVideo: home.video,
       exploreVideo: explore.video,
       homeChannelGrid: home.nearbyGrid,
@@ -2557,6 +2658,7 @@ export function mountAppUI(root, options = {}) {
       multiviewGrid: multiview.grid,
       multiviewSlots: multiview.slots,
       multiviewVideos: multiview.slots.map((slot) => slot.video),
+      multiviewPresets: multiview.presets,
       multiviewSignalLab: multiviewSignalLab.backdrop,
       channelPicker: channelPicker.backdrop,
       channelPickerInput: channelPicker.input,
@@ -2665,6 +2767,7 @@ export function mountAppUI(root, options = {}) {
       home.openPlayer.disabled = !playable;
       home.random.disabled = !playable;
       home.favorite.disabled = !playable;
+      home.fullscreen.disabled = !playable;
       home.mute.disabled = !playable;
       home.liveCard.classList.toggle('is-restoring', Boolean(state.restoring || state.syncError || state.restoreError));
       if (state.restoring || state.syncError || state.restoreError) {
@@ -2731,12 +2834,15 @@ export function mountAppUI(root, options = {}) {
       if (shouldActivateShellView(root.dataset.mode, state.activate)) activateShellView('guide');
       const channels = normaliseArray(state.channels);
       guide.refresh.disabled = Boolean(state.loading) || !state.configured;
+      guide.search.value = safeText(state.query);
+      guide.favorites.classList.toggle('is-active', Boolean(state.favoritesOnly));
+      guide.favorites.setAttribute('aria-pressed', state.favoritesOnly ? 'true' : 'false');
       if (state.loading) setTranslatedText(guide.status, t, 'guide.loading', 'Loading live schedules…');
       else if (state.error) guide.status.textContent = safeText(state.error);
       else if (state.configured && !channels.some((channel) => channelSchedule(channel).length)) {
         setTranslatedText(guide.status, t, 'guide.empty', 'No matching programme data was returned. Check the guide URL and channel tvg-id values.');
       } else if (state.configured) {
-        setTranslatedText(guide.status, t, 'guide.updated', 'Schedules cached locally · times shown in your timezone');
+        guide.status.textContent = translate(t, 'guide.coverage', 'Guide coverage: {covered}/{total} channels · times shown in your timezone', { covered: state.covered ?? 0, total: state.total ?? channels.length });
       } else setTranslatedText(guide.status, t, 'guide.unconfigured', 'Connect an XMLTV source in Settings to add live programme data.');
       renderGuideCards(guide.grid, channels, t);
       return api;
@@ -2943,8 +3049,24 @@ export function mountAppUI(root, options = {}) {
       player.localTime.textContent = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(new Date());
       if (state.loading !== undefined) {
         player.status.hidden = !state.loading && !state.error;
-        setTranslatedText(player.statusText, t, state.error ? 'player.error' : 'player.loading', state.error ? 'Signal unavailable' : 'Tuning signal…');
+        const connection = state.connection || {};
+        player.statusText.textContent = safeText(
+          state.error ? connection.title || translate(t, 'player.error', 'Stream unavailable') : connection.title,
+          state.error ? translate(t, 'player.error', 'Stream unavailable') : translate(t, 'player.loading', 'Contacting stream'),
+        );
+        player.statusDetail.textContent = safeText(
+          state.error ? connection.error || state.error || connection.detail : connection.detail,
+          state.error ? translate(t, 'player.errorDetail', 'No playable signal was returned by this channel.') : translate(t, 'player.connectionStart', 'Selecting a browser-compatible route to the provider.'),
+        );
+        player.statusRoute.textContent = safeText(connection.meta, 'DIRECT · ENDPOINT 1/1');
+        player.statusElapsed.textContent = `${(Math.max(0, Number(connection.elapsedMs) || 0) / 1000).toFixed(1)} S`;
+        player.statusAdvice.textContent = safeText(connection.advice, translate(t, 'player.connectionNormal', 'This is within the normal startup window.'));
+        const activeStep = Math.max(1, Math.min(4, Number(connection.step) || 1));
+        player.statusSteps.forEach((step, index) => step.classList.toggle('is-active', index < activeStep));
+        player.statusAlternate.hidden = !connection.canTryAnother;
+        player.status.dataset.tone = safeText(connection.tone, state.error ? 'error' : 'loading');
         player.status.classList.toggle('is-error', Boolean(state.error));
+        player.statusIcon.className = `ph ph-${state.error ? 'warning-circle' : 'spinner-gap'}${state.error ? '' : ' is-spinning'}`;
       }
       if (state.playing !== undefined) {
         player.playPause.replaceChildren(icon(state.playing ? 'pause' : 'play'));

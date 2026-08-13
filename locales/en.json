@@ -11,7 +11,8 @@
     "guide": "TV Guide",
     "archive": "Archive",
     "settings": "Settings",
-    "search": "Search"
+    "search": "Search",
+    "more": "More"
   },
   "home": {
     "liveCount": "{count} live channels",
@@ -162,6 +163,11 @@
     "fullscreenExitFailed": "Could not exit full screen. Playback stayed in the player."
   },
   "guide": {
+    "searchPlaceholder": "Search channels or countries…",
+    "searchAriaLabel": "Search the TV Guide",
+    "favoritesOnly": "Favorites only",
+    "coverage": "Guide coverage: {covered}/{total} channels · times shown in your timezone",
+    "addGuide": "Add guide",
     "eyebrow": "Live schedules",
     "title": "TV Guide",
     "description": "Now and next across your imported channels. Times are shown in your local timezone.",
@@ -198,6 +204,8 @@
     "updated": "Schedules cached locally · times shown in your timezone"
   },
   "multiview": {
+    "presets": "Presets",
+    "savePreset": "Save preset",
     "random": "Random",
     "listenToFeed": "Listen to this feed",
     "muteFeed": "Mute this feed",
@@ -259,6 +267,13 @@
         "listSeparator": ", "
       }
     }
+  },
+  "backup": {
+    "eyebrow": "Portable setup",
+    "title": "Data & backup",
+    "body": "Export sources, Favorites, guide settings, preferences, and Multiview presets. Cached media and private browser data stay on this device.",
+    "export": "Download backup",
+    "import": "Restore backup"
   },
   "status": {
     "loading": "Loading",

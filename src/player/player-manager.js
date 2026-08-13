@@ -2,7 +2,7 @@ import { emit } from "./player-events.js";
 import { PlayerSlot } from "./player-slot.js";
 
 const FORWARDED_EVENTS = [
-  "attached", "tuning", "tuned", "warning", "retrying", "recovering",
+  "attached", "tuning", "tuned", "progress", "warning", "retrying", "recovering",
   "fallback", "fatal", "autoplay-blocked", "audio", "metrics", "destroyed"
 ];
 

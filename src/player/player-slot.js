@@ -36,6 +36,18 @@ function hlsSupported(HlsClass) {
   return Boolean(HlsClass && (typeof HlsClass.isSupported !== "function" || HlsClass.isSupported()));
 }
 
+const ENDPOINT_HEALTH_KEY = "catodo:endpoint-health";
+
+function endpointHealth() {
+  try { return JSON.parse(globalThis.localStorage?.getItem(ENDPOINT_HEALTH_KEY) || "{}") || {}; }
+  catch { return {}; }
+}
+
+function preferLastWorking(values) {
+  const health = endpointHealth();
+  return [...values].sort((a, b) => Number(health[b.url]?.workedAt || 0) - Number(health[a.url]?.workedAt || 0));
+}
+
 export class PlayerSlot extends EventTarget {
   constructor(options) {
     super();
@@ -59,10 +71,12 @@ export class PlayerSlot extends EventTarget {
     this.retries = 0;
     this.mediaRecoveries = 0;
     this.retryTimer = null;
+    this.connectionListeners = [];
     this.destroyed = false;
     this.source = null;
     this.handleHlsError = this.handleHlsError.bind(this);
     this.handleNativeError = this.handleNativeError.bind(this);
+    this.handlePlaying = this.handlePlaying.bind(this);
     if (settings.video) this.attach(settings.video);
   }
 
@@ -83,6 +97,7 @@ export class PlayerSlot extends EventTarget {
     this.video.muted = true;
     this.video.playsInline = true;
     this.video.addEventListener("error", this.handleNativeError);
+    this.video.addEventListener("playing", this.handlePlaying);
     this.metrics.start(video);
     emit(this, "attached", { slotId: this.id, video: video }, this.onEvent);
     return this;
@@ -93,7 +108,7 @@ export class PlayerSlot extends EventTarget {
     if (settings.video) this.attach(settings.video);
     if (!this.video) return Promise.reject(new Error("Attach a video element before tuning"));
     this.source = source;
-    this.endpoints = normalizeEndpoints(source);
+    this.endpoints = preferLastWorking(normalizeEndpoints(source));
     if (!this.endpoints.length) return Promise.reject(new Error("No playable endpoint supplied"));
     this.metrics.reset();
     this.endpointIndex = -1;
@@ -120,6 +135,7 @@ export class PlayerSlot extends EventTarget {
       slotId: this.id,
       endpoint: selected,
       endpointIndex: index,
+      endpointCount: this.endpoints.length,
       reason: reason
     }, this.onEvent);
 
@@ -138,10 +154,18 @@ export class PlayerSlot extends EventTarget {
       if (typeof this.hls.on === "function") {
         this.hls.on(events.ERROR || "hlsError", this.handleHlsError);
       }
+      this.bindConnectionEvents(HlsClass, selected);
       this.metrics.bindHls(this.hls, HlsClass);
       this.hls.attachMedia(this.video);
       this.hls.loadSource(selected.url);
     } else if (this.canPlayNativeHls()) {
+      emit(this, "progress", {
+        slotId: this.id,
+        phase: "native-loading",
+        endpoint: selected,
+        endpointIndex: index,
+        endpointCount: this.endpoints.length,
+      }, this.onEvent);
       this.video.src = selected.url;
       if (typeof this.video.load === "function") this.video.load();
     } else {
@@ -167,6 +191,44 @@ export class PlayerSlot extends EventTarget {
     );
   }
 
+  handlePlaying() {
+    const selected = this.endpoints[this.endpointIndex];
+    if (!selected?.url) return;
+    try {
+      const health = endpointHealth();
+      health[selected.url] = { workedAt: Date.now(), route: selected.route || "direct" };
+      const compact = Object.fromEntries(Object.entries(health).sort((a, b) => Number(b[1]?.workedAt || 0) - Number(a[1]?.workedAt || 0)).slice(0, 100));
+      globalThis.localStorage?.setItem(ENDPOINT_HEALTH_KEY, JSON.stringify(compact));
+    } catch { /* endpoint preference is an optional device-local optimisation */ }
+  }
+
+  bindConnectionEvents(HlsClass, endpointValue) {
+    if (!this.hls || typeof this.hls.on !== "function") return;
+    const events = HlsClass?.Events || {};
+    const phases = [
+      [events.MEDIA_ATTACHED, "media-attaching"],
+      [events.MANIFEST_LOADING, "manifest-loading"],
+      [events.MANIFEST_PARSED, "manifest-parsed"],
+      [events.LEVEL_LOADING, "level-loading"],
+      [events.FRAG_LOADING, "fragment-loading"],
+      [events.FRAG_BUFFERED, "buffering"],
+    ];
+    const registered = new Set();
+    phases.forEach(([type, phase]) => {
+      if (!type || registered.has(type)) return;
+      registered.add(type);
+      const handler = () => emit(this, "progress", {
+        slotId: this.id,
+        phase,
+        endpoint: endpointValue,
+        endpointIndex: this.endpointIndex,
+        endpointCount: this.endpoints.length,
+      }, this.onEvent);
+      this.hls.on(type, handler);
+      this.connectionListeners.push({ hls: this.hls, type, handler });
+    });
+  }
+
   handleHlsError(_event, data) {
     if (!data || !data.fatal) {
       emit(this, "warning", { slotId: this.id, data: data }, this.onEvent);
@@ -178,7 +240,14 @@ export class PlayerSlot extends EventTarget {
       if (this.mediaRecoveries < this.maxMediaRecoveries && this.hls && typeof this.hls.recoverMediaError === "function") {
         this.mediaRecoveries += 1;
         this.hls.recoverMediaError();
-        emit(this, "recovering", { slotId: this.id, kind: "media", attempt: this.mediaRecoveries }, this.onEvent);
+        emit(this, "recovering", {
+          slotId: this.id,
+          kind: "media",
+          attempt: this.mediaRecoveries,
+          endpoint: this.endpoints[this.endpointIndex],
+          endpointIndex: this.endpointIndex,
+          endpointCount: this.endpoints.length,
+        }, this.onEvent);
         return;
       }
       this.fallback("media-error", data);
@@ -202,7 +271,14 @@ export class PlayerSlot extends EventTarget {
       return;
     }
     this.retries += 1;
-    emit(this, "retrying", { slotId: this.id, attempt: this.retries, error: error }, this.onEvent);
+    emit(this, "retrying", {
+      slotId: this.id,
+      attempt: this.retries,
+      error: error,
+      endpoint: this.endpoints[this.endpointIndex],
+      endpointIndex: this.endpointIndex,
+      endpointCount: this.endpoints.length,
+    }, this.onEvent);
     this.clearRetry();
     this.retryTimer = setTimeout(() => {
       this.retryTimer = null;
@@ -222,6 +298,9 @@ export class PlayerSlot extends EventTarget {
       slotId: this.id,
       from: this.endpoints[this.endpointIndex] || null,
       to: this.endpoints[nextIndex] || null,
+      endpoint: this.endpoints[nextIndex] || null,
+      endpointIndex: nextIndex,
+      endpointCount: this.endpoints.length,
       reason: reason,
       error: error
     }, this.onEvent);
@@ -248,6 +327,8 @@ export class PlayerSlot extends EventTarget {
   }
 
   teardownEngine() {
+    this.connectionListeners.forEach(({ hls, type, handler }) => hls?.off?.(type, handler));
+    this.connectionListeners = [];
     this.metrics.unbindHls();
     if (this.hls) {
       const HlsClass = this.getHlsClass();
@@ -262,6 +343,7 @@ export class PlayerSlot extends EventTarget {
     this.teardownEngine();
     if (this.video) {
       this.video.removeEventListener("error", this.handleNativeError);
+      this.video.removeEventListener("playing", this.handlePlaying);
       if (typeof this.video.pause === "function") this.video.pause();
       this.video.removeAttribute("src");
       if (typeof this.video.load === "function") this.video.load();

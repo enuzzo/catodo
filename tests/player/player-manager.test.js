@@ -21,3 +21,15 @@ test("PlayerManager exposes one slot and forwards its browser events", async () 
   manager.destroy();
   assert.equal(slot.destroyed, true);
 });
+
+test("PlayerManager forwards connection progress events", () => {
+  const slot = new FakeSlot({ id: "main" });
+  const manager = new PlayerManager({ slot });
+  let forwarded = null;
+  manager.addEventListener("progress", (event) => { forwarded = event.detail; });
+  const progress = new Event("progress");
+  Object.defineProperty(progress, "detail", { value: { phase: "manifest-loading" } });
+  slot.dispatchEvent(progress);
+  assert.deepEqual(forwarded, { phase: "manifest-loading" });
+  manager.destroy();
+});

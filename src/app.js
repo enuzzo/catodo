@@ -16,6 +16,7 @@ import { EpgService, epgPreset } from "./epg/index.js";
 import { filterChannelPicker } from "./ui/channel-picker-filter.js";
 import { buildExploreCollections, pickExploreFeatured } from "./ui/explore-model.js";
 import { multiviewTelemetry, singleTelemetry } from "./ui/telemetry-model.js";
+import { advanceConnection, connectionView, startConnection } from "./ui/connection-model.js";
 import { resetWorldMapView, zoomWorldMap } from "./ui/world-map.js";
 
 const UI_CHANNEL_LIMIT = 72;
@@ -70,8 +71,12 @@ const state = {
   schedules: new Map(),
   guideLoading: false,
   guideError: "",
+  guideQuery: "",
+  guideFavoritesOnly: false,
+  multiviewPresets: [],
   playerChromeVisible: false,
   playerReturnMode: "shell",
+  playerConnection: null,
 };
 
 let catalog;
@@ -92,11 +97,30 @@ let multiviewChromeTimer = 0;
 let multiviewPointerAt = 0;
 let playerSession = 0;
 let playerTransitioning = false;
+let playerConnectionTimer = 0;
+let initialHomeSelectionDone = false;
 let lastInstallationSyncNotice = "";
 
 function legacyStorage() {
   try { return globalThis.localStorage || undefined; }
   catch { return undefined; }
+}
+
+function readLocalJson(key, fallback) {
+  try { return JSON.parse(legacyStorage()?.getItem(key) || "") ?? fallback; }
+  catch { return fallback; }
+}
+
+function writeLocalJson(key, value) {
+  try { legacyStorage()?.setItem(key, JSON.stringify(value)); } catch { /* optional device preference */ }
+}
+
+function updatePresetOptions() {
+  const select = ui?.refs.multiviewPresets;
+  if (!select) return;
+  const current = select.value;
+  select.replaceChildren(new Option(t("multiview.presets", "Presets"), ""), ...state.multiviewPresets.map((preset) => new Option(preset.name, preset.id)));
+  select.value = state.multiviewPresets.some((preset) => preset.id === current) ? current : "";
 }
 
 function t(key, fallback, vars = {}) {
@@ -416,6 +440,52 @@ function playerUiState(extra = {}) {
   };
 }
 
+function clearPlayerConnectionTimer() {
+  window.clearInterval(playerConnectionTimer);
+  playerConnectionTimer = 0;
+}
+
+function playerConnectionUi() {
+  return state.playerConnection ? connectionView(state.playerConnection) : null;
+}
+
+function refreshPlayerConnection() {
+  if (!state.playerConnection || !isPlayerSurfaceActive()) return;
+  const failed = state.playerConnection.phase === "error";
+  ui.updatePlayer({
+    loading: !failed,
+    playing: false,
+    error: failed ? state.playerConnection.error || "Stream unavailable" : "",
+    connection: playerConnectionUi(),
+  });
+}
+
+function beginPlayerConnection(source, phase = "start", detail = {}) {
+  clearPlayerConnectionTimer();
+  const endpoints = source?.endpoints || [];
+  state.playerConnection = startConnection({
+    route: endpoints[0]?.route || "direct",
+    endpointCount: Math.max(1, endpoints.length),
+  });
+  if (phase !== "start") state.playerConnection = advanceConnection(state.playerConnection, phase, detail);
+  playerConnectionTimer = window.setInterval(refreshPlayerConnection, 500);
+  return playerConnectionUi();
+}
+
+function advancePlayerConnection(phase, detail = {}, { restart = false } = {}) {
+  if (!state.playerConnection && !restart) return;
+  if (!state.playerConnection) beginPlayerConnection(playbackSource(findChannel(state.currentId)));
+  if (state.playerConnection.phase === "error" && phase !== "error") return;
+  state.playerConnection = advanceConnection(state.playerConnection, phase, detail);
+  if (phase === "error") clearPlayerConnectionTimer();
+  refreshPlayerConnection();
+}
+
+function finishPlayerConnection() {
+  clearPlayerConnectionTimer();
+  state.playerConnection = null;
+}
+
 async function applyPlayerAudio({ resume = false } = {}) {
   const volume = Math.max(0, Math.min(100, Number(state.playerVolume) || 0));
   state.playerVolume = volume;
@@ -607,13 +677,26 @@ function renderSources() {
       ...source,
       channelCount: source.count || 0,
       host: (() => { try { return new URL(source.url).host; } catch { return source.url; } })(),
+      healthLabel: source.error ? "Using last known good" : source.checkedAt ? `Healthy · checked ${formatRelativeTime(source.checkedAt)}` : "Ready to refresh",
     })),
   });
 }
 
+function formatRelativeTime(value) {
+  const elapsed = Math.max(0, Date.now() - Number(value || 0));
+  if (elapsed < 60_000) return "just now";
+  if (elapsed < 3_600_000) return `${Math.floor(elapsed / 60_000)}m ago`;
+  if (elapsed < 86_400_000) return `${Math.floor(elapsed / 3_600_000)}h ago`;
+  return `${Math.floor(elapsed / 86_400_000)}d ago`;
+}
+
 function renderGuide() {
-  const channels = playableChannels().slice(0, 48).map(decorateChannel);
+  const all = playableChannels().slice(0, 200).map(decorateChannel);
+  const query = state.guideQuery.trim().toLocaleLowerCase("en-US");
+  const channels = all.filter((channel) => (!state.guideFavoritesOnly || channel.favorite)
+    && (!query || `${channel.name} ${channel.countryName || channel.country || ""}`.toLocaleLowerCase("en-US").includes(query))).slice(0, 72);
   const hasMappedGuide = channels.some((channel) => channel?.hasGuide || channel?.guides?.length || channel?.endpoints?.some((endpoint) => endpoint?.guides?.length));
+  const covered = channels.filter((channel) => channel.schedule?.length).length;
   ui.renderGuide({
     activate: state.view === "guide",
     channels,
@@ -621,16 +704,16 @@ function renderGuide() {
     configured: state.epgSources.length > 0 || hasMappedGuide,
     loading: state.guideLoading,
     error: state.guideError,
+    query: state.guideQuery,
+    favoritesOnly: state.guideFavoritesOnly,
+    covered,
+    total: channels.length,
   });
 }
 
 function renderAll() {
-  renderHome();
-  renderExplore();
-  renderCountries();
-  renderLibrary();
-  renderGuide();
-  renderSources();
+  const renderer = { home: renderHome, explore: renderExplore, countries: renderCountries, library: renderLibrary, guide: renderGuide, sources: renderSources }[state.view];
+  renderer?.();
   ui.updateHeader({
     view: state.view,
     query: state.query,
@@ -683,13 +766,15 @@ async function openPlayer(channel, { returnMode = "shell" } = {}) {
   state.playerChromeVisible = false;
   state.playerMuted = state.playerVolume === 0;
   ui.refs.playerVideo.volume = state.playerVolume / 100;
-  ui.showPlayer(playerUiState({ loading: true, playing: false, chromeVisible: false }));
+  const source = playbackSource(channel);
+  const connection = beginPlayerConnection(source);
+  ui.showPlayer(playerUiState({ loading: true, playing: false, chromeVisible: false, connection }));
   void loadSchedules([channel]).then(() => {
     if (isActivePlayerSession(session, openedChannelId)) ui.updatePlayer(playerUiState());
   });
-  await mainPlayer.tune(playbackSource(channel), { muted: state.playerMuted }).catch((error) => {
+  await mainPlayer.tune(source, { muted: state.playerMuted }).catch((error) => {
     if (isActivePlayerSession(session, openedChannelId)) {
-      ui.updatePlayer(playerUiState({ loading: false, error: error.message, playing: false }));
+      advancePlayerConnection("error", { error }, { restart: true });
     }
   });
 }
@@ -793,12 +878,16 @@ function createMultiviewController() {
 
 function createMainPlayer() {
   return new PlayerManager({ video: ui.refs.playerVideo, id: "main", onEvent: (type, detail) => {
-    if (type === "fatal") ui.updatePlayer(playerUiState({
-      loading: false,
-      error: detail.error?.message,
-      playing: false,
-    }));
-    if (type === "autoplay-blocked") ui.updatePlayer(playerUiState({ chromeVisible: true, playing: false }));
+    if (type === "tuning") advancePlayerConnection("tuning", detail);
+    if (type === "progress") advancePlayerConnection(detail.phase, detail);
+    if (type === "retrying" || type === "recovering" || type === "fallback") {
+      advancePlayerConnection(type, detail, { restart: true });
+    }
+    if (type === "fatal") advancePlayerConnection("error", { ...detail, error: detail.error }, { restart: true });
+    if (type === "autoplay-blocked") {
+      finishPlayerConnection();
+      ui.updatePlayer(playerUiState({ loading: false, chromeVisible: true, playing: false }));
+    }
   } });
 }
 
@@ -833,6 +922,7 @@ async function releaseMainPlayer() {
     ui.toast(t("player.fullscreenExitFailed", "Could not exit full screen. Playback stayed in the player."), { tone: "error" });
     return false;
   }
+  finishPlayerConnection();
   playerSession += 1;
   mainPlayer = createMainPlayer();
   return true;
@@ -1040,11 +1130,28 @@ async function copyDiagnostics() {
   }
 }
 
+async function toggleFullscreen(target) {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen?.();
+    else if (typeof target?.requestFullscreen === "function") await target.requestFullscreen();
+    else throw new Error("Fullscreen API unavailable");
+  } catch {
+    ui.toast("Full screen is unavailable in this browser.", { tone: "error" });
+  }
+}
+
 async function handleAction(action, detail) {
   const id = detail.dataset.channelId || detail.element?.closest?.("[data-channel-id]")?.dataset.channelId;
   if (ui.refs.root.dataset.mode === "multiview" && action !== "toggle-multiview-chrome") revealMultiviewChrome();
   switch (action) {
+    case "toggle-more-menu": {
+      const open = ui.refs.moreMenu.hidden;
+      ui.refs.moreMenu.hidden = !open;
+      ui.refs.moreSummary.setAttribute("aria-expanded", String(open));
+      break;
+    }
     case "navigate": {
+      if (ui.refs.moreMenu) ui.refs.moreMenu.hidden = true;
       const targetView = detail.dataset.mode === "explore" ? "explore" : detail.dataset.view || "home";
       const shouldRandomizeHome = targetView === "home";
       state.view = detail.dataset.mode === "explore" ? "explore" : detail.dataset.view || "home";
@@ -1154,6 +1261,16 @@ async function handleAction(action, detail) {
       renderHome();
       break;
     }
+    case "toggle-home-fullscreen": {
+      await toggleFullscreen(ui.refs.homeLiveStage);
+      break;
+    }
+    case "random-player-channel": {
+      const next = catalog.randomPlayable({ currentChannelId: state.currentId, filters: {} });
+      if (next && isPlayableChannel(next)) await openPlayer(next, { returnMode: state.playerReturnMode });
+      else ui.toast("No other browser-playable channel is available.", { tone: "error" });
+      break;
+    }
     case "toggle-favorite":
     case "add-favorite":
     case "remove-favorite": {
@@ -1204,6 +1321,28 @@ async function handleAction(action, detail) {
       state.schedules.clear();
       await loadSchedules(playableChannels().slice(0, 48), { force: true });
       break;
+    case "filter-guide":
+      state.guideQuery = detail.value || "";
+      renderGuide();
+      break;
+    case "filter-guide-favorites":
+      state.guideFavoritesOnly = !state.guideFavoritesOnly;
+      renderGuide();
+      break;
+    case "add-channel-guide": {
+      state.view = "sources";
+      renderSources();
+      ui.showView("sources");
+      if (detail.dataset.country === "IT") {
+        const preset = epgPreset("globetv-italy");
+        if (preset) ui.refs.guideInput.value = preset.urls.join("\n");
+        ui.toast("Italy guide sources are ready to review and approve.");
+      } else {
+        ui.refs.guideInput.focus();
+        ui.toast("Add a country XMLTV source, then save it to match this channel.");
+      }
+      break;
+    }
     case "select-country":
       state.selectedCountry = String(detail.dataset.iso2 || "").toUpperCase();
       state.countryChannelQuery = "";
@@ -1359,6 +1498,42 @@ async function handleAction(action, detail) {
       ui.toast(state.proxy ? "Proxy saved." : "Proxy disabled.");
       break;
     }
+    case "export-backup": {
+      const backup = {
+        schema: "catodo-backup", version: 1, exportedAt: new Date().toISOString(),
+        sources: (state.lastCatalog?.sources || []).map(({ name, url, trusted }) => ({ name, url, trusted })),
+        favorites: [...(state.lastCatalog?.favorites || [])],
+        settings: { proxy: state.proxy, guideSources: state.epgSources, guideRefreshMinutes: state.epgRefreshMinutes },
+        multiviewPresets: state.multiviewPresets,
+      };
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `catodo-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(link.href), 0);
+      ui.toast("Backup downloaded.");
+      break;
+    }
+    case "import-backup": {
+      const file = detail.target?.files?.[0];
+      if (!file || file.size > 1_000_000) { if (file) ui.toast("Backup is too large.", { tone: "error" }); break; }
+      try {
+        const backup = JSON.parse(await file.text());
+        if (backup?.schema !== "catodo-backup" || backup.version !== 1) throw new Error("Unsupported CATODO backup.");
+        if (!window.confirm(`Merge ${backup.sources?.length || 0} sources, ${backup.favorites?.length || 0} Favorites, and ${backup.multiviewPresets?.length || 0} presets into this installation?`)) break;
+        for (const source of backup.sources || []) await catalog.importUrl(source.url, { confirmed: true, name: source.name, proxy: state.proxy || undefined });
+        for (const id of backup.favorites || []) if (!state.lastCatalog?.favorites.has(id) && findChannel(id)) await catalog.toggleFavorite(id);
+        if (backup.settings?.proxy !== undefined) { state.proxy = String(backup.settings.proxy || ""); await catalog.setSetting("proxy", state.proxy); }
+        if (Array.isArray(backup.settings?.guideSources)) state.epgSources = await epg.setSources(backup.settings.guideSources);
+        if (backup.settings?.guideRefreshMinutes !== undefined) state.epgRefreshMinutes = await epg.setRefreshMinutes(backup.settings.guideRefreshMinutes);
+        state.multiviewPresets = [...state.multiviewPresets, ...(backup.multiviewPresets || [])].slice(-8);
+        writeLocalJson("catodo:multiview-presets", state.multiviewPresets);
+        updatePresetOptions(); renderAll(); ui.toast("Backup merged successfully.");
+      } catch (error) { ui.toast(error.message || "Backup could not be restored.", { tone: "error" }); }
+      finally { detail.target.value = ""; }
+      break;
+    }
     case "close-player":
       await closePlayerOverlay();
       break;
@@ -1430,8 +1605,7 @@ async function handleAction(action, detail) {
       break;
     case "toggle-fullscreen": {
       const target = ui.refs.root.dataset.mode === "multiview" ? ui.refs.multiview : ui.refs.player;
-      if (document.fullscreenElement) await document.exitFullscreen?.();
-      else await target.requestFullscreen?.();
+      await toggleFullscreen(target);
       break;
     }
     case "add-to-multiview":
@@ -1451,8 +1625,25 @@ async function handleAction(action, detail) {
     }
     case "set-multiview-layout":
       state.multiviewLayout = Math.max(2, Math.min(4, Number(detail.dataset.count) || 4));
+      writeLocalJson("catodo:multiview-layout", state.multiviewLayout);
       await openMultiview();
       break;
+    case "save-multiview-preset": {
+      if (!state.multiviewFeeds.length) break;
+      const name = window.prompt("Preset name", `Multiview ${state.multiviewPresets.length + 1}`)?.trim();
+      if (!name) break;
+      state.multiviewPresets = [...state.multiviewPresets, { id: `preset-${Date.now()}`, name: name.slice(0, 40), layout: state.multiviewLayout, channelIds: state.multiviewFeeds.slice(0, state.multiviewLayout).map(channelId) }].slice(-8);
+      writeLocalJson("catodo:multiview-presets", state.multiviewPresets); updatePresetOptions(); ui.toast("Multiview preset saved.");
+      break;
+    }
+    case "load-multiview-preset": {
+      const preset = state.multiviewPresets.find((item) => item.id === detail.value);
+      if (!preset) break;
+      state.multiviewLayout = preset.layout;
+      state.multiviewFeeds = preset.channelIds.map(findChannel).filter(Boolean);
+      await openMultiview();
+      break;
+    }
     case "select-multiview-audio": {
       await selectMultiviewAudio(detail.dataset.slot);
       break;
@@ -1545,7 +1736,8 @@ function bindVideoEvents() {
   });
   ui.refs.playerVideo.addEventListener("playing", async () => {
     if (!isPlayerSurfaceActive()) return;
-    ui.updatePlayer(playerUiState({ loading: false, playing: true }));
+    finishPlayerConnection();
+    ui.updatePlayer(playerUiState({ loading: false, playing: true, connection: null }));
     if (state.currentId && lastRememberedId !== state.currentId) {
       lastRememberedId = state.currentId;
       await catalog.remember(state.currentId, { endpointId: firstEndpoint(findChannel(state.currentId))?.endpointId });
@@ -1557,7 +1749,13 @@ function bindVideoEvents() {
   });
   ui.refs.playerVideo.addEventListener("waiting", () => {
     if (!isPlayerSurfaceActive()) return;
-    ui.updatePlayer(playerUiState({ loading: true, playing: false }));
+    advancePlayerConnection("waiting", {}, { restart: true });
+  });
+  ui.refs.playerVideo.addEventListener("loadedmetadata", () => {
+    if (isPlayerSurfaceActive()) advancePlayerConnection("metadata");
+  });
+  ui.refs.playerVideo.addEventListener("canplay", () => {
+    if (isPlayerSurfaceActive()) advancePlayerConnection("canplay");
   });
   ui.refs.multiview.addEventListener("pointermove", () => {
     const now = performance.now();
@@ -1582,6 +1780,9 @@ async function boot() {
   document.documentElement.dir = i18n.direction;
 
   ui = mountAppUI(root, { t, onAction: (action, detail) => void handleAction(action, detail) });
+  state.multiviewLayout = Math.max(2, Math.min(4, Number(readLocalJson("catodo:multiview-layout", 4)) || 4));
+  state.multiviewPresets = readLocalJson("catodo:multiview-presets", []).filter((item) => item?.id && item?.name && Array.isArray(item.channelIds)).slice(-8);
+  updatePresetOptions();
   ui.setCountryImportHandler((iso2) => {
     const country = importCountryModel(iso2 || state.activeCountry);
     if (country) ui.showImportDialog({ source: country, country });
@@ -1618,7 +1819,12 @@ async function boot() {
     state.lastCatalog = snapshot;
     rebuildCountryDirectoryMaps(snapshot.countries);
     const first = playableChannels(snapshot.channels)[0];
-    if (!state.featuredId && first) state.featuredId = channelId(first);
+    if (!initialHomeSelectionDone && first) {
+      refreshWorldMix();
+      const initial = nextRandomHomeChannel() || first;
+      state.featuredId = channelId(initial);
+      initialHomeSelectionDone = true;
+    }
     renderAll();
   });
 
@@ -1674,6 +1880,7 @@ window.addEventListener("beforeunload", () => {
   window.clearInterval(clockTimer);
   window.clearInterval(metricTimer);
   window.clearInterval(epgTimer);
+  clearPlayerConnectionTimer();
   window.clearTimeout(playerChromeTimer);
   window.clearTimeout(multiviewChromeTimer);
   unsubscribeCatalog?.();

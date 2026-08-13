@@ -190,6 +190,11 @@ Stream diagnostics report manifest codec data plus measured browser counters.
 `N/A` is correct when the browser exposes no decoded-audio counter. The browser
 cannot prove that speakers are physically audible.
 
+Successful endpoint choices are remembered locally after the media element emits
+`playing`. A later tune prefers the most recently successful URL on that device,
+then retains the normal bounded fallback order. This is local evidence, not a
+global availability claim, and the compact history is never synchronized.
+
 ### Supported media and proxy boundary
 
 The current engine is HLS-oriented. Platform pages, DASH manifests, RTMP/RTSP
@@ -219,6 +224,11 @@ from enriched channel/feed metadata. It:
 Channel matching considers `tvgId`, internal identity and guide site IDs. EPG
 coverage is inherently incomplete, and matching accuracy depends on provider
 identifiers. Do not display invented programme titles when a mapping is absent.
+
+The TV Guide exposes search, a Favorites-only view, honest coverage counts and a
+consent-gated path to add country XMLTV sources. Settings can export a versioned
+JSON configuration backup and merge a validated backup into the installation;
+runtime caches, credentials, logs and programme bodies are excluded.
 
 ## UI, navigation and localization
 

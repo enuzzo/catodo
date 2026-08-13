@@ -51,3 +51,32 @@ test("PlayerSlot recovers media errors, retries network errors, then falls back"
   assert.equal(second.url, "https://two.test/live.m3u8");
   slot.destroy();
 });
+
+test("PlayerSlot reports provider connection phases with endpoint context", async () => {
+  FakeHls.instances.length = 0;
+  const phases = [];
+  const slot = new PlayerSlot({
+    video: new FakeVideo(),
+    HlsClass: FakeHls,
+    onEvent: (type, detail) => {
+      if (type === "progress") phases.push(detail);
+    },
+  });
+  await slot.tune({
+    url: "https://one.test/live.m3u8",
+    fallbackUrl: "https://two.test/live.m3u8",
+  });
+  const hls = FakeHls.instances[0];
+  hls.emit(FakeHls.Events.MANIFEST_LOADING);
+  hls.emit(FakeHls.Events.MANIFEST_PARSED);
+  hls.emit(FakeHls.Events.FRAG_LOADING);
+  hls.emit(FakeHls.Events.FRAG_BUFFERED);
+  assert.deepEqual(phases.map((entry) => entry.phase), [
+    "manifest-loading",
+    "manifest-parsed",
+    "fragment-loading",
+    "buffering",
+  ]);
+  assert.ok(phases.every((entry) => entry.endpointCount === 2 && entry.endpointIndex === 0));
+  slot.destroy();
+});

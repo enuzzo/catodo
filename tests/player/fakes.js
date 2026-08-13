@@ -56,6 +56,12 @@ export class FakeHls {
 
   static Events = {
     ERROR: "error",
+    MEDIA_ATTACHED: "media-attached",
+    MANIFEST_LOADING: "manifest-loading",
+    MANIFEST_PARSED: "manifest-parsed",
+    LEVEL_LOADING: "level-loading",
+    FRAG_LOADING: "frag-loading",
+    FRAG_BUFFERED: "frag-buffered",
     FRAG_LOADED: "frag-loaded",
     LEVEL_SWITCHED: "level-switched",
     LEVEL_LOADED: "level-loaded"
