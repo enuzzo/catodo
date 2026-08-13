@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { guideChannelIdsFor, parseXmltv, parseXmltvDate, parseXmltvDocument, programmesForChannel } from "../../src/epg/xmltv.js";
 import { EpgService, guideUrlsForChannels } from "../../src/epg/service.js";
-import { epgPresetsForCountry } from "../../src/epg/presets.js";
+import { epgPresetsForCountry, migrateKnownEpgSources, OPEN_EPG_ITALY_URLS } from "../../src/epg/presets.js";
 import { GlobeTvCatalog, globeTvCountryFromUrl, groupGuideSources } from "../../src/epg/catalog.js";
 
 test("collects unique catalog-listed XMLTV URLs from country channel mappings", () => {
@@ -21,8 +21,15 @@ test("collects unique catalog-listed XMLTV URLs from country channel mappings", 
 });
 
 test("resolves only explicitly configured country presets", () => {
-  assert.equal(epgPresetsForCountry("it")[0]?.id, "globetv-italy");
+  assert.equal(epgPresetsForCountry("it")[0]?.id, "open-epg-italy");
   assert.deepEqual(epgPresetsForCountry("FR"), []);
+});
+
+test("migrates the obsolete GlobeTV Italy mirror without removing custom sources", () => {
+  assert.deepEqual(migrateKnownEpgSources([
+    "https://example.org/custom.xml",
+    "https://raw.githubusercontent.com/globetvapp/epg/main/Italy/italy1.xml",
+  ]), ["https://example.org/custom.xml", ...OPEN_EPG_ITALY_URLS]);
 });
 
 test("parses XMLTV dates with offsets", () => {
@@ -167,6 +174,47 @@ test("uses XMLTV channel display names to match provider-specific IDs", async ()
   assert.equal(schedule.matched, true);
   assert.equal(schedule.programmes[0].title, "Telegiornale");
   assert.equal(service.getSourceStatuses()[0].matchedChannels, 1);
+});
+
+test("marks matched channels and sources as stale when programme data ended before the requested window", async () => {
+  const xml = `<tv>
+    <channel id="Canale 5.it"><display-name>Canale 5</display-name></channel>
+    <programme start="20251231140000 +0100" stop="20251231150000 +0100" channel="Canale 5.it"><title>Old news</title></programme>
+  </tv>`;
+  const settings = new Map([["epg:sources", ["https://example.org/italy.xml"]]]);
+  const catalog = {
+    getSetting: async (key, fallback) => settings.has(key) ? settings.get(key) : fallback,
+    setSetting: async (key, value) => { settings.set(key, value); return value; },
+  };
+  const service = await new EpgService({ catalog, fetchImpl: async () => new Response(xml) }).init();
+  const schedule = await service.schedule({ channelId: "canale-5", name: "Canale 5" }, {
+    from: Date.UTC(2026, 7, 13, 12),
+    to: Date.UTC(2026, 7, 13, 20),
+  });
+  assert.equal(schedule.matched, true);
+  assert.equal(schedule.status, "stale");
+  assert.deepEqual(schedule.programmes, []);
+  assert.equal(service.getSourceStatuses()[0].dataState, "stale");
+});
+
+test("falls back to the authenticated same-origin cache for Open EPG feeds", async () => {
+  const settings = new Map([["epg:sources", [OPEN_EPG_ITALY_URLS[0]]]]);
+  const catalog = {
+    getSetting: async (key, fallback) => settings.has(key) ? settings.get(key) : fallback,
+    setSetting: async (key, value) => { settings.set(key, value); return value; },
+  };
+  const requests = [];
+  const service = await new EpgService({ catalog, fetchImpl: async (url) => {
+    requests.push(url);
+    if (url === OPEN_EPG_ITALY_URLS[0]) throw new TypeError("CORS blocked");
+    return new Response(`<tv><channel id="Rai1.it"><display-name>Rai 1</display-name></channel><programme start="20260813140000 +0200" stop="20260813150000 +0200" channel="Rai1.it"><title>Live news</title></programme></tv>`);
+  } }).init();
+  const schedule = await service.schedule({ channelId: "rai-1", name: "Rai 1" }, {
+    from: Date.UTC(2026, 7, 13, 12, 30),
+    to: Date.UTC(2026, 7, 13, 13, 30),
+  });
+  assert.equal(requests[1], `./epg-cache.php?url=${encodeURIComponent(OPEN_EPG_ITALY_URLS[0])}`);
+  assert.equal(schedule.programmes[0].title, "Live news");
 });
 
 test("groups GlobeTV guide sources by country with persistent diagnostics", () => {

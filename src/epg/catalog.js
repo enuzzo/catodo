@@ -26,11 +26,21 @@ export function globeTvCountryFromUrl(value) {
   }
 }
 
+function openEpgCountryFromUrl(value) {
+  try {
+    const url = new URL(value);
+    const match = url.hostname === "www.open-epg.com" ? url.pathname.match(/^\/files\/(italy[1-8]\.xml)$/i) : null;
+    return match ? { id: "Italy", name: "Italy", file: match[1] } : null;
+  } catch {
+    return null;
+  }
+}
+
 export function groupGuideSources(sources, statuses = []) {
   const statusByUrl = new Map((Array.isArray(statuses) ? statuses : []).map((item) => [item.url, item]));
   const groups = new Map();
   for (const url of Array.isArray(sources) ? sources : []) {
-    const country = globeTvCountryFromUrl(url) || { id: "custom", name: "Custom sources", file: (() => { try { return new URL(url).pathname.split("/").pop() || url; } catch { return url; } })() };
+    const country = globeTvCountryFromUrl(url) || openEpgCountryFromUrl(url) || { id: "custom", name: "Custom sources", file: (() => { try { return new URL(url).pathname.split("/").pop() || url; } catch { return url; } })() };
     if (!groups.has(country.id)) groups.set(country.id, { id: country.id, name: country.name, sources: [] });
     groups.get(country.id).sources.push({ url, file: country.file, ...(statusByUrl.get(url) || {}) });
   }

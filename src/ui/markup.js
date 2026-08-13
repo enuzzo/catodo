@@ -2,6 +2,8 @@ import { renderCountryShape, renderWorldMap } from './world-map.js';
 import { isPrimaryNavActive, shouldActivateShellView } from './view-mode.js';
 import { EXPLORE_CATEGORIES } from './explore-model.js';
 import { featuredChannelIdentity } from './channel-identity.js';
+import { APP_VERSION } from '../version.js';
+import { formatGuideDateTime, formatGuideTime } from './time-format.js';
 
 const FLAG_URLS = import.meta.glob('../../assets/vendor/flags/4x3/*.svg', {
   eager: true,
@@ -12,6 +14,7 @@ const FLAG_URLS = import.meta.glob('../../assets/vendor/flags/4x3/*.svg', {
 const TONES = ['white', 'red', 'green', 'yellow', 'cyan', 'magenta', 'blue'];
 const VIEW_NAMES = ['home', 'explore', 'countries', 'guide', 'library', 'sources'];
 const MULTIVIEW_SIZE = 4;
+const CATODO_LOGO_URL = './icons/catodo-netmilk-tv-192.png';
 const mountedApps = new WeakMap();
 
 function translate(t, key, fallback, vars = {}) {
@@ -280,7 +283,7 @@ function channelQuality(channel) {
 
 function metadataDivider() {
   const node = element('span', 'meta-divider', { 'aria-hidden': 'true' });
-  node.textContent = '|';
+  node.textContent = '–';
   return node;
 }
 
@@ -302,12 +305,7 @@ function channelNumber(channel, index) {
   return Number.isFinite(numeric) ? String(Math.max(0, Math.floor(numeric))).padStart(3, '0') : safeText(supplied);
 }
 
-function formatProgrammeTime(value) {
-  const date = new Date(Number(value));
-  return Number.isFinite(date.getTime())
-    ? new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(date)
-    : '--:--';
-}
+const formatProgrammeTime = formatGuideTime;
 
 function channelSchedule(channel) {
   return normaliseArray(channel?.schedule || channel?.programmes);
@@ -429,7 +427,17 @@ function createHeader(t) {
     dataset: { action: 'navigate', view: 'home' },
     'aria-label': translate(t, 'nav.homeAriaLabel', 'Go to live home'),
   });
-  brand.append(textNode('span', 'brand__name', t, 'brand.name', 'CATODO'));
+  const brandLogo = element('img', 'brand__logo', {
+    src: CATODO_LOGO_URL,
+    alt: '',
+    'aria-hidden': 'true',
+    draggable: false,
+  });
+  const brandCopy = element('span', 'brand__copy');
+  const brandVersion = element('span', 'brand__version');
+  brandVersion.textContent = `v${APP_VERSION}`;
+  brandCopy.append(textNode('span', 'brand__name', t, 'brand.name', 'Catodo'), brandVersion);
+  brand.append(brandLogo, brandCopy);
 
   const nav = element('nav', 'primary-nav', {
     'aria-label': translate(t, 'nav.primaryAriaLabel', 'Primary navigation'),
@@ -618,7 +626,7 @@ function createHomeView(t) {
     key: 'common.viewAll',
     fallback: 'View all',
     className: 'button--text',
-    dataset: { view: 'library' },
+    dataset: { view: 'library', libraryFilter: 'favorites' },
   });
   const favoriteGrid = element('div', 'channel-grid channel-grid--favorites');
   favorites.append(createSectionTitle(t, 'favorites.title', 'Favorites', favoriteMore), favoriteGrid);
@@ -1197,7 +1205,7 @@ function createGuideView(t) {
   copy.append(
     textNode('p', 'eyebrow', t, 'guide.eyebrow', 'Live schedules'),
     textNode('h1', null, t, 'guide.title', 'TV Guide'),
-    textNode('p', 'page-heading__description', t, 'guide.description', 'Now and next across your imported channels. Times are shown in your local timezone.'),
+    textNode('p', 'page-heading__description', t, 'guide.description', 'Now and next across your imported channels. Times use your local timezone in 24-hour format.'),
   );
   const refresh = actionButton({
     t, action: 'refresh-guide', iconName: 'arrows-clockwise', key: 'guide.refresh', fallback: 'Refresh guide', className: 'button--ghost',
@@ -1349,20 +1357,24 @@ function renderGuideSourceManager(refs, state, t) {
     const list = element('div', 'guide-country-source__list');
     group.sources.forEach((source) => {
       const zeroMatches = Boolean(source.fetchedAt) && (Number(source.matchedChannels) || 0) === 0;
-      const row = element('div', 'guide-source-file', { dataset: { state: source.state === 'error' ? 'error' : zeroMatches ? 'unmatched' : source.state || 'idle' } });
-      const stateIcon = icon(source.state === 'error' || zeroMatches ? 'warning-circle' : source.state === 'cached' ? 'cloud-slash' : 'check-circle');
+      const stale = source.dataState === 'stale';
+      const rowState = source.state === 'error' ? 'error' : stale ? 'stale' : zeroMatches ? 'unmatched' : source.state || 'idle';
+      const row = element('div', 'guide-source-file', { dataset: { state: rowState } });
+      const stateIcon = icon(source.state === 'error' || stale || zeroMatches ? 'warning-circle' : source.state === 'cached' ? 'cloud-slash' : 'check-circle');
       const copy = element('div');
       const file = element('strong');
       file.textContent = safeText(source.file || source.url);
       const meta = element('span');
       if (source.fetchedAt) {
-        const checked = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(source.fetchedAt));
+        const checked = formatGuideDateTime(source.fetchedAt);
         const dataThrough = source.latestProgrammeAt
-          ? ` · data through ${new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(source.latestProgrammeAt))}`
+          ? ` · data through ${formatGuideDateTime(source.latestProgrammeAt)}`
           : '';
         meta.textContent = source.state === 'error'
           ? `Refresh failed · cached copy from ${checked}`
-          : `Downloaded ${checked} · ${Number(source.matchedChannels) || 0} matches · ${Number(source.programmeCount) || 0} programmes${dataThrough}`;
+          : stale
+            ? `Outdated · data ended ${formatGuideDateTime(source.latestProgrammeAt)} · downloaded ${checked}`
+            : `Downloaded ${checked} · ${Number(source.matchedChannels) || 0} matches · ${Number(source.programmeCount) || 0} programmes${dataThrough}`;
       } else meta.textContent = 'Never downloaded';
       copy.append(file, meta);
       row.append(stateIcon, copy, iconButton({
@@ -1475,14 +1487,14 @@ function createSourcesView(t) {
   const providerCopy = element('div', 'guide-provider__copy');
   providerCopy.append(
     textNode('span', 'guide-provider__badge', t, 'guide.recommended', 'Recommended free source'),
-    textNode('h3', null, t, 'guide.providerTitle', 'GlobeTV country guides'),
-    textNode('p', null, t, 'guide.providerBody', 'Daily XMLTV files organised by country. The Italy preset includes five feeds; other countries are available in the provider catalog.'),
+    textNode('h3', null, t, 'guide.providerTitle', 'XMLTV country guides'),
+    textNode('p', null, t, 'guide.providerBody', 'The Italy preset includes eight current Open EPG feeds; other countries remain available in the provider catalog.'),
   );
   const providerActions = element('div', 'guide-provider__actions');
   providerActions.append(
     actionButton({
       t, action: 'use-guide-preset', iconName: 'plus', key: 'guide.useItalyPreset', fallback: 'Use Italy preset', className: 'button--primary button--small',
-      dataset: { presetId: 'globetv-italy' },
+      dataset: { presetId: 'open-epg-italy' },
     }),
     actionButton({
       t, action: 'view-guide-provider', iconName: 'arrow-square-out', key: 'guide.browseCountries', fallback: 'Browse countries', className: 'button--ghost button--small',
@@ -3290,12 +3302,14 @@ export function mountAppUI(root, options = {}) {
       guide.favorites.setAttribute('aria-pressed', state.favoritesOnly ? 'true' : 'false');
       if (state.loading) setTranslatedText(guide.status, t, 'guide.loading', 'Loading live schedules…');
       else if (state.error) guide.status.textContent = safeText(state.error);
-      else if (state.configured && Number(state.covered) > 0 && !channels.some((channel) => channelSchedule(channel).length)) {
-        guide.status.textContent = translate(t, 'guide.matchedNoCurrent', '{covered} channels matched · no current programmes were found in this time window', { covered: state.covered });
+      else if (state.configured && Number(state.staleSourceCount) > 0 && Number(state.covered) === 0) {
+        guide.status.textContent = translate(t, 'guide.stale', 'Installed guide data is out of date — latest programme ended {date}. Refreshing will replace known legacy Italian feeds.', { date: formatGuideDateTime(state.latestProgrammeAt) });
+      } else if (state.configured && Number(state.matched) > 0 && Number(state.covered) === 0) {
+        guide.status.textContent = translate(t, 'guide.matchedNoCurrent', '{matched} channels matched — no current programmes were found in this time window', { matched: state.matched });
       } else if (state.configured && Number(state.covered) === 0) {
         setTranslatedText(guide.status, t, 'guide.empty', 'Sources downloaded, but no channels matched. Review source diagnostics in Settings.');
       } else if (state.configured) {
-        guide.status.textContent = translate(t, 'guide.coverage', 'Guide coverage: {covered}/{total} channels · times shown in your timezone', { covered: state.covered ?? 0, total: state.total ?? channels.length });
+        guide.status.textContent = translate(t, 'guide.coverage', 'Guide coverage: {covered}/{total} channels — times shown in your timezone (24h)', { covered: state.covered ?? 0, total: state.total ?? channels.length });
       } else setTranslatedText(guide.status, t, 'guide.unconfigured', 'Connect an XMLTV source in Settings to add live programme data.');
       renderGuideCards(guide.grid, channels, t);
       return api;
@@ -3456,7 +3470,7 @@ export function mountAppUI(root, options = {}) {
       }
       if (state.guideLastRefresh) {
         sources.guideStatus.textContent = translate(t, 'guide.lastChecked', 'Last checked {time}', {
-          time: new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(state.guideLastRefresh)),
+          time: formatGuideDateTime(state.guideLastRefresh),
         });
       } else setTranslatedText(sources.guideStatus, t, 'guide.notChecked', 'Not checked yet');
       return api;
@@ -3518,7 +3532,7 @@ export function mountAppUI(root, options = {}) {
         }
       }
       if (state.chromeVisible !== undefined) player.overlay.classList.toggle('is-chrome-visible', Boolean(state.chromeVisible));
-      player.localTime.textContent = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(new Date());
+      player.localTime.textContent = formatGuideTime(Date.now());
       if (state.loading !== undefined) {
         player.status.hidden = !state.loading && !state.error;
         const connection = state.connection || {};

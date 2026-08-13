@@ -144,6 +144,23 @@ if ($authed) {
     echo $app;
     exit;
 }
+
+function readAppVersion(): string
+{
+    $raw = @file_get_contents(__DIR__ . '/version.json');
+    if ($raw === false) {
+        return '';
+    }
+
+    $manifest = json_decode($raw, true);
+    $version = is_array($manifest) ? ($manifest['version'] ?? '') : '';
+    if (!is_string($version) || preg_match('/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/', $version) !== 1) {
+        return '';
+    }
+    return $version;
+}
+
+$appVersion = readAppVersion();
 ?>
 <!doctype html>
 <html lang="en">
@@ -181,18 +198,11 @@ body{background:var(--glass);color:var(--ink);font-family:var(--sans);font-size:
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 input{font:inherit;color:inherit}
 input::placeholder{color:var(--dim)}
-.fringe{text-shadow:1.2px 0 0 rgba(224,85,69,.75), -1.2px 0 0 rgba(63,214,214,.7)}
-.barStrip{display:flex;gap:2px;width:126px;height:11px;margin:0 auto 17px}
-.barStrip i{flex:1}
-.barStrip i:nth-child(1){background:var(--ebu-white)}
-.barStrip i:nth-child(2){background:var(--ebu-yellow)}
-.barStrip i:nth-child(3){background:var(--ebu-cyan)}
-.barStrip i:nth-child(4){background:var(--ebu-green)}
-.barStrip i:nth-child(5){background:var(--ebu-magenta)}
-.barStrip i:nth-child(6){background:var(--ebu-red)}
-.barStrip i:nth-child(7){background:var(--ebu-blue)}
 #gate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:20px;max-width:360px}
-h1{font-size:15px;font-weight:800;letter-spacing:.46em;text-indent:.46em;text-align:center}
+.login-brand{display:flex;flex-direction:column;align-items:center}
+.login-logo{width:132px;height:132px;border-radius:30px;box-shadow:0 0 0 1px rgba(10,11,13,.08),0 18px 42px rgba(10,11,13,.12);object-fit:cover;margin-bottom:18px}
+h1{font-size:38px;font-weight:760;line-height:1;letter-spacing:-.045em;text-align:center}
+.login-version{margin-top:9px;color:var(--dim);font-family:var(--mono);font-size:9px;font-weight:650;letter-spacing:.18em;text-align:center}
 .sub{font-size:10.5px;letter-spacing:.24em;color:var(--dim);margin-top:10px;text-align:center}
 .sub.bad{color:var(--c-red);letter-spacing:.1em;max-width:360px;line-height:1.6}
 form{display:flex;flex-direction:column;gap:12px;width:100%}
@@ -207,9 +217,10 @@ button[type=submit]:active{background:var(--c-amber);border-color:var(--c-amber)
 </head>
 <body>
 <div id="gate">
-  <div>
-    <div class="barStrip"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-    <h1 class="fringe">CATODO</h1>
+  <div class="login-brand">
+    <img class="login-logo" src="./icons/catodo-netmilk-tv-192.png" alt="" aria-hidden="true">
+    <h1>Catodo</h1>
+    <?php if ($appVersion !== ''): ?><div class="login-version">VERSION <?= htmlspecialchars($appVersion, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
     <div class="sub<?= $error !== '' ? ' bad' : '' ?>"><?= $error !== '' ? htmlspecialchars($error, ENT_QUOTES, 'UTF-8') : 'SIGN IN' ?></div>
   </div>
   <form method="post" autocomplete="off">

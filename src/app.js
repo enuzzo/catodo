@@ -293,7 +293,7 @@ function decorateChannel(channel, index = 0) {
     poster: channel.poster || channel.image || channel.thumbnail || cachedLogoUrl(channel.logo) || "",
     schedule: state.schedules.get(channelId(channel))?.programmes || [],
     guideStatus: state.schedules.get(channelId(channel))?.status || "unconfigured",
-    guideAvailable: state.schedules.get(channelId(channel))?.matched === true,
+    guideAvailable: state.schedules.get(channelId(channel))?.status === "ready",
   };
 }
 
@@ -776,11 +776,16 @@ function formatRelativeTime(value) {
 }
 
 function renderGuide() {
-  const all = playableChannels().map(decorateChannel).filter((channel) => channel.guideAvailable);
+  const decorated = playableChannels().map(decorateChannel);
+  const matched = decorated.filter((channel) => state.schedules.get(channelId(channel))?.matched === true);
+  const all = decorated.filter((channel) => channel.guideAvailable && channel.schedule.length > 0);
   const query = state.guideQuery.trim().toLocaleLowerCase("en-US");
   const channels = all.filter((channel) => (!state.guideFavoritesOnly || channel.favorite)
     && (!query || `${channel.name} ${channel.countryName || channel.country || ""}`.toLocaleLowerCase("en-US").includes(query))).slice(0, 160);
   const hasMappedGuide = all.length > 0 || state.epgSources.length > 0;
+  const sourceStatuses = epg?.getSourceStatuses?.() || [];
+  const staleSources = sourceStatuses.filter((source) => source.dataState === "stale");
+  const latestProgrammeAt = sourceStatuses.reduce((latest, source) => Math.max(latest, Number(source.latestProgrammeAt) || 0), 0);
   const covered = all.length;
   ui.renderGuide({
     activate: state.view === "guide",
@@ -792,7 +797,10 @@ function renderGuide() {
     query: state.guideQuery,
     favoritesOnly: state.guideFavoritesOnly,
     covered,
-    total: all.length,
+    total: matched.length || all.length,
+    matched: matched.length,
+    staleSourceCount: staleSources.length,
+    latestProgrammeAt,
   });
 }
 
@@ -1275,7 +1283,15 @@ async function handleAction(action, detail) {
       if (ui.refs.moreMenu) ui.refs.moreMenu.hidden = true;
       const targetView = detail.dataset.mode === "explore" ? "explore" : detail.dataset.view || "home";
       const shouldRandomizeHome = targetView === "home";
-      state.view = detail.dataset.mode === "explore" ? "explore" : detail.dataset.view || "home";
+      const opensFavoriteLibrary = targetView === "library" && detail.dataset.libraryFilter === "favorites";
+      state.view = targetView;
+      if (opensFavoriteLibrary) {
+        state.libraryFavoritesOnly = true;
+        state.libraryQuery = "";
+        state.libraryCategory = "";
+        state.libraryLanguage = "";
+        state.libraryLimit = UI_CHANNEL_LIMIT;
+      }
       if (shouldRandomizeHome) {
         refreshWorldMix();
         const randomHome = nextRandomHomeChannel();
@@ -1559,7 +1575,7 @@ async function handleAction(action, detail) {
       renderSources();
       ui.showView("sources");
       if (detail.dataset.country === "IT") {
-        const preset = epgPreset("globetv-italy");
+        const preset = epgPreset("open-epg-italy");
         if (preset) ui.refs.guideInput.value = preset.urls.join("\n");
         ui.toast("Italy guide sources are ready to review and approve.");
       } else {

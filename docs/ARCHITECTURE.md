@@ -1,6 +1,6 @@
 # CATODO architecture
 
-This document is the maintainer map for CATODO 2.0. It describes the runtime
+This document is the maintainer map for CATODO 2.1.1. It describes the runtime
 boundaries, the data flow, and the invariants that should survive future UI and
 feature work. For operational procedures and failure symptoms, see
 [OPERATIONS.md](OPERATIONS.md).
@@ -229,10 +229,15 @@ diagnostics separately report download success, registry matches and the latest
 programme timestamp, because a valid XML file can contain stale schedules.
 
 The TV Guide exposes a shared horizontal timeline, search, a Favorites-only
-view, honest coverage counts and only channels with a resolved guide mapping.
-The GlobeTV catalog is cached for 24 hours and country file lists are loaded
-lazily; installed URLs remain installation-wide settings while source status
-and programme bodies stay local to each browser. Settings can export a versioned
+view, honest coverage counts and only channels with programmes in the active
+window. Times use the local timezone and 24-hour notation. The Italian preset
+uses eight current Open EPG feeds; known expired GlobeTV Italy URLs are migrated
+automatically. Because Open EPG does not expose browser CORS headers, production
+uses an authenticated, host/path-allowlisted PHP cache and Vite supplies the same
+narrow bridge during development. The broader GlobeTV catalog is cached for 24
+hours and country file lists are loaded lazily; installed URLs remain
+installation-wide settings while source status and programme bodies stay local
+to each browser. Settings can export a versioned
 JSON configuration backup and merge a validated backup into the installation;
 runtime caches, credentials, logs and programme bodies are excluded.
 

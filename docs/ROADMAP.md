@@ -55,11 +55,19 @@ or real-device validation. It is intentionally concrete and ordered by value.
 
 ### P1 — remote playback
 
-- Prototype AirPlay through native media controls/WebKit playback-target
-  capability detection, then validate authenticated and cross-origin HLS URLs.
-- Prototype Chromecast through standards-based Remote Playback first; assess the
-  Google Cast Web Sender SDK only if device coverage requires it. Treat CORS,
-  cookies, expiring stream URLs and receiver compatibility as release blockers.
+- Add one mobile-first **Stream** button, hidden on Tesla and browsers with no
+  supported remote-playback route. Its sheet presents AirPlay and Chromecast
+  with their own icon, availability state and short connection guidance.
+- Use WebKit playback-target detection and the native AirPlay picker on
+  iPhone/iPad. Apple owns device discovery and device names; CATODO must not
+  simulate a custom scan that the browser does not expose.
+- Prototype Chromecast through standards-based Remote Playback first, then use
+  the Google Cast Web Sender SDK if real-device coverage requires it. Let the
+  system/Cast picker present receiver names while CATODO keeps one consistent
+  entry point.
+- Validate hotel/guest-network behavior, authenticated and cross-origin HLS,
+  cookies, expiring stream URLs, receiver codecs and disconnect/reconnect states
+  before treating either route as shipped.
 
 ### P2 — maintainability and polish
 

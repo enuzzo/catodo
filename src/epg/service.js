@@ -1,5 +1,6 @@
 import { guideChannelIdsFor, parseXmltvDocument } from "./xmltv.js";
 import { MAX_EPG_SOURCES } from "../data/installation-sync.js";
+import { migrateKnownEpgSources } from "./presets.js";
 
 const CACHE_TTL = 6 * 60 * 60 * 1000;
 const WINDOW_MS = 8 * 60 * 60 * 1000;
@@ -11,6 +12,16 @@ function unique(values) {
 
 function latestProgrammeAt(programmes) {
   return (Array.isArray(programmes) ? programmes : []).reduce((latest, item) => Math.max(latest, Number(item?.stop) || 0), 0);
+}
+
+function builtInProxyUrl(url) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname !== "www.open-epg.com" || !/^\/files\/italy[1-8]\.xml$/.test(parsed.pathname)) return "";
+    return `./epg-cache.php?url=${encodeURIComponent(parsed.href)}`;
+  } catch {
+    return "";
+  }
 }
 
 function guidesFor(channel) {
@@ -70,7 +81,11 @@ export class EpgService {
   }
 
   async init() {
-    this.#customSources = unique(await this.#catalog?.getSetting?.("epg:sources", []) || []);
+    const storedSources = unique(await this.#catalog?.getSetting?.("epg:sources", []) || []);
+    this.#customSources = migrateKnownEpgSources(storedSources).slice(0, MAX_EPG_SOURCES);
+    if (this.#customSources.join("\n") !== storedSources.join("\n")) {
+      await this.#catalog?.setSetting?.("epg:sources", this.#customSources);
+    }
     const refreshMinutes = Number(await this.#catalog?.getSetting?.("epg:refreshMinutes", 360));
     this.#refreshMinutes = REFRESH_INTERVALS.has(refreshMinutes) ? refreshMinutes : 360;
     this.#lastRefresh = Number(await this.#catalog?.getSetting?.("epg:lastRefresh", 0)) || 0;
@@ -122,6 +137,8 @@ export class EpgService {
       ? memory
       : persisted?.url === url && Array.isArray(persisted.channels) ? persisted : null;
     const candidates = [url];
+    const builtInProxy = builtInProxyUrl(url);
+    if (builtInProxy) candidates.push(builtInProxy);
     const proxied = typeof this.#proxy === "function" ? this.#proxy(url) : "";
     if (proxied) candidates.push(proxied);
     let lastError;
@@ -204,18 +221,27 @@ export class EpgService {
         if (!programmesByChannel.has(key)) programmesByChannel.set(key, []);
         programmesByChannel.get(key).push(programme);
       }
-      return [{ ...record, programmesByChannel, registryIds: new Set((record.channels || []).map((entry) => String(entry.id).toLocaleLowerCase("en-US"))) }];
+      const sourceLatestProgrammeAt = latestProgrammeAt(record.programmes);
+      return [{
+        ...record,
+        programmesByChannel,
+        latestProgrammeAt: sourceLatestProgrammeAt,
+        dataState: !record.programmes?.length ? "empty" : sourceLatestProgrammeAt <= from ? "stale" : "current",
+        registryIds: new Set((record.channels || []).map((entry) => String(entry.id).toLocaleLowerCase("en-US"))),
+      }];
     });
     const matchCounts = new Map(urls.map((url) => [url, 0]));
     const entries = values.map((channel) => {
       const directIds = guideIdsForChannel(channel);
       let matched = false;
+      const matchedDataStates = [];
       const programmes = documents.flatMap((document) => {
         const ids = unique([...directIds, ...guideChannelIdsFor(channel, document.channels)]);
         const normalizedIds = [...new Set(ids.map((id) => String(id).toLocaleLowerCase("en-US")))];
         const sourceMatched = normalizedIds.some((id) => document.registryIds.has(id) || document.programmesByChannel.has(id));
         if (sourceMatched) {
           matched = true;
+          matchedDataStates.push(document.dataState);
           matchCounts.set(document.url, (matchCounts.get(document.url) || 0) + 1);
         }
         return normalizedIds.flatMap((id) => document.programmesByChannel.get(id) || [])
@@ -223,12 +249,23 @@ export class EpgService {
       });
       return [String(channel?.channelId || channel?.id || ""), {
         programmes: programmes.sort((a, b) => a.start - b.start || a.stop - b.stop),
-        status: documents.length ? (matched ? "ready" : "unmatched") : "error",
+        status: documents.length
+          ? matched
+            ? matchedDataStates.some((state) => state === "current") ? "ready" : "stale"
+            : "unmatched"
+          : "error",
         sources: urls,
         matched,
       }];
     });
-    await Promise.all([...matchCounts].map(([url, matchedChannels]) => this.#rememberSourceStatus(url, { matchedChannels })));
+    const documentByUrl = new Map(documents.map((document) => [document.url, document]));
+    await Promise.all([...matchCounts].map(([url, matchedChannels]) => {
+      const document = documentByUrl.get(url);
+      return this.#rememberSourceStatus(url, {
+        matchedChannels,
+        ...(document ? { dataState: document.dataState, latestProgrammeAt: document.latestProgrammeAt } : {}),
+      });
+    }));
     const schedules = new Map(entries);
     if (documents.length) {
       this.#lastRefresh = Date.now();

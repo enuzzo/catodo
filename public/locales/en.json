@@ -3,6 +3,9 @@
     "name": "CATODO",
     "tagline": "Live television from around the world"
   },
+  "brand": {
+    "name": "Catodo"
+  },
   "nav": {
     "live": "Live",
     "countries": "Countries",
@@ -190,11 +193,13 @@
     "searchPlaceholder": "Search channels or countries…",
     "searchAriaLabel": "Search the TV Guide",
     "favoritesOnly": "Favorites only",
-    "coverage": "Guide coverage: {covered}/{total} channels · times shown in your timezone",
+    "coverage": "Guide coverage: {covered}/{total} channels — times shown in your timezone (24h)",
+    "stale": "Installed guide data is out of date — latest programme ended {date}. Refreshing will replace known legacy Italian feeds.",
+    "matchedNoCurrent": "{matched} channels matched — no current programmes were found in this time window",
     "addGuide": "Add guide",
     "eyebrow": "Live schedules",
     "title": "TV Guide",
-    "description": "Now and next across your imported channels. Times are shown in your local timezone.",
+    "description": "Now and next across your imported channels. Times use your local timezone in 24-hour format.",
     "refresh": "Refresh guide",
     "configure": "Guide settings",
     "setupTitle": "Connect an XMLTV guide",
@@ -206,8 +211,8 @@
     "settingsTitle": "TV Guide sources",
     "settingsBody": "Connect plain XMLTV feeds, choose a refresh cadence, and keep programme data on this device.",
     "recommended": "Recommended free source",
-    "providerTitle": "GlobeTV country guides",
-    "providerBody": "Daily XMLTV files organised by country. The Italy preset includes five feeds; other countries are available in the provider catalog.",
+    "providerTitle": "XMLTV country guides",
+    "providerBody": "The Italy preset includes eight current Open EPG feeds; other countries remain available in the provider catalog.",
     "useItalyPreset": "Use Italy preset",
     "browseCountries": "Browse countries",
     "sourceLabel": "XMLTV source URLs",

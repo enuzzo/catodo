@@ -1,8 +1,12 @@
-# CATODO 2.0
+# CATODO 2.1.1
 
 CATODO is an open-source, Tesla-first web player for discovering and watching public live television sources. It is licensed under [AGPL-3.0-or-later](LICENSE).
 
 It is a vanilla ES-module application with no framework. Pinned runtime assets are vendored, so a CDN is not required to boot; Vite is used for the verified production bundle.
+
+Release history is maintained in [CHANGELOG.md](CHANGELOG.md). `package.json` is
+the version source of truth; maintainers prepare releases with
+`npm run release -- X.Y.Z` and verify consistency with `npm run check`.
 
 ## Experience
 
@@ -28,7 +32,7 @@ Multiple sources may be connected safely. CATODO merges records by stable channe
 
 CATODO uses the official iptv-org JSON directory as optional metadata: channels, feeds, streams, logos, categories, languages, guides and the upstream blocklist. Guide records are discovery mappings; CATODO can also read user-approved XMLTV URLs, cache parsed schedules locally, and never bundles or redistributes programme data. Settings offers manual, 30-minute, hourly, six-hour and daily refresh cadences. A manual or due refresh sends ETag and Last-Modified validators when the provider supplies them, so unchanged XML can return a compact `304` response. Automatic refresh runs while CATODO is open and checks again when the page becomes visible. Blocklisted sources are excluded and adult content is hidden from default discovery and random playback.
 
-The recommended free EPG catalog reads [GlobeTV's country-organised XMLTV repository](https://github.com/globetvapp/epg) (GPL-3.0, updated daily). Settings caches the country directory for 24 hours, searches it locally, and fetches a selected country's plain `.xml` file list only when the user installs it. `.xml.gz` files are intentionally excluded because the browser parser does not decompress them. It deliberately does not ship or automatically contact a universal mega-feed: those archives can be hundreds of megabytes and are not appropriate for a browser/Tesla client. The [iptv-org EPG project](https://github.com/iptv-org/epg) supplies grabber tooling and channel mappings, not a hosted universal programme database; run its tools yourself if you need a controlled custom feed.
+The Italy preset uses the eight current plain-XML feeds published by [Open EPG](https://www.open-epg.com/app/epgguide.php). CATODO automatically replaces the expired 2025 GlobeTV Italy mirror URLs in existing installations; an allowlisted same-origin cache bridges the provider's browser CORS policy without becoming a general-purpose proxy. The broader country picker still reads [GlobeTV's country-organised XMLTV repository](https://github.com/globetvapp/epg) and reports stale programme windows explicitly instead of treating a syntactically valid download as current coverage. Settings caches that country directory for 24 hours and fetches a selected country's plain `.xml` file list only after user consent. `.xml.gz` files remain excluded because the browser parser does not decompress them. CATODO deliberately does not ship or automatically contact a universal mega-feed: those archives can be hundreds of megabytes and are not appropriate for a browser/Tesla client. The [iptv-org EPG project](https://github.com/iptv-org/epg) supplies grabber tooling and channel mappings, not a hosted universal programme database; run its tools yourself if you need a controlled custom feed.
 
 Users are responsible for ensuring they may access a source in their jurisdiction. See [CONTENT_POLICY.md](CONTENT_POLICY.md), [TAKEDOWN.md](TAKEDOWN.md), and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
@@ -37,6 +41,8 @@ Users are responsible for ensuring they may access a source in their jurisdictio
 On the authenticated PHP installation, approved playlist sources, favourites, proxy configuration, and TV Guide source/cadence settings are canonical installation data and follow the user across browsers. IndexedDB remains a fast per-browser catalog/cache and refreshes any installation source that is new to that browser. A server-owned migration marker allows exactly one automatic merge of retained legacy browser data before the server becomes canonical; later retained data is offered as an explicit recovery instead of silently resurrecting deleted records. Shared changes use a persistent browser outbox, survive reloads and remain visibly pending after network failures. Static deployments without the PHP endpoints continue to use browser-only IndexedDB.
 
 Remote channel logos are requested through an authenticated same-origin cache on the private installation. The cache accepts HTTPS images only, enforces public-host resolution, bounded redirects, supported image MIME types, and a 2 MB limit; it is not a general-purpose proxy. This improves durability and avoids every browser hotlinking separately, but does not change copyright or trademark ownership of third-party logos. If the cache cannot fetch a logo, the UI tries the original URL and then its text fallback.
+
+The Italian TV Guide cache follows the same authenticated boundary and accepts only the eight documented Open EPG Italy URLs, with a 20 MB response ceiling and six-hour server cache. Vite provides the same narrow bridge during local development.
 
 ## Local setup
 

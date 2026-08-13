@@ -13,6 +13,7 @@ CATODO vendors pinned runtime assets so the player can boot without a CDN.
 | Exo 2 Variable | 5.3.0 package | OFL-1.1 | `assets/fonts/exo-2/LICENSE.txt` |
 | IBM Plex Mono (diagnostic statistics only) | 5.3.0 package | OFL-1.1 | `assets/fonts/ibm-plex-mono/LICENSE` |
 
-The iptv-org APIs and playlists are fetched from the provider after user
-confirmation and are not included in this repository. Third-party playlist,
-stream, logo, and EPG rights are not sublicensed by CATODO.
+The iptv-org APIs/playlists, Open EPG programme feeds, and other user-selected
+XMLTV sources are fetched from their providers after user confirmation and are
+not included in this repository. Third-party playlist, stream, logo, and EPG
+rights are not sublicensed by CATODO.

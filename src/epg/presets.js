@@ -1,20 +1,34 @@
-const GLOBETV_ITALY_URLS = Object.freeze(Array.from({ length: 5 }, (_, index) =>
+export const LEGACY_GLOBETV_ITALY_URLS = Object.freeze(Array.from({ length: 5 }, (_, index) =>
   `https://raw.githubusercontent.com/globetvapp/epg/main/Italy/italy${index + 1}.xml`,
+));
+
+export const OPEN_EPG_ITALY_URLS = Object.freeze(Array.from({ length: 8 }, (_, index) =>
+  `https://www.open-epg.com/files/italy${index + 1}.xml`,
 ));
 
 export const EPG_PRESETS = Object.freeze([
   Object.freeze({
-    id: "globetv-italy",
-    name: "GlobeTV · Italy",
-    provider: "GlobeTV",
-    description: "Five plain XMLTV country feeds, published daily.",
-    cadence: "Daily at 03:00 UTC",
-    license: "GPL-3.0",
-    sourceUrl: "https://github.com/globetvapp/epg",
+    id: "open-epg-italy",
+    name: "Open EPG · Italy",
+    provider: "Open EPG",
+    description: "Eight current plain XMLTV feeds for Italian television.",
+    cadence: "Updated daily",
+    license: "Provider terms",
+    sourceUrl: "https://www.open-epg.com/app/epgguide.php",
     countryCodes: Object.freeze(["IT"]),
-    urls: GLOBETV_ITALY_URLS,
+    urls: OPEN_EPG_ITALY_URLS,
   }),
 ]);
+
+export function migrateKnownEpgSources(sources) {
+  const values = Array.isArray(sources) ? sources : [];
+  const legacy = new Set(LEGACY_GLOBETV_ITALY_URLS);
+  if (!values.some((url) => legacy.has(String(url)))) return [...values];
+  return [...new Set([
+    ...values.filter((url) => !legacy.has(String(url))),
+    ...OPEN_EPG_ITALY_URLS,
+  ])];
+}
 
 export function epgPreset(id) {
   return EPG_PRESETS.find((preset) => preset.id === String(id || "")) || null;

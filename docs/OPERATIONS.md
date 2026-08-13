@@ -21,7 +21,11 @@ production data source. Use real imported channels for playback validation.
 ## Release checklist
 
 1. Inspect `git status` and preserve unrelated/user changes.
-2. Run:
+2. Add every user-visible change to `CHANGELOG.md` under **Unreleased**, then
+   prepare the release with `npm run release -- X.Y.Z`. Use a patch version for
+   compatible fixes, a minor version for backward-compatible features and a
+   major version only for breaking changes.
+3. Run:
 
    ```sh
    npm test
@@ -35,12 +39,12 @@ production data source. Use real imported channels for playback validation.
    Confirm that `dist/manifest.webmanifest` and the complete `dist/icons/`
    family exist. All icon PNGs must be square and opaque.
 
-3. Smoke-test the production bundle in a real Chromium browser:
+4. Smoke-test the production bundle in a real Chromium browser:
    navigation, search, favourites, a single player, volume/mute, player chrome,
    Multiview audio focus, channel replacement and return navigation.
-4. Commit and push `main` intentionally.
-5. Deploy with `npm run deploy:siteground`.
-6. Verify the public security boundary without credentials:
+5. Commit and push `main` intentionally.
+6. Deploy with `npm run deploy:siteground`.
+7. Verify the public security boundary without credentials:
 
    ```sh
    curl -sI https://catodo.netmilk.dev/installation-api.php
@@ -53,15 +57,21 @@ production data source. Use real imported channels for playback validation.
 
    Expected: authenticated services return `401`; private storage and direct
    `app.html` return `403`; the manifest and touch icon return `200`.
-7. Sign in normally and verify that the built app loads. The official deployment
+8. Sign in normally and verify that the built app loads. The official deployment
    is SiteGround; GitHub Pages is intentionally not the release target.
-8. On a real iPhone or iPad, use Share → **Add to Home Screen**, confirm the CRT
+9. On a real iPhone or iPad, use Share → **Add to Home Screen**, confirm the CRT
    icon is sharp and centered, then launch it and verify standalone navigation,
    safe-area padding, playback and return behavior.
 
 The deploy script uploads protective `.htaccess` and the versioned PHP login
 gate before `dist/`. It does not delete the remote directory, `.htpasswd`, login
 bookkeeping or `.catodo-data/`.
+
+`package.json` is the only version source of truth. Vite injects it into the
+splash and frontend JavaScript and emits `version.json`, which the PHP login gate
+reads at runtime. `npm run check` deliberately fails when the lockfile,
+changelog, maintainer documents or build wiring are stale, so version and
+release notes cannot be forgotten silently.
 
 ## First installation-state migration
 
@@ -166,11 +176,17 @@ avoid synchronous fuzzy work across the full catalog on every keystroke.
   need a server-side preprocessing pipeline, not a larger browser limit.
 - Missing programmes usually indicate identifier mismatch, not a rendering bug.
   Compare channel `tvgId`, guide `siteId` and the XMLTV `<channel id>`.
+- A successful XML download is not proof of current coverage. Source diagnostics
+  show the latest programme timestamp and mark feeds whose window has ended.
+- Existing GlobeTV Italy URLs are migrated to the eight current Open EPG feeds.
+  `epg-cache.php` accepts only those allowlisted URLs; a `400` indicates a URL
+  outside that boundary and a `502` indicates an upstream/download failure.
 - Failed refreshes may intentionally show stale cached programmes.
 
 ## Installation sync diagnosis
 
-The local Vite server cannot execute PHP. On the official host:
+The local Vite server cannot execute PHP, but it supplies a narrow development
+bridge for the allowlisted Italian EPG feeds. On the official host:
 
 - `401` from `installation-api.php` means the gate cookie is absent/expired;
 - `404`/`405` disables installation sync and the client remains browser-local;
