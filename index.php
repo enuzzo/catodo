@@ -160,10 +160,10 @@ if ($authed) {
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>CATODO</title>
 <link rel="manifest" href="./manifest.webmanifest">
-<link rel="icon" type="image/png" sizes="32x32" href="./icons/catodo-tv-32.png">
-<link rel="apple-touch-icon" sizes="152x152" href="./icons/apple-touch-icon-152.png">
-<link rel="apple-touch-icon" sizes="167x167" href="./icons/apple-touch-icon-167.png">
-<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./icons/catodo-netmilk-tv-32.png">
+<link rel="apple-touch-icon" sizes="152x152" href="./icons/apple-touch-icon-netmilk-152.png">
+<link rel="apple-touch-icon" sizes="167x167" href="./icons/apple-touch-icon-netmilk-167.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-netmilk-180.png">
 <style>
 :root{
   --ebu-white:#BFBFBF; --ebu-yellow:#BFBF00; --ebu-cyan:#00BFBF; --ebu-green:#00BF00;

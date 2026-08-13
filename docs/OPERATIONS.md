@@ -48,7 +48,7 @@ production data source. Use real imported channels for playback validation.
    curl -sI https://catodo.netmilk.dev/.catodo-data/installation-state.json
    curl -sI https://catodo.netmilk.dev/app.html
    curl -sI https://catodo.netmilk.dev/manifest.webmanifest
-   curl -sI https://catodo.netmilk.dev/icons/apple-touch-icon-180.png
+   curl -sI https://catodo.netmilk.dev/icons/apple-touch-icon-netmilk-180.png
    ```
 
    Expected: authenticated services return `401`; private storage and direct

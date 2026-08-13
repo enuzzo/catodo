@@ -11,19 +11,19 @@
   "orientation": "any",
   "icons": [
     {
-      "src": "/icons/catodo-tv-192.png",
+      "src": "/icons/catodo-netmilk-tv-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/catodo-tv-512.png",
+      "src": "/icons/catodo-netmilk-tv-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/catodo-tv-1024.png",
+      "src": "/icons/catodo-netmilk-tv-1024.png",
       "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any"
