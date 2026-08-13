@@ -1,6 +1,7 @@
 import { renderCountryShape, renderWorldMap } from './world-map.js';
 import { isPrimaryNavActive, shouldActivateShellView } from './view-mode.js';
 import { EXPLORE_CATEGORIES } from './explore-model.js';
+import { featuredChannelIdentity } from './channel-identity.js';
 
 const FLAG_URLS = import.meta.glob('../../assets/vendor/flags/4x3/*.svg', {
   eager: true,
@@ -453,6 +454,13 @@ function createHomeView(t) {
     preload: 'metadata',
     dataset: { mediaRole: 'home-live' },
   });
+  const openPlayer = element('button', 'live-anchor__open', {
+    type: 'button',
+    'aria-label': translate(t, 'player.open', 'Open player'),
+    title: translate(t, 'player.open', 'Open player'),
+    dataset: { action: 'open-player' },
+  });
+  openPlayer.append(icon('play'));
   const liveBadge = element('span', 'live-badge');
   liveBadge.append(element('i', 'live-dot', { 'aria-hidden': 'true' }));
   const liveBadgeText = textNode('span', null, t, 'status.liveMuted', 'LIVE · MUTED');
@@ -470,11 +478,14 @@ function createHomeView(t) {
     textNode('span', 'status-chip', t, 'status.live', 'LIVE'),
     textNode('time', 'live-clock', t, 'time.placeholder', '--:-- CET'),
   );
-  liveStage.append(video, liveBadge, mute, nowBar);
+  liveStage.append(video, openPlayer, liveBadge, mute, nowBar);
 
   const liveInfo = element('div', 'live-anchor__info');
   const channelHeading = element('div', 'live-anchor__heading');
+  const channelIdentity = element('div', 'live-anchor__identity');
   const channelName = textNode('h2', 'live-anchor__name', t, 'channel.unknown', 'Unknown channel');
+  const availability = textNode('span', 'live-anchor__availability', t, 'catalog.notAlwaysOn', 'Not always on');
+  availability.hidden = true;
   const favorite = iconButton({
     t,
     action: 'add-favorite',
@@ -492,9 +503,18 @@ function createHomeView(t) {
     fallback: 'Full screen',
     className: 'live-anchor__fullscreen',
   });
+  const random = iconButton({
+    t,
+    action: 'random-channel',
+    iconName: 'shuffle',
+    key: 'home.random',
+    fallback: 'Random',
+    className: 'live-anchor__random',
+  });
   const channelTools = element('div', 'live-anchor__tools');
-  channelTools.append(favorite, fullscreen);
-  channelHeading.append(channelName, channelTools);
+  channelTools.append(favorite, fullscreen, random);
+  channelIdentity.append(channelName, availability);
+  channelHeading.append(channelIdentity, channelTools);
   const description = textNode('p', 'live-anchor__description', t, 'home.liveDescriptionFallback', 'Live television from around the world');
   const facts = element('dl', 'live-anchor__facts');
   const factNodes = {};
@@ -513,25 +533,7 @@ function createHomeView(t) {
   });
   liveInfo.append(channelHeading, description, facts);
 
-  const liveActions = element('div', 'live-anchor__actions');
-  const openPlayer = actionButton({
-    t,
-    action: 'open-player',
-    iconName: 'play',
-    key: 'player.open',
-    fallback: 'Open player',
-    className: 'button--inverted',
-  });
-  const random = actionButton({
-    t,
-    action: 'random-channel',
-    iconName: 'shuffle',
-    key: 'home.random',
-    fallback: 'Random',
-    className: 'button--inverted',
-  });
-  liveActions.append(openPlayer, random);
-  liveCard.append(liveStage, liveInfo, liveActions);
+  liveCard.append(liveStage, liveInfo);
 
   const nearbyGrid = element('div', 'channel-grid channel-grid--nearby');
   directory.append(liveCard, nearbyGrid);
@@ -565,6 +567,7 @@ function createHomeView(t) {
     liveClock: nowBar.querySelector('.live-clock'),
     mute,
     channelName,
+    availability,
     favorite,
     fullscreen,
     description,
@@ -2173,7 +2176,14 @@ function setFeatured(refs, channel, t) {
   refs.liveCard.dataset.channelId = id;
   refs.openPlayer.dataset.channelId = id;
   refs.random.dataset.currentChannelId = id;
-  refs.channelName.textContent = safeText(value.name, translate(t, 'channel.unknown', 'Unknown channel'));
+  const identity = featuredChannelIdentity(
+    value,
+    channelQuality(value),
+    translate(t, 'channel.unknown', 'Unknown channel'),
+  );
+  refs.channelName.textContent = identity.displayName;
+  refs.channelName.title = identity.displayName === identity.rawName ? '' : identity.rawName;
+  refs.availability.hidden = !identity.notAlwaysOn;
   const isFavorite = Boolean(value.favorite || value.isFavorite);
   refs.favorite.dataset.channelId = id;
   refs.favorite.dataset.action = isFavorite ? 'remove-favorite' : 'add-favorite';
