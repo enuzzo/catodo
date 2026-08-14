@@ -61,12 +61,10 @@ function createNyanCat(documentRef) {
     sky.append(star);
   }
   const flyer = node(documentRef, 'div', 'nyan-flyer');
-  const trail = node(documentRef, 'div', 'nyan-trail');
-  for (let index = 0; index < 6; index += 1) trail.append(node(documentRef, 'i'));
   const cat = node(documentRef, 'img', 'nyan-cat');
   cat.src = nyanCatGifUrl;
   cat.alt = 'Nyan Cat';
-  flyer.append(trail, cat);
+  flyer.append(cat);
   const copy = node(documentRef, 'strong', 'nyan-copy', 'NYAN CAT HAS LEFT THE MULTIVIEW');
   const meta = node(documentRef, 'span', 'signal-anomaly__meta mono', 'POP-TART PACKETS: 8 · LATENCY: NYAN');
   scene.append(sky, flyer, copy, meta);
@@ -137,7 +135,15 @@ function createBreakout(documentRef, windowRef) {
   }
   const ball = node(documentRef, 'i', 'breakout__ball');
   const paddle = node(documentRef, 'i', 'breakout__paddle');
-  arena.append(bricks, ball, paddle);
+  const victory = node(documentRef, 'div', 'breakout__victory');
+  victory.setAttribute('aria-hidden', 'true');
+  const victoryRick = node(documentRef, 'img', 'breakout__victory-rick');
+  victoryRick.src = rickAstleyGifUrl;
+  victoryRick.alt = '';
+  const victoryTitle = node(documentRef, 'strong', '', 'SIGNAL CLEARED');
+  const victoryCopy = node(documentRef, 'span', 'mono', 'YOU HAVE BEEN RICKROLLED');
+  victory.append(victoryRick, victoryTitle, victoryCopy);
+  arena.append(bricks, ball, paddle, victory);
   const copy = node(documentRef, 'strong', 'breakout__copy', 'SPACE / TAP TO START · ← → / A D / DRAG');
   copy.setAttribute('aria-live', 'polite');
   scene.append(header, arena, copy);
@@ -213,7 +219,7 @@ function createBreakout(documentRef, windowRef) {
 
   const finish = (won) => {
     state.status = won ? 'won' : 'lost';
-    copy.textContent = won ? 'SIGNAL CLEARED · R / SPACE TO REPLAY' : 'SIGNAL LOST · R / SPACE TO RETRY';
+    copy.textContent = won ? 'NEVER GONNA GIVE YOU UP · R / SPACE / TAP TO REPLAY' : 'SIGNAL LOST · R / SPACE TO RETRY';
     arena.dataset.state = state.status;
   };
 

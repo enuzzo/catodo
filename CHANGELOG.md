@@ -12,11 +12,11 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ### ✨ Added
 
-- EBU Breakout is now a playable keyboard, pointer and touch mini-game with real ball physics, brick collisions, score, lives and replay.
+- EBU Breakout is now a playable keyboard, pointer and touch mini-game with real ball physics, brick collisions, score, lives, replay and a giant Rickroll victory screen.
 
 ### 🛠 Changed
 
-- Rickroll now uses transparent animated Rick Astley dancers, while Nyan Cow has been replaced by the original transparent Nyan Cat animation.
+- Rickroll now uses transparent animated Rick Astley dancers, while Nyan Cow uses the supplied complete transparent Nyan Cat GIF without a duplicate CSS rainbow trail.
 - Explore's featured preview now uses a narrower 16:9 media stage, leaving more room for channel details and actions.
 
 ### 🐛 Fixed
