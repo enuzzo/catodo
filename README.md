@@ -1,4 +1,4 @@
-# CATODO 2.5.1
+# CATODO 2.6.0
 
 <img src="public/icons/catodo-netmilk-tv-transparent-512.png" alt="CATODO horned CRT" width="150" align="right">
 

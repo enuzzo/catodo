@@ -1457,6 +1457,9 @@ async function handleAction(action, detail) {
   const id = detail.dataset.channelId || detail.element?.closest?.("[data-channel-id]")?.dataset.channelId;
   if (ui.refs.root.dataset.mode === "multiview" && action !== "toggle-multiview-chrome") revealMultiviewChrome();
   switch (action) {
+    case "trigger-signal-easter-egg":
+      ui.playSignalEasterEgg?.();
+      break;
     case "toggle-more-menu": {
       const open = ui.refs.moreMenu.hidden;
       ui.refs.moreMenu.hidden = !open;

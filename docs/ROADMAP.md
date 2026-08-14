@@ -113,6 +113,16 @@ or real-device validation. It is intentionally concrete and ordered by value.
 
 ## Implemented and verified under Unreleased
 
+- The footer EBU strip now acts as an accessible, silent signal-anomaly
+  roulette with six local animated effects, no repeats within a cycle, immediate
+  click/Escape dismissal, reduced-motion handling and a secret seventh-step
+  finale. Rendered browser QA exercised the complete Rickroll, pirate Teletext,
+  Nyan Cow, numbers-station, Breakout and degauss deck plus the finale at exactly
+  1600×900; all effects produced bounded content, unique state and clean
+  dismissal. A 390×844 responsive pass kept the active overlay within the
+  viewport with zero horizontal overflow. The EBU trigger itself remains hidden
+  at the existing compact-footer breakpoint, while an already active effect
+  adapts safely if the viewport changes.
 - Multiview presets and the preferred feed layout are now installation-wide
   shared settings instead of browser-only local preferences, and both are part
   of the manual configuration backup. Existing values migrate once from the original
@@ -121,6 +131,15 @@ or real-device validation. It is intentionally concrete and ordered by value.
   origin browser QA at exactly 1600×900 hydrated one shared four-feed preset,
   selected it on entry and populated all four expected channels; focused tests
   also cover server validation, cross-browser hydration and empty-list deletion.
+- Explore's featured preview now exposes Favorite directly. Unconfigured Guide
+  badges on the preview and scheduled channel cards lead to the channel's country
+  setup, where provider acceptance remains unchecked and the existing full-country
+  connection installs all discovered XMLTV feeds only after consent. Decorative
+  channel numbers are removed from cards and the immersive player, leaving the
+  reclaimed card width to larger logos while retaining functional Multiview slot
+  numbers. Isolated rendered QA verified the complete pre-consent path for France,
+  Favorite state/feedback, zero horizontal overflow and zero browser warnings at
+  1600×900 and 390×844; no third-party guide provider was contacted in this UI pass.
 
 ## Next work
 

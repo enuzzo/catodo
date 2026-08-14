@@ -7,8 +7,9 @@ import { channelLocalTime, formatGuideDateTime, formatGuideTime } from './time-f
 import { enableGuideTimelineDrag } from './guide-timeline-drag.js';
 import { favoriteEffectPosition, resolveFavoriteEffectHost } from './favorite-effect-host.js';
 import { programmeCardNeedsExpansion } from './guide-programme-card.js';
-import { countryGuideControlState, guideProgrammeFallback } from './country-guide-model.js';
+import { channelGuideSetupAction, countryGuideControlState, guideProgrammeFallback } from './country-guide-model.js';
 import { channelMetadataBadges } from './channel-meta-model.js';
+import { createSignalEasterEgg } from './signal-easter-egg.js';
 
 const FLAG_URLS = import.meta.glob('../../assets/vendor/flags/4x3/*.svg', {
   eager: true,
@@ -328,12 +329,6 @@ function channelMeta(channel, className = 'channel-meta', t) {
   return row;
 }
 
-function channelNumber(channel, index) {
-  const supplied = channel?.number ?? channel?.position;
-  const numeric = Number(supplied ?? index + 1);
-  return Number.isFinite(numeric) ? String(Math.max(0, Math.floor(numeric))).padStart(3, '0') : safeText(supplied);
-}
-
 const formatProgrammeTime = formatGuideTime;
 
 function channelSchedule(channel) {
@@ -358,9 +353,6 @@ function renderChannelTiles(container, channels, t, options = {}) {
       ),
     });
     const masthead = element('span', 'channel-tile__masthead');
-    masthead.append(textNode('span', 'channel-tile__number', t, 'channel.number', '{number}', {
-      number: channelNumber(channel, index),
-    }));
     const logo = element('span', 'channel-logo channel-tile__logo');
     renderLogo(logo, channel, t);
     masthead.append(logo);
@@ -368,31 +360,47 @@ function renderChannelTiles(container, channels, t, options = {}) {
     const name = element('strong', 'channel-tile__name');
     name.textContent = safeText(channel?.name, translate(t, 'channel.unknown', 'Unknown channel'));
     main.append(name, channelMeta(channel, 'channel-meta', t));
+    let scheduleStrip = null;
     if (options.schedule === true) {
       const schedule = channelSchedule(channel);
       const now = schedule.find((programme) => Number(programme.start) <= Date.now() && Number(programme.stop) > Date.now());
       const next = schedule.find((programme) => Number(programme.start) > Date.now());
       const fallback = guideProgrammeFallback(channel?.guideStatus);
-      const strip = element('div', 'channel-tile__schedule');
+      scheduleStrip = element('div', 'channel-tile__schedule');
       const nowRow = element('div');
-      nowRow.append(
-        textNode('span', 'channel-tile__schedule-label', t, 'guide.now', 'Now'),
-        textNode('strong', null, t, now ? 'guide.programmeValue' : fallback.key, now ? '{time} · {title}' : fallback.fallback, {
-          time: now ? formatProgrammeTime(now.start) : '', title: now?.title || '',
-        }),
-      );
-      strip.append(nowRow);
+      const nowValue = now
+        ? textNode('strong', null, t, 'guide.programmeValue', '{time} · {title}', {
+          time: formatProgrammeTime(now.start), title: now.title || '',
+        })
+        : textNode('strong', null, t, fallback.key, fallback.fallback);
+      const guideSetup = channelGuideSetupAction({
+        status: channel?.guideStatus,
+        countryCode: channel?.countryCode,
+      });
+      if (guideSetup.action) {
+        const connect = element('button', 'channel-tile__guide-connect', {
+          type: 'button',
+          title: translate(t, 'guide.connectCountryGuide', 'Connect this country TV Guide'),
+          'aria-label': translate(t, 'guide.connectCountryGuide', 'Connect this country TV Guide'),
+          dataset: { action: guideSetup.action, iso2: guideSetup.iso2, channelId: id },
+        });
+        connect.append(icon('calendar-plus'), nowValue);
+        nowRow.append(textNode('span', 'channel-tile__schedule-label', t, 'guide.now', 'Now'), connect);
+      } else {
+        nowRow.append(textNode('span', 'channel-tile__schedule-label', t, 'guide.now', 'Now'), nowValue);
+      }
+      scheduleStrip.append(nowRow);
       if (next) {
         const nextRow = element('div');
         nextRow.append(
           textNode('span', 'channel-tile__schedule-label', t, 'guide.next', 'Next'),
           textNode('strong', null, t, 'guide.programmeValue', '{time} · {title}', { time: formatProgrammeTime(next.start), title: next.title }),
         );
-        strip.append(nextRow);
+        scheduleStrip.append(nextRow);
       }
-      main.append(strip);
     }
     tile.append(main);
+    if (scheduleStrip) tile.append(scheduleStrip);
 
     if (options.favorites !== false) {
       const isFavorite = Boolean(channel?.favorite || channel?.isFavorite);
@@ -775,7 +783,10 @@ function createExploreView(t) {
   const random = actionButton({
     t, action: 'explore-random', iconName: 'shuffle', key: 'home.random', fallback: 'Random', className: 'button--ghost',
   });
-  heroActions.append(watch, random);
+  const favorite = actionButton({
+    t, action: 'toggle-favorite', iconName: 'heart', key: 'favorite.add', fallback: 'Favorite', className: 'button--ghost explore-hero__favorite',
+  });
+  heroActions.append(watch, favorite, random);
   heroCopy.append(heroCollection, heroName, heroMeta, heroSchedule, heroActions);
   hero.append(heroStage, heroCopy);
 
@@ -794,7 +805,7 @@ function createExploreView(t) {
 
   const collections = element('div', 'explore-collections');
   view.append(intro, hero, filters, collections);
-  return { view, video, hero, heroCollection, heroName, heroMeta, heroSchedule, heroLiveText, mute, fullscreen, watch, random, surprise, filters, filterButtons, collections };
+  return { view, video, hero, heroCollection, heroName, heroMeta, heroSchedule, heroLiveText, mute, fullscreen, watch, favorite, random, surprise, filters, filterButtons, collections };
 }
 
 function setExploreHero(refs, channel, collection, t) {
@@ -803,6 +814,7 @@ function setExploreHero(refs, channel, collection, t) {
   refs.hero.dataset.channelId = id;
   refs.watch.dataset.channelId = id;
   refs.fullscreen.dataset.channelId = id;
+  refs.favorite.dataset.channelId = id;
   refs.random.dataset.currentChannelId = id;
   refs.heroCollection.textContent = safeText(collection?.title, translate(t, 'explore.featuredCollection', 'Featured collection'));
   refs.heroName.textContent = safeText(value.name, translate(t, 'channel.unknown', 'Unknown channel'));
@@ -813,14 +825,34 @@ function setExploreHero(refs, channel, collection, t) {
   refs.heroSchedule.replaceChildren();
   [[now, 'guide.now', 'Now'], [next, 'guide.next', 'Next']].forEach(([programme, key, fallback]) => {
     const row = element('div');
-    row.append(
-      textNode('span', null, t, key, fallback),
-      textNode('strong', null, t, programme ? 'guide.programmeValue' : 'guide.noDataShort', programme ? '{time} · {title}' : 'Guide unavailable', {
-        time: programme ? formatProgrammeTime(programme.start) : '', title: programme?.title || '',
-      }),
-    );
+    const label = textNode('span', null, t, key, fallback);
+    if (programme) {
+      row.append(label, textNode('strong', null, t, 'guide.programmeValue', '{time} · {title}', {
+        time: formatProgrammeTime(programme.start), title: programme.title || '',
+      }));
+    } else if (key === 'guide.now') {
+      const guideFallback = guideProgrammeFallback(value.guideStatus);
+      const guideSetup = channelGuideSetupAction({ status: value.guideStatus, countryCode: value.countryCode });
+      if (guideSetup.action) {
+        const connect = element('button', 'explore-hero__guide-connect', {
+          type: 'button',
+          title: translate(t, 'guide.connectCountryGuide', 'Connect this country TV Guide'),
+          'aria-label': translate(t, 'guide.connectCountryGuide', 'Connect this country TV Guide'),
+          dataset: { action: guideSetup.action, iso2: guideSetup.iso2, channelId: id },
+        });
+        connect.append(icon('calendar-plus'), textNode('strong', null, t, guideFallback.key, guideFallback.fallback));
+        row.append(label, connect);
+      } else row.append(label, textNode('strong', null, t, guideFallback.key, guideFallback.fallback));
+    } else row.append(label, textNode('strong', null, t, 'guide.noDataShort', 'Guide unavailable'));
     refs.heroSchedule.append(row);
   });
+  const isFavorite = Boolean(value.favorite || value.isFavorite);
+  refs.favorite.classList.toggle('is-active', isFavorite);
+  refs.favorite.setAttribute('aria-pressed', isFavorite ? 'true' : 'false');
+  refs.favorite.setAttribute('aria-label', translate(t, isFavorite ? 'favorite.remove' : 'favorite.add', isFavorite ? 'Remove from favorites' : 'Add to favorites'));
+  refs.favorite.title = refs.favorite.getAttribute('aria-label');
+  setTranslatedText(refs.favorite.querySelector('.button__label'), t, isFavorite ? 'favorite.remove' : 'favorite.add', isFavorite ? 'Remove favorite' : 'Favorite');
+  setFavoriteGlyph(refs.favorite, isFavorite);
   setMedia(refs.video, { ...value, muted: value.muted !== false, autoplay: value.autoplay !== false });
   const muted = refs.video.muted;
   setTranslatedText(refs.heroLiveText, t, muted ? 'status.liveMuted' : 'status.live', muted ? 'LIVE · MUTED' : 'LIVE');
@@ -2020,12 +2052,11 @@ function createPlayer(t) {
   const transport = element('footer', 'player-transport');
   const identity = element('div', 'player-identity');
   const previous = iconButton({ t, action: 'previous-channel', iconName: 'skip-back', key: 'player.previous', fallback: 'Previous channel' });
-  const number = textNode('span', 'player-identity__number', t, 'channel.number', '{number}', { number: '000' });
   const copy = element('div', 'player-identity__copy');
   const name = textNode('strong', null, t, 'channel.unknown', 'Unknown channel');
   const meta = element('div', 'player-identity__meta');
   copy.append(name, meta);
-  identity.append(previous, number, copy);
+  identity.append(previous, copy);
 
   const controls = element('div', 'player-controls');
   const labButton = iconButton({ t, action: 'open-signal-lab', iconName: 'cell-signal-high', key: 'signalLab.open', fallback: 'Open Signal Lab' });
@@ -2085,7 +2116,6 @@ function createPlayer(t) {
     statusAdvice,
     statusAlternate,
     signalLab,
-    number,
     name,
     meta,
     favoriteButton: toolbar.querySelector('[data-action="toggle-favorite"]'),
@@ -2545,7 +2575,12 @@ function createSignalBar(t) {
     icon('globe-hemisphere-west'),
   );
   const clock = textNode('time', 'signal-bar__clock', t, 'time.placeholder', '--:-- CET');
-  const bars = element('div', 'ebu-bars', { 'aria-hidden': 'true' });
+  const bars = element('button', 'ebu-bars', {
+    type: 'button',
+    dataset: { action: 'trigger-signal-easter-egg' },
+    'aria-label': 'Trigger a signal anomaly',
+    title: 'Touch the broadcast standard. Regret is local.',
+  });
   for (let index = 0; index < 8; index += 1) bars.append(element('i'));
   const status = element('div', 'signal-bar__status');
   const statusLabel = textNode('span', 'signal-bar__telemetry-label', t, 'footer.buffer', 'Buffer');
@@ -2563,7 +2598,7 @@ function createSignalBar(t) {
   statusMeta.textContent = 'Waiting';
   status.append(icon('waveform'), statusLabel, statusText, statusMeta, network);
   bar.append(region, clock, bars, status);
-  return { bar, clock, status, statusText, statusMeta, network, downValue, receivedValue };
+  return { bar, bars, clock, status, statusText, statusMeta, network, downValue, receivedValue };
 }
 
 function renderCountryRows(container, countries, t, selectedIso2) {
@@ -3183,6 +3218,7 @@ export function mountAppUI(root, options = {}) {
     'aria-atomic': 'true',
   });
   root.append(toastRegion);
+  const signalEasterEgg = createSignalEasterEgg({ root, bars: signalBar.bars });
   const dispatcher = makeActionDispatcher(root, options.onAction);
   const views = {
     home: home.view,
@@ -3286,6 +3322,7 @@ export function mountAppUI(root, options = {}) {
       importForm: importDialog.form,
       importPresetGrid: importDialog.presetGrid,
       signalBar: signalBar.bar,
+      ebuBars: signalBar.bars,
       toastRegion,
     },
 
@@ -3461,6 +3498,7 @@ export function mountAppUI(root, options = {}) {
       explore.watch.disabled = !playable;
       explore.fullscreen.disabled = !playable;
       explore.mute.disabled = !playable;
+      explore.favorite.disabled = !playable;
       explore.random.disabled = !playable;
       explore.surprise.disabled = !playable;
       explore.hero.classList.toggle('is-restoring', Boolean(state.restoring || state.syncError || state.restoreError));
@@ -3679,7 +3717,6 @@ export function mountAppUI(root, options = {}) {
         player.favoriteButton.dataset.channelId = id;
         player.addToMultiviewButton.dataset.channelId = id;
         setMedia(player.video, { ...channel, muted: state.muted ?? channel.muted, autoplay: state.autoplay ?? channel.autoplay });
-        player.number.textContent = channelNumber(channel, Number(channel.position || 0));
         player.name.textContent = safeText(channel.name, translate(t, 'channel.unknown', 'Unknown channel'));
         updateChannelMeta(player.meta, channel, {
           localClock: true,
@@ -4018,10 +4055,15 @@ export function mountAppUI(root, options = {}) {
       return playFavoriteEffect(root, anchor, mode === 'remove' ? 'remove' : 'add');
     },
 
+    playSignalEasterEgg() {
+      return signalEasterEgg.play();
+    },
+
     destroy() {
       window.clearTimeout(toastTimer);
       window.clearTimeout(guideProgrammeTimer);
       explore.view.removeEventListener('scroll', loadMoreExploreNearEnd);
+      signalEasterEgg.destroy();
       dispatcher.destroy();
       root.replaceChildren();
       root.classList.remove('catodo-app');

@@ -34,4 +34,11 @@ function guideProgrammeFallback(status) {
   }
 }
 
-export { countryGuideControlState, guideProgrammeFallback };
+function channelGuideSetupAction({ status = 'unconfigured', countryCode = '' } = {}) {
+  if (String(status || 'unconfigured') !== 'unconfigured') return { action: '', iso2: '' };
+  const iso2 = String(countryCode || '').trim().toUpperCase();
+  if (/^[A-Z]{2}$/.test(iso2)) return { action: 'open-favorite-guide-setup', iso2 };
+  return { action: 'open-guide-settings', iso2: '' };
+}
+
+export { channelGuideSetupAction, countryGuideControlState, guideProgrammeFallback };

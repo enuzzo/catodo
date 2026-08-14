@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { countryGuideControlState, guideProgrammeFallback } from '../../src/ui/country-guide-model.js';
+import { channelGuideSetupAction, countryGuideControlState, guideProgrammeFallback } from '../../src/ui/country-guide-model.js';
 
 test('country guide discovery remains actionable before a provider lookup', () => {
   assert.deepEqual(countryGuideControlState(), {
@@ -31,4 +31,19 @@ test('channel guide copy distinguishes stale, unmatched and unconfigured data', 
   assert.equal(guideProgrammeFallback('ready').fallback, 'No current programme');
   assert.equal(guideProgrammeFallback('error').fallback, 'Guide unavailable');
   assert.equal(guideProgrammeFallback('unconfigured').fallback, 'Guide not connected');
+});
+
+test('an unconnected channel guide offers the consent-first whole-country setup', () => {
+  assert.deepEqual(channelGuideSetupAction({ status: 'unconfigured', countryCode: 'fr' }), {
+    action: 'open-favorite-guide-setup',
+    iso2: 'FR',
+  });
+  assert.deepEqual(channelGuideSetupAction({ status: 'unconfigured' }), {
+    action: 'open-guide-settings',
+    iso2: '',
+  });
+  assert.deepEqual(channelGuideSetupAction({ status: 'ready', countryCode: 'DE' }), {
+    action: '',
+    iso2: '',
+  });
 });

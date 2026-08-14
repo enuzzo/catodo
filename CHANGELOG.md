@@ -10,6 +10,18 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-08-14
+
+### ✨ Added
+
+- The footer EBU bars now hide a six-effect, no-repeat signal-anomaly roulette: a local CSS Rickroll flip, Nyan Cow, pirate Teletext, a surreal numbers station, Breakout and CRT degauss, followed by a secret finale after the full set is discovered. Effects stay silent, can be dismissed immediately and respect reduced-motion preferences.
+- Explore's featured preview now includes a Favorite control with the same saved state and feedback used across CATODO.
+- Every visible `Guide not connected` state is now an accessible action: it opens the channel's country page, keeps third-party acceptance explicit, and connects the complete country guide after consent so one setup can cover many channels.
+
+### 🛠 Changed
+
+- Decorative channel numbers have been removed from cards and the immersive player; channel logos are larger throughout the directory while functional Multiview slot numbers remain.
+
 ## [2.5.1] - 2026-08-14
 
 ### 🐛 Fixed
@@ -148,7 +160,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.5.1...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.6.0...HEAD
+[2.6.0]: https://github.com/enuzzo/catodo/compare/v2.5.1...v2.6.0
 [2.5.1]: https://github.com/enuzzo/catodo/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/enuzzo/catodo/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/enuzzo/catodo/compare/v2.3.0...v2.4.0
