@@ -19,7 +19,7 @@ import {
 import i18n from "./i18n/index.js";
 import { MultiviewController, PlayerManager, releasePlayerForTransition } from "./player/index.js";
 import { mountAppUI } from "./ui/markup.js";
-import { EpgService, GlobeTvCatalog, epgPreset, epgPresetsForCountry, groupGuideSources, guideUrlsForChannels } from "./epg/index.js";
+import { CountryGuideResolver, EpgService, GlobeTvCatalog, epgPreset, epgPresetsForCountry, groupGuideSources, guideUrlsForChannels } from "./epg/index.js";
 import { filterChannelPicker } from "./ui/channel-picker-filter.js";
 import {
   buildExploreCountryOptions,
@@ -124,6 +124,7 @@ let mainPlayer;
 let multiview;
 let epg;
 let guideCatalog;
+let countryGuideResolver;
 let unsubscribeCatalog;
 let metricTimer;
 let clockTimer;
@@ -737,7 +738,7 @@ async function discoverCountryGuideUrls(iso2, { force = false } = {}) {
   if (state.selectedCountry === code) renderCountries();
   const discovery = (async () => {
     try {
-      const files = await guideCatalog.countryFor(country, { force });
+      const files = await countryGuideResolver.countryFor(country, { force });
       const urls = files.map((file) => file.url).filter(Boolean);
       state.countryGuideCatalogUrls.set(code, urls);
       state.countryGuideAvailability.set(code, urls.length ? "ready" : "unavailable");
@@ -906,7 +907,10 @@ function renderGuide() {
 }
 
 function countryCodeForGuideName(name) {
-  const compact = normalizedCountryLabel(name).replace(/\s+/g, "");
+  const base = String(name || "").split("·")[0].trim();
+  const direct = base.toUpperCase();
+  if (/^[A-Z]{2}$/.test(direct) && countryDirectoryMaps().byCode.has(direct)) return direct;
+  const compact = normalizedCountryLabel(base).replace(/\s+/g, "");
   for (const [label, code] of countryDirectoryMaps().byName) {
     if (label.replace(/\s+/g, "") === compact) return code;
   }
@@ -917,13 +921,13 @@ function guideSourcesForCountry(iso2) {
   const code = String(iso2 || "").trim().toUpperCase();
   if (!code) return [];
   return groupGuideSources(state.epgSources)
-    .filter((group) => countryCodeForGuideName(group.name) === code)
+    .filter((group) => group.countryCode === code || countryCodeForGuideName(group.name) === code)
     .flatMap((group) => group.sources.map((source) => source.url));
 }
 
 function guideCandidateChannels() {
   const groups = groupGuideSources(state.epgSources, epg?.getSourceStatuses?.() || []);
-  const codes = new Set(groups.map((group) => countryCodeForGuideName(group.name)).filter(Boolean));
+  const codes = new Set(groups.map((group) => group.countryCode || countryCodeForGuideName(group.name)).filter(Boolean));
   const hasCustom = groups.some((group) => group.id === "custom");
   if (hasCustom || !groups.length) {
     return playableChannels().filter((channel) => channel?.hasGuide || channel?.guides?.length || channel?.endpoints?.some((endpoint) => endpoint?.guides?.length)).slice(0, 320);
@@ -1068,6 +1072,100 @@ async function loadCountrySchedules(iso2 = state.selectedCountry, { force = fals
   const channels = catalog.list({ country: code }).filter(isPlayableChannel).slice(0, UI_CHANNEL_LIMIT);
   await loadSchedules(channels, { force, sourceUrls: guideSourcesForCountry(code) });
   if (state.selectedCountry === code) renderCountries();
+}
+
+function rejectedCountryGuideUrls(urls) {
+  const statusByUrl = new Map((epg?.getSourceStatuses?.() || []).map((status) => [status.url, status]));
+  const futureLimit = Date.now() + 21 * 24 * 60 * 60 * 1000;
+  return (Array.isArray(urls) ? urls : []).filter((url) => {
+    const status = statusByUrl.get(url);
+    if (!status) return false;
+    return status.state === "error"
+      || status.dataState === "stale"
+      || status.dataState === "empty"
+      || Number(status.latestProgrammeAt || 0) > futureLimit;
+  });
+}
+
+async function refreshCountryGuideSources(iso2, urls, { force = true } = {}) {
+  const code = String(iso2 || "").toUpperCase();
+  const candidates = [...new Set(Array.isArray(urls) ? urls : [])];
+  const channels = catalog.list({ country: code }).filter(isPlayableChannel);
+  channels.forEach((channel) => state.schedules.delete(channelId(channel)));
+  await loadCountrySchedules(code, { force });
+  const rejected = rejectedCountryGuideUrls(candidates);
+  if (rejected.length) {
+    const rejectedSet = new Set(rejected);
+    state.epgSources = await epg.setSources(state.epgSources.filter((url) => !rejectedSet.has(url)));
+    const discovered = state.countryGuideCatalogUrls.get(code) || [];
+    state.countryGuideCatalogUrls.set(code, discovered.filter((url) => !rejectedSet.has(url)));
+    channels.forEach((channel) => state.schedules.delete(channelId(channel)));
+    renderSources();
+    renderGuide();
+    if (guideSourcesForCountry(code).length) await loadCountrySchedules(code, { force: true });
+  }
+  const active = guideSourcesForCountry(code);
+  if (!active.length) state.countryGuideAvailability.set(code, "error");
+  return { active, rejected };
+}
+
+function isPreferredCountryGuideUrl(value) {
+  try {
+    const host = new URL(value).hostname;
+    return host === "www.open-epg.com" || host === "epgshare01.online";
+  } catch {
+    return false;
+  }
+}
+
+async function ensureCurrentCountryGuideSources(iso2, { force = false } = {}) {
+  const code = String(iso2 || "").toUpperCase();
+  const installed = guideSourcesForCountry(code);
+  if (!installed.length) {
+    await loadCountrySchedules(code, { force });
+    return { active: [], rejected: [], added: [] };
+  }
+  let validation = await refreshCountryGuideSources(code, installed, { force });
+  if (validation.active.some(isPreferredCountryGuideUrl)) return { ...validation, added: [] };
+  const country = countryModels().find((item) => item.code === code);
+  if (!country) return { ...validation, added: [] };
+  let replacements = [];
+  try {
+    replacements = (await countryGuideResolver.countryFor(country, { force: true })).map((file) => file.url).filter(Boolean);
+  } catch {
+    return { ...validation, added: [] };
+  }
+  const added = replacements.filter((url) => !state.epgSources.includes(url));
+  if (!added.length) return { ...validation, added: [] };
+  state.countryGuideCatalogUrls.set(code, replacements);
+  state.countryGuideAvailability.set(code, "ready");
+  state.epgSources = await epg.setSources([...state.epgSources, ...added]);
+  renderSources();
+  validation = await refreshCountryGuideSources(code, [...validation.active, ...replacements], { force: true });
+  if (validation.active.some(isPreferredCountryGuideUrl)) {
+    const superseded = validation.active.filter((url) => {
+      try { return new URL(url).hostname === "raw.githubusercontent.com" && new URL(url).pathname.includes("/globetvapp/epg/"); }
+      catch { return false; }
+    });
+    if (superseded.length) {
+      const supersededSet = new Set(superseded);
+      state.epgSources = await epg.setSources(state.epgSources.filter((url) => !supersededSet.has(url)));
+      const channels = catalog.list({ country: code }).filter(isPlayableChannel);
+      channels.forEach((channel) => state.schedules.delete(channelId(channel)));
+      renderSources();
+      await loadCountrySchedules(code, { force: true });
+      validation = { ...validation, active: guideSourcesForCountry(code), rejected: [...validation.rejected, ...superseded] };
+    }
+  }
+  return { ...validation, added };
+}
+
+function refreshCountryGuideInBackground(iso2) {
+  void ensureCurrentCountryGuideSources(iso2).catch((error) => {
+    state.guideError = error?.message || "The country guide could not be refreshed.";
+    if (state.selectedCountry === String(iso2 || "").toUpperCase()) renderCountries();
+    renderSources();
+  });
 }
 
 async function connectFavoriteGuide(channel) {
@@ -1722,8 +1820,11 @@ async function handleAction(action, detail) {
       }
       const installedSources = guideSourcesForCountry(iso2);
       if (installedSources.length) {
-        await loadCountrySchedules(iso2, { force: true });
-        ui.toast("This country guide is already connected in Preferences.");
+        const validation = await ensureCurrentCountryGuideSources(iso2, { force: true });
+        if (!validation.active.length) ui.toast("The installed country feeds are no longer current. Open setup to discover replacements.", { tone: "error" });
+        else ui.toast(validation.added.length || validation.rejected.length
+          ? `Country guide refreshed · ${validation.added.length} source${validation.added.length === 1 ? "" : "s"} added, ${validation.rejected.length} outdated removed.`
+          : "This country guide is already connected and current in Preferences.");
         break;
       }
       const country = countryModels().find((item) => item.code === iso2);
@@ -1858,7 +1959,7 @@ async function handleAction(action, detail) {
       state.countryChannelLimit = UI_CHANNEL_LIMIT;
       state.view = "countries";
       renderCountries();
-      void loadCountrySchedules();
+      refreshCountryGuideInBackground(state.selectedCountry);
       break;
     case "clear-country-selection":
     case "back-to-world-map":
@@ -1899,7 +2000,7 @@ async function handleAction(action, detail) {
       state.selectedCountry = String(detail.dataset.iso2 || state.selectedCountry || "").toUpperCase();
       state.countryChannelLimit = UI_CHANNEL_LIMIT;
       renderCountries();
-      void loadCountrySchedules();
+      refreshCountryGuideInBackground(state.selectedCountry);
       break;
     case "filter-country-channels":
       state.countryChannelQuery = detail.value || "";
@@ -1940,7 +2041,7 @@ async function handleAction(action, detail) {
           force: ["error", "unavailable"].includes(state.countryGuideAvailability.get(iso2)),
         });
         if (!guideUrls.length) {
-          ui.toast("GlobeTV does not currently publish an XMLTV source for this country.", { tone: "error" });
+          ui.toast("No current XMLTV source was found for this country.", { tone: "error" });
           break;
         }
         const merged = [...new Set([...state.epgSources, ...guideUrls])];
@@ -1952,11 +2053,15 @@ async function handleAction(action, detail) {
         channels.forEach((channel) => state.schedules.delete(channelId(channel)));
         renderSources();
         renderGuide();
-        await loadCountrySchedules(iso2, { force: true });
+        const validation = await refreshCountryGuideSources(iso2, guideUrls, { force: true });
+        if (!validation.active.length) {
+          ui.toast("No discovered provider returned a current guide. Nothing was kept in Preferences.", { tone: "error" });
+          break;
+        }
         ui.showCountryGuideDialog(false);
         if (state.guideError) ui.toast(`Guide saved in Preferences, but refresh failed: ${state.guideError}`, { tone: "error" });
         else ui.toast(added
-          ? "Country guide added to Preferences and refreshed."
+          ? `Country guide added · ${validation.active.length} current source${validation.active.length === 1 ? "" : "s"} saved in Preferences${validation.rejected.length ? `, ${validation.rejected.length} rejected` : ""}.`
           : "Country guide already connected in Preferences and refreshed.");
       } catch (error) {
         ui.toast(error.message || "The country guide could not be connected.", { tone: "error" });
@@ -2405,6 +2510,7 @@ async function boot() {
   epg = new EpgService({ catalog, proxy: proxyUrl });
   await epg.init();
   guideCatalog = new GlobeTvCatalog({ catalog });
+  countryGuideResolver = new CountryGuideResolver({ catalog });
   state.epgSources = epg.getSources();
   state.epgRefreshMinutes = epg.getRefreshMinutes();
   state.epgLastRefresh = epg.getLastRefresh();

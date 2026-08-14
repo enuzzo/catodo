@@ -2548,7 +2548,7 @@ function createCountryGuideDialog(t) {
   const note = element('div', 'import-note country-guide-dialog__note');
   note.append(
     icon('info'),
-    textNode('p', null, t, 'countries.guideDialogNotice', 'The lookup checks the public GlobeTV GitHub catalog. Programme data is then downloaded from the selected third-party XMLTV providers.'),
+    textNode('p', null, t, 'countries.guideDialogNotice', 'CATODO checks Open EPG and EPGShare01 first, then uses an allowlisted repository fallback. Outdated or invalid feeds are discarded automatically.'),
   );
   const consent = element('label', 'check-field');
   const checkbox = element('input', null, {
@@ -2559,7 +2559,7 @@ function createCountryGuideDialog(t) {
   });
   consent.append(
     checkbox,
-    textNode('span', null, t, 'countries.guideConsent', 'I accept checking the public GlobeTV GitHub catalog and contacting the selected third-party XMLTV providers.'),
+    textNode('span', null, t, 'countries.guideConsent', 'I accept contacting the listed third-party XMLTV providers and saving only the current feeds in Preferences.'),
   );
   const actions = element('div', 'modal__actions');
   const confirm = actionButton({
@@ -2870,11 +2870,11 @@ function setCountryDetail(refs, country, t, guideState = {}) {
   refs.guideButton.querySelector('.button__label').textContent = guideLabel;
   refs.guideStatus.hidden = !iso2;
   refs.guideStatus.textContent = control.status === 'checking'
-    ? translate(t, 'countries.guideCheckingHint', 'Checking the GlobeTV country catalog…')
+    ? translate(t, 'countries.guideCheckingHint', 'Checking the available country guide providers…')
     : control.status === 'error'
-      ? translate(t, 'countries.guideLookupFailedHint', 'The GlobeTV catalog could not be checked. Retry when the connection is available.')
+      ? translate(t, 'countries.guideLookupFailedHint', 'The guide providers could not be checked. Retry when the connection is available.')
       : control.status === 'unavailable'
-        ? translate(t, 'countries.guideUnavailableHint', 'No XMLTV feed was found in the current GlobeTV catalog. You can check again later.')
+        ? translate(t, 'countries.guideUnavailableHint', 'No current XMLTV feed was found across the available providers. You can check again later.')
         : control.status === 'idle'
           ? translate(t, 'countries.guideConsentHint', 'Open the guide setup, review the third-party notice and connect the available country feeds.')
           : control.connected

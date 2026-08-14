@@ -4,6 +4,7 @@ import { migrateKnownEpgSources } from "./presets.js";
 
 const CACHE_TTL = 6 * 60 * 60 * 1000;
 const WINDOW_MS = 8 * 60 * 60 * 1000;
+const BUILT_IN_PROXY_MAX_BYTES = 32 * 1024 * 1024;
 const REFRESH_INTERVALS = new Set([0, 30, 60, 360, 1440]);
 
 function unique(values) {
@@ -41,7 +42,9 @@ function preferProgrammeCandidate(current, candidate) {
 function builtInProxyUrl(url) {
   try {
     const parsed = new URL(url);
-    if (parsed.hostname !== "www.open-epg.com" || !/^\/files\/italy[1-8]\.xml$/.test(parsed.pathname)) return "";
+    const openEpg = parsed.hostname === "www.open-epg.com" && /^\/files\/[a-z0-9_-]+\.xml$/i.test(parsed.pathname);
+    const epgShare = parsed.hostname === "epgshare01.online" && /^\/epgshare01\/epg_ripper_(?:[A-Z]{2}1)\.xml\.gz$/.test(parsed.pathname);
+    if (!openEpg && !epgShare) return "";
     return `./epg-cache.php?url=${encodeURIComponent(parsed.href)}`;
   } catch {
     return "";
@@ -160,9 +163,8 @@ export class EpgService {
     const cached = memory?.url === url && Array.isArray(memory.channels)
       ? memory
       : persisted?.url === url && Array.isArray(persisted.channels) ? persisted : null;
-    const candidates = [url];
     const builtInProxy = builtInProxyUrl(url);
-    if (builtInProxy) candidates.push(builtInProxy);
+    const candidates = builtInProxy ? [builtInProxy] : [url];
     const proxied = typeof this.#proxy === "function" ? this.#proxy(url) : "";
     if (proxied) candidates.push(proxied);
     let lastError;
@@ -189,9 +191,10 @@ export class EpgService {
           return record;
         }
         if (!response.ok) throw new Error(`TV guide request failed (${response.status})`);
+        const maxBytes = target === builtInProxy ? BUILT_IN_PROXY_MAX_BYTES : 20 * 1024 * 1024;
         const length = Number(response.headers?.get?.("content-length") || 0);
-        if (length > 20 * 1024 * 1024) throw new RangeError("TV guide is larger than 20 MB");
-        const document = parseXmltvDocument(await response.text());
+        if (length > maxBytes) throw new RangeError(`TV guide is larger than ${Math.round(maxBytes / 1024 / 1024)} MB`);
+        const document = parseXmltvDocument(await response.text(), { limits: { maxBytes } });
         const record = {
           url,
           fetchedAt: Date.now(),

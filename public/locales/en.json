@@ -192,17 +192,17 @@
     "guideUnavailable": "Guide unavailable",
     "guideRetry": "Retry guide check",
     "guideCheckAgain": "Check again",
-    "guideConsent": "I accept checking the public GlobeTV GitHub catalog and contacting the selected third-party XMLTV providers.",
+    "guideConsent": "I accept contacting the listed third-party XMLTV providers and saving only the current feeds in Preferences.",
     "guideConsentHint": "Open the guide setup, review the third-party notice and connect the available country feeds.",
     "guideDialogTitle": "Connect country TV Guide",
     "guideDialogCountryTitle": "Connect {country} TV Guide",
     "guideDialogIntro": "CATODO will find the public XMLTV feeds for this country, save them in Preferences and load the available schedules.",
-    "guideDialogNotice": "The lookup checks the public GlobeTV GitHub catalog. Programme data is then downloaded from the selected third-party XMLTV providers.",
+    "guideDialogNotice": "CATODO checks Open EPG and EPGShare01 first, then uses an allowlisted repository fallback. Outdated or invalid feeds are discarded automatically.",
     "guideAvailableHint": "{count} known XMLTV sources available. Loading saves them in Preferences and contacts those third-party providers.",
     "guideLoadedHint": "{count} guide sources saved in Preferences.",
-    "guideUnavailableHint": "No XMLTV feed was found in the current GlobeTV catalog. You can check again later.",
-    "guideCheckingHint": "Checking the GlobeTV country catalog…",
-    "guideLookupFailedHint": "The GlobeTV catalog could not be checked. Retry when the connection is available."
+    "guideUnavailableHint": "No current XMLTV feed was found across the available providers. You can check again later.",
+    "guideCheckingHint": "Checking the available country guide providers…",
+    "guideLookupFailedHint": "The guide providers could not be checked. Retry when the connection is available."
   },
   "player": {
     "play": "Play",

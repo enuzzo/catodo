@@ -3,7 +3,14 @@ import assert from "node:assert/strict";
 import { guideChannelIdsFor, parseXmltv, parseXmltvDate, parseXmltvDocument, programmesForChannel } from "../../src/epg/xmltv.js";
 import { EpgService, guideUrlsForChannels } from "../../src/epg/service.js";
 import { epgPresetsForCountry, migrateKnownEpgSources, OPEN_EPG_ITALY_URLS } from "../../src/epg/presets.js";
-import { GlobeTvCatalog, globeTvCatalogCountryFor, globeTvCountryFromUrl, groupGuideSources } from "../../src/epg/catalog.js";
+import { CountryGuideResolver, GlobeTvCatalog, OpenEpgCatalog, globeTvCatalogCountryFor, globeTvCountryFromUrl, groupGuideSources } from "../../src/epg/catalog.js";
+
+function openEpgAge(date = new Date()) {
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const year = String(date.getUTCFullYear()).slice(-2);
+  return `${day}-${month}-00${year}`;
+}
 
 test("collects unique catalog-listed XMLTV URLs from country channel mappings", () => {
   const channels = [
@@ -298,7 +305,7 @@ test("marks matched channels and sources as stale when programme data ended befo
   assert.equal(service.getSourceStatuses()[0].dataState, "stale");
 });
 
-test("falls back to the authenticated same-origin cache for Open EPG feeds", async () => {
+test("routes Open EPG feeds through the authenticated same-origin cache", async () => {
   const settings = new Map([["epg:sources", [OPEN_EPG_ITALY_URLS[0]]]]);
   const catalog = {
     getSetting: async (key, fallback) => settings.has(key) ? settings.get(key) : fallback,
@@ -307,15 +314,34 @@ test("falls back to the authenticated same-origin cache for Open EPG feeds", asy
   const requests = [];
   const service = await new EpgService({ catalog, fetchImpl: async (url) => {
     requests.push(url);
-    if (url === OPEN_EPG_ITALY_URLS[0]) throw new TypeError("CORS blocked");
     return new Response(`<tv><channel id="Rai1.it"><display-name>Rai 1</display-name></channel><programme start="20260813140000 +0200" stop="20260813150000 +0200" channel="Rai1.it"><title>Live news</title></programme></tv>`);
   } }).init();
   const schedule = await service.schedule({ channelId: "rai-1", name: "Rai 1" }, {
     from: Date.UTC(2026, 7, 13, 12, 30),
     to: Date.UTC(2026, 7, 13, 13, 30),
   });
-  assert.equal(requests[1], `./epg-cache.php?url=${encodeURIComponent(OPEN_EPG_ITALY_URLS[0])}`);
+  assert.equal(requests[0], `./epg-cache.php?url=${encodeURIComponent(OPEN_EPG_ITALY_URLS[0])}`);
   assert.equal(schedule.programmes[0].title, "Live news");
+});
+
+test("routes EPGShare01 country archives through the bounded same-origin cache", async () => {
+  const source = "https://epgshare01.online/epgshare01/epg_ripper_ES1.xml.gz";
+  const settings = new Map([["epg:sources", [source]]]);
+  const catalog = {
+    getSetting: async (key, fallback) => settings.has(key) ? settings.get(key) : fallback,
+    setSetting: async (key, value) => { settings.set(key, value); return value; },
+  };
+  const requests = [];
+  const service = await new EpgService({ catalog, fetchImpl: async (url) => {
+    requests.push(url);
+    return new Response(`<tv><channel id="24Horas.es"><display-name>24 Horas</display-name></channel><programme start="20260813140000 +0200" stop="20260813150000 +0200" channel="24Horas.es"><title>Noticias</title></programme></tv>`);
+  } }).init();
+  const schedule = await service.schedule({ channelId: "24Horas.es", name: "24 Horas" }, {
+    from: Date.UTC(2026, 7, 13, 12, 30),
+    to: Date.UTC(2026, 7, 13, 13, 30),
+  });
+  assert.equal(requests[0], `./epg-cache.php?url=${encodeURIComponent(source)}`);
+  assert.equal(schedule.programmes[0].title, "Noticias");
 });
 
 test("groups GlobeTV guide sources by country with persistent diagnostics", () => {
@@ -369,4 +395,60 @@ test("GlobeTV catalog resolves country models to their published feeds", async (
     { name: "germany1.xml", url: "https://raw.test/germany1.xml", size: 20 },
   ]);
   assert.equal(globeTvCatalogCountryFor({ code: "KR", name: "South Korea" }, await service.countries()).id, "Korea");
+});
+
+test("Open EPG catalog resolves only fresh allowlisted feeds for the selected country", async () => {
+  const settings = new Map();
+  const requests = [];
+  const catalog = {
+    getSetting: async (key, fallback) => settings.has(key) ? settings.get(key) : fallback,
+    setSetting: async (key, value) => { settings.set(key, value); return value; },
+  };
+  const service = new OpenEpgCatalog({ catalog, fetchImpl: async (url) => {
+    requests.push(url);
+    return new Response(JSON.stringify([
+      { cou: "Spain 1", url: "https://www.open-epg.com/files/spain1.xml", age: openEpgAge(), cnt: "179" },
+      { cou: "Spain 2", url: "https://www.open-epg.com/files/spain2.xml", age: "01-01-0020", cnt: "149" },
+      { cou: "France", url: "https://www.open-epg.com/files/france.xml", age: openEpgAge(), cnt: "200" },
+      { cou: "Spain bad", url: "https://evil.test/spain.xml", age: openEpgAge(), cnt: "999" },
+    ]));
+  } });
+  assert.deepEqual(await service.countryFor({ code: "ES", name: "Spain" }), [{
+    url: "https://www.open-epg.com/files/spain1.xml",
+    name: "spain1.xml",
+    country: "Spain",
+    updatedAt: Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate()),
+    channelCount: 179,
+    provider: "Open EPG",
+    countryCode: "ES",
+  }]);
+  assert.equal(requests[0], "./epg-cache.php?catalog=open-epg");
+});
+
+test("country guide resolver combines fresh Open EPG files with the EPGShare01 country fallback", async () => {
+  const settings = new Map();
+  const catalog = {
+    getSetting: async (key, fallback) => settings.has(key) ? settings.get(key) : fallback,
+    setSetting: async (key, value) => { settings.set(key, value); return value; },
+  };
+  const resolver = new CountryGuideResolver({ catalog, fetchImpl: async () => new Response(JSON.stringify([
+    { cou: "Spain 1", url: "https://www.open-epg.com/files/spain1.xml", age: openEpgAge(), cnt: "179" },
+    { cou: "Spain 2", url: "https://www.open-epg.com/files/spain2.xml", age: openEpgAge(), cnt: "149" },
+  ])) });
+  assert.deepEqual((await resolver.countryFor({ code: "ES", name: "Spain" })).map((item) => item.url), [
+    "https://www.open-epg.com/files/spain1.xml",
+    "https://www.open-epg.com/files/spain2.xml",
+    "https://epgshare01.online/epgshare01/epg_ripper_ES1.xml.gz",
+  ]);
+});
+
+test("guide source grouping keeps Open EPG and EPGShare01 country providers identifiable", () => {
+  const groups = groupGuideSources([
+    "https://www.open-epg.com/files/spain1.xml",
+    "https://epgshare01.online/epgshare01/epg_ripper_ES1.xml.gz",
+  ]);
+  assert.deepEqual(groups.map((group) => [group.id, group.countryCode, group.provider]), [
+    ["epgshare:ES", "ES", "EPGShare01"],
+    ["open-epg:spain", "", "Open EPG"],
+  ]);
 });

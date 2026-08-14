@@ -173,15 +173,21 @@ avoid synchronous fuzzy work across the full catalog on every keystroke.
   browser-local caches.
 - Automatic cadence is checked while the app is open and again on visibility.
   CATODO is not a background server scheduler.
-- Each XMLTV response is limited to 20 MB. Large compressed or universal feeds
-  need a server-side preprocessing pipeline, not a larger browser limit.
+- Direct XMLTV responses are limited to 20 MB. The authenticated built-in cache
+  accepts only allowlisted Open EPG country XML and EPGShare01 country archives,
+  caps compressed downloads at 12 MB and expanded XML at 32 MB. Larger or
+  universal feeds still need a dedicated server-side preprocessing pipeline.
 - Missing programmes usually indicate identifier mismatch, not a rendering bug.
   Compare channel `tvgId`, guide `siteId` and the XMLTV `<channel id>`.
 - A successful XML download is not proof of current coverage. Source diagnostics
   show the latest programme timestamp and mark feeds whose window has ended.
 - Existing GlobeTV Italy URLs are migrated to the eight current Open EPG feeds.
-  `epg-cache.php` accepts only those allowlisted URLs; a `400` indicates a URL
-  outside that boundary and a `502` indicates an upstream/download failure.
+  Country discovery checks the cached Open EPG JSON catalog, then the allowlisted
+  EPGShare01 country tag, and uses GlobeTV only as a final repository fallback.
+  `epg-cache.php` accepts only those provider/path combinations; a `400` indicates
+  a URL outside that boundary and a `502` indicates an upstream, archive or size
+  failure. Current-source validation removes stale, empty and implausibly future
+  feeds from Preferences after a country refresh.
 - Failed refreshes may intentionally show stale cached programmes.
 
 ## Installation sync diagnosis
