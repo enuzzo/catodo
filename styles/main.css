@@ -3077,18 +3077,6 @@ textarea {
   font-size: 11px;
 }
 
-.country-detail__guide-consent {
-  flex: 1 0 100%;
-  margin: 2px 0;
-  color: var(--ink-soft);
-  font-size: 10px;
-  line-height: 1.35;
-}
-
-.country-detail__guide-consent input {
-  flex: 0 0 auto;
-}
-
 .country-detail__guide-button.is-active {
   border-color: rgb(48 115 76 / 24%);
   background: rgb(48 115 76 / 9%);
@@ -5456,6 +5444,27 @@ textarea {
 
 .import-form {
   padding: 20px 24px 24px;
+}
+
+.country-guide-form {
+  padding: 22px 24px 24px;
+}
+
+.country-guide-dialog__intro {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.country-guide-dialog__note {
+  margin: 18px 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.country-guide-form[aria-busy="true"] > :not(.modal__actions) {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .import-presets {

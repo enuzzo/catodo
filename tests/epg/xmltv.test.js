@@ -238,6 +238,16 @@ test("uses XMLTV channel display names to match provider-specific IDs", async ()
   assert.equal(service.getSourceStatuses()[0].matchedChannels, 1);
 });
 
+test("uses official channel aliases to match provider display names", () => {
+  const registry = [{ id: "Canal 24 horas.es", names: ["Canal 24 horas.es"] }];
+  assert.deepEqual(guideChannelIdsFor({
+    channelId: "24Horas.es",
+    tvgId: "24Horas.es",
+    name: "24 Horas",
+    aliases: ["Canal 24 Horas", "24h"],
+  }, registry), ["24Horas.es", "Canal 24 horas.es"]);
+});
+
 test("selects one coherent schedule when multiple guide feeds match the same channel", async () => {
   const settings = new Map([["epg:sources", ["https://example.org/sparse.xml", "https://example.org/complete.xml"]]]);
   const catalog = {

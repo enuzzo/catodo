@@ -21,6 +21,7 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ### 🐛 Fixed
 
+- Country guide actions now open an explicit consent dialog, reuse guides already saved in Preferences after reload, refresh already-connected sources instead of asking again, and match XMLTV channel aliases more reliably.
 - Removed the “Recalibrating reality” degauss easter egg from the signal-anomaly roulette and adjusted the five-effect finale.
 - Active Favorite controls now use the compact “Unfavorite” label on one line, with white button text and red reserved for the heart icon.
 

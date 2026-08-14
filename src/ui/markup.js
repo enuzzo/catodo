@@ -1115,23 +1115,14 @@ function createCountriesView(t) {
   });
   const guideButton = actionButton({
     t,
-    action: 'load-country-guide',
+    action: 'open-favorite-guide-setup',
     iconName: 'calendar-plus',
     key: 'countries.loadGuide',
     fallback: 'Load guide',
     className: 'button--ghost country-detail__guide-button',
   });
-  const guideConsent = element('label', 'check-field country-detail__guide-consent');
-  const guideConsentInput = element('input', null, {
-    type: 'checkbox',
-    dataset: { countryGuideConsent: 'true' },
-  });
-  guideConsent.append(
-    guideConsentInput,
-    textNode('span', null, t, 'countries.guideConsent', 'I accept checking the public GlobeTV GitHub catalog and contacting the selected third-party XMLTV providers.'),
-  );
   const guideStatus = element('p', 'country-detail__guide-status');
-  detailActions.append(importButton, guideConsent, guideButton, guideStatus);
+  detailActions.append(importButton, guideButton, guideStatus);
   detailGrid.append(detailCopy, shape, detailActions);
   detail.append(detailBack, detailGrid);
 
@@ -1249,8 +1240,6 @@ function createCountriesView(t) {
     categoriesList,
     shape,
     importButton,
-    guideConsent,
-    guideConsentInput,
     guideButton,
     guideStatus,
     regionButtons,
@@ -2530,6 +2519,72 @@ function createImportDialog(t) {
   return { backdrop, dialog, title, form, facts: factNodes, presets, presetGrid, urlInput, consent: checkbox, confirm, sourceLink };
 }
 
+function createCountryGuideDialog(t) {
+  const backdrop = element('div', 'modal-backdrop', { hidden: true, dataset: { overlay: 'country-guide-dialog' } });
+  const dialog = element('section', 'modal country-guide-dialog', {
+    role: 'dialog',
+    'aria-modal': 'true',
+    'aria-labelledby': 'country-guide-dialog-title',
+  });
+  const header = element('div', 'modal__header');
+  const title = textNode('h2', null, t, 'countries.guideDialogTitle', 'Connect country TV Guide');
+  title.id = 'country-guide-dialog-title';
+  header.append(title, iconButton({
+    t,
+    action: 'close-country-guide-dialog',
+    iconName: 'x',
+    key: 'common.close',
+    fallback: 'Close',
+  }));
+
+  const form = element('form', 'country-guide-form', { dataset: { action: 'load-country-guide' } });
+  const intro = textNode(
+    'p',
+    'country-guide-dialog__intro',
+    t,
+    'countries.guideDialogIntro',
+    'CATODO will find the public XMLTV feeds for this country, save them in Preferences and load the available schedules.',
+  );
+  const note = element('div', 'import-note country-guide-dialog__note');
+  note.append(
+    icon('info'),
+    textNode('p', null, t, 'countries.guideDialogNotice', 'The lookup checks the public GlobeTV GitHub catalog. Programme data is then downloaded from the selected third-party XMLTV providers.'),
+  );
+  const consent = element('label', 'check-field');
+  const checkbox = element('input', null, {
+    type: 'checkbox',
+    name: 'countryGuideConsent',
+    required: true,
+    dataset: { countryGuideConsent: 'true' },
+  });
+  consent.append(
+    checkbox,
+    textNode('span', null, t, 'countries.guideConsent', 'I accept checking the public GlobeTV GitHub catalog and contacting the selected third-party XMLTV providers.'),
+  );
+  const actions = element('div', 'modal__actions');
+  const confirm = actionButton({
+    t,
+    action: 'load-country-guide',
+    iconName: 'calendar-plus',
+    key: 'countries.findGuide',
+    fallback: 'Find & load guide',
+    className: 'button--primary',
+    type: 'submit',
+  });
+  const cancel = actionButton({
+    t,
+    action: 'close-country-guide-dialog',
+    key: 'common.cancel',
+    fallback: 'Cancel',
+    className: 'button--ghost',
+  });
+  actions.append(confirm, cancel);
+  form.append(intro, note, consent, actions);
+  dialog.append(header, form);
+  backdrop.append(dialog);
+  return { backdrop, dialog, title, form, consent: checkbox, confirm };
+}
+
 function renderSourcePresets(container, presets, t, selectedId = '') {
   const fragment = document.createDocumentFragment();
   normaliseArray(presets).forEach((preset) => {
@@ -2807,9 +2862,6 @@ function setCountryDetail(refs, country, t, guideState = {}) {
   };
   const [guideLabelKey, guideLabelFallback] = labels[control.status];
   const guideLabel = translate(t, guideLabelKey, guideLabelFallback);
-  if (previousIso2 !== iso2) refs.guideConsentInput.checked = false;
-  refs.guideConsent.hidden = !iso2 || control.connected;
-  refs.guideConsentInput.disabled = control.disabled;
   refs.guideButton.hidden = !iso2;
   refs.guideButton.disabled = control.disabled;
   refs.guideButton.dataset.iso2 = iso2;
@@ -2824,10 +2876,10 @@ function setCountryDetail(refs, country, t, guideState = {}) {
       : control.status === 'unavailable'
         ? translate(t, 'countries.guideUnavailableHint', 'No XMLTV feed was found in the current GlobeTV catalog. You can check again later.')
         : control.status === 'idle'
-          ? translate(t, 'countries.guideConsentHint', 'Accept the third-party notice, then CATODO will search GlobeTV and connect any country feeds it finds.')
+          ? translate(t, 'countries.guideConsentHint', 'Open the guide setup, review the third-party notice and connect the available country feeds.')
           : control.connected
-          ? translate(t, 'countries.guideLoadedHint', '{count} guide sources saved in Settings.', { count: sourceCount })
-          : translate(t, 'countries.guideAvailableHint', '{count} known XMLTV sources available. Loading saves them in Settings and contacts those third-party providers.', { count: sourceCount });
+          ? translate(t, 'countries.guideLoadedHint', '{count} guide sources saved in Preferences.', { count: sourceCount })
+          : translate(t, 'countries.guideAvailableHint', '{count} known XMLTV sources available. Loading saves them in Preferences and contacts those third-party providers.', { count: sourceCount });
   renderCountryShape(refs.shape, iso2, { t });
 }
 
@@ -3204,6 +3256,7 @@ export function mountAppUI(root, options = {}) {
   const multiviewSignalLab = createMultiviewSignalLab(t);
   const channelPicker = createChannelPicker(t);
   const importDialog = createImportDialog(t);
+  const countryGuideDialog = createCountryGuideDialog(t);
   const signalBar = createSignalBar(t);
 
   const shell = element('div', 'catodo-shell');
@@ -3211,7 +3264,16 @@ export function mountAppUI(root, options = {}) {
   main.append(home.view, explore.view, countries.view, guide.view, library.view, sources.view);
   shell.append(header.header, main, signalBar.bar);
   root.classList.add('catodo-app');
-  root.replaceChildren(shell, player.overlay, multiview.overlay, programmeOverlay.backdrop, multiviewSignalLab.backdrop, channelPicker.backdrop, importDialog.backdrop);
+  root.replaceChildren(
+    shell,
+    player.overlay,
+    multiview.overlay,
+    programmeOverlay.backdrop,
+    multiviewSignalLab.backdrop,
+    channelPicker.backdrop,
+    importDialog.backdrop,
+    countryGuideDialog.backdrop,
+  );
 
   const toastRegion = element('div', 'toast-region', {
     'aria-live': 'polite',
@@ -3905,6 +3967,45 @@ export function mountAppUI(root, options = {}) {
       });
       channelPicker.backdrop.hidden = false;
       scheduleFrame(() => channelPicker.input.focus());
+      return api;
+    },
+
+    showCountryGuideDialog(state = {}) {
+      if (state === false || state?.open === false) {
+        countryGuideDialog.backdrop.hidden = true;
+        countryGuideDialog.form.reset();
+        delete countryGuideDialog.form.dataset.iso2;
+        return api;
+      }
+      const iso2 = safeIso2(state.iso2 || state.code);
+      const country = safeText(state.name, iso2);
+      countryGuideDialog.form.dataset.iso2 = iso2;
+      countryGuideDialog.title.textContent = translate(
+        t,
+        'countries.guideDialogCountryTitle',
+        'Connect {country} TV Guide',
+        { country },
+      );
+      countryGuideDialog.form.reset();
+      countryGuideDialog.backdrop.hidden = false;
+      scheduleFrame(() => countryGuideDialog.consent.focus());
+      return api;
+    },
+
+    setCountryGuideDialogBusy(busy) {
+      const active = Boolean(busy);
+      countryGuideDialog.form.setAttribute('aria-busy', active ? 'true' : 'false');
+      countryGuideDialog.confirm.disabled = active;
+      countryGuideDialog.consent.disabled = active;
+      const label = countryGuideDialog.confirm.querySelector('.button__label');
+      if (label) label.textContent = active
+        ? translate(t, 'countries.loadingGuide', 'Loading guide…')
+        : translate(t, 'countries.findGuide', 'Find & load guide');
+      countryGuideDialog.confirm.replaceChildren(
+        icon(active ? 'spinner-gap' : 'calendar-plus'),
+        label || textNode('span', 'button__label', t, active ? 'countries.loadingGuide' : 'countries.findGuide', active ? 'Loading guide…' : 'Find & load guide'),
+      );
+      countryGuideDialog.confirm.classList.toggle('is-loading', active);
       return api;
     },
 

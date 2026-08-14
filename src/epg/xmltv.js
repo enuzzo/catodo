@@ -122,6 +122,9 @@ export function guideChannelIdsFor(channel, registry = []) {
     channel?.tvgName,
     channel?.officialName,
     channel?.title,
+    ...(Array.isArray(channel?.aliases) ? channel.aliases : []),
+    ...(Array.isArray(channel?.altNames) ? channel.altNames : []),
+    ...(Array.isArray(channel?.alt_names) ? channel.alt_names : []),
   ].map(normalizeGuideIdentity).filter(Boolean));
   const resolved = new Set(explicit);
   for (const entry of Array.isArray(registry) ? registry : []) {

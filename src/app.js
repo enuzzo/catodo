@@ -717,6 +717,7 @@ function countryGuideUrls(iso2, channels) {
   return [...new Set([
     ...knownCountryGuideUrls(code, channels),
     ...(state.countryGuideCatalogUrls.get(code) || []),
+    ...guideSourcesForCountry(code),
   ])];
 }
 
@@ -1712,10 +1713,6 @@ async function handleAction(action, detail) {
       break;
     }
     case "open-favorite-guide-setup": {
-      if (ui.refs.root.dataset.mode === "player") {
-        await closePlayerOverlay();
-        if (ui.refs.root.dataset.mode === "player") break;
-      }
       const iso2 = String(detail.dataset.iso2 || "").toUpperCase();
       if (!/^[A-Z]{2}$/.test(iso2)) {
         state.view = "sources";
@@ -1723,21 +1720,19 @@ async function handleAction(action, detail) {
         ui.showView("sources");
         break;
       }
-      state.selectedCountry = iso2;
-      state.countryChannelQuery = "";
-      state.countryChannelCategory = "";
-      state.countryChannelLanguage = "";
-      state.countryChannelLimit = UI_CHANNEL_LIMIT;
-      state.view = "countries";
-      renderAll();
-      ui.showView("countries");
-      void loadCountrySchedules(iso2);
-      window.requestAnimationFrame(() => {
-        ui.refs.views.countries.scrollTop = 0;
-        ui.refs.views.countries.querySelector('.country-detail__guide-consent input')?.focus();
-      });
+      const installedSources = guideSourcesForCountry(iso2);
+      if (installedSources.length) {
+        await loadCountrySchedules(iso2, { force: true });
+        ui.toast("This country guide is already connected in Preferences.");
+        break;
+      }
+      const country = countryModels().find((item) => item.code === iso2);
+      ui.showCountryGuideDialog({ iso2, name: country?.name || iso2 });
       break;
     }
+    case "close-country-guide-dialog":
+      ui.showCountryGuideDialog(false);
+      break;
     case "open-guide-settings":
       if (ui.refs.root.dataset.mode === "player") {
         await closePlayerOverlay();
@@ -1932,14 +1927,13 @@ async function handleAction(action, detail) {
     case "load-country-guide": {
       const iso2 = String(detail.dataset.iso2 || state.selectedCountry || "").toUpperCase();
       const channels = iso2 ? catalog.list({ country: iso2 }).filter(isPlayableChannel) : [];
-      const accepted = Boolean(detail.element
-        ?.closest('.country-detail__actions')
-        ?.querySelector('[data-country-guide-consent]')?.checked);
+      const accepted = Boolean(detail.formData?.get("countryGuideConsent"));
       if (!accepted) {
         ui.toast("Accept the third-party guide notice before connecting this country.", { tone: "error" });
         break;
       }
       state.countryGuideLoading = iso2;
+      ui.setCountryGuideDialogBusy(true);
       renderCountries();
       try {
         const guideUrls = await discoverCountryGuideUrls(iso2, {
@@ -1950,22 +1944,25 @@ async function handleAction(action, detail) {
           break;
         }
         const merged = [...new Set([...state.epgSources, ...guideUrls])];
-        if (merged.length === state.epgSources.length) {
-          ui.toast("This country guide is already connected in Settings.");
-          break;
+        const added = merged.length > state.epgSources.length;
+        if (added) {
+          state.epgSources = await epg.setSources(merged);
+          scheduleGuideRefresh();
         }
-        state.epgSources = await epg.setSources(merged);
-        scheduleGuideRefresh();
         channels.forEach((channel) => state.schedules.delete(channelId(channel)));
         renderSources();
         renderGuide();
         await loadCountrySchedules(iso2, { force: true });
-        if (state.guideError) ui.toast(`Guide saved in Settings, but refresh failed: ${state.guideError}`, { tone: "error" });
-        else ui.toast("Country guide added to Settings and refreshed.");
+        ui.showCountryGuideDialog(false);
+        if (state.guideError) ui.toast(`Guide saved in Preferences, but refresh failed: ${state.guideError}`, { tone: "error" });
+        else ui.toast(added
+          ? "Country guide added to Preferences and refreshed."
+          : "Country guide already connected in Preferences and refreshed.");
       } catch (error) {
         ui.toast(error.message || "The country guide could not be connected.", { tone: "error" });
       } finally {
         state.countryGuideLoading = "";
+        ui.setCountryGuideDialogBusy(false);
         renderCountries();
       }
       break;
