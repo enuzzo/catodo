@@ -114,11 +114,11 @@ or real-device validation. It is intentionally concrete and ordered by value.
 ## Implemented and verified under Unreleased
 
 - The footer EBU strip now acts as an accessible, silent signal-anomaly
-  roulette with six local animated effects, no repeats within a cycle, immediate
-  click/Escape dismissal, reduced-motion handling and a secret seventh-step
+  roulette with five local animated effects, no repeats within a cycle, immediate
+  click/Escape dismissal, reduced-motion handling and a secret sixth-step
   finale. Rendered browser QA exercised the complete Rickroll, pirate Teletext,
-  Nyan Cow, numbers-station, Breakout and degauss deck plus the finale at exactly
-  1600×900; all effects produced bounded content, unique state and clean
+  Nyan Cat, numbers-station and playable Breakout deck plus the finale at exactly
+  1280×720; all effects produced bounded content, unique state and clean
   dismissal. A 390×844 responsive pass kept the active overlay within the
   viewport with zero horizontal overflow. The EBU trigger itself remains hidden
   at the existing compact-footer breakpoint, while an already active effect

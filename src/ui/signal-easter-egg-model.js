@@ -1,10 +1,9 @@
 export const SIGNAL_EASTER_EGGS = Object.freeze([
   'rickroll',
-  'nyan-cow',
+  'nyan-cat',
   'teletext',
   'numbers-station',
   'breakout',
-  'degauss',
 ]);
 
 function normaliseRandom(value) {

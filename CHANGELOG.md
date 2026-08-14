@@ -10,6 +10,18 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+### ✨ Added
+
+- EBU Breakout is now a playable keyboard, pointer and touch mini-game with real ball physics, brick collisions, score, lives and replay.
+
+### 🛠 Changed
+
+- Rickroll now uses transparent animated Rick Astley dancers, while Nyan Cow has been replaced by the original transparent Nyan Cat animation.
+
+### 🐛 Fixed
+
+- Removed the “Recalibrating reality” degauss easter egg from the signal-anomaly roulette and adjusted the five-effect finale.
+
 ## [2.6.0] - 2026-08-14
 
 ### ✨ Added

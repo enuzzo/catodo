@@ -10,11 +10,13 @@ import {
 
 test('signal easter eggs are shuffled without duplicates', () => {
   const effects = shuffleSignalEasterEggs(() => 0.42);
+  assert.equal(SIGNAL_EASTER_EGGS.length, 5);
+  assert.equal(SIGNAL_EASTER_EGGS.includes('degauss'), false);
   assert.equal(effects.length, SIGNAL_EASTER_EGGS.length);
   assert.deepEqual(new Set(effects), new Set(SIGNAL_EASTER_EGGS));
 });
 
-test('the six anomalies play once before the secret finale', () => {
+test('the five anomalies play once before the secret finale', () => {
   let deck = createSignalEasterEggDeck(() => 0);
   const played = [];
 

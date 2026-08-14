@@ -1,23 +1,22 @@
 import { createSignalEasterEggDeck, drawSignalEasterEgg } from './signal-easter-egg-model.js';
+import nyanCatGifUrl from '../../assets/easter-eggs/nyan-cat.gif?url';
+import rickAstleyGifUrl from '../../assets/easter-eggs/rick-astley.gif?url';
 
 const EFFECT_DURATIONS = Object.freeze({
   rickroll: 6800,
-  'nyan-cow': 7200,
+  'nyan-cat': 7200,
   teletext: 7600,
   'numbers-station': 8200,
-  breakout: 8200,
-  degauss: 6200,
   finale: 9200,
 });
 
 const EFFECT_ANNOUNCEMENTS = Object.freeze({
   rickroll: 'Broadcast hijacked. Never gonna give you up.',
-  'nyan-cow': 'Nyan Cow crossed the signal path.',
+  'nyan-cat': 'Nyan Cat crossed the signal path.',
   teletext: 'Pirate teletext page zero x dead opened.',
   'numbers-station': 'Unknown numbers station acquired.',
-  breakout: 'Broadcast Breakout demo started.',
-  degauss: 'Cathode degauss cycle started.',
-  finale: 'All six signal anomalies confirmed. Root access granted to the cow.',
+  breakout: 'EBU Breakout started. Use left and right arrows or drag to move the paddle.',
+  finale: 'All five signal anomalies confirmed. Root access granted to the cow.',
 });
 
 function node(documentRef, tagName, className, text) {
@@ -39,14 +38,11 @@ function createRickroll(documentRef) {
   for (let index = 0; index < 8; index += 1) {
     const dancer = node(documentRef, 'span', 'rick-dancer');
     dancer.style.setProperty('--dancer-index', String(index));
-    dancer.append(
-      node(documentRef, 'i', 'rick-dancer__head'),
-      node(documentRef, 'i', 'rick-dancer__body'),
-      node(documentRef, 'i', 'rick-dancer__arm rick-dancer__arm--left'),
-      node(documentRef, 'i', 'rick-dancer__arm rick-dancer__arm--right'),
-      node(documentRef, 'i', 'rick-dancer__leg rick-dancer__leg--left'),
-      node(documentRef, 'i', 'rick-dancer__leg rick-dancer__leg--right'),
-    );
+    const image = node(documentRef, 'img', 'rick-dancer__gif');
+    image.src = rickAstleyGifUrl;
+    image.alt = index === 0 ? 'Rick Astley dancing' : '';
+    if (index > 0) image.setAttribute('aria-hidden', 'true');
+    dancer.append(image);
     dancers.append(dancer);
   }
   const meta = node(documentRef, 'span', 'signal-anomaly__meta mono', 'MEMETIC PAYLOAD ACCEPTED · AUDIO REMAINS MUTED');
@@ -54,7 +50,7 @@ function createRickroll(documentRef) {
   return scene;
 }
 
-function createNyanCow(documentRef) {
+function createNyanCat(documentRef) {
   const scene = node(documentRef, 'div', 'signal-anomaly__scene signal-anomaly__scene--nyan');
   const sky = node(documentRef, 'div', 'nyan-sky');
   for (let index = 0; index < 20; index += 1) {
@@ -67,20 +63,12 @@ function createNyanCow(documentRef) {
   const flyer = node(documentRef, 'div', 'nyan-flyer');
   const trail = node(documentRef, 'div', 'nyan-trail');
   for (let index = 0; index < 6; index += 1) trail.append(node(documentRef, 'i'));
-  const cow = node(documentRef, 'div', 'nyan-cow');
-  cow.append(
-    node(documentRef, 'i', 'nyan-cow__body'),
-    node(documentRef, 'i', 'nyan-cow__spot nyan-cow__spot--one'),
-    node(documentRef, 'i', 'nyan-cow__spot nyan-cow__spot--two'),
-    node(documentRef, 'i', 'nyan-cow__head'),
-    node(documentRef, 'i', 'nyan-cow__horn nyan-cow__horn--left'),
-    node(documentRef, 'i', 'nyan-cow__horn nyan-cow__horn--right'),
-    node(documentRef, 'i', 'nyan-cow__leg nyan-cow__leg--one'),
-    node(documentRef, 'i', 'nyan-cow__leg nyan-cow__leg--two'),
-  );
-  flyer.append(trail, cow);
-  const copy = node(documentRef, 'strong', 'nyan-copy', 'NYAN COW HAS LEFT THE MULTIVIEW');
-  const meta = node(documentRef, 'span', 'signal-anomaly__meta mono', 'MILK PACKETS: 8 · LATENCY: MOO');
+  const cat = node(documentRef, 'img', 'nyan-cat');
+  cat.src = nyanCatGifUrl;
+  cat.alt = 'Nyan Cat';
+  flyer.append(trail, cat);
+  const copy = node(documentRef, 'strong', 'nyan-copy', 'NYAN CAT HAS LEFT THE MULTIVIEW');
+  const meta = node(documentRef, 'span', 'signal-anomaly__meta mono', 'POP-TART PACKETS: 8 · LATENCY: NYAN');
   scene.append(sky, flyer, copy, meta);
   return scene;
 }
@@ -126,33 +114,287 @@ function createNumbersStation(documentRef, random) {
   return scene;
 }
 
-function createBreakout(documentRef) {
+function createBreakout(documentRef, windowRef) {
   const scene = node(documentRef, 'div', 'signal-anomaly__scene signal-anomaly__scene--breakout');
-  const header = node(documentRef, 'div', 'breakout__header mono', 'EBU BREAKOUT // ATTRACT MODE');
+  const header = node(documentRef, 'div', 'breakout__header mono');
+  const title = node(documentRef, 'strong', '', 'EBU BREAKOUT // LIVE');
+  const hud = node(documentRef, 'span', 'breakout__hud');
+  const score = node(documentRef, 'span', '', 'SCORE 0000');
+  const lives = node(documentRef, 'span', '', 'LIVES 3');
+  hud.append(score, lives);
+  header.append(title, hud);
   const arena = node(documentRef, 'div', 'breakout__arena');
+  arena.tabIndex = 0;
+  arena.setAttribute('role', 'application');
+  arena.setAttribute('aria-label', 'EBU Breakout. Use left and right arrows, A and D, or drag to move the paddle.');
   const bricks = node(documentRef, 'div', 'breakout__bricks');
-  for (let index = 0; index < 16; index += 1) {
+  const brickNodes = [];
+  for (let index = 0; index < 24; index += 1) {
     const brick = node(documentRef, 'i');
     brick.style.setProperty('--brick-index', String(index));
     bricks.append(brick);
+    brickNodes.push(brick);
   }
-  arena.append(bricks, node(documentRef, 'i', 'breakout__ball'), node(documentRef, 'i', 'breakout__paddle'));
-  const copy = node(documentRef, 'strong', 'breakout__copy', 'INSERT COIN? CUTE. THIS IS PRODUCTION.');
+  const ball = node(documentRef, 'i', 'breakout__ball');
+  const paddle = node(documentRef, 'i', 'breakout__paddle');
+  arena.append(bricks, ball, paddle);
+  const copy = node(documentRef, 'strong', 'breakout__copy', 'SPACE / TAP TO START · ← → / A D / DRAG');
+  copy.setAttribute('aria-live', 'polite');
   scene.append(header, arena, copy);
-  return scene;
-}
 
-function createDegauss(documentRef) {
-  const scene = node(documentRef, 'div', 'signal-anomaly__scene signal-anomaly__scene--degauss');
-  const tube = node(documentRef, 'div', 'degauss__tube');
-  tube.append(
-    node(documentRef, 'i', 'degauss__scanline'),
-    node(documentRef, 'i', 'degauss__orb'),
-    node(documentRef, 'span', 'degauss__error mono', 'ERR_COW_NOT_FOUND'),
-    node(documentRef, 'strong', 'degauss__copy', 'RECALIBRATING REALITY'),
-  );
-  scene.append(tube, node(documentRef, 'span', 'signal-anomaly__meta mono', 'PLEASE STAND BY · MAGNETIC DIGNITY: 0%'));
-  return scene;
+  const requestFrame = windowRef.requestAnimationFrame?.bind(windowRef)
+    || ((callback) => windowRef.setTimeout(() => callback(Date.now()), 16));
+  const cancelFrame = windowRef.cancelAnimationFrame?.bind(windowRef) || windowRef.clearTimeout.bind(windowRef);
+  const activeBricks = new Set(brickNodes);
+  const keys = { left: false, right: false };
+  const state = {
+    status: 'ready',
+    score: 0,
+    lives: 3,
+    width: 0,
+    height: 0,
+    paddleX: 0,
+    ballX: 0,
+    ballY: 0,
+    velocityX: 190,
+    velocityY: -210,
+  };
+  let frameId = 0;
+  let previousTime = 0;
+  let pointerId = null;
+
+  const renderHud = () => {
+    score.textContent = `SCORE ${String(state.score).padStart(4, '0')}`;
+    lives.textContent = `LIVES ${state.lives}`;
+  };
+
+  const positionPaddle = (x) => {
+    const half = paddle.offsetWidth / 2 || 54;
+    state.paddleX = Math.max(half, Math.min(state.width - half, x));
+    paddle.style.transform = `translate3d(${state.paddleX - half}px, 0, 0)`;
+  };
+
+  const positionBall = () => {
+    const radius = ball.offsetWidth / 2 || 8;
+    ball.style.transform = `translate3d(${state.ballX - radius}px, ${state.ballY - radius}px, 0)`;
+  };
+
+  const resetBall = (direction = 1) => {
+    state.ballX = state.width / 2;
+    state.ballY = Math.max(80, state.height - 52);
+    state.velocityX = 190 * direction;
+    state.velocityY = -210;
+    positionBall();
+  };
+
+  const syncLayout = () => {
+    const nextWidth = arena.clientWidth;
+    const nextHeight = arena.clientHeight;
+    if (!nextWidth || !nextHeight) return false;
+    if (!state.width) {
+      state.width = nextWidth;
+      state.height = nextHeight;
+      positionPaddle(nextWidth / 2);
+      resetBall(Math.random() < 0.5 ? -1 : 1);
+      return true;
+    }
+    if (nextWidth !== state.width || nextHeight !== state.height) {
+      const widthRatio = nextWidth / state.width;
+      const heightRatio = nextHeight / state.height;
+      state.width = nextWidth;
+      state.height = nextHeight;
+      positionPaddle(state.paddleX * widthRatio);
+      state.ballX *= widthRatio;
+      state.ballY *= heightRatio;
+      positionBall();
+    }
+    return true;
+  };
+
+  const finish = (won) => {
+    state.status = won ? 'won' : 'lost';
+    copy.textContent = won ? 'SIGNAL CLEARED · R / SPACE TO REPLAY' : 'SIGNAL LOST · R / SPACE TO RETRY';
+    arena.dataset.state = state.status;
+  };
+
+  const begin = () => {
+    if (state.status !== 'ready') return;
+    syncLayout();
+    state.status = 'playing';
+    delete arena.dataset.state;
+    copy.textContent = '← → / A D / DRAG · CLEAR THE SIGNAL';
+    previousTime = 0;
+    cancelFrame(frameId);
+    frameId = requestFrame(tick);
+  };
+
+  const restart = () => {
+    activeBricks.clear();
+    brickNodes.forEach((brick) => {
+      brick.classList.remove('is-hit');
+      activeBricks.add(brick);
+    });
+    state.status = 'playing';
+    state.score = 0;
+    state.lives = 3;
+    delete arena.dataset.state;
+    copy.textContent = '← → / A D / DRAG · CLEAR THE SIGNAL';
+    renderHud();
+    syncLayout();
+    positionPaddle(state.width / 2);
+    resetBall(Math.random() < 0.5 ? -1 : 1);
+    previousTime = 0;
+    cancelFrame(frameId);
+    frameId = requestFrame(tick);
+  };
+
+  const hitBrick = (previousX, previousY, radius) => {
+    for (const brick of activeBricks) {
+      const left = brick.offsetLeft;
+      const top = brick.offsetTop;
+      const right = left + brick.offsetWidth;
+      const bottom = top + brick.offsetHeight;
+      if (state.ballX + radius < left || state.ballX - radius > right
+        || state.ballY + radius < top || state.ballY - radius > bottom) continue;
+      activeBricks.delete(brick);
+      brick.classList.add('is-hit');
+      state.score += 100;
+      renderHud();
+      if (previousX + radius <= left || previousX - radius >= right) state.velocityX *= -1;
+      else state.velocityY *= -1;
+      if (!activeBricks.size) finish(true);
+      return;
+    }
+  };
+
+  function tick(time) {
+    if (!syncLayout()) {
+      frameId = requestFrame(tick);
+      return;
+    }
+    if (state.status !== 'playing') return;
+    if (!previousTime) previousTime = time;
+    const delta = Math.min(0.032, Math.max(0, (time - previousTime) / 1000));
+    previousTime = time;
+
+    const paddleSpeed = 430;
+    if (keys.left !== keys.right) positionPaddle(state.paddleX + (keys.left ? -1 : 1) * paddleSpeed * delta);
+
+    const radius = ball.offsetWidth / 2 || 8;
+    const previousX = state.ballX;
+    const previousY = state.ballY;
+    state.ballX += state.velocityX * delta;
+    state.ballY += state.velocityY * delta;
+
+    if (state.ballX - radius <= 0 && state.velocityX < 0) {
+      state.ballX = radius;
+      state.velocityX *= -1;
+    } else if (state.ballX + radius >= state.width && state.velocityX > 0) {
+      state.ballX = state.width - radius;
+      state.velocityX *= -1;
+    }
+    if (state.ballY - radius <= 0 && state.velocityY < 0) {
+      state.ballY = radius;
+      state.velocityY *= -1;
+    }
+
+    const paddleTop = state.height - 28;
+    const paddleHalf = paddle.offsetWidth / 2 || 54;
+    if (state.velocityY > 0 && state.ballY + radius >= paddleTop
+      && previousY + radius <= paddleTop + 4
+      && state.ballX + radius >= state.paddleX - paddleHalf
+      && state.ballX - radius <= state.paddleX + paddleHalf) {
+      const impact = Math.max(-1, Math.min(1, (state.ballX - state.paddleX) / paddleHalf));
+      const speed = Math.min(430, Math.hypot(state.velocityX, state.velocityY) * 1.035);
+      state.velocityX = speed * Math.sin(impact * 1.08);
+      state.velocityY = -Math.max(155, speed * Math.cos(impact * 1.08));
+      state.ballY = paddleTop - radius;
+    }
+
+    hitBrick(previousX, previousY, radius);
+
+    if (state.ballY - radius > state.height) {
+      state.lives -= 1;
+      renderHud();
+      if (!state.lives) finish(false);
+      else resetBall(state.velocityX < 0 ? -1 : 1);
+    }
+
+    positionBall();
+    if (state.status === 'playing') frameId = requestFrame(tick);
+  }
+
+  const onKeydown = (event) => {
+    const key = event.key.toLowerCase();
+    if (key === 'arrowleft' || key === 'a') {
+      if (state.status === 'ready') begin();
+      if (state.status !== 'playing') return;
+      keys.left = true;
+      positionPaddle(state.paddleX - 26);
+    } else if (key === 'arrowright' || key === 'd') {
+      if (state.status === 'ready') begin();
+      if (state.status !== 'playing') return;
+      keys.right = true;
+      positionPaddle(state.paddleX + 26);
+    }
+    else if ((key === ' ' || key === 'enter') && state.status === 'ready') begin();
+    else if ((key === 'r' || key === ' ' || key === 'enter') && state.status !== 'playing') restart();
+    else return;
+    event.preventDefault();
+  };
+
+  const onKeyup = (event) => {
+    const key = event.key.toLowerCase();
+    if (key === 'arrowleft' || key === 'a') keys.left = false;
+    else if (key === 'arrowright' || key === 'd') keys.right = false;
+    else return;
+    event.preventDefault();
+  };
+
+  const movePaddleFromPointer = (event) => {
+    const bounds = arena.getBoundingClientRect();
+    positionPaddle(event.clientX - bounds.left);
+  };
+
+  const onPointerDown = (event) => {
+    if (state.status === 'ready') begin();
+    else if (state.status !== 'playing') restart();
+    pointerId = event.pointerId;
+    arena.setPointerCapture?.(pointerId);
+    arena.focus({ preventScroll: true });
+    movePaddleFromPointer(event);
+  };
+
+  const onPointerMove = (event) => {
+    if (event.pointerId === pointerId) movePaddleFromPointer(event);
+  };
+
+  const onPointerUp = (event) => {
+    if (event.pointerId === pointerId) pointerId = null;
+  };
+
+  windowRef.addEventListener('keydown', onKeydown);
+  windowRef.addEventListener('keyup', onKeyup);
+  arena.addEventListener('pointerdown', onPointerDown);
+  arena.addEventListener('pointermove', onPointerMove);
+  arena.addEventListener('pointerup', onPointerUp);
+  arena.addEventListener('pointercancel', onPointerUp);
+  renderHud();
+  arena.dataset.state = 'ready';
+  frameId = requestFrame(tick);
+
+  return {
+    element: scene,
+    cleanup() {
+      cancelFrame(frameId);
+      windowRef.removeEventListener('keydown', onKeydown);
+      windowRef.removeEventListener('keyup', onKeyup);
+      arena.removeEventListener('pointerdown', onPointerDown);
+      arena.removeEventListener('pointermove', onPointerMove);
+      arena.removeEventListener('pointerup', onPointerUp);
+      arena.removeEventListener('pointercancel', onPointerUp);
+    },
+  };
 }
 
 function createFinale(documentRef) {
@@ -164,11 +406,11 @@ function createFinale(documentRef) {
     node(documentRef, 'i', 'finale__horn finale__horn--right'),
     node(documentRef, 'span', '', '🐄'),
   );
-  const eyebrow = node(documentRef, 'span', 'signal-anomaly__eyebrow', 'ALL SIX ANOMALIES CONFIRMED');
+  const eyebrow = node(documentRef, 'span', 'signal-anomaly__eyebrow', 'ALL FIVE ANOMALIES CONFIRMED');
   const title = node(documentRef, 'strong', 'finale__title', 'THE COW HAS ROOT');
   const terminal = node(documentRef, 'div', 'finale__terminal mono');
   appendLines(documentRef, terminal, [
-    '> sudo catodo --degauss-reality',
+    '> sudo catodo --unlock-channel-zero',
     '[ OK ] timeline contaminated',
     '[ OK ] teletext escaped containment',
     '[ OK ] bovine privilege escalation',
@@ -180,14 +422,13 @@ function createFinale(documentRef) {
   return scene;
 }
 
-function effectScene(documentRef, effect, random) {
-  if (effect === 'rickroll') return createRickroll(documentRef);
-  if (effect === 'nyan-cow') return createNyanCow(documentRef);
-  if (effect === 'teletext') return createTeletext(documentRef);
-  if (effect === 'numbers-station') return createNumbersStation(documentRef, random);
-  if (effect === 'breakout') return createBreakout(documentRef);
-  if (effect === 'degauss') return createDegauss(documentRef);
-  return createFinale(documentRef);
+function effectScene(documentRef, windowRef, effect, random) {
+  if (effect === 'breakout') return createBreakout(documentRef, windowRef);
+  if (effect === 'rickroll') return { element: createRickroll(documentRef) };
+  if (effect === 'nyan-cat') return { element: createNyanCat(documentRef) };
+  if (effect === 'teletext') return { element: createTeletext(documentRef) };
+  if (effect === 'numbers-station') return { element: createNumbersStation(documentRef, random) };
+  return { element: createFinale(documentRef) };
 }
 
 export function createSignalEasterEgg({ root, bars, random = Math.random } = {}) {
@@ -212,11 +453,14 @@ export function createSignalEasterEgg({ root, bars, random = Math.random } = {})
   let deck = createSignalEasterEggDeck(random);
   let timer = 0;
   let activeEffect = '';
+  let activeCleanup = null;
 
   const stop = () => {
     windowRef.clearTimeout(timer);
+    activeCleanup?.();
     timer = 0;
     activeEffect = '';
+    activeCleanup = null;
     overlay.hidden = true;
     overlay.setAttribute('aria-hidden', 'true');
     overlay.className = 'signal-anomaly';
@@ -235,7 +479,9 @@ export function createSignalEasterEgg({ root, bars, random = Math.random } = {})
     const draw = drawSignalEasterEgg(deck, random);
     deck = draw.deck;
     activeEffect = draw.effect;
-    stage.replaceChildren(effectScene(documentRef, activeEffect, random));
+    const effect = effectScene(documentRef, windowRef, activeEffect, random);
+    activeCleanup = effect.cleanup || null;
+    stage.replaceChildren(effect.element);
     overlay.className = `signal-anomaly signal-anomaly--${activeEffect}`;
     overlay.hidden = false;
     overlay.setAttribute('aria-hidden', 'false');
@@ -245,7 +491,9 @@ export function createSignalEasterEgg({ root, bars, random = Math.random } = {})
     root.dataset.signalAnomaly = activeEffect;
     announcement.textContent = EFFECT_ANNOUNCEMENTS[activeEffect];
     const reduced = windowRef.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    timer = windowRef.setTimeout(stop, reduced ? 2800 : EFFECT_DURATIONS[activeEffect]);
+    if (activeEffect !== 'breakout') {
+      timer = windowRef.setTimeout(stop, reduced ? 2800 : EFFECT_DURATIONS[activeEffect]);
+    }
     return activeEffect;
   };
 
