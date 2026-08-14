@@ -87,6 +87,9 @@
     "notAlwaysOn": "Not always on",
     "geoRestricted": "Geo-restricted"
   },
+  "favorite": {
+    "unfavoriteLabel": "Unfavorite"
+  },
   "channelMeta": {
     "country": "Country",
     "language": "Language",

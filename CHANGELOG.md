@@ -17,10 +17,12 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 ### 🛠 Changed
 
 - Rickroll now uses transparent animated Rick Astley dancers, while Nyan Cow has been replaced by the original transparent Nyan Cat animation.
+- Explore's featured preview now uses a narrower 16:9 media stage, leaving more room for channel details and actions.
 
 ### 🐛 Fixed
 
 - Removed the “Recalibrating reality” degauss easter egg from the signal-anomaly roulette and adjusted the five-effect finale.
+- Active Favorite controls now use the compact “Unfavorite” label on one line, with white button text and red reserved for the heart icon.
 
 ## [2.6.0] - 2026-08-14
 

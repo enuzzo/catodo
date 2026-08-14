@@ -851,7 +851,7 @@ function setExploreHero(refs, channel, collection, t) {
   refs.favorite.setAttribute('aria-pressed', isFavorite ? 'true' : 'false');
   refs.favorite.setAttribute('aria-label', translate(t, isFavorite ? 'favorite.remove' : 'favorite.add', isFavorite ? 'Remove from favorites' : 'Add to favorites'));
   refs.favorite.title = refs.favorite.getAttribute('aria-label');
-  setTranslatedText(refs.favorite.querySelector('.button__label'), t, isFavorite ? 'favorite.remove' : 'favorite.add', isFavorite ? 'Remove favorite' : 'Favorite');
+  setTranslatedText(refs.favorite.querySelector('.button__label'), t, isFavorite ? 'favorite.unfavoriteLabel' : 'favorite.add', isFavorite ? 'Unfavorite' : 'Favorite');
   setFavoriteGlyph(refs.favorite, isFavorite);
   setMedia(refs.video, { ...value, muted: value.muted !== false, autoplay: value.autoplay !== false });
   const muted = refs.video.muted;
@@ -3727,12 +3727,14 @@ export function mountAppUI(root, options = {}) {
         const isFavorite = Boolean(channel.favorite || channel.isFavorite);
         player.favoriteButton.classList.toggle('is-active', isFavorite);
         player.favoriteButton.setAttribute('aria-pressed', isFavorite ? 'true' : 'false');
+        player.favoriteButton.setAttribute('aria-label', translate(t, isFavorite ? 'favorite.remove' : 'favorite.add', isFavorite ? 'Remove from favorites' : 'Add to favorites'));
+        player.favoriteButton.title = player.favoriteButton.getAttribute('aria-label');
         setFavoriteGlyph(player.favoriteButton, isFavorite);
         setTranslatedText(
           player.favoriteButton.querySelector('.button__label'),
           t,
-          isFavorite ? 'favorite.remove' : 'favorite.add',
-          isFavorite ? 'Remove favorite' : 'Favorite',
+          isFavorite ? 'favorite.unfavoriteLabel' : 'favorite.add',
+          isFavorite ? 'Unfavorite' : 'Favorite',
         );
         player.programmeList.replaceChildren();
         const programmes = channelSchedule(channel).slice(0, 8);
