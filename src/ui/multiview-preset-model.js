@@ -1,5 +1,7 @@
+import { normalizeMultiviewPresets } from '../data/multiview-presets.js';
+
 function values(presets) {
-  return Array.isArray(presets) ? presets.filter(Boolean) : [];
+  return normalizeMultiviewPresets(presets);
 }
 
 export function findMultiviewPreset(presets, id) {

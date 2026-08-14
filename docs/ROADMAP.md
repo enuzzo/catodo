@@ -111,6 +111,17 @@ or real-device validation. It is intentionally concrete and ordered by value.
   Pro screenshot is real-device evidence for the original regressions; the
   corrected build still requires a final Safari real-device confirmation.
 
+## Implemented and verified under Unreleased
+
+- Multiview presets and the preferred feed layout are now installation-wide
+  shared settings instead of browser-only local preferences, and both are part
+  of the manual configuration backup. Existing values migrate once from the original
+  browser, while fresh browsers hydrate the shared setup and normal Multiview
+  entry continues to apply its first preset automatically. An isolated fresh-
+  origin browser QA at exactly 1600×900 hydrated one shared four-feed preset,
+  selected it on entry and populated all four expected channels; focused tests
+  also cover server validation, cross-browser hydration and empty-list deletion.
+
 ## Next work
 
 ### P0 — validate on target devices

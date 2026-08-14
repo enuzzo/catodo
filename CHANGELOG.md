@@ -10,6 +10,12 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.5.1] - 2026-08-14
+
+### 🐛 Fixed
+
+- Multiview presets and the preferred 2/3/4-feed layout now follow the shared installation into new browsers, migrate once from the original browser's local storage, and are included in manual backups; Multiview still opens with the first saved preset by default.
+
 ## [2.5.0] - 2026-08-14
 
 ### 🐛 Fixed
@@ -142,7 +148,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.5.0...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.5.1...HEAD
+[2.5.1]: https://github.com/enuzzo/catodo/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/enuzzo/catodo/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/enuzzo/catodo/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/enuzzo/catodo/compare/v2.2.1...v2.3.0

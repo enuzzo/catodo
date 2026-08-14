@@ -4,9 +4,16 @@ import {
   CatalogService,
   SOURCE_PRESETS,
   countryPlaylistUrl,
+  createConfigurationBackup,
   filterCountriesByRegion,
+  MULTIVIEW_LAYOUT_SETTING,
+  MULTIVIEW_PRESETS_SETTING,
+  normalizeMultiviewLayout,
+  normalizeMultiviewPresets,
   parseDeepLink,
   regionForCountry,
+  resolveMultiviewLayoutSync,
+  resolveMultiviewPresetSync,
   sourcePreset,
 } from "./data/index.js";
 import i18n from "./i18n/index.js";
@@ -145,6 +152,21 @@ function readLocalJson(key, fallback) {
 
 function writeLocalJson(key, value) {
   try { legacyStorage()?.setItem(key, JSON.stringify(value)); } catch { /* optional device preference */ }
+}
+
+async function persistMultiviewPresets(presets) {
+  state.multiviewPresets = normalizeMultiviewPresets(presets);
+  writeLocalJson("catodo:multiview-presets", state.multiviewPresets);
+  updatePresetOptions();
+  if (catalog) await catalog.setSetting(MULTIVIEW_PRESETS_SETTING, state.multiviewPresets);
+  return state.multiviewPresets;
+}
+
+async function persistMultiviewLayout(layout) {
+  state.multiviewLayout = normalizeMultiviewLayout(layout);
+  writeLocalJson("catodo:multiview-layout", state.multiviewLayout);
+  if (catalog) await catalog.setSetting(MULTIVIEW_LAYOUT_SETTING, state.multiviewLayout);
+  return state.multiviewLayout;
 }
 
 function updatePresetOptions() {
@@ -2033,13 +2055,15 @@ async function handleAction(action, detail) {
       break;
     }
     case "export-backup": {
-      const backup = {
-        schema: "catodo-backup", version: 1, exportedAt: new Date().toISOString(),
-        sources: (state.lastCatalog?.sources || []).map(({ name, url, trusted }) => ({ name, url, trusted })),
-        favorites: [...(state.lastCatalog?.favorites || [])],
-        settings: { proxy: state.proxy, guideSources: state.epgSources, guideRefreshMinutes: state.epgRefreshMinutes },
+      const backup = createConfigurationBackup({
+        sources: state.lastCatalog?.sources,
+        favorites: state.lastCatalog?.favorites,
+        proxy: state.proxy,
+        guideSources: state.epgSources,
+        guideRefreshMinutes: state.epgRefreshMinutes,
+        multiviewLayout: state.multiviewLayout,
         multiviewPresets: state.multiviewPresets,
-      };
+      });
       const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
@@ -2061,9 +2085,9 @@ async function handleAction(action, detail) {
         if (backup.settings?.proxy !== undefined) { state.proxy = String(backup.settings.proxy || ""); await catalog.setSetting("proxy", state.proxy); }
         if (Array.isArray(backup.settings?.guideSources)) state.epgSources = await epg.setSources(backup.settings.guideSources);
         if (backup.settings?.guideRefreshMinutes !== undefined) state.epgRefreshMinutes = await epg.setRefreshMinutes(backup.settings.guideRefreshMinutes);
-        state.multiviewPresets = [...state.multiviewPresets, ...(backup.multiviewPresets || [])].slice(-8);
-        writeLocalJson("catodo:multiview-presets", state.multiviewPresets);
-        updatePresetOptions(); renderAll(); ui.toast("Backup merged successfully.");
+        if (backup.settings?.multiviewLayout !== undefined) await persistMultiviewLayout(backup.settings.multiviewLayout);
+        await persistMultiviewPresets([...state.multiviewPresets, ...(backup.multiviewPresets || [])]);
+        renderAll(); ui.toast("Backup merged successfully.");
       } catch (error) { ui.toast(error.message || "Backup could not be restored.", { tone: "error" }); }
       finally { detail.target.value = ""; }
       break;
@@ -2155,8 +2179,7 @@ async function handleAction(action, detail) {
       break;
     }
     case "set-multiview-layout":
-      state.multiviewLayout = Math.max(2, Math.min(4, Number(detail.dataset.count) || 4));
-      writeLocalJson("catodo:multiview-layout", state.multiviewLayout);
+      await persistMultiviewLayout(detail.dataset.count);
       await openMultiview();
       break;
     case "save-multiview-preset": {
@@ -2164,9 +2187,9 @@ async function handleAction(action, detail) {
       const name = window.prompt("Preset name", `Multiview ${state.multiviewPresets.length + 1}`)?.trim();
       if (!name) break;
       const preset = { id: `preset-${Date.now()}`, name: name.slice(0, 40), layout: state.multiviewLayout, channelIds: state.multiviewFeeds.slice(0, state.multiviewLayout).map(channelId) };
-      state.multiviewPresets = [...state.multiviewPresets, preset].slice(-8);
+      state.multiviewPresets = [...state.multiviewPresets, preset];
       state.selectedMultiviewPresetId = preset.id;
-      writeLocalJson("catodo:multiview-presets", state.multiviewPresets); updatePresetOptions(); ui.toast("Multiview preset saved.");
+      await persistMultiviewPresets(state.multiviewPresets); ui.toast("Multiview preset saved.");
       break;
     }
     case "load-multiview-preset": {
@@ -2184,19 +2207,16 @@ async function handleAction(action, detail) {
       if (!preset) break;
       const name = window.prompt("Rename preset", preset.name)?.trim();
       if (!name) break;
-      state.multiviewPresets = renameMultiviewPreset(state.multiviewPresets, preset.id, name);
-      writeLocalJson("catodo:multiview-presets", state.multiviewPresets);
-      updatePresetOptions();
+      await persistMultiviewPresets(renameMultiviewPreset(state.multiviewPresets, preset.id, name));
       ui.toast("Multiview preset renamed.");
       break;
     }
     case "delete-multiview-preset": {
       const preset = findMultiviewPreset(state.multiviewPresets, state.selectedMultiviewPresetId);
       if (!preset || !window.confirm(`Delete the preset “${preset.name}”?`)) break;
-      state.multiviewPresets = deleteMultiviewPreset(state.multiviewPresets, preset.id);
+      const remainingPresets = deleteMultiviewPreset(state.multiviewPresets, preset.id);
       state.selectedMultiviewPresetId = "";
-      writeLocalJson("catodo:multiview-presets", state.multiviewPresets);
-      updatePresetOptions();
+      await persistMultiviewPresets(remainingPresets);
       ui.toast("Multiview preset deleted.");
       break;
     }
@@ -2336,8 +2356,10 @@ async function boot() {
   document.documentElement.dir = i18n.direction;
 
   ui = mountAppUI(root, { t, onAction: (action, detail) => void handleAction(action, detail) });
-  state.multiviewLayout = Math.max(2, Math.min(4, Number(readLocalJson("catodo:multiview-layout", 4)) || 4));
-  state.multiviewPresets = readLocalJson("catodo:multiview-presets", []).filter((item) => item?.id && item?.name && Array.isArray(item.channelIds)).slice(-8);
+  const legacyMultiviewLayout = readLocalJson("catodo:multiview-layout", null);
+  state.multiviewLayout = normalizeMultiviewLayout(legacyMultiviewLayout);
+  const legacyMultiviewPresets = normalizeMultiviewPresets(readLocalJson("catodo:multiview-presets", []));
+  state.multiviewPresets = legacyMultiviewPresets;
   updatePresetOptions();
   ui.setCountryImportHandler((iso2) => {
     const country = importCountryModel(iso2 || state.activeCountry);
@@ -2364,6 +2386,21 @@ async function boot() {
     onSyncError: reportInstallationSyncError,
   });
   await catalog.init();
+  const layoutSync = resolveMultiviewLayoutSync(
+    await catalog.getSetting(MULTIVIEW_LAYOUT_SETTING, null),
+    legacyMultiviewLayout,
+  );
+  state.multiviewLayout = layoutSync.layout;
+  writeLocalJson("catodo:multiview-layout", state.multiviewLayout);
+  if (layoutSync.migrateLegacy) await catalog.setSetting(MULTIVIEW_LAYOUT_SETTING, state.multiviewLayout);
+  const presetSync = resolveMultiviewPresetSync(
+    await catalog.getSetting(MULTIVIEW_PRESETS_SETTING, null),
+    legacyMultiviewPresets,
+  );
+  state.multiviewPresets = presetSync.presets;
+  writeLocalJson("catodo:multiview-presets", state.multiviewPresets);
+  updatePresetOptions();
+  if (presetSync.migrateLegacy) await catalog.setSetting(MULTIVIEW_PRESETS_SETTING, state.multiviewPresets);
   state.proxy = await catalog.getSetting("proxy", "");
   epg = new EpgService({ catalog, proxy: proxyUrl });
   await epg.init();

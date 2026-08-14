@@ -93,7 +93,11 @@ require __DIR__ . '/installation-api.php';
       version: 2,
       sources: [{ sourceId: 'shared', name: 'Shared', url: 'https://example.test/list.m3u' }],
       favorites: ['channel:favorite'],
-      settings: { 'epg:refreshMinutes': 30 },
+      settings: {
+        'epg:refreshMinutes': 30,
+        'multiview:layout': 3,
+        'multiview:presets': [{ id: 'morning', name: 'Morning', layout: 2, channelIds: ['news', 'weather'] }],
+      },
     }),
   });
   assert.equal(saveResponse.status, 200);
@@ -102,6 +106,8 @@ require __DIR__ . '/installation-api.php';
   assert.equal(saved.migration.legacyInstallation, 'complete');
   assert.deepEqual(saved.sources.map((source) => source.sourceId), ['shared']);
   assert.deepEqual(saved.favorites.map((favorite) => favorite.channelId), ['channel:favorite']);
+  assert.deepEqual(saved.settings['multiview:presets'], [{ id: 'morning', name: 'Morning', layout: 2, channelIds: ['news', 'weather'] }]);
+  assert.equal(saved.settings['multiview:layout'], 3);
 
   const staleWrite = request(documentRoot, {
     method: 'PUT',

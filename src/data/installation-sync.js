@@ -1,5 +1,14 @@
+import {
+  MULTIVIEW_LAYOUT_SETTING,
+  MULTIVIEW_PRESETS_SETTING,
+  isValidMultiviewLayout,
+  isValidMultiviewPresets,
+  normalizeMultiviewLayout,
+  normalizeMultiviewPresets,
+} from './multiview-presets.js';
+
 const DEFAULT_ENDPOINT = './installation-api.php';
-const SYNC_SETTINGS = new Set(['proxy', 'epg:sources', 'epg:refreshMinutes']);
+const SYNC_SETTINGS = new Set(['proxy', 'epg:sources', 'epg:refreshMinutes', MULTIVIEW_PRESETS_SETTING, MULTIVIEW_LAYOUT_SETTING]);
 const MAX_EPG_SOURCES = 32;
 const EPG_REFRESH_INTERVALS = new Set([0, 30, 60, 360, 1440]);
 
@@ -45,7 +54,13 @@ export function installationPayload({ sources = [], favorites = [], settings = {
     version: 2,
     sources: sourceValues.map(cleanSource).filter(Boolean),
     favorites: favoriteValues.map(cleanFavorite).filter(Boolean),
-    settings: Object.fromEntries([...SYNC_SETTINGS].filter((key) => Object.prototype.hasOwnProperty.call(settingValues, key)).map((key) => [key, settingValues[key]])),
+    settings: Object.fromEntries([...SYNC_SETTINGS]
+      .filter((key) => Object.prototype.hasOwnProperty.call(settingValues, key))
+      .map((key) => [key, key === MULTIVIEW_PRESETS_SETTING
+        ? normalizeMultiviewPresets(settingValues[key])
+        : key === MULTIVIEW_LAYOUT_SETTING
+          ? normalizeMultiviewLayout(settingValues[key])
+          : settingValues[key]])),
     ...(migration ? { migration: cleanMigration(migration) } : {}),
   };
 }
@@ -94,6 +109,16 @@ export function assertSharedSetting(key, value) {
     if (!Number.isInteger(value) || !EPG_REFRESH_INTERVALS.has(value)) {
       throw syncError('Unsupported TV Guide refresh interval', { code: 'INVALID_SETTING' });
     }
+  } else if (key === MULTIVIEW_PRESETS_SETTING) {
+    if (!isValidMultiviewPresets(value)) {
+      throw syncError('Multiview accepts at most eight valid presets', { code: 'INVALID_SETTING' });
+    }
+    return normalizeMultiviewPresets(value);
+  } else if (key === MULTIVIEW_LAYOUT_SETTING) {
+    if (!isValidMultiviewLayout(value)) {
+      throw syncError('Multiview layout must contain between two and four feeds', { code: 'INVALID_SETTING' });
+    }
+    return value;
   }
   return value;
 }
@@ -137,6 +162,10 @@ function validResponseState(payload) {
   }
   if (Object.prototype.hasOwnProperty.call(settings, 'epg:refreshMinutes')
     && ![0, 30, 60, 360, 1440].includes(settings['epg:refreshMinutes'])) return false;
+  if (Object.prototype.hasOwnProperty.call(settings, MULTIVIEW_PRESETS_SETTING)
+    && !isValidMultiviewPresets(settings[MULTIVIEW_PRESETS_SETTING])) return false;
+  if (Object.prototype.hasOwnProperty.call(settings, MULTIVIEW_LAYOUT_SETTING)
+    && !isValidMultiviewLayout(settings[MULTIVIEW_LAYOUT_SETTING])) return false;
   return true;
 }
 

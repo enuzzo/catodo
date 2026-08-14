@@ -1,6 +1,6 @@
 # CATODO architecture
 
-This document is the maintainer map for CATODO 2.5.0. It describes the runtime
+This document is the maintainer map for CATODO 2.5.1. It describes the runtime
 boundaries, the data flow, and the invariants that should survive future UI and
 feature work. For operational procedures and failure symptoms, see
 [OPERATIONS.md](OPERATIONS.md).
@@ -92,7 +92,9 @@ to every authenticated browser:
 - approved playlist source descriptors;
 - favourite channel IDs;
 - catalog proxy URL;
-- XMLTV source URLs and refresh cadence.
+- XMLTV source URLs and refresh cadence;
+- validated Multiview presets (up to eight, with at most four channel IDs each)
+  and the preferred 2/3/4-feed layout.
 
 `installation-api.php` stores this in
 `.catodo-data/installation-state.json`. Version 2 state includes a server-owned

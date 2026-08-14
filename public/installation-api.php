@@ -46,9 +46,32 @@ function isListArray(mixed $value): bool {
     return is_array($value) && array_is_list($value);
 }
 
+function validMultiviewPresets(mixed $value): bool {
+    if (!isListArray($value) || count($value) > 8) return false;
+    $presetIds = [];
+    foreach ($value as $preset) {
+        if (!is_array($preset) || array_diff(array_keys($preset), ['id', 'name', 'layout', 'channelIds']) !== []) return false;
+        $id = $preset['id'] ?? null;
+        $name = $preset['name'] ?? null;
+        $layout = $preset['layout'] ?? null;
+        $channelIds = $preset['channelIds'] ?? null;
+        if (!is_string($id) || trim($id) === '' || strlen($id) > 128 || isset($presetIds[$id])) return false;
+        if (!is_string($name) || trim($name) === '' || strlen($name) > 160) return false;
+        if (!is_int($layout) || $layout < 2 || $layout > 4) return false;
+        if (!isListArray($channelIds) || count($channelIds) < 1 || count($channelIds) > 4) return false;
+        $seenChannels = [];
+        foreach ($channelIds as $channelId) {
+            if (!is_string($channelId) || trim($channelId) === '' || strlen($channelId) > 256 || isset($seenChannels[$channelId])) return false;
+            $seenChannels[$channelId] = true;
+        }
+        $presetIds[$id] = true;
+    }
+    return true;
+}
+
 function validSettings(mixed $value): bool {
     if (!is_array($value) || (array_is_list($value) && $value !== [])) return false;
-    $allowed = ['proxy', 'epg:sources', 'epg:refreshMinutes'];
+    $allowed = ['proxy', 'epg:sources', 'epg:refreshMinutes', 'multiview:presets', 'multiview:layout'];
     foreach (array_keys($value) as $key) if (!in_array($key, $allowed, true)) return false;
     if (array_key_exists('proxy', $value)) {
         if (!is_string($value['proxy']) || ($value['proxy'] !== '' && httpUrl($value['proxy']) === null)) return false;
@@ -60,6 +83,9 @@ function validSettings(mixed $value): bool {
     if (array_key_exists('epg:refreshMinutes', $value)) {
         if (!is_int($value['epg:refreshMinutes']) || !in_array($value['epg:refreshMinutes'], [0, 30, 60, 360, 1440], true)) return false;
     }
+    if (array_key_exists('multiview:presets', $value) && !validMultiviewPresets($value['multiview:presets'])) return false;
+    if (array_key_exists('multiview:layout', $value)
+        && (!is_int($value['multiview:layout']) || $value['multiview:layout'] < 2 || $value['multiview:layout'] > 4)) return false;
     return true;
 }
 
@@ -169,7 +195,7 @@ function cleanPayload(array $input): array {
         if (is_array($favorite) && isset($favorite['createdAt']) && (!is_int($favorite['createdAt']) || $favorite['createdAt'] < 0)) failJson(400, 'Invalid favorite record');
         $favorites[$id] = ['id' => $id, 'channelId' => $id, 'createdAt' => time() * 1000];
     }
-    $allowed = ['proxy', 'epg:sources', 'epg:refreshMinutes'];
+    $allowed = ['proxy', 'epg:sources', 'epg:refreshMinutes', 'multiview:presets', 'multiview:layout'];
     $inputSettings = is_array($input['settings'] ?? null) ? $input['settings'] : [];
     $settings = [];
     foreach ($allowed as $key) if (array_key_exists($key, $inputSettings)) $settings[$key] = $inputSettings[$key];

@@ -7,6 +7,7 @@ import {
   findMultiviewPreset,
   renameMultiviewPreset,
 } from '../../src/ui/multiview-preset-model.js';
+import { resolveMultiviewLayoutSync, resolveMultiviewPresetSync } from '../../src/data/multiview-presets.js';
 
 const presets = [
   { id: 'morning', name: 'Morning', layout: 2, channelIds: ['a', 'b'] },
@@ -45,4 +46,19 @@ test('a channel added from fullscreen replaces the first preset slot without dup
 
 test('Multiview keeps its existing fallback when there are no presets', () => {
   assert.equal(defaultMultiviewPresetState([], 'live-news'), null);
+});
+
+test('a new browser uses shared presets while an existing browser migrates its legacy presets once', () => {
+  assert.deepEqual(resolveMultiviewPresetSync(presets, []).presets, presets);
+  assert.equal(resolveMultiviewPresetSync(presets, []).migrateLegacy, false);
+  assert.deepEqual(resolveMultiviewPresetSync(null, presets).presets, presets);
+  assert.equal(resolveMultiviewPresetSync(null, presets).migrateLegacy, true);
+  assert.deepEqual(resolveMultiviewPresetSync([], presets).presets, []);
+  assert.equal(resolveMultiviewPresetSync([], presets).migrateLegacy, false);
+});
+
+test('Multiview layout follows the shared installation and only migrates an explicit legacy choice', () => {
+  assert.deepEqual(resolveMultiviewLayoutSync(3, 2), { layout: 3, migrateLegacy: false });
+  assert.deepEqual(resolveMultiviewLayoutSync(null, 2), { layout: 2, migrateLegacy: true });
+  assert.deepEqual(resolveMultiviewLayoutSync(null, null), { layout: 4, migrateLegacy: false });
 });

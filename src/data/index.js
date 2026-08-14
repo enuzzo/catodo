@@ -12,3 +12,5 @@ export * from "./search.js";
 export * from "./catalog-service.js";
 export * from "./source-presets.js";
 export * from "./installation-sync.js";
+export * from "./multiview-presets.js";
+export * from "./backup.js";

@@ -199,8 +199,10 @@ bridge for the allowlisted Italian EPG feeds. On the official host:
   another browser can see the change while this status is present.
 
 The canonical file is private server state. Do not edit it manually while the
-app is writing. There is currently no in-product backup/restore UI; back it up
-at the hosting layer before migration or major schema work.
+app is writing. The in-product configuration backup covers sources, Favorites,
+proxy and guide settings, plus Multiview presets/layout; browser caches,
+programme bodies and operational sync records remain excluded. Also back up the
+private server state at the hosting layer before migration or major schema work.
 
 ## Logo cache diagnosis
 

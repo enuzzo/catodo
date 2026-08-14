@@ -111,7 +111,7 @@
     "worldConsent": "Consent always required",
     "worldAction": "Review world import",
     "syncReady": "Shared library connected",
-    "syncReadyDetail": "Sources, Favorites and guide settings follow this installation.",
+    "syncReadyDetail": "Sources, Favorites, guide settings and Multiview setup follow this installation.",
     "syncPending": "Changes waiting to sync",
     "syncPendingDetail": "{count} change(s) are safely queued in this browser.",
     "syncHydrating": "Restoring shared channels",

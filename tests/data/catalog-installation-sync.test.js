@@ -6,6 +6,7 @@ import { CatalogService } from '../../src/data/catalog-service.js';
 import { COUNTRIES_API_URL } from '../../src/data/countries.js';
 import { openCatalogDb, put, replaceSourceSnapshot } from '../../src/data/db.js';
 import { installationPayload } from '../../src/data/installation-sync.js';
+import { MULTIVIEW_LAYOUT_SETTING, MULTIVIEW_PRESETS_SETTING } from '../../src/data/multiview-presets.js';
 
 const clone = (value) => structuredClone(value);
 
@@ -77,6 +78,41 @@ function storageFrom(entries) {
   const keys = Object.keys(entries);
   return { length: keys.length, key: (index) => keys[index], getItem: (key) => entries[key] ?? null };
 }
+
+test('a fresh browser hydrates Multiview presets saved by another browser', async () => {
+  const initialPreset = [{ id: 'morning', name: 'Morning', layout: 2, channelIds: ['news', 'weather'] }];
+  const updatedPresets = [...initialPreset, { id: 'sports', name: 'Sports', layout: 4, channelIds: ['one', 'two', 'three', 'four'] }];
+  const remote = new FakeInstallationSync({
+    settings: { [MULTIVIEW_PRESETS_SETTING]: initialPreset, [MULTIVIEW_LAYOUT_SETTING]: 2 },
+    migration: { legacyInstallation: 'complete', completedAt: 1 },
+  });
+  const firstBrowser = new CatalogService({
+    indexedDB: new IDBFactory(),
+    installationSync: remote,
+    autoEnrichMetadata: false,
+    fetchImpl: directoryFetch(),
+    localStorage: null,
+  });
+  await firstBrowser.init();
+  assert.deepEqual(await firstBrowser.getSetting(MULTIVIEW_PRESETS_SETTING), initialPreset);
+  await firstBrowser.setSetting(MULTIVIEW_PRESETS_SETTING, updatedPresets);
+  await firstBrowser.setSetting(MULTIVIEW_LAYOUT_SETTING, 4);
+  assert.deepEqual(remote.state.settings[MULTIVIEW_PRESETS_SETTING], updatedPresets);
+  assert.equal(remote.state.settings[MULTIVIEW_LAYOUT_SETTING], 4);
+  firstBrowser.destroy();
+
+  const freshBrowser = new CatalogService({
+    indexedDB: new IDBFactory(),
+    installationSync: new FakeInstallationSync(remote.state),
+    autoEnrichMetadata: false,
+    fetchImpl: directoryFetch(),
+    localStorage: null,
+  });
+  await freshBrowser.init();
+  assert.deepEqual(await freshBrowser.getSetting(MULTIVIEW_PRESETS_SETTING), updatedPresets);
+  assert.equal(await freshBrowser.getSetting(MULTIVIEW_LAYOUT_SETTING), 4);
+  freshBrowser.destroy();
+});
 
 test('first link merges an existing browser library into a valid empty installation', async () => {
   const indexedDB = new IDBFactory();

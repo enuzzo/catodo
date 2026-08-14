@@ -6,6 +6,9 @@ import {
   installationPayload,
   mergeInstallationPayloads,
 } from '../../src/data/installation-sync.js';
+import { MULTIVIEW_LAYOUT_SETTING, MULTIVIEW_PRESETS_SETTING } from '../../src/data/multiview-presets.js';
+
+const sharedPresets = [{ id: 'morning', name: 'Morning', layout: 2, channelIds: ['news', 'weather'] }];
 
 function serverState({ revision = 'r1', updatedAt = 0, ...overrides } = {}) {
   return {
@@ -24,13 +27,31 @@ test('installation payload keeps only shared settings and canonical source/favor
   assert.deepEqual(installationPayload({
     sources: [{ sourceId: 'one', url: 'https://example.test/list.m3u', name: 'One', trusted: true, createdAt: 12, activeSnapshotId: 'local-only' }],
     favorites: [{ channelId: 'channel:1', createdAt: 12 }],
-    settings: { proxy: 'https://proxy.test', 'epg:sources': ['https://guide.test/a.xml'], secret: 'nope' },
+    settings: { proxy: 'https://proxy.test', 'epg:sources': ['https://guide.test/a.xml'], [MULTIVIEW_PRESETS_SETTING]: sharedPresets, [MULTIVIEW_LAYOUT_SETTING]: 3, secret: 'nope' },
   }), {
     version: 2,
     sources: [{ sourceId: 'one', kind: 'url', name: 'One', url: 'https://example.test/list.m3u', trusted: true, createdAt: 12 }],
     favorites: [{ id: 'channel:1', channelId: 'channel:1', createdAt: 12 }],
-    settings: { proxy: 'https://proxy.test', 'epg:sources': ['https://guide.test/a.xml'] },
+    settings: { proxy: 'https://proxy.test', 'epg:sources': ['https://guide.test/a.xml'], [MULTIVIEW_PRESETS_SETTING]: sharedPresets, [MULTIVIEW_LAYOUT_SETTING]: 3 },
   });
+});
+
+test('installation sync rejects malformed shared Multiview presets', async () => {
+  const sync = new InstallationSync({ fetchImpl: async () => new Response(JSON.stringify(serverState({
+    revision: 'bad-presets',
+    updatedAt: 1,
+    settings: { [MULTIVIEW_PRESETS_SETTING]: [{ id: 'bad', name: 'Bad', layout: 8, channelIds: [] }] },
+  }))) });
+  await assert.rejects(sync.load(), (error) => error.code === 'INVALID_RESPONSE');
+});
+
+test('installation sync rejects an invalid shared Multiview layout', async () => {
+  const sync = new InstallationSync({ fetchImpl: async () => new Response(JSON.stringify(serverState({
+    revision: 'bad-layout',
+    updatedAt: 1,
+    settings: { [MULTIVIEW_LAYOUT_SETTING]: 5 },
+  }))) });
+  await assert.rejects(sync.load(), (error) => error.code === 'INVALID_RESPONSE');
 });
 
 test('installation sync loads and saves with same-origin credentials and revision guards', async () => {

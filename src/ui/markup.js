@@ -3626,7 +3626,7 @@ export function mountAppUI(root, options = {}) {
             ? 'restore-error'
             : baseStatus;
       const syncContent = {
-        synced: ['cloud-check', 'settings.syncReady', 'Shared library connected', 'settings.syncReadyDetail', 'Sources, Favorites and guide settings follow this installation.'],
+        synced: ['cloud-check', 'settings.syncReady', 'Shared library connected', 'settings.syncReadyDetail', 'Sources, Favorites, guide settings and Multiview setup follow this installation.'],
         pending: ['cloud-arrow-up', 'settings.syncPending', 'Changes waiting to sync', 'settings.syncPendingDetail', '{count} change(s) are safely queued in this browser.'],
         hydrating: ['cloud-arrow-down', 'settings.syncHydrating', 'Restoring shared channels', 'settings.syncHydratingDetail', '{count} playlist(s) are being downloaded on this browser.'],
         'restore-error': ['warning-circle', 'settings.restoreError', 'Some playlists could not be restored', 'settings.restoreErrorDetail', '{count} saved playlist(s) could not be downloaded on this browser. Shared storage is still connected.'],

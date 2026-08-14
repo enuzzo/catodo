@@ -1,4 +1,4 @@
-# CATODO 2.5.0
+# CATODO 2.5.1
 
 <img src="public/icons/catodo-netmilk-tv-transparent-512.png" alt="CATODO horned CRT" width="150" align="right">
 
@@ -55,7 +55,7 @@ Publicly listed does not automatically mean universally licensed in every jurisd
 
 ## Data and privacy
 
-On the authenticated PHP installation, approved playlist sources, favourites, proxy configuration, and TV Guide source/cadence settings are canonical installation data and follow the user across browsers. IndexedDB remains a fast per-browser catalog/cache and refreshes any installation source that is new to that browser. A server-owned migration marker allows exactly one automatic merge of retained legacy browser data before the server becomes canonical; later retained data is offered as an explicit recovery instead of silently resurrecting deleted records. Shared changes use a persistent browser outbox, survive reloads and remain visibly pending after network failures. Static deployments without the PHP endpoints continue to use browser-only IndexedDB.
+On the authenticated PHP installation, approved playlist sources, favourites, proxy configuration, TV Guide source/cadence settings, and Multiview presets/layout are canonical installation data and follow the user across browsers. IndexedDB remains a fast per-browser catalog/cache and refreshes any installation source that is new to that browser. Existing browser-only Multiview presets and an explicitly chosen layout migrate once when the updated browser reconnects. A server-owned migration marker allows exactly one automatic merge of retained legacy browser data before the server becomes canonical; later retained data is offered as an explicit recovery instead of silently resurrecting deleted records. Shared changes use a persistent browser outbox, survive reloads and remain visibly pending after network failures. Static deployments without the PHP endpoints continue to use browser-only IndexedDB.
 
 Remote channel logos are requested through an authenticated same-origin cache on the private installation. The cache accepts HTTPS images only, enforces public-host resolution, bounded redirects, supported image MIME types, and a 2 MB limit; it is not a general-purpose proxy. This improves durability and avoids every browser hotlinking separately, but does not change copyright or trademark ownership of third-party logos. If the cache cannot fetch a logo, the UI tries the original URL and then its text fallback.
 

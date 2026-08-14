@@ -233,19 +233,19 @@ export class CatalogService {
       await put(this.#db, "settings", { key, value, updatedAt: Date.now() });
       return value;
     }
-    assertSharedSetting(key, value);
-    const intent = this.#newInstallationIntent({ type: 'set-setting', key, value });
+    const sharedValue = assertSharedSetting(key, value);
+    const intent = this.#newInstallationIntent({ type: 'set-setting', key, value: sharedValue });
     const transaction = this.#db.transaction('settings', 'readwrite');
     const done = transactionDone(transaction);
     const store = transaction.objectStore('settings');
     const outboxRecord = await requestResult(store.get(OUTBOX_SETTING));
-    store.put({ key, value, updatedAt: Date.now() });
+    store.put({ key, value: sharedValue, updatedAt: Date.now() });
     const retained = this.#outboxValues(outboxRecord)
       .filter((entry) => !(entry.type === 'set-setting' && entry.key === key));
     this.#writeOutbox(store, [...retained, intent]);
     await done;
     await this.#syncPersistedIntent(intent.id);
-    return value;
+    return sharedValue;
   }
 
   async importCountry(code, { confirmed = false, ...options } = {}) {
