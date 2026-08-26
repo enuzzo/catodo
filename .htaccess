@@ -1,8 +1,7 @@
 # CATODO: real barrier in front of the site. index.php is the only entry
 # point: it shows a styled login, verifies it in PHP, then streams
-# app.html itself. app.html and .htpasswd are blocked from direct
-# requests below, so the only way to reach the player is through the
-# login.
+# the private app entry itself. Private files and the legacy app.html route
+# are blocked below, so the only way to reach the player is through login.
 
 DirectoryIndex index.php
 
@@ -18,7 +17,7 @@ AddType application/manifest+json .webmanifest
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteRule ^\.catodo-data(?:/|$) - [F,L]
+  RewriteRule ^(?:app\.html|\.catodo-data(?:/|$)|\.catodo-private(?:/|$)) - [F,L]
   RewriteCond %{HTTPS} off
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 </IfModule>

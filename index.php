@@ -6,9 +6,9 @@
  * and password against .htpasswd (the same bcrypt file gen-htpasswd.mjs
  * writes). On success it sets a signed cookie, not a PHP session, so it
  * keeps working regardless of the host's session garbage collection, and
- * streams app.html, the real player, which stays blocked from direct
- * requests by .htaccess. app.html's bytes only ever leave through this
- * file. Failed attempts are throttled per IP address in a local file, so
+ * streams the private app entry, which is stored outside the public static
+ * namespace and stays blocked from direct requests by .htaccess. Its bytes
+ * only ever leave through this file. Failed attempts are throttled per IP, so
  * clearing cookies does not reset the lockout.
  */
 
@@ -134,10 +134,10 @@ if (!$authed && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($authed) {
-    $app = @file_get_contents(__DIR__ . '/app.html');
+    $app = @file_get_contents(__DIR__ . '/.catodo-private/app.html');
     if ($app === false) {
         http_response_code(500);
-        echo 'app.html not found.';
+        echo 'CATODO application entry not found.';
         exit;
     }
     header('Content-Type: text/html; charset=utf-8');

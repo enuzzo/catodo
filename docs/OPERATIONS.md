@@ -51,21 +51,25 @@ production data source. Use real imported channels for playback validation.
    curl -sI https://catodo.app/installation-api.php
    curl -sI https://catodo.app/logo-cache.php
    curl -sI https://catodo.app/.catodo-data/installation-state.json
+   curl -sI https://catodo.app/.catodo-private/app.html
    curl -sI https://catodo.app/app.html
    curl -sI https://catodo.app/manifest.webmanifest
    curl -sI https://catodo.app/icons/apple-touch-icon-netmilk-180.png
    ```
 
-   Expected: authenticated services return `401`; private storage and direct
-   `app.html` return `403`; the manifest and touch icon return `200`.
+   Expected: authenticated services return `401`; private storage, the private
+   app entry and legacy `app.html` route return `403`; the manifest and touch
+   icon return `200`.
 8. Sign in normally and verify that the built app loads. The official deployment
    is SiteGround; GitHub Pages is intentionally not the release target.
 9. On a real iPhone or iPad, use Share → **Add to Home Screen**, confirm the CRT
    icon is sharp and centered, then launch it and verify standalone navigation,
    safe-area padding, playback and return behavior.
 
-The deploy script uploads protective `.htaccess` and the versioned PHP login
-gate before `dist/`. It does not delete the remote directory, `.htpasswd`, login
+The build moves the player shell to `dist/.catodo-private/app.html`, outside the
+public static namespace. The deploy script uploads protective `.htaccess` and
+the versioned PHP login gate before `dist/`, then removes any legacy public
+`app.html`. It does not delete the remote directory, `.htpasswd`, login
 bookkeeping or `.catodo-data/`.
 
 `package.json` is the only version source of truth. Vite injects it into the

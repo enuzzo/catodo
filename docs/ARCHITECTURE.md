@@ -1,6 +1,6 @@
 # CATODO architecture
 
-This document is the maintainer map for CATODO 2.7.0. It describes the runtime
+This document is the maintainer map for CATODO 2.7.1. It describes the runtime
 boundaries, the data flow, and the invariants that should survive future UI and
 feature work. For operational procedures and failure symptoms, see
 [OPERATIONS.md](OPERATIONS.md).
@@ -44,7 +44,7 @@ deployment is the SiteGround root installation.
 | `src/player/` | HLS lifecycle, endpoint fallback, multiview audio and telemetry | `tuned` is not proof that a first frame or audio was decoded |
 | `src/epg/` | XMLTV fetch, cache, parsing and channel schedule matching | Guide URLs require user approval; large universal feeds are unsuitable for the browser |
 | `public/*.php` | Installation-wide state and private logo cache | Both services require the signed login cookie |
-| `index.php` + `.htaccess` | Official deployment login gate | `app.html`, credentials and `.catodo-data/` must remain inaccessible directly |
+| `index.php` + `.htaccess` | Official deployment login gate | The private app entry, credentials and `.catodo-data/` must remain inaccessible directly |
 | `worker.js` | Optional stream proxy and HLS URI rewriting | This is not an anonymous general-purpose proxy |
 
 ## Catalog and identity
@@ -278,7 +278,8 @@ has a reduced-motion path and must not delay data initialization unnecessarily.
 
 `public/manifest.webmanifest` is the cross-platform Home Screen contract. It
 keeps the production start URL on `/`, because the authenticated PHP gate is the
-only legal entry point and direct access to `app.html` is denied. The manifest
+only legal entry point and the built player lives at the denied
+`.catodo-private/app.html` path. The manifest
 requests standalone display and provides 192, 512 and 1024 px square PNGs.
 
 `app.html` and the PHP login gate also declare Apple touch icons at 152, 167 and
@@ -296,7 +297,7 @@ Security invariants that must not be weakened:
 
 - every import, including a trusted preset, requires explicit consent;
 - playlist, XMLTV, metadata, logo and stream URLs are untrusted input;
-- `.htpasswd`, `app.html`, `.catodo-data/` and gate bookkeeping are not public;
+- `.htpasswd`, `.catodo-private/app.html`, `.catodo-data/` and gate bookkeeping are not public;
 - installation state and logo cache require the signed gate cookie;
 - proxy and logo redirects are validated at every hop;
 - URL/body/record limits remain enforced;

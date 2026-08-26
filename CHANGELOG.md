@@ -10,6 +10,12 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.7.1] - 2026-08-26
+
+### 🔐 Security
+
+- The production player shell now lives outside the public static root, preventing Nginx from bypassing the PHP login gate when serving `app.html` directly.
+
 ## [2.7.0] - 2026-08-26
 
 ### ✨ Added
@@ -179,7 +185,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.7.0...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.7.1...HEAD
+[2.7.1]: https://github.com/enuzzo/catodo/compare/v2.7.0...v2.7.1
 [2.7.0]: https://github.com/enuzzo/catodo/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/enuzzo/catodo/compare/v2.5.1...v2.6.0
 [2.5.1]: https://github.com/enuzzo/catodo/compare/v2.5.0...v2.5.1

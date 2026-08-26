@@ -27,6 +27,7 @@ try {
   await client.uploadFrom(resolve(root, ".htaccess"), ".htaccess");
   await client.uploadFrom(resolve(root, "index.php"), "index.php");
   await client.uploadFromDir(resolve(root, "dist"));
+  await client.remove("app.html", true);
   console.log("SiteGround upload complete: production bundle, authenticated PHP services and protected installation storage");
 } finally {
   client.close();
