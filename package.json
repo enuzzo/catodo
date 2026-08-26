@@ -1,6 +1,6 @@
 {
   "name": "catodo",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "description": "Tesla-first world TV explorer for user-approved public IPTV sources — zero bundled streams, zero DRM bypass, zero pezzotto.",
   "keywords": [
     "iptv",
@@ -25,7 +25,7 @@
   "bugs": {
     "url": "https://github.com/enuzzo/catodo/issues"
   },
-  "homepage": "https://catodo.netmilk.dev/",
+  "homepage": "https://catodo.app/",
   "type": "module",
   "scripts": {
     "dev": "vite",

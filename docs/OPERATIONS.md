@@ -48,12 +48,12 @@ production data source. Use real imported channels for playback validation.
 7. Verify the public security boundary without credentials:
 
    ```sh
-   curl -sI https://catodo.netmilk.dev/installation-api.php
-   curl -sI https://catodo.netmilk.dev/logo-cache.php
-   curl -sI https://catodo.netmilk.dev/.catodo-data/installation-state.json
-   curl -sI https://catodo.netmilk.dev/app.html
-   curl -sI https://catodo.netmilk.dev/manifest.webmanifest
-   curl -sI https://catodo.netmilk.dev/icons/apple-touch-icon-netmilk-180.png
+   curl -sI https://catodo.app/installation-api.php
+   curl -sI https://catodo.app/logo-cache.php
+   curl -sI https://catodo.app/.catodo-data/installation-state.json
+   curl -sI https://catodo.app/app.html
+   curl -sI https://catodo.app/manifest.webmanifest
+   curl -sI https://catodo.app/icons/apple-touch-icon-netmilk-180.png
    ```
 
    Expected: authenticated services return `401`; private storage and direct

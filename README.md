@@ -1,4 +1,4 @@
-# CATODO 2.6.0
+# CATODO 2.7.0
 
 <img src="public/icons/catodo-netmilk-tv-transparent-512.png" alt="CATODO horned CRT" width="150" align="right">
 
@@ -15,7 +15,7 @@
 > [!IMPORTANT]
 > **ZERO ILLEGAL. Zero pezzotto.** CATODO ships no channels, media, playlist snapshots, pirate subscriptions, credentials or DRM tricks. It is a player and discovery interface for external public directories and sources explicitly approved by the user. No decoderino sotto la TV, no guy on Telegram, no “trust me bro” annual renewal.
 
-[Open the official installation](https://catodo.netmilk.dev/) · [Read the changelog](CHANGELOG.md) · [See the roadmap](docs/ROADMAP.md)
+[Open the official installation](https://catodo.app/) · [Read the changelog](CHANGELOG.md) · [See the roadmap](docs/ROADMAP.md)
 
 CATODO is licensed under [AGPL-3.0-or-later](LICENSE).
 
@@ -83,7 +83,7 @@ The test suite covers catalogue parsing, import policy and migration, random sel
 
 ### SiteGround (official)
 
-The official hosted instance is [catodo.netmilk.dev](https://catodo.netmilk.dev/).
+The official hosted instance is [catodo.app](https://catodo.app/).
 It runs the Vite production bundle behind the repository's PHP login gate on
 SiteGround. GitHub Pages is intentionally disabled and the repository does not
 contain an automatic Pages deployment workflow.

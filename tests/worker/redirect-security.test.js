@@ -11,7 +11,7 @@ afterEach(() => {
 
 function proxyRequest(target, headers = {}) {
   return new Request("https://proxy.example/?url=" + encodeURIComponent(target), {
-    headers: { origin: "https://catodo.netmilk.dev", ...headers }
+    headers: { origin: "https://catodo.app", ...headers }
   });
 }
 
@@ -29,7 +29,7 @@ test("rejects a redirect to a denied host before fetching it", async () => {
 
   assert.equal(response.status, 400);
   assert.equal(await response.text(), "Host not allowed");
-  assert.equal(response.headers.get("access-control-allow-origin"), "https://catodo.netmilk.dev");
+  assert.equal(response.headers.get("access-control-allow-origin"), "https://catodo.app");
   assert.equal(calls.length, 1);
   assert.equal(calls[0].options.redirect, "manual");
 });

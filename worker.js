@@ -30,7 +30,7 @@
 //
 // Keep this explicit. A wildcard leaves the proxy open to every web origin.
 const ALLOWED_ORIGINS = new Set([
-  "https://catodo.netmilk.dev"
+  "https://catodo.app"
 ]);
 
 // Blocks anything that is not a plausible streaming host.

@@ -10,12 +10,15 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-08-26
+
 ### ✨ Added
 
 - EBU Breakout is now a playable keyboard, pointer and touch mini-game with real ball physics, brick collisions, score, lives, replay and a giant Rickroll victory screen.
 
 ### 🛠 Changed
 
+- The official CATODO installation, project links and proxy origin now use `https://catodo.app`.
 - Rickroll now uses transparent animated Rick Astley dancers, while Nyan Cow uses the supplied complete transparent Nyan Cat GIF without a duplicate CSS rainbow trail.
 - Explore's featured preview now uses a narrower 16:9 media stage, leaving more room for channel details and actions.
 
@@ -176,7 +179,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.6.0...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.7.0...HEAD
+[2.7.0]: https://github.com/enuzzo/catodo/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/enuzzo/catodo/compare/v2.5.1...v2.6.0
 [2.5.1]: https://github.com/enuzzo/catodo/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/enuzzo/catodo/compare/v2.4.0...v2.5.0
