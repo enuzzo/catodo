@@ -4,7 +4,9 @@
 
 The September UI/UX and agent-guidance work is complete. The user explicitly
 requested commit, push and live SiteGround deployment on 2026-09-20.
-Publication is in progress; the final outcome will be recorded below.
+Runtime release commit `c7bb0d8` was pushed to `origin/main` and deployed to
+SiteGround successfully. Live `version.json` and the authenticated UI both
+confirmed **2.8.0**. The documentation follow-up records that outcome.
 
 Start the next task with Git status, this note and the relevant route in
 [CODE-MAP.md](../CODE-MAP.md). Do not repeat the audit or reimport the global
@@ -33,10 +35,27 @@ owns the subsequent publication outcome. The same applies to the earlier
   square opaque RGB. Brand transparency regression tests passed.
 - Production bundle boot, version, lazy map and Settings verified on localhost.
   Prior detailed desktop/mobile interactions used the same runtime changes.
-- Commit/push and SiteGround publication pending; live checks will follow.
+- Commit `c7bb0d8` pushed to `main`; `npm run deploy:siteground` completed.
+- Unauthenticated curl checks: installation, logo and EPG APIs returned 401;
+  private installation state, private shell and legacy app.html returned 403;
+  manifest and Apple touch icon returned 200. Cache-busted version.json was 2.8.0.
+  Python urllib received 403 even on public metadata; curl and browser checks
+  established the expected behavior without weakening server rules.
+- Authenticated live UI restored the library and showed Shared library connected.
+  The existing world playlist was recognized; global search returned the expected
+  channel and was cleared afterward. No new source was imported.
+- Deejay TV and Rai Storia played with advancing video and decoded audio reported
+  by the browser. Volume 50/100 and mute were verified. Multiview audio moved
+  between the first two feeds with exactly one unmuted video; replacement and
+  player-to-Multiview return worked. Original preset was restored, no preset was
+  saved, and playback was left muted. The other two sample feeds did not establish
+  playback, so this is not four-provider availability acceptance.
+- Favorites remained present; add/remove persistence was not retested live.
+  Physical fullscreen, Tesla/iOS installation, physical audibility and device
+  performance remain outside this browser verification.
 
 No schema migration, credential rotation or provider reconfiguration is part of
-this release. The local build cannot verify PHP synchronization or live playback.
+this release. Local synthetic tests remain separate from the live checks above.
 
 ## Next product decision
 

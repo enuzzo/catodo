@@ -6,6 +6,10 @@ preserved. This pass covers navigation, Live, Explore, Library/search, Countries
 Guide, Settings and Multiview. New product ideas remain proposals in
 [ROADMAP.md](../ROADMAP.md).
 
+Publication follow-up: subsequently released as 2.8.0 at the user's request.
+See the [release handoff](2026-09-20-release-handoff.md) for commit, deployment
+and live checks. The local-only statements below describe this original audit.
+
 ## Audit findings and implemented work
 
 The design already has a recognizable visual identity, consistent channel

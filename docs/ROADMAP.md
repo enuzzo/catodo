@@ -39,7 +39,7 @@ features and detailed QA results are preserved in
 | ID | Priority | Proposal | Constraints |
 | --- | --- | --- | --- |
 | ENG-01 | P2 | Extract focused app controllers/UI renderers as product work touches them | Preserve persistent media and navigation; no blanket rewrite |
-| ENG-02 | P2 | Measure further Guide splitting and map geometry simplification | Map deferred in September local changes; initial app JS 1.58 MB → 357 KB. Remaining map chunk is 1.24 MB; measure actual timing and memory before more work |
+| ENG-02 | P2 | Measure further Guide splitting and map geometry simplification | Map deferred in 2.8.0; initial app JS 1.58 MB → 357 KB. Remaining map chunk is 1.24 MB; measure actual timing and memory before more work |
 | ENG-03 | P2 | Finish i18n extraction and generate the served locale from one source | September changes reconcile all existing English keys; both JSON mirrors must still be edited together |
 | ENG-04 | P2 | Repeatable browser/visual and manifest/icon checks in CI | Cover audio state, return paths, touch targets and mobile/tablet layout |
 | ENG-05 | Candidate | Timestamped/recoverable installation backups beyond manual export/import | Manual configuration export/import already exists; define retention/recovery separately |

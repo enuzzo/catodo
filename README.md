@@ -30,7 +30,9 @@ the version source of truth; maintainers prepare releases with
 - **Soft Signal Grid:** an editorial broadcast UI with electric-blue and EBU accents.
 - **Home Live Anchor:** when a cached catalog is available, the first tile at left starts muted and stays live while you explore. Use **Random** beside it to switch quickly to another playable channel.
 - **Explore collections:** Explore is a separate editorial surface built entirely from real catalog metadata. **All** shows eight-channel previews that can be randomized independently; category views expose the complete News, Sports, Movies, Music, Kids, Culture, or Local catalog with progressive loading and sorting by relevance, name, quality, or country.
-- **Signal Atlas:** explore every country exposed by the upstream catalog, with global search and country discovery.
+- **Library:** filter by genre and language, see shown/total counts, clear filters in one tap and search the complete catalog from the header.
+- **Signal Atlas:** explore every country exposed by the upstream catalog, with global search and country discovery. Map geometry loads on demand; worldwide imports contribute to its coverage highlights.
+- **Settings:** jump directly to connected playlists, TV Guide sources or backups. An already-connected world catalog shows its saved count and a Browse action.
 - **Country directories and guides:** load country channels progressively or reveal the complete filtered collection in one action. When enriched catalog metadata exposes listed XMLTV URLs, a country guide can be connected directly from its profile; the sources are saved in Settings and keep the existing refresh cadence.
 - **Country flags:** the Countries index and country detail use self-hosted SVG artwork from the MIT-licensed `flag-icons` collection, with an ISO-code fallback.
 - **Multiview:** 2-, 3-, or 4-feed layouts with a remembered four-feed default, renameable/deletable user presets, and exactly one selected audio feed.
@@ -59,14 +61,17 @@ On the authenticated PHP installation, approved playlist sources, favourites, pr
 
 Remote channel logos are requested through an authenticated same-origin cache on the private installation. The cache accepts HTTPS images only, enforces public-host resolution, bounded redirects, supported image MIME types, and a 2 MB limit; it is not a general-purpose proxy. This improves durability and avoids every browser hotlinking separately, but does not change copyright or trademark ownership of third-party logos. If the cache cannot fetch a logo, the UI tries the original URL and then its text fallback.
 
-The Italian TV Guide cache follows the same authenticated boundary and accepts only the eight documented Open EPG Italy URLs, with a 20 MB response ceiling and six-hour server cache. Vite provides the same narrow bridge during local development.
+The TV Guide cache follows the same authenticated boundary and permits only
+approved provider hosts and paths, including bounded country XML and compressed
+feeds. Vite supplies the corresponding development bridge. Current limits and
+failure handling belong to [the server guide](docs/SERVER.md).
 
 ## Local setup
 
 Requirements: a current browser with ES modules; Node.js for tests and development utilities. Playback additionally depends on browser HLS/MSE support and the codec, network, CORS, and geographic availability of each third-party source.
 
 ```sh
-npm install
+npm ci
 npm run dev
 ```
 
@@ -101,8 +106,8 @@ Deploy the generated `dist/` directory over HTTPS; Vite copies the authenticated
 PHP services from `public/` into that bundle. Do not publish the source tree as
 the application runtime. Maintainers with a local `.env` can publish these
 runtime artifacts with `npm run deploy:siteground`; the script updates the
-versioned access rules while leaving the existing login endpoint and credentials
-untouched. The PHP runtime creates private `.catodo-data/` state/cache files,
+versioned access rules and PHP login gate while preserving credentials and
+private server data. The PHP runtime creates private `.catodo-data/` state/cache files,
 which must remain blocked from HTTP access and preserved across deploys.
 
 ### Cloudflare Worker proxy (optional)
@@ -112,7 +117,7 @@ which must remain blocked from HTTP access and preserved across deploys.
 ## Limits and compatibility
 
 - Tesla/in-car Chromium variants have constrained CPU, memory, MSE, and codec support. A stream that works in VLC may still fail in the browser.
-- Multiview starts multiple independent decoders. Four feeds are the product default and have been validated on the target Tesla installation; individual vehicles, codecs, thermal conditions, or networks can still reduce capacity. CATODO never silently downgrades the layout and keeps one audio feed to reduce noise, not decoder load.
+- Multiview starts multiple independent decoders. Four feeds are the product default; earlier device results do not establish compatibility for every release or vehicle. Codecs, thermal conditions and networks can reduce capacity. CATODO never silently downgrades the layout and keeps one audio feed to reduce noise, not decoder load.
 - HLS, codecs, CORS policy, mixed-content blocking, hotlink protection, and geoblocking are controlled by external sources and may change without notice.
 - The analog boot sequence is decorative, uses lightweight CSS transforms and respects reduced-motion preferences.
 
@@ -137,6 +142,8 @@ Treat every imported playlist and stream endpoint as untrusted input. Read [SECU
 ## Maintainer documentation
 
 - [Documentation index](docs/README.md): choose the right guide for the task.
+- [Latest release handoff](docs/work/2026-09-20-release-handoff.md): publication,
+  verification limits and where to resume product work.
 - [Agent instructions](AGENTS.md): repository rules and scoped working guides.
 - [Code map](docs/CODE-MAP.md) and [test map](docs/TESTING.md): implementation
   entry points, neighboring checks and evidence limits.
@@ -145,6 +152,6 @@ Treat every imported playlist and stream endpoint as untrusted input. Read [SECU
   installation synchronization, EPG, security invariants and pressure points.
 - [Operations and gotchas](docs/OPERATIONS.md): development, release, migration
   and symptom-oriented troubleshooting.
-- [Roadmap](docs/ROADMAP.md): shipped scope, remaining validation and future work.
+- [Roadmap](docs/ROADMAP.md): remaining validation and proposed future work.
 - [Independent review brief](docs/REVIEW_BRIEF.md): scope and output contract for
   code, product and UI/UX inspections.

@@ -25,7 +25,7 @@ requirement to read this entire directory before editing a file.
   point for September publication, verification and remaining product decisions.
 - [Completed local UI/UX review](work/2026-09-20-ui-ux-review.md) records the
   September audit, implemented refinements, bundle measurements and evidence
-  limits. Publication is a separate step.
+  limits. The release handoff records its subsequent publication in 2.8.0.
 - [Completed agent-guidance checkpoint](work/2026-09-20-agent-guidance.md) records
   the reorganization and its final local verification.
 - [August roadmap and validation evidence](history/2026-08-roadmap.md) preserves

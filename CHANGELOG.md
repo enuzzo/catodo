@@ -18,7 +18,7 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 - Reordered Settings around connected playlists, guide sources and backups, added section shortcuts, and replaced the repeated world-import offer with the saved source's actual count when already connected.
 - Deferred world-map geometry until Countries is opened, while keeping a compact offline country directory available at startup.
 - Improved mobile navigation context, keyboard menu dismissal, Live channel details, touch targets and country-table containment; synchronized existing English locale keys without dropping either mirror's copy.
-- Reorganized maintainer guidance into task-based agent instructions, code/test maps and a focused open roadmap; preserved earlier plans and validation as explicitly historical references.
+- Reorganized maintainer guidance into task-based agent instructions, code/test maps and a focused open roadmap; refreshed README setup/deployment guidance, added a release handoff and preserved earlier plans and validation as explicitly historical references.
 
 ### 🐛 Fixed
 

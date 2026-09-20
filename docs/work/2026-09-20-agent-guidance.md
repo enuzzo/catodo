@@ -3,6 +3,10 @@
 Date: 2026-09-20. Scope: repository documentation and working instructions.
 Status: complete; the Dropbox verification blocker is resolved.
 
+Publication follow-up: this documentation was included in release 2.8.0.
+See the [release handoff](2026-09-20-release-handoff.md). Statements below about
+no publication refer to the original documentation-only task.
+
 ## Final verification
 
 - Git and dependency directories now report zero online-only files. Git status

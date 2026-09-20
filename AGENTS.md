@@ -52,6 +52,9 @@ cover files outside the subtree where the guide lives.
 
 - `package.json` is the only application version source. For user-visible
   changes, add a concise `CHANGELOG.md` entry under `Unreleased` in the same change.
+- Keep documentation current in the same task: update README when setup,
+  capabilities or usage change, plus affected architecture, operations, test
+  maps and roadmap status. Leave a linked handoff for substantial work.
 - Prepare releases with `npm run release -- X.Y.Z`; never manually change
   splash, login or documentation version strings. Use SemVer: compatible fix =
   patch, compatible feature = minor, breaking change = major.
