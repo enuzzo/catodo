@@ -1,4 +1,4 @@
-# CATODO 2.7.1
+# CATODO 2.8.0
 
 <img src="public/icons/catodo-netmilk-tv-transparent-512.png" alt="CATODO horned CRT" width="150" align="right">
 
@@ -77,7 +77,7 @@ npm test
 npm run check
 ```
 
-The test suite covers catalogue parsing, import policy and migration, random selection, and player/multiview behaviour. `npm run check` performs syntax checks.
+The test suite covers catalogue parsing, import policy and migration, random selection, and player/multiview behaviour. `npm run check` performs JavaScript syntax and release-metadata consistency checks.
 
 ## Deployment
 
@@ -135,6 +135,11 @@ Runtime dependencies are pinned and vendored: hls.js, Phosphor Icons, SVG Maps W
 Treat every imported playlist and stream endpoint as untrusted input. Read [SECURITY.md](SECURITY.md) for the reporting process and deployment guidance.
 
 ## Maintainer documentation
+
+- [Documentation index](docs/README.md): choose the right guide for the task.
+- [Agent instructions](AGENTS.md): repository rules and scoped working guides.
+- [Code map](docs/CODE-MAP.md) and [test map](docs/TESTING.md): implementation
+  entry points, neighboring checks and evidence limits.
 
 - [Architecture](docs/ARCHITECTURE.md): runtime boundaries, data model, playback,
   installation synchronization, EPG, security invariants and pressure points.

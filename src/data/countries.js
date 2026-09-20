@@ -1,5 +1,5 @@
 import { get, put } from "./db.js";
-import worldMap from "../../assets/vendor/map/world-map.js";
+import { COUNTRY_NAMES } from "./country-names.js";
 
 export const COUNTRIES_API_URL = "https://iptv-org.github.io/api/countries.json";
 const FALLBACK_LANGUAGES = Object.freeze({
@@ -8,11 +8,11 @@ const FALLBACK_LANGUAGES = Object.freeze({
   CA: ["eng", "fra"], MX: ["spa"], AR: ["spa"], AU: ["eng"], JP: ["jpn"],
 });
 export const FALLBACK_COUNTRIES = Object.freeze(
-  worldMap.locations
-    .map((item) => ({
-      code: String(item.id || "").toUpperCase(),
-      name: item.name,
-      languages: FALLBACK_LANGUAGES[String(item.id || "").toUpperCase()] || [],
+  COUNTRY_NAMES
+    .map(([code, name]) => ({
+      code,
+      name,
+      languages: FALLBACK_LANGUAGES[code] || [],
     }))
     .filter((item) => /^[A-Z]{2}$/.test(item.code) && item.name)
     .sort((left, right) => left.name.localeCompare(right.name)),

@@ -18,6 +18,7 @@ import { legacyInstallationPayload, migrateLegacyStorage } from "./migration.js"
 import { loadCountries } from "./countries.js";
 import { randomPlayable, randomWorld, countryStats } from "./randomizer.js";
 import { CatalogSearch, searchChannels } from "./search.js";
+import { channelCategories } from "./channel-categories.js";
 import {
   enrichPersistedChannelMetadata,
   enrichPersistedChannelSafety,
@@ -458,7 +459,7 @@ export class CatalogService {
     const contains = (values, expected) => !expected || values?.some((value) => value.toLocaleLowerCase("en-US") === String(expected).toLocaleLowerCase("en-US"));
     if (filters.country) channels = channels.filter((channel) => contains(channel.countries, filters.country));
     if (filters.language) channels = channels.filter((channel) => contains(channel.languages, filters.language));
-    if (filters.category) channels = channels.filter((channel) => contains(channel.categories, filters.category) || contains(channel.categoryNames, filters.category));
+    if (filters.category) channels = channels.filter((channel) => contains(channelCategories(channel), filters.category));
     if (filters.source) {
       const source = String(filters.source).toLocaleLowerCase("en-US");
       channels = channels.filter((channel) => channel.sources?.includes(filters.source) || channel.sourceNames?.some((name) => name.toLocaleLowerCase("en-US") === source));

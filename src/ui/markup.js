@@ -1,4 +1,5 @@
-import { renderCountryShape, renderWorldMap } from './world-map.js';
+import { renderCountryShape, renderWorldMap } from './lazy-world-map.js';
+import { connectedWorldSource } from './source-settings-model.js';
 import { isPrimaryNavActive, shouldActivateShellView } from './view-mode.js';
 import { EXPLORE_CATEGORIES } from './explore-model.js';
 import { featuredChannelIdentity } from './channel-identity.js';
@@ -22,6 +23,8 @@ const VIEW_NAMES = ['home', 'explore', 'countries', 'guide', 'library', 'sources
 const MULTIVIEW_SIZE = 4;
 const CATODO_LOGO_URL = './icons/catodo-netmilk-tv-transparent-512.png';
 const mountedApps = new WeakMap();
+const countFormatter = new Intl.NumberFormat('en');
+const formatCount = (value) => countFormatter.format(Math.max(0, Number(value) || 0));
 
 function translate(t, key, fallback, vars = {}) {
   let value;
@@ -500,9 +503,9 @@ function createHeader(t) {
     navButtons[view] = button;
   });
   const more = element('div', 'primary-nav__more');
-  const moreSummary = element('button', 'primary-nav__item', { type: 'button', dataset: { action: 'toggle-more-menu' }, 'aria-expanded': 'false' });
+  const moreSummary = element('button', 'primary-nav__item', { type: 'button', dataset: { action: 'toggle-more-menu' }, 'aria-expanded': 'false', 'aria-controls': 'primary-nav-overflow' });
   moreSummary.append(textNode('span', null, t, 'nav.more', 'More'), icon('caret-down'));
-  const moreMenu = element('div', 'primary-nav__more-menu', { hidden: true });
+  const moreMenu = element('div', 'primary-nav__more-menu', { id: 'primary-nav-overflow', hidden: true });
   [['guide', 'calendar-blank', 'nav.guide', 'TV Guide'], ['library', 'books', 'nav.library', 'Library'], ['sources', 'gear-six', 'nav.settings', 'Settings']].forEach(([view, iconName, key, fallback]) => {
     const button = actionButton({ t, action: 'navigate', iconName, key, fallback, className: 'button--ghost', dataset: { view } });
     moreMenu.append(button);
@@ -1298,7 +1301,7 @@ function createLibraryView(t) {
   header.append(copy, actions);
 
   const toolbar = element('div', 'library-toolbar');
-  const title = textNode('h2', null, t, 'library.channels', 'Saved channels');
+  const title = textNode('h2', null, t, 'library.channels', 'Channel directory');
   const filters = element('div', 'library-toolbar__filters');
   const searchWrap = element('label', 'field field--icon');
   searchWrap.append(icon('magnifying-glass'));
@@ -1328,6 +1331,11 @@ function createLibraryView(t) {
   favorites.setAttribute('aria-pressed', 'false');
   filters.append(searchWrap, category, language, favorites);
   toolbar.append(title, filters);
+  const results = element('div', 'library-results');
+  const resultCount = element('p', 'library-results__count', { role: 'status', 'aria-live': 'polite', 'aria-atomic': 'true' });
+  const clearFilters = actionButton({ t, action: 'clear-library-filters', iconName: 'x', key: 'library.clearFilters', fallback: 'Clear filters', className: 'button--ghost button--small' });
+  clearFilters.hidden = true;
+  results.append(resultCount, clearFilters);
   const grid = element('div', 'channel-grid channel-grid--library');
   const loadMore = actionButton({
     t,
@@ -1343,8 +1351,8 @@ function createLibraryView(t) {
   const recentGrid = element('div', 'channel-grid library-recent__grid');
   recent.append(recentGrid);
   recent.hidden = true;
-  view.append(header, recent, toolbar, grid, loadMore);
-  return { view, stats: statNodes, search, category, language, favorites, recent, recentGrid, grid, loadMore };
+  view.append(header, recent, toolbar, results, grid, loadMore);
+  return { view, title, stats: statNodes, search, category, language, favorites, recent, recentGrid, grid, loadMore, resultCount, clearFilters };
 }
 
 function createGuideView(t) {
@@ -1361,7 +1369,7 @@ function createGuideView(t) {
   });
   const configure = actionButton({
     t, action: 'navigate', iconName: 'gear', key: 'guide.configure', fallback: 'Guide settings', className: 'button--ghost',
-    dataset: { view: 'sources' },
+    dataset: { view: 'sources', section: 'guide' },
   });
   const actions = element('div', 'page-heading__actions');
   actions.append(configure, refresh);
@@ -1599,14 +1607,16 @@ function createSourcesView(t) {
   const worldIcon = element('div', 'world-catalog-callout__icon');
   worldIcon.append(icon('globe-hemisphere-west'));
   const worldCopy = element('div', 'world-catalog-callout__copy');
+  const worldEyebrow = textNode('p', 'eyebrow', t, 'settings.worldEyebrow', 'Ready-to-import default');
+  const worldBody = textNode('p', null, t, 'settings.worldBody', 'Import the complete public directory in one step. Add other playlists later: matching channels and identical stream endpoints are merged automatically.');
   worldCopy.append(
-    textNode('p', 'eyebrow', t, 'settings.worldEyebrow', 'Ready-to-import default'),
+    worldEyebrow,
     textNode('h2', null, t, 'settings.worldTitle', 'World catalog · all countries'),
-    textNode('p', null, t, 'settings.worldBody', 'Import the complete public directory in one step. Add other playlists later: matching channels and identical stream endpoints are merged automatically.'),
+    worldBody,
   );
   const worldFacts = element('div', 'world-catalog-callout__facts');
   [
-    ['broadcast', 'settings.worldChannels', '12,000+ public channels'],
+    ['broadcast', 'settings.worldChannels', 'Public channels · all countries'],
     ['arrows-merge', 'settings.worldDedup', 'Automatic deduplication'],
     ['shield-check', 'settings.worldConsent', 'Consent always required'],
   ].forEach(([iconName, key, fallback]) => {
@@ -1626,7 +1636,7 @@ function createSourcesView(t) {
   });
   worldCatalog.append(worldIcon, worldCopy, worldAction);
 
-  const guideSettings = element('section', 'panel guide-settings');
+  const guideSettings = element('section', 'panel guide-settings', { id: 'settings-guide', tabIndex: -1 });
   const guideHeader = element('div', 'guide-settings__header');
   const guideTitle = element('div');
   guideTitle.append(
@@ -1712,7 +1722,7 @@ function createSourcesView(t) {
   guideForm.append(advanced, cadenceLabel, consent, formFooter);
   guideSettings.append(guideHeader, provider, sourceManager, guideForm);
 
-  const layout = element('div', 'sources-layout');
+  const layout = element('div', 'sources-layout', { id: 'settings-playlists', tabIndex: -1 });
   const sourcePanel = element('section', 'panel sources-panel');
   const sourceHeader = createSectionTitle(
     t,
@@ -1775,7 +1785,7 @@ function createSourcesView(t) {
   proxyForm.append(proxyLabel, proxyFooter);
   guide.append(guideList, proxyForm);
   layout.append(sourcePanel, guide);
-  const backup = element('section', 'panel backup-settings');
+  const backup = element('section', 'panel backup-settings', { id: 'settings-backup', tabIndex: -1 });
   const backupCopy = element('div');
   backupCopy.append(
     textNode('p', 'eyebrow', t, 'backup.eyebrow', 'Portable setup'),
@@ -1791,10 +1801,24 @@ function createSourcesView(t) {
     importLabel,
   );
   backup.append(backupCopy, backupActions);
-  view.append(heading, syncStatus, worldCatalog, guideSettings, backup, layout);
+  const sectionNav = element('nav', 'settings-sections', { 'aria-label': translate(t, 'settings.sections', 'Settings sections') });
+  [
+    ['playlists', 'stack', 'sources.connected', 'Connected playlists'],
+    ['guide', 'calendar-blank', 'guide.settingsTitle', 'TV Guide sources'],
+    ['backup', 'download-simple', 'backup.title', 'Data & backup'],
+  ].forEach(([section, iconName, key, fallback]) => {
+    sectionNav.append(actionButton({ t, action: 'settings-section', iconName, key, fallback, className: 'button--ghost', dataset: { section } }));
+  });
+  view.append(heading, syncStatus, sectionNav, worldCatalog, layout, guideSettings, backup);
   return {
     view,
     list,
+    sections: { playlists: layout, guide: guideSettings, backup },
+    worldCatalog,
+    worldEyebrow,
+    worldBody,
+    worldFacts,
+    worldAction,
     proxyForm,
     proxyInput,
     guideInput,
@@ -2672,10 +2696,12 @@ function renderCountryRows(container, countries, t, selectedIso2) {
     code.textContent = iso2;
     const countryName = element('span', 'country-row__name');
     countryName.textContent = name;
-    countryCell.append(countryFlag(iso2, name, 'country-row__flag'), code, countryName);
+    const identity = element('div', 'country-row__identity');
+    identity.append(countryFlag(iso2, name, 'country-row__flag'), code, countryName);
+    countryCell.append(identity);
 
     const countCell = element('td');
-    countCell.textContent = safeText(country?.channelCount ?? country?.channels ?? 0);
+    countCell.textContent = formatCount(country?.channelCount ?? country?.channels ?? 0);
     const stateCell = element('td');
     stateCell.append(icon(imported ? 'check-circle' : 'circle'));
     stateCell.append(textNode(
@@ -2727,7 +2753,7 @@ function renderSources(container, sources, t) {
     host.textContent = safeText(source?.host || source?.url);
     const meta = element('div', 'source-row__meta');
     meta.append(textNode('span', null, t, 'sources.channelCount', '{count} channels', {
-      count: safeText(source?.channelCount ?? source?.channels ?? 0),
+      count: formatCount(source?.channelCount ?? source?.channels ?? 0),
     }));
     meta.append(textNode(
       'span',
@@ -2758,6 +2784,12 @@ function setLibrarySelectOptions(select, values, allLabel, selected) {
   const optionValues = [...new Set(normaliseArray(values)
     .map((value) => safeText(value).trim())
     .filter(Boolean))];
+  const signature = JSON.stringify([allLabel, optionValues]);
+  if (select.dataset.optionsSignature === signature) {
+    select.value = safeText(selected);
+    return;
+  }
+  select.dataset.optionsSignature = signature;
   const options = [element('option')];
   options[0].value = '';
   options[0].textContent = allLabel;
@@ -3308,8 +3340,27 @@ export function mountAppUI(root, options = {}) {
   };
   explore.view.addEventListener('scroll', loadMoreExploreNearEnd, { passive: true });
 
+  const setMoreMenuOpen = (open, restoreFocus = false) => {
+    header.moreMenu.hidden = !open;
+    header.moreSummary.setAttribute('aria-expanded', String(open));
+    if (restoreFocus) header.moreSummary.focus();
+  };
+  const dismissMoreMenu = (event) => {
+    if (!header.more.contains(event.target)) setMoreMenuOpen(false);
+  };
+  const escapeMoreMenu = (event) => {
+    if (event.key === 'Escape' && !header.moreMenu.hidden) {
+      event.preventDefault();
+      setMoreMenuOpen(false, true);
+    }
+  };
+  root.addEventListener('click', dismissMoreMenu);
+  root.addEventListener('focusin', dismissMoreMenu);
+  root.addEventListener('keydown', escapeMoreMenu);
+
   const activateShellView = (name) => {
     const viewName = VIEW_NAMES.includes(name) ? name : 'home';
+    if (viewName !== activeShellView) setMoreMenuOpen(false);
     activeShellView = viewName;
     Object.entries(views).forEach(([key, node]) => setViewVisible(node, key === viewName));
     setViewVisible(player.overlay, false);
@@ -3320,7 +3371,20 @@ export function mountAppUI(root, options = {}) {
     Object.entries(header.navButtons).forEach(([key, button]) => {
       const active = isPrimaryNavActive(key, viewName);
       button.classList.toggle('is-active', active);
-      button.toggleAttribute('aria-current', active);
+      if (active) button.setAttribute('aria-current', 'page');
+      else button.removeAttribute('aria-current');
+    });
+    const overflowLabels = { guide: ['nav.guide', 'TV Guide'], library: ['nav.library', 'Library'], sources: ['nav.settings', 'Settings'] };
+    const overflowLabel = overflowLabels[viewName];
+    header.moreSummary.classList.toggle('is-active', Boolean(overflowLabel));
+    header.moreSummary.querySelector('span').textContent = overflowLabel
+      ? translate(t, ...overflowLabel)
+      : translate(t, 'nav.more', 'More');
+    header.moreMenu.querySelectorAll('[data-view]').forEach((button) => {
+      const active = button.dataset.view === viewName;
+      button.classList.toggle('is-active', active);
+      if (active) button.setAttribute('aria-current', 'page');
+      else button.removeAttribute('aria-current');
     });
     header.settings.classList.toggle('is-active', viewName === 'sources');
     header.settings.setAttribute('aria-current', viewName === 'sources' ? 'page' : 'false');
@@ -3328,6 +3392,15 @@ export function mountAppUI(root, options = {}) {
   };
 
   const api = {
+    setMoreMenuOpen,
+    focusSettingsSection(name) {
+      const section = sources.sections[name];
+      if (section) {
+        const top = section.getBoundingClientRect().top - sources.view.getBoundingClientRect().top + sources.view.scrollTop - 18;
+        sources.view.scrollTo({ top: Math.max(0, top) });
+        section.focus({ preventScroll: true });
+      }
+    },
     refs: {
       root,
       shell,
@@ -3398,7 +3471,8 @@ export function mountAppUI(root, options = {}) {
         Object.entries(header.navButtons).forEach(([key, button]) => {
           const active = key === state.activeNav;
           button.classList.toggle('is-active', active);
-          button.toggleAttribute('aria-current', active);
+          if (active) button.setAttribute('aria-current', 'page');
+          else button.removeAttribute('aria-current');
         });
       }
       if (state.time !== undefined) {
@@ -3496,7 +3570,7 @@ export function mountAppUI(root, options = {}) {
         );
       }
       setTranslatedText(home.liveCount, t, 'home.liveCount', '{count} LIVE', {
-        count: safeText(state.liveCount ?? state.totalLive ?? channels.length),
+        count: formatCount(state.liveCount ?? state.totalLive ?? channels.length),
       });
       setTranslatedText(home.countryCount, t, 'home.countryCount', '{count} COUNTRIES', {
         count: safeText(state.countryCount ?? state.totalCountries ?? 0),
@@ -3591,7 +3665,10 @@ export function mountAppUI(root, options = {}) {
       } else if (state.configured) {
         guide.status.textContent = translate(t, 'guide.coverage', 'Guide coverage: {covered}/{total} channels — times shown in your timezone (24h)', { covered: state.covered ?? 0, total: state.total ?? channels.length });
       } else setTranslatedText(guide.status, t, 'guide.unconfigured', 'Connect an XMLTV source in Settings to add live programme data.');
-      renderGuideCards(guide.grid, channels, t);
+      guide.grid.setAttribute('aria-busy', String(Boolean(state.loading)));
+      if (state.loading && !channels.length) {
+        renderEmpty(guide.grid, t, 'guide.pending', 'Finding your programmes', 'Matching the installed guides to your channels. Schedules will appear here when ready.');
+      } else renderGuideCards(guide.grid, channels, t);
       return api;
     },
 
@@ -3639,34 +3716,36 @@ export function mountAppUI(root, options = {}) {
     renderLibrary(state = {}) {
       if (shouldActivateShellView(root.dataset.mode, state.activate)) activateShellView('library');
       const channels = normaliseArray(state.channels || state.favorites);
-      library.stats.favorites.textContent = safeText(state.favoriteCount ?? state.favorites?.length ?? 0);
-      library.stats.channels.textContent = safeText(state.channelCount ?? channels.length);
-      library.stats.sources.textContent = safeText(state.sourceCount ?? 0);
+      library.stats.favorites.textContent = formatCount(state.favoriteCount ?? state.favorites?.length ?? 0);
+      library.stats.channels.textContent = formatCount(state.channelCount ?? channels.length);
+      library.stats.sources.textContent = formatCount(state.sourceCount ?? 0);
       setLibrarySelectOptions(library.category, state.categories, translate(t, 'library.allCategories', 'All categories'), state.category);
       setLibrarySelectOptions(library.language, state.languages, translate(t, 'library.allLanguages', 'All languages'), state.language);
       if (state.query !== undefined) library.search.value = safeText(state.query);
       const favoritesOnly = Boolean(state.favoritesOnly);
+      const isFiltered = Boolean(safeText(state.query).trim() || safeText(state.category).trim() || safeText(state.language).trim() || favoritesOnly);
+      setTranslatedText(library.title, t, favoritesOnly ? 'favorites.title' : 'library.channels', favoritesOnly ? 'Favorites' : 'Channel directory');
       library.favorites.classList.toggle('is-active', favoritesOnly);
       library.favorites.setAttribute('aria-pressed', favoritesOnly ? 'true' : 'false');
       const recent = normaliseArray(state.recent);
-      library.recent.hidden = !recent.length;
-      if (recent.length) renderChannelTiles(library.recentGrid, recent.slice(0, 20), t);
+      library.recent.hidden = !recent.length || isFiltered;
+      if (recent.length && !isFiltered) renderChannelTiles(library.recentGrid, recent.slice(0, 20), t);
       if (channels.length) renderChannelTiles(library.grid, channels, t);
-      else if (state.restoring) renderEmpty(
+      else if (state.restoring && !isFiltered) renderEmpty(
         library.grid,
         t,
         'library.restoring',
         'Restoring your shared library',
         'CATODO is downloading the saved playlists for this browser. Your Favorites will appear as their channels become available.',
       );
-      else if (state.syncError) renderEmpty(
+      else if (state.syncError && !isFiltered) renderEmpty(
         library.grid,
         t,
         'library.syncError',
         'Your shared library could not be restored',
         'Local data is safe. Open Settings to check the shared-storage status and retry after the connection recovers.',
       );
-      else if (state.restoreError) renderEmpty(
+      else if (state.restoreError && !isFiltered) renderEmpty(
         library.grid,
         t,
         'library.restoreError',
@@ -3674,7 +3753,6 @@ export function mountAppUI(root, options = {}) {
         'Shared storage is connected, but one or more third-party playlists failed on this browser. Open Settings to refresh those sources.',
       );
       else {
-        const isFiltered = Boolean(safeText(state.query).trim() || safeText(state.category).trim() || safeText(state.language).trim() || favoritesOnly);
         renderEmpty(
           library.grid,
           t,
@@ -3683,7 +3761,7 @@ export function mountAppUI(root, options = {}) {
           isFiltered
             ? 'Try a different search or clear one of the active filters.'
             : 'Add a playlist or favorite a live channel to keep it close.',
-          isFiltered ? null : actionButton({
+          isFiltered ? actionButton({ t, action: 'clear-library-filters', iconName: 'x', key: 'library.clearFilters', fallback: 'Clear filters', className: 'button--primary' }) : actionButton({
             t,
             action: 'open-import-dialog',
             iconName: 'plus',
@@ -3695,20 +3773,42 @@ export function mountAppUI(root, options = {}) {
       }
       const visibleCount = Number(state.visibleCount ?? channels.length) || 0;
       const filteredCount = Number(state.filteredCount ?? visibleCount) || 0;
+      library.clearFilters.hidden = !isFiltered;
+      library.resultCount.textContent = translate(t, 'library.resultCount', 'Showing {visible} of {total} channels', { visible: formatCount(visibleCount), total: formatCount(filteredCount) });
       library.loadMore.hidden = visibleCount >= filteredCount;
       const loadMoreLabel = library.loadMore.querySelector('.button__label');
       if (loadMoreLabel) loadMoreLabel.textContent = translate(
         t,
         'library.loadMoreCount',
         'Load more channels · {count} remaining',
-        { count: Math.max(0, filteredCount - visibleCount) },
+        { count: formatCount(Math.max(0, filteredCount - visibleCount)) },
       );
+      if (loadMoreLabel) library.loadMore.setAttribute('aria-label', loadMoreLabel.textContent);
       return api;
     },
 
     renderSources(state = {}) {
       if (shouldActivateShellView(root.dataset.mode, state.activate)) activateShellView('sources');
       renderSources(sources.list, state.sources || state.playlists, t);
+      const worldSource = connectedWorldSource(state.sources || state.playlists);
+      sources.worldCatalog.classList.toggle('is-connected', Boolean(worldSource));
+      sources.worldFacts.hidden = Boolean(worldSource);
+      setTranslatedText(sources.worldEyebrow, t, worldSource ? 'settings.worldConnected' : 'settings.worldEyebrow', worldSource ? 'Already in your library' : 'Ready-to-import default');
+      setTranslatedText(sources.worldBody, t, worldSource ? 'settings.worldConnectedBody' : 'settings.worldBody', worldSource
+        ? '{count} channels in the saved world playlist. Manage or refresh it below.'
+        : 'Import the complete public directory in one step. Add other playlists later: matching channels and identical stream endpoints are merged automatically.', { count: formatCount(worldSource?.channelCount ?? worldSource?.count) });
+      sources.worldAction.dataset.action = worldSource ? 'navigate' : 'open-import-dialog';
+      if (worldSource) {
+        sources.worldAction.dataset.view = 'library';
+        delete sources.worldAction.dataset.presetId;
+      } else {
+        sources.worldAction.dataset.presetId = 'world-all';
+        delete sources.worldAction.dataset.view;
+      }
+      const worldActionLabel = translate(t, worldSource ? 'settings.worldBrowse' : 'settings.worldAction', worldSource ? 'Browse channels' : 'Review world import');
+      sources.worldAction.setAttribute('aria-label', worldActionLabel);
+      sources.worldAction.querySelector('.button__label').textContent = worldActionLabel;
+      sources.worldAction.querySelector('i').className = worldSource ? 'ph ph-arrow-right' : 'ph ph-download-simple';
       renderGuideSourceManager({
         catalogSearch: sources.guideCatalogSearch,
         catalogResults: sources.guideCatalogResults,
@@ -4166,6 +4266,9 @@ export function mountAppUI(root, options = {}) {
       window.clearTimeout(toastTimer);
       window.clearTimeout(guideProgrammeTimer);
       explore.view.removeEventListener('scroll', loadMoreExploreNearEnd);
+      root.removeEventListener('click', dismissMoreMenu);
+      root.removeEventListener('focusin', dismissMoreMenu);
+      root.removeEventListener('keydown', escapeMoreMenu);
       signalEasterEgg.destroy();
       dispatcher.destroy();
       root.replaceChildren();
@@ -4176,7 +4279,6 @@ export function mountAppUI(root, options = {}) {
     },
   };
 
-  renderWorldMap(countries.map, { t });
   renderEmpty(home.favoriteGrid, t, 'favorites.empty', 'No favorites yet', 'Save channels here for one-tap tuning.');
   renderEmpty(library.grid, t, 'library.empty', 'Your library is waiting', 'Add a playlist or favorite a live channel to keep it close.');
   renderSources(sources.list, [], t);

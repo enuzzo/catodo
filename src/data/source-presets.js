@@ -22,7 +22,7 @@ export const SOURCE_PRESETS = Object.freeze([
     "index.m3u",
     "global",
     "globe-hemisphere-west",
-    { featured: true, recommended: true, meta: "12,000+ channels · all countries" },
+    { featured: true, recommended: true, meta: "Public channels · all countries" },
   ),
   preset("world-country", "Worldwide by country", "The complete directory with country groupings.", "index.country.m3u", "global", "map-trifold"),
   preset("world-language", "Worldwide by language", "The complete directory arranged by broadcast language.", "index.language.m3u", "global", "translate"),

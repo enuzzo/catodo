@@ -37,7 +37,8 @@ import { resolvePlayerReturnView } from "./ui/view-mode.js";
 import { selectInitialHomeChannel } from "./ui/home-selection.js";
 import { favoriteGuidePlan } from "./ui/favorite-guide-model.js";
 import { defaultMultiviewPresetState, deleteMultiviewPreset, findMultiviewPreset, renameMultiviewPreset } from "./ui/multiview-preset-model.js";
-import { resetWorldMapView, zoomWorldMap } from "./ui/world-map.js";
+import { resetWorldMapView, zoomWorldMap } from "./ui/lazy-world-map.js";
+import { categoryOptions } from "./data/channel-categories.js";
 
 const UI_CHANNEL_LIMIT = 72;
 const HOME_FAVORITES_LIMIT = 10;
@@ -399,7 +400,7 @@ function countryModels() {
 }
 
 function importedIso2() {
-  return [...sourceCountryCodes(state.lastCatalog?.sources)];
+  return [...new Set([...sourceCountryCodes(state.lastCatalog?.sources), ...inferredCountryStats().map((country) => country.country)])];
 }
 
 function countryCounts() {
@@ -800,7 +801,7 @@ function renderCountries() {
     countryChannelQuery: state.countryChannelQuery,
     countryChannelCategory: state.countryChannelCategory,
     countryChannelLanguage: state.countryChannelLanguage,
-    countryChannelCategories: [...new Set(selectedCountryChannels.flatMap((channel) => channel.categories || []))].sort(),
+    countryChannelCategories: categoryOptions(selectedCountryChannels),
     countryChannelLanguages: [...new Set(selectedCountryChannels.flatMap((channel) => channel.languages || []))].sort(),
     countryGuideSourceCount: selectedCountryGuideUrls.length,
     countryGuideConfiguredCount: selectedCountryGuideUrls.filter((url) => configuredGuideUrls.has(url)).length,
@@ -830,7 +831,7 @@ function renderLibrary() {
     favoriteCount: state.lastCatalog?.favorites.size || 0,
     channelCount: state.lastCatalog?.channels.length || 0,
     sourceCount: state.lastCatalog?.sources.length || 0,
-    categories: [...new Set(allChannels.flatMap((channel) => channel.categories || []))].sort(),
+    categories: categoryOptions(allChannels),
     languages: [...new Set(allChannels.flatMap((channel) => channel.languages || []))].sort(),
     category: state.libraryCategory,
     language: state.libraryLanguage,
@@ -864,7 +865,11 @@ function renderSources() {
       ...source,
       channelCount: source.count || 0,
       host: (() => { try { return new URL(source.url).host; } catch { return source.url; } })(),
-      healthLabel: source.error ? "Using last known good" : source.checkedAt ? `Healthy · checked ${formatRelativeTime(source.checkedAt)}` : "Ready to refresh",
+      healthLabel: source.error
+        ? i18n.t("sources.savedCopy", "Using saved playlist")
+        : source.checkedAt
+          ? i18n.t("sources.checkedAt", "Playlist checked {time}", { time: formatRelativeTime(source.checkedAt) })
+          : i18n.t("sources.readyToRefresh", "Ready to refresh"),
     })),
   });
 }
@@ -1560,12 +1565,11 @@ async function handleAction(action, detail) {
       ui.playSignalEasterEgg?.();
       break;
     case "toggle-more-menu": {
-      const open = ui.refs.moreMenu.hidden;
-      ui.refs.moreMenu.hidden = !open;
-      ui.refs.moreSummary.setAttribute("aria-expanded", String(open));
+      ui.setMoreMenuOpen(ui.refs.moreMenu.hidden);
       break;
     }
     case "toggle-mobile-search": {
+      ui.setMoreMenuOpen(false);
       const open = !ui.refs.searchForm.classList.contains("is-open");
       ui.refs.searchForm.classList.toggle("is-open", open);
       ui.refs.searchToggle.setAttribute("aria-expanded", String(open));
@@ -1579,7 +1583,7 @@ async function handleAction(action, detail) {
       break;
     }
     case "navigate": {
-      if (ui.refs.moreMenu) ui.refs.moreMenu.hidden = true;
+      ui.setMoreMenuOpen(false);
       ui.refs.searchForm.classList.remove("is-open");
       ui.refs.searchToggle.setAttribute("aria-expanded", "false");
       const targetView = detail.dataset.mode === "explore" ? "explore" : detail.dataset.view || "home";
@@ -1602,6 +1606,7 @@ async function handleAction(action, detail) {
       if (shouldRandomizeExplore) refreshExploreCollectionSamples();
       renderAll();
       ui.showView(state.view);
+      if (state.view === "sources" && detail.dataset.section) ui.focusSettingsSection(detail.dataset.section);
       if (state.view === "guide") void loadSchedules(guideCandidateChannels());
       if (state.view === "sources" && !state.guideCatalogCountries.length) void loadGuideCatalog();
       if (shouldRandomizeHome) await tuneHome(findChannel(state.featuredId));
@@ -1698,6 +1703,9 @@ async function handleAction(action, detail) {
     case "search-query":
       state.query = detail.value || "";
       if (state.query.trim()) {
+        state.libraryCategory = state.libraryLanguage = "";
+        state.libraryFavoritesOnly = false;
+        state.libraryLimit = UI_CHANNEL_LIMIT;
         state.libraryQuery = state.query.trim();
         state.view = "library";
         renderLibrary();
@@ -1711,6 +1719,9 @@ async function handleAction(action, detail) {
     case "search": {
       state.query = String(detail.formData?.get("query") || state.query).trim();
       state.libraryQuery = state.query;
+      state.libraryCategory = state.libraryLanguage = "";
+      state.libraryFavoritesOnly = false;
+      state.libraryLimit = UI_CHANNEL_LIMIT;
       state.view = "library";
       renderLibrary();
       ui.updateHeader({ view: "library", query: state.query });
@@ -1720,8 +1731,10 @@ async function handleAction(action, detail) {
     }
     case "filter-library":
       state.libraryQuery = detail.value || "";
+      state.query = state.libraryQuery;
       state.libraryLimit = UI_CHANNEL_LIMIT;
       renderLibrary();
+      ui.updateHeader({ query: state.query });
       break;
     case "filter-library-category":
       state.libraryCategory = detail.value || "";
@@ -1741,6 +1754,19 @@ async function handleAction(action, detail) {
     case "load-more-library":
       state.libraryLimit += UI_CHANNEL_LIMIT;
       renderLibrary();
+      break;
+    case "clear-library-filters":
+      state.query = state.libraryQuery = state.libraryCategory = state.libraryLanguage = "";
+      state.libraryFavoritesOnly = false;
+      state.libraryLimit = UI_CHANNEL_LIMIT;
+      renderLibrary();
+      ui.updateHeader({ query: "" });
+      break;
+    case "settings-section":
+      ui.focusSettingsSection(detail.dataset.section);
+      break;
+    case "retry-world-map":
+      renderCountries();
       break;
     case "open-channel":
     case "open-player":

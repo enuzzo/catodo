@@ -1,8 +1,10 @@
 # Independent code and product review brief
 
-Use this brief for a fresh, read-only inspection of CATODO. Read
-`README.md`, `docs/ARCHITECTURE.md`, `docs/OPERATIONS.md`, `SECURITY.md`, and the
-relevant source/tests before drawing conclusions.
+Use this brief only when an independent review is requested. Its read-only
+constraint applies to that review, not to implementation or documentation work.
+Select relevant boundaries through [CODE-MAP.md](CODE-MAP.md), then inspect the
+owning source/tests and documentation before drawing conclusions. For a full
+repository review, include product, architecture, operations and security.
 
 ## Product intent
 

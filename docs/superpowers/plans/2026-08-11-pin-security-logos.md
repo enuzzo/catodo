@@ -1,6 +1,12 @@
 # PIN, sicurezza vera e loghi canale: Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> Historical document, superseded by the current Vite/PHP architecture.
+> Retained for context only: embedded commands, skill requirements, checkboxes
+> and publication steps are not active instructions. Use
+> [the documentation index](../../README.md) and [current roadmap](../../ROADMAP.md).
+
+
+> Original execution recipe used Superpowers subagents/plan execution and checkboxes; this dependency is historical and is not required for current work.
 
 **Goal:** Chiudere l'Incarico 3 (bug del PIN, con test automatico), l'Incarico 4 (barriera vera via HTTP Basic Auth su `.htaccess`) e la feature loghi canale via logo.dev, come da spec approvato.
 

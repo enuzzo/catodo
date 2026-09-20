@@ -95,7 +95,7 @@ export function parseM3U(text, options = {}) {
     const languages = unique(splitList(a["tvg-language"] || a.language));
     const categories = unique(splitList(a["tvg-category"] || a.category));
     const groupTitle = clamp(a["group-title"] || pending.groupTitle, limits.maxFieldLength);
-    if (groupTitle && !categories.length) categories.push(groupTitle);
+    if (groupTitle && !categories.length) categories.push(...unique(groupTitle.split(/[;|]/).map((value) => value.trim()).filter(Boolean)));
     const headers = Object.fromEntries(Object.entries(pending.headers).map(([key, value]) => [clamp(key, 128), clamp(value, limits.maxFieldLength)]));
     const referrer = clamp(a["http-referrer"] || a["http-referer"] || pending.referrer || headers.Referer || headers.Referrer, limits.maxFieldLength);
     if (referrer && !headers.Referer) headers.Referer = referrer;

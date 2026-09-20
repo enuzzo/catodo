@@ -519,8 +519,9 @@ textarea {
 }
 
 .select {
+  min-width: 0;
   min-height: 46px;
-  padding: 0 42px 0 14px;
+  padding: 0 28px 0 12px;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: var(--paper-raised);
@@ -1351,8 +1352,9 @@ textarea {
   --live-slate: #62727d;
   --live-sage: #737966;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 1fr;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-self: start;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
@@ -1368,6 +1370,7 @@ textarea {
   width: 100%;
   min-width: 0;
   min-height: 220px;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 0;
   background: #06162b;
@@ -1559,10 +1562,10 @@ textarea {
 .live-anchor__favorite,
 .live-anchor__fullscreen,
 .live-anchor__random {
-  width: 38px;
-  min-width: 38px;
-  height: 38px;
-  min-height: 38px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
   border-color: transparent;
   border-radius: 50%;
   background: var(--live-surface-raised);
@@ -2640,7 +2643,7 @@ textarea {
 
   .live-anchor {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
   }
 
   .live-anchor__stage {
@@ -3275,6 +3278,7 @@ textarea {
 
 .country-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 11px;
 }
@@ -3285,6 +3289,11 @@ textarea {
   padding: 5px 10px;
   border-bottom: 1px solid var(--line);
   text-align: left;
+}
+
+.country-table td {
+  height: 52px;
+  padding-block: 10px;
 }
 
 .country-table th {
@@ -3303,13 +3312,15 @@ textarea {
 }
 
 .country-table tbody tr:hover,
+.country-table tbody tr:focus-visible,
 .country-table tbody tr.is-selected {
   background: var(--signal-soft);
   color: var(--signal);
 }
 
-.country-table td:first-child {
+.country-row__identity {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: 10px;
 }
@@ -3336,9 +3347,13 @@ textarea {
 .country-row__name {
   overflow: hidden;
   font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
 }
+
+.country-table th:nth-child(2) { width: 82px; }
+.country-table th:nth-child(3) { width: 110px; }
+.country-table td:nth-child(2) { font-variant-numeric: tabular-nums; }
 
 .country-table td:nth-child(3) {
   color: var(--ink-soft);
@@ -3437,6 +3452,53 @@ textarea {
   font-size: 21px;
   text-transform: uppercase;
 }
+
+.library-results {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -4px 0 14px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 10px;
+}
+
+.library-results__count {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.library-results .button { min-height: 44px; flex-shrink: 0; }
+
+.settings-sections {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.settings-sections .button { background: var(--paper-raised); }
+.page--sources [id^="settings-"] { scroll-margin-top: 18px; }
+.world-catalog-callout.is-connected { border-color: var(--line); background: var(--paper-raised); }
+.world-catalog-callout.is-connected .world-catalog-callout__icon { background: var(--signal-soft); color: var(--signal); }
+.world-catalog-callout.is-connected .world-catalog-callout__copy h2 { font-size: 19px; }
+.primary-nav__more-menu .is-active { background: var(--signal-soft); color: var(--signal); border-color: var(--signal); }
+
+.map-load-status {
+  display: grid;
+  min-height: 240px;
+  height: 100%;
+  align-content: center;
+  justify-items: center;
+  gap: 16px;
+  padding: 24px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+.map-load-status p { max-width: 34ch; margin: 0; }
 
 .library-toolbar__filters {
   display: grid;
@@ -6244,6 +6306,8 @@ textarea {
     display: none;
   }
 
+  .signal-bar__status-meta { display: none; }
+
   .page--home,
   .page--countries,
   .page--library,
@@ -6308,6 +6372,9 @@ textarea {
   .library-toolbar__filters .field {
     grid-column: 1 / -1;
   }
+
+  .library-filter-select { font-size: 14px; }
+  .library-favorites-filter { grid-column: 1 / -1; }
 
   .countries-atlas {
     min-height: 440px;
@@ -6599,8 +6666,16 @@ textarea {
 
   .live-anchor {
     grid-template-columns: 1fr;
-    grid-template-rows: 235px auto;
+    grid-template-rows: auto auto;
+    min-height: 0;
   }
+
+  .live-anchor__stage { min-height: 0; }
+  .live-anchor__heading { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .live-anchor__identity { flex-wrap: wrap; }
+  .live-anchor__name { white-space: normal; overflow-wrap: anywhere; line-height: 1.1; }
+  .live-anchor__tools { gap: 10px; }
+  .live-anchor__description { white-space: normal; margin-top: 12px; }
 
   .live-anchor__info,
   .live-anchor__facts {
@@ -6608,18 +6683,23 @@ textarea {
   }
 
   .live-anchor__facts {
-    grid-template-columns: 1fr;
-    padding: 0 10px 10px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 14px;
+    padding: 12px 0 0;
+    border-top: 1px solid var(--live-line);
   }
 
   .live-anchor__facts div {
-    padding: 9px 0;
+    padding: 0 9px;
   }
 
   .live-anchor__facts div + div {
-    border-top: 1px solid var(--live-line);
-    border-left: 0;
+    border-top: 0;
+    border-inline-start: 1px solid var(--live-line);
   }
+
+  .live-anchor__facts dd { white-space: normal; overflow-wrap: anywhere; font-size: 14px; }
+  .live-anchor__facts dt { font-size: 11px; }
 
   .channel-grid--nearby,
   .channel-grid--favorites,
@@ -6646,10 +6726,16 @@ textarea {
     grid-template-columns: 1fr;
   }
 
-  .country-table th:nth-child(2),
-  .country-table td:nth-child(2) {
-    display: none;
-  }
+  .country-table th:nth-child(2) { width: 64px; }
+  .country-table th:nth-child(3) { width: 88px; }
+  .country-table__arrow { width: 20px; }
+  .country-table .country-code { display: none; }
+  .country-table th, .country-table td { padding-inline: 6px; }
+  .country-row__identity { gap: 6px; }
+  .country-table td:nth-child(3) i { display: none; }
+  .country-table td { font-size: 12px; }
+  .settings-sections { display: grid; grid-template-columns: 1fr; }
+  .settings-sections .button { justify-content: flex-start; }
 
   .import-source-facts {
     grid-template-columns: 1fr;

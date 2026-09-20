@@ -67,7 +67,11 @@
       "kids": "Kids",
       "culture": "Culture",
       "local": "Local"
-    }
+    },
+    "channelCountOne": "{count} channel",
+    "countryLabel": "Country",
+    "countryAriaLabel": "Filter this collection by country",
+    "allCountries": "All countries"
   },
   "footer": {
     "global": "Global",
@@ -105,7 +109,10 @@
     "remove": "Remove source",
     "lastGood": "Showing the last successful update",
     "consentRequired": "Confirm before CATODO contacts this source",
-    "channelsImported": "{count} channels imported"
+    "channelsImported": "{count} channels imported",
+    "savedCopy": "Using saved playlist",
+    "checkedAt": "Playlist checked {time}",
+    "readyToRefresh": "Ready to refresh"
   },
   "settings": {
     "eyebrow": "Setup & preferences",
@@ -114,7 +121,7 @@
     "worldEyebrow": "Ready-to-import default",
     "worldTitle": "World catalog · all countries",
     "worldBody": "Import the complete public directory in one step. Add other playlists later: matching channels and identical stream endpoints are merged automatically.",
-    "worldChannels": "12,000+ public channels",
+    "worldChannels": "Public channels · all countries",
     "worldDedup": "Automatic deduplication",
     "worldConsent": "Consent always required",
     "worldAction": "Review world import",
@@ -139,7 +146,11 @@
     "syncRecover": "Recover retained data",
     "syncRecoverConfirm": "Merge the retained browser sources and Favorites into the shared library? Existing shared data will be kept.",
     "syncRecoverSuccess": "Retained data was merged into the shared library.",
-    "syncRecoverFailed": "Recovery is queued and will retry when shared storage reconnects."
+    "syncRecoverFailed": "Recovery is queued and will retry when shared storage reconnects.",
+    "worldConnected": "Already in your library",
+    "worldConnectedBody": "{count} channels in the saved world playlist. Manage or refresh it below.",
+    "worldBrowse": "Browse channels",
+    "sections": "Settings sections"
   },
   "import": {
     "presetsTitle": "Recommended playlists",
@@ -164,7 +175,10 @@
     "restoreError": {
       "title": "Saved playlists could not be downloaded",
       "body": "Shared storage is connected, but one or more third-party playlists failed on this browser. Open Settings to refresh those sources."
-    }
+    },
+    "channels": "Channel directory",
+    "clearFilters": "Clear filters",
+    "resultCount": "Showing {visible} of {total} channels"
   },
   "countries": {
     "backToWorld": "Back to world map",
@@ -259,7 +273,16 @@
     "noData": "No current programme data for this channel.",
     "loading": "Loading live schedules…",
     "empty": "No matching programme data was returned. Check the guide URL and channel tvg-id values.",
-    "updated": "Schedules cached locally · times shown in your timezone"
+    "updated": "Schedules cached locally · times shown in your timezone",
+    "dataOutdatedShort": "Guide outdated",
+    "noMatchShort": "No guide match",
+    "noCurrentProgrammeShort": "No current programme",
+    "notConnectedShort": "Guide not connected",
+    "loadingChannel": "Loading this channel’s guide…",
+    "pending": {
+      "title": "Finding your programmes",
+      "body": "Matching the installed guides to your channels. Schedules will appear here when ready."
+    }
   },
   "multiview": {
     "presets": "Presets",
@@ -349,5 +372,10 @@
     "close": "Close",
     "retry": "Try again",
     "done": "Done"
+  },
+  "map": {
+    "loading": "Loading the signal atlas…",
+    "loadError": "Map unavailable. You can still choose a country from the list.",
+    "retry": "Retry map"
   }
 }

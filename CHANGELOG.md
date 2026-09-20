@@ -10,6 +10,21 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.8.0] - 2026-09-20
+
+### 🛠 Changed
+
+- Refined Library search with readable genre filters (including existing combined playlist groups), visible result counts, one-tap filter reset, and more accurate empty states.
+- Reordered Settings around connected playlists, guide sources and backups, added section shortcuts, and replaced the repeated world-import offer with the saved source's actual count when already connected.
+- Deferred world-map geometry until Countries is opened, while keeping a compact offline country directory available at startup.
+- Improved mobile navigation context, keyboard menu dismissal, Live channel details, touch targets and country-table containment; synchronized existing English locale keys without dropping either mirror's copy.
+- Reorganized maintainer guidance into task-based agent instructions, code/test maps and a focused open roadmap; preserved earlier plans and validation as explicitly historical references.
+
+### 🐛 Fixed
+
+- Country-map coverage now includes channels imported through worldwide playlists; guide loading no longer briefly claims that no covered channels exist.
+- Playlist status now describes the last catalog check without implying that every stream plays successfully.
+
 ## [2.7.1] - 2026-08-26
 
 ### 🔐 Security
@@ -185,7 +200,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.7.1...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.8.0...HEAD
+[2.8.0]: https://github.com/enuzzo/catodo/compare/v2.7.1...v2.8.0
 [2.7.1]: https://github.com/enuzzo/catodo/compare/v2.7.0...v2.7.1
 [2.7.0]: https://github.com/enuzzo/catodo/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/enuzzo/catodo/compare/v2.5.1...v2.6.0

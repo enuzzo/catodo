@@ -1,5 +1,9 @@
 # Design QA — Home density, TV Guide and immersive player
 
+> Historical visual evidence from earlier iterations. Screenshots and test
+> results below do not validate the current build; use [the roadmap](docs/ROADMAP.md)
+> for open acceptance and [the test map](docs/TESTING.md) for new checks.
+
 - Source visual truth: `/tmp/catodo-qa/reference.png`
 - Implementation: `/tmp/catodo-qa/implementation-home.png`, `/tmp/catodo-qa/implementation-player.png`
 - Viewport: desktop 1280 × 720 CSS px at device scale 1; mobile checked at 390 × 844 CSS px.

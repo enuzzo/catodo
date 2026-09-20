@@ -6,6 +6,12 @@
   "brand": {
     "name": "Catodo"
   },
+  "search": {
+    "open": "Open search",
+    "close": "Close search",
+    "placeholder": "Search channels, countries, languages…",
+    "ariaLabel": "Search channels, countries, and languages"
+  },
   "nav": {
     "live": "Live",
     "countries": "Countries",
@@ -41,12 +47,11 @@
     "surprise": "Surprise me",
     "filterAriaLabel": "Explore categories",
     "channelCount": "{count} channels",
-    "channelCountOne": "{count} channel",
-    "countryLabel": "Country",
-    "countryAriaLabel": "Filter this collection by country",
-    "allCountries": "All countries",
+    "randomizeCollection": "Randomize",
     "sortLabel": "Sort by",
     "sortAriaLabel": "Sort this collection",
+    "loadMore": "Load more channels",
+    "emptyCategory": "No matching channels yet",
     "sort": {
       "relevance": "Relevance",
       "name": "Name",
@@ -62,7 +67,11 @@
       "kids": "Kids",
       "culture": "Culture",
       "local": "Local"
-    }
+    },
+    "channelCountOne": "{count} channel",
+    "countryLabel": "Country",
+    "countryAriaLabel": "Filter this collection by country",
+    "allCountries": "All countries"
   },
   "footer": {
     "global": "Global",
@@ -100,7 +109,10 @@
     "remove": "Remove source",
     "lastGood": "Showing the last successful update",
     "consentRequired": "Confirm before CATODO contacts this source",
-    "channelsImported": "{count} channels imported"
+    "channelsImported": "{count} channels imported",
+    "savedCopy": "Using saved playlist",
+    "checkedAt": "Playlist checked {time}",
+    "readyToRefresh": "Ready to refresh"
   },
   "settings": {
     "eyebrow": "Setup & preferences",
@@ -109,7 +121,7 @@
     "worldEyebrow": "Ready-to-import default",
     "worldTitle": "World catalog · all countries",
     "worldBody": "Import the complete public directory in one step. Add other playlists later: matching channels and identical stream endpoints are merged automatically.",
-    "worldChannels": "12,000+ public channels",
+    "worldChannels": "Public channels · all countries",
     "worldDedup": "Automatic deduplication",
     "worldConsent": "Consent always required",
     "worldAction": "Review world import",
@@ -134,7 +146,11 @@
     "syncRecover": "Recover retained data",
     "syncRecoverConfirm": "Merge the retained browser sources and Favorites into the shared library? Existing shared data will be kept.",
     "syncRecoverSuccess": "Retained data was merged into the shared library.",
-    "syncRecoverFailed": "Recovery is queued and will retry when shared storage reconnects."
+    "syncRecoverFailed": "Recovery is queued and will retry when shared storage reconnects.",
+    "worldConnected": "Already in your library",
+    "worldConnectedBody": "{count} channels in the saved world playlist. Manage or refresh it below.",
+    "worldBrowse": "Browse channels",
+    "sections": "Settings sections"
   },
   "import": {
     "presetsTitle": "Recommended playlists",
@@ -159,10 +175,29 @@
     "restoreError": {
       "title": "Saved playlists could not be downloaded",
       "body": "Shared storage is connected, but one or more third-party playlists failed on this browser. Open Settings to refresh those sources."
-    }
+    },
+    "channels": "Channel directory",
+    "clearFilters": "Clear filters",
+    "resultCount": "Showing {visible} of {total} channels"
   },
   "countries": {
     "backToWorld": "Back to world map",
+    "countryChannelsEyebrow": "Country channels",
+    "searchChannelsPlaceholder": "Search this country…",
+    "searchChannelsAriaLabel": "Search channels in this country",
+    "categoryFilterAriaLabel": "Filter country channels by category",
+    "languageFilterAriaLabel": "Filter country channels by language",
+    "channelAvailability": "{shown} shown · {total} available now",
+    "channelsNotImported": {
+      "title": "Add this country's channels",
+      "body": "This country is in the public directory, but its playlist is not in your local catalog yet."
+    },
+    "noChannelMatches": {
+      "title": "No channels match these filters",
+      "body": "Try a different search, category, or language."
+    },
+    "loadAllChannels": "Load all channels",
+    "loadAllChannelsCount": "Load all channels · {count} remaining",
     "loadGuide": "Load guide",
     "findGuide": "Find & load guide",
     "loadingGuide": "Loading guide…",
@@ -177,25 +212,11 @@
     "guideDialogCountryTitle": "Connect {country} TV Guide",
     "guideDialogIntro": "CATODO will find the public XMLTV feeds for this country, save them in Preferences and load the available schedules.",
     "guideDialogNotice": "CATODO checks Open EPG and EPGShare01 first, then uses an allowlisted repository fallback. Outdated or invalid feeds are discarded automatically.",
+    "guideAvailableHint": "{count} known XMLTV sources available. Loading saves them in Preferences and contacts those third-party providers.",
+    "guideLoadedHint": "{count} guide sources saved in Preferences.",
     "guideUnavailableHint": "No current XMLTV feed was found across the available providers. You can check again later.",
     "guideCheckingHint": "Checking the available country guide providers…",
-    "guideLookupFailedHint": "The guide providers could not be checked. Retry when the connection is available.",
-    "guideLoadedHint": "{count} guide sources saved in Preferences.",
-    "guideAvailableHint": "{count} known XMLTV sources available. Loading saves them in Preferences and contacts those third-party providers.",
-    "countryChannelsEyebrow": "Country channels",
-    "searchChannelsPlaceholder": "Search this country…",
-    "searchChannelsAriaLabel": "Search channels in this country",
-    "categoryFilterAriaLabel": "Filter country channels by category",
-    "languageFilterAriaLabel": "Filter country channels by language",
-    "channelAvailability": "{shown} shown · {total} available now",
-    "channelsNotImported": {
-      "title": "Add this country's channels",
-      "body": "This country is in the public directory, but its playlist is not in your local catalog yet."
-    },
-    "noChannelMatches": {
-      "title": "No channels match these filters",
-      "body": "Try a different search, category, or language."
-    }
+    "guideLookupFailedHint": "The guide providers could not be checked. Retry when the connection is available."
   },
   "player": {
     "play": "Play",
@@ -249,19 +270,25 @@
     "localTime": "Your time",
     "programmeValue": "{time} · {title}",
     "noDataShort": "Guide unavailable",
+    "noData": "No current programme data for this channel.",
+    "loading": "Loading live schedules…",
+    "empty": "No matching programme data was returned. Check the guide URL and channel tvg-id values.",
+    "updated": "Schedules cached locally · times shown in your timezone",
     "dataOutdatedShort": "Guide outdated",
     "noMatchShort": "No guide match",
     "noCurrentProgrammeShort": "No current programme",
     "notConnectedShort": "Guide not connected",
-    "noData": "No current programme data for this channel.",
-    "loading": "Loading live schedules…",
     "loadingChannel": "Loading this channel’s guide…",
-    "empty": "No matching programme data was returned. Check the guide URL and channel tvg-id values.",
-    "updated": "Schedules cached locally · times shown in your timezone"
+    "pending": {
+      "title": "Finding your programmes",
+      "body": "Matching the installed guides to your channels. Schedules will appear here when ready."
+    }
   },
   "multiview": {
     "presets": "Presets",
     "savePreset": "Save preset",
+    "renamePreset": "Rename preset",
+    "deletePreset": "Delete preset",
     "random": "Random",
     "listenToFeed": "Listen to this feed",
     "muteFeed": "Mute this feed",
@@ -345,5 +372,10 @@
     "close": "Close",
     "retry": "Try again",
     "done": "Done"
+  },
+  "map": {
+    "loading": "Loading the signal atlas…",
+    "loadError": "Map unavailable. You can still choose a country from the list.",
+    "retry": "Retry map"
   }
 }

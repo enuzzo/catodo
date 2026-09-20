@@ -1,4 +1,4 @@
-# CATODO 2.7.1 — product brief
+# CATODO 2.8.0 — product brief
 
 CATODO is an open-source, Tesla-first web player for discovering and watching
 public live television sources from around the world.
@@ -15,8 +15,9 @@ public live television sources from around the world.
   discoverable through Signal Atlas and the country directory.
 - **Consent before fetch.** Curated links can prepare an import, but no playlist
   is fetched until the user confirms the provider and disclaimer.
-- **Local ownership.** Sources, snapshots, favourites and history persist on the
-  device. A failed refresh never replaces the last known good snapshot.
+- **Local ownership.** Parsed catalogs, snapshots and history remain on the
+  device; the authenticated installation shares approved sources, favourites
+  and configuration. A failed refresh keeps the last known good snapshot.
 - **One audible feed.** Multiview supports 2, 3 and 4 feeds, with one explicit
   audio source at a time.
 - **Truthful diagnostics.** Signal Lab distinguishes measured, estimated and

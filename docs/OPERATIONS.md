@@ -6,9 +6,17 @@ and runtime boundaries are documented in [ARCHITECTURE.md](ARCHITECTURE.md).
 ## Local development
 
 ```sh
-npm install
+npm ci
 npm run dev
 ```
+
+In a Dropbox checkout, wait for Git metadata and dependencies to be available
+offline before diagnosing stalled commands. Downloading `node_modules/` from
+another Mac does not make its native packages compatible with this machine.
+If Rollup/esbuild reports a missing platform package, verify `process.arch` and
+restore the locked dependencies locally with
+`npm ci --ignore-scripts --no-audit --no-fund`. Do not delete or regenerate the
+lockfile to fix a platform mismatch. Keep `node_modules/` and `dist/` out of Git.
 
 Vite serves the frontend, but it does not execute the PHP services. A local Vite
 session therefore uses browser-only storage: requests to `installation-api.php`
@@ -19,6 +27,9 @@ The QA query parameter used by visual development should never be treated as a
 production data source. Use real imported channels for playback validation.
 
 ## Release checklist
+
+Use this checklist when release/publication is in the authorized task scope;
+reading it during local maintenance does not authorize a deployment.
 
 1. Inspect `git status` and preserve unrelated/user changes.
 2. Add every user-visible change to `CHANGELOG.md` under **Unreleased**, then
@@ -33,6 +44,8 @@ production data source. Use real imported channels for playback validation.
    npm run build
    php -l dist/installation-api.php
    php -l dist/logo-cache.php
+   php -l dist/epg-cache.php
+   php -l index.php
    git diff --check
    ```
 
@@ -43,13 +56,15 @@ production data source. Use real imported channels for playback validation.
 4. Smoke-test the production bundle in a real Chromium browser:
    navigation, search, favourites, a single player, volume/mute, player chrome,
    Multiview audio focus, channel replacement and return navigation.
-5. Commit and push `main` intentionally.
+5. Commit and push the intended branch within the task scope; the official
+   release branch is `main`. Apply the Git/worktree notes below.
 6. Deploy with `npm run deploy:siteground`.
 7. Verify the public security boundary without credentials:
 
    ```sh
    curl -sI https://catodo.app/installation-api.php
    curl -sI https://catodo.app/logo-cache.php
+   curl -sI https://catodo.app/epg-cache.php
    curl -sI https://catodo.app/.catodo-data/installation-state.json
    curl -sI https://catodo.app/.catodo-private/app.html
    curl -sI https://catodo.app/app.html
@@ -60,8 +75,11 @@ production data source. Use real imported channels for playback validation.
    Expected: authenticated services return `401`; private storage, the private
    app entry and legacy `app.html` route return `403`; the manifest and touch
    icon return `200`.
-8. Sign in normally and verify that the built app loads. The official deployment
-   is SiteGround; GitHub Pages is intentionally not the release target.
+8. Fetch production `version.json` with a cache buster such as
+   `https://catodo.app/version.json?release=X.Y.Z` and compare the returned version
+   to `package.json`. A stale response without a cache buster does not prove
+   upload failure. Sign in normally and verify that the built app loads. The
+   official deployment is SiteGround; GitHub Pages is intentionally not the release target.
 9. On a real iPhone or iPad, use Share → **Add to Home Screen**, confirm the CRT
    icon is sharp and centered, then launch it and verify standalone navigation,
    safe-area padding, playback and return behavior.
@@ -77,6 +95,38 @@ splash and frontend JavaScript and emits `version.json`, which the PHP login gat
 reads at runtime. `npm run check` deliberately fails when the lockfile,
 changelog, maintainer documents or build wiring are stale, so version and
 release notes cannot be forgotten silently.
+
+## Git and worktree publication
+
+- Codex worktrees share the primary checkout's Git metadata outside the
+  worktree sandbox. Read-only Git commands can run normally, but commands that
+  write Git metadata (`git add`, `git commit`) and network publication
+  (`git push`) should request escalated execution on the first attempt. An
+  `index.lock: Operation not permitted` error here is a sandbox boundary, not
+  repository corruption; do not delete locks or retry blindly.
+- This repository's `origin` uses HTTPS with the macOS `osxkeychain` credential
+  helper. A routine push to an existing tracked branch uses native Git and does
+  not depend on the separate `gh` token. Treat `gh auth status` as a prerequisite
+  only for operations that actually use GitHub CLI/API features, such as opening
+  a pull request or editing a GitHub release; an expired `gh` token alone must
+  not block a normal `git push`.
+- When deploying from a worktree, the deployment `.env` is intentionally stored
+  only in the primary checkout,
+  whose root is the parent of `git rev-parse --git-common-dir`; Codex worktrees
+  normally have no local `.env`. Before `npm run deploy:siteground`, resolve and
+  confirm that primary `.env` without printing its contents, expose it to the
+  worktree only through a temporary `.env` symlink, and remove the symlink after
+  every success or failure. Verify that the worktree no longer contains `.env`
+  before finishing.
+- Verify a deployment with a cache-busting request to production
+  `version.json` (for example `?release=X.Y.Z`). A stale response without a
+  cache buster is not evidence that the FTP upload failed.
+
+The primary checkout keeps its original `.env`; never remove it as worktree
+cleanup. Resolve a relative `--git-common-dir` against the current directory.
+Create the temporary symlink only if no worktree `.env` already exists, arrange
+cleanup before running the uploader, and verify removal on failure as well as
+success. Do not display credential contents.
 
 ## First installation-state migration
 
@@ -197,7 +247,8 @@ avoid synchronous fuzzy work across the full catalog on every keystroke.
 ## Installation sync diagnosis
 
 The local Vite server cannot execute PHP, but it supplies a narrow development
-bridge for the allowlisted Italian EPG feeds. On the official host:
+bridge for allowlisted Open EPG and EPGShare01 country sources. On the official
+host:
 
 - `401` from `installation-api.php` means the gate cookie is absent/expired;
 - `404`/`405` disables installation sync and the client remains browser-local;
@@ -242,20 +293,8 @@ step should generate one from the other to remove this footgun.
 - Keep Worker `ALLOWED_ORIGINS` explicit. CORS headers alone are not access
   control for non-browser clients.
 
-## High-value future engineering work
+## Future engineering work
 
-These are candidates, not committed roadmap promises:
-
-1. Split `src/app.js` into destination controllers and split UI renderers by
-   surface while retaining persistent media elements.
-2. Lazy-load map/country and low-frequency product areas to reduce the large
-   initial JavaScript chunk.
-3. Generate production locale files from one canonical source and add a key
-   parity test.
-4. Add authenticated export/import and timestamped backups for installation
-   configuration.
-5. Add logo cache garbage collection and health/size visibility.
-6. Add browser-level smoke tests for player audio state, overlay return paths,
-   touch targets and navigation regressions.
-7. Add source health and last-known-good visibility without claiming universal
-   availability from upstream metadata.
+Use [ROADMAP.md](ROADMAP.md) as the single queue for engineering candidates.
+Manual configuration export/import already exists; timestamped/automatic recovery
+and other backup extensions remain separate proposals there.

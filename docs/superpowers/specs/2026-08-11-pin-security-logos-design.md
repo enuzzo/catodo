@@ -1,5 +1,11 @@
 # CATODO: PIN, sicurezza vera, loghi canale
 
+> Historical document, superseded by the current Vite/PHP architecture.
+> Retained for context only: embedded commands, skill requirements, checkboxes
+> and publication steps are not active instructions. Use
+> [the documentation index](../../README.md) and [current roadmap](../../ROADMAP.md).
+
+
 Data: 2026-08-11
 Stato: approvato, in attesa di piano di implementazione
 

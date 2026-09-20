@@ -1,8 +1,10 @@
 # CATODO architecture
 
-This document is the maintainer map for CATODO 2.7.1. It describes the runtime
+This document is the maintainer map for CATODO 2.8.0. It describes the runtime
 boundaries, the data flow, and the invariants that should survive future UI and
-feature work. For operational procedures and failure symptoms, see
+feature work. For task-to-file navigation use [CODE-MAP.md](CODE-MAP.md); for
+focused checks use [TESTING.md](TESTING.md). For operational procedures and
+failure symptoms, see
 [OPERATIONS.md](OPERATIONS.md).
 
 ## System at a glance
@@ -34,6 +36,11 @@ The production artifact is built by Vite. Runtime assets use relative URLs so
 the bundle remains compatible with subdirectories, although the official
 deployment is the SiteGround root installation.
 
+World-map geometry is imported on demand through `src/ui/lazy-world-map.js`.
+The initial catalog uses the compact country-name directory instead of importing
+SVG paths. A shared deferred renderer discards superseded requests and permits
+retry after a loading failure; the country list remains usable without the map.
+
 ## Runtime surfaces
 
 | Surface | Responsibility | Important boundary |
@@ -43,7 +50,7 @@ deployment is the SiteGround root installation.
 | `src/data/` | Import, identity, deduplication, enrichment, search and persistence | Imported playlists and metadata are untrusted |
 | `src/player/` | HLS lifecycle, endpoint fallback, multiview audio and telemetry | `tuned` is not proof that a first frame or audio was decoded |
 | `src/epg/` | XMLTV fetch, cache, parsing and channel schedule matching | Guide URLs require user approval; large universal feeds are unsuitable for the browser |
-| `public/*.php` | Installation-wide state and private logo cache | Both services require the signed login cookie |
+| `public/*.php` | Installation-wide state, private logo and EPG caches | All three services require the signed login cookie |
 | `index.php` + `.htaccess` | Official deployment login gate | The private app entry, credentials and `.catodo-data/` must remain inaccessible directly |
 | `worker.js` | Optional stream proxy and HLS URI rewriting | This is not an anonymous general-purpose proxy |
 
@@ -236,18 +243,22 @@ window. Times use the local timezone and 24-hour notation. The Italian preset
 uses eight current Open EPG feeds; known expired GlobeTV Italy URLs are migrated
 automatically. Because Open EPG does not expose browser CORS headers, production
 uses an authenticated, host/path-allowlisted PHP cache and Vite supplies the same
-narrow bridge during development. The broader GlobeTV catalog is cached for 24
-hours and country file lists are loaded lazily; installed URLs remain
+narrow bridge during development. Country discovery uses fresh Open EPG catalog
+entries plus the allowlisted
+EPGShare01 country fallback, with GlobeTV as the final repository fallback.
+The GlobeTV catalog is cached for 24 hours and country file lists load lazily;
+installed URLs remain
 installation-wide settings while source status and programme bodies stay local
 to each browser. Settings can export a versioned
 JSON configuration backup and merge a validated backup into the installation;
 runtime caches, credentials, logs and programme bodies are excluded.
 
-Country profiles expose guide loading only when enriched channel metadata lists
-real XMLTV source URLs. Activating it merges those URLs into the installation's
-existing EPG sources, preserves the chosen refresh cadence and immediately
-refreshes a bounded first set of country schedules. Missing mappings remain an
-explicit unavailable state rather than generating provider URLs heuristically.
+Country guide discovery is coordinated by `CountryGuideResolver` in
+`src/epg/catalog.js`. Country actions present a consent dialog, reuse approved
+sources and merge accepted provider URLs into shared settings while preserving
+cadence. Channel-mapped guide URLs also support on-demand playback schedules.
+Missing matches, stale schedules and provider failures remain distinct states;
+do not infer current coverage from discovery alone.
 
 ## UI, navigation and localization
 
@@ -271,7 +282,7 @@ visual language combines a structured broadcast grid, restrained rounding,
 Exo 2 Variable, IBM Plex Mono for diagnostics, electric blue and EBU accents.
 Interactive targets must remain comfortable on Tesla touch displays.
 
-The boot ident is CSS/DOM animation controlled by `AnalogBoot`; it is skippable,
+The boot ident is CSS/DOM animation controlled by `playAnalogBoot`; it is skippable,
 has a reduced-motion path and must not delay data initialization unnecessarily.
 
 ### Home Screen installation
@@ -298,7 +309,7 @@ Security invariants that must not be weakened:
 - every import, including a trusted preset, requires explicit consent;
 - playlist, XMLTV, metadata, logo and stream URLs are untrusted input;
 - `.htpasswd`, `.catodo-private/app.html`, `.catodo-data/` and gate bookkeeping are not public;
-- installation state and logo cache require the signed gate cookie;
+- installation state, logo cache and EPG cache require the signed gate cookie;
 - proxy and logo redirects are validated at every hop;
 - URL/body/record limits remain enforced;
 - CATODO stores external links and user-approved configuration, not bundled
@@ -325,6 +336,8 @@ PHP endpoints also need syntax checks against the built copies:
 ```sh
 php -l dist/installation-api.php
 php -l dist/logo-cache.php
+php -l dist/epg-cache.php
+php -l index.php
 ```
 
 Tests are strong at module boundaries but do not replace a real-browser smoke
@@ -335,8 +348,9 @@ transitions and actual hosting headers.
 
 - `src/app.js` and `src/ui/markup.js` are large. New product areas should prefer
   focused controllers/renderers instead of adding another broad switch branch.
-- The production application chunk is large; boot-path code splitting and lazy
-  loading of country/map or low-frequency surfaces are worthwhile future work.
+- Map geometry is now deferred, substantially reducing the initial app chunk.
+  Its own chunk remains large; measure startup, first Countries access and memory
+  before choosing further map simplification or Guide code splitting.
 - Installation synchronization has no accounts, per-device profiles or
   automatic backups; its intent rebase is deliberately narrower than a general
   three-way merge.
