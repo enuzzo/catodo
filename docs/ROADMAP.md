@@ -1,6 +1,6 @@
 # CATODO roadmap
 
-Resume from the [compact Theatre handoff](work/2026-09-22-theatre-compact-curation.md) for
+Resume from the [archive index handoff](work/2026-09-22-theatre-archive-index.md) for
 publication status and the recommended next task.
 
 Open work and ideas, reconciled with repository documentation and code on
@@ -39,7 +39,7 @@ features and detailed QA results are preserved in
 | CONTENT-01 | Published; provider/device acceptance open | Discover: Adrenaline first, Documentaries and full-category navigation | Groups all matching approved catalog identities without importing sources or promising Red Bull VOD rights. Synthetic multi-feed rendering and browser transitions verified; actual installation coverage and Tesla playback remain open. See [handoff](work/2026-09-22-theatre-integration.md) |
 | CONTENT-02 | Partial: 29 usable works; 50-work target open | Theatre: internationally interesting films and substantive documentaries, with edition-specific rights | Compact persistent player, Randomize, six editorial collections, 61 credited images and 16 optional galleries. [Register](work/2026-09-22-theatre-register.md) separates active works and unresolved candidates. Rejected newsreels count zero; Metropolis/Chaplin remain conditional. Improve low-resolution copies and verified captions; publication tracked in the [current handoff](work/2026-09-22-theatre-compact-curation.md) |
 | CONTENT-03 | Published; physical scan open | Visible source, attribution, exact license and source QR | Local generation and independent decoding; no QR service, tracking or film bundle. Real-phone/Tesla scanning and viewing remain open. See [handoff](work/2026-09-22-theatre-integration.md) |
-| CONTENT-04 | External discovery guides implemented; vintage editions remain research | Curated vintage horror and Elvis seasons; stronger official poster coverage | Three labelled external guides open Archive.org collections and PDR references. They do not make all linked films playable in CATODO. [Vintage register](work/2026-09-22-theatre-artwork-curation.md) retains Midnight Monsters / Drive-in After Dark / Elvis on Screen; review edition, territory, score and artwork separately |
+| CONTENT-04 | Complete source index integrated; vintage playback remains research | Curated vintage horror and Elvis seasons; stronger official poster coverage | Explore archives indexes 30,067 entries from all returned Archive feature_films records and the direct Open Culture / Public Domain Movies lists, with categories, declared-rights and review filters, opt-in images and provenance. Linked collections are not recursively expanded; this does not add 30,067 playable films. Territory clarification and exact edition review remain open. [Vintage register](work/2026-09-22-theatre-artwork-curation.md) retains Midnight Monsters / Drive-in After Dark / Elvis on Screen; review edition, territory, score and artwork separately |
 
 ## Engineering candidates
 

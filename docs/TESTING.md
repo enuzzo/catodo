@@ -21,6 +21,7 @@ package (check its `engines` if setup fails).
 | Catalog/storage | `node --test tests/data/*.test.js` | Include PHP test for shared-state contracts |
 | Player/audio | `node --test tests/player/*.test.js` | Real gesture, playback, mute/volume and return path |
 | Theatre | `node --test tests/data/theatre-model.test.js tests/player/theatre-player.test.js tests/ui/telemetry-model.test.js` | No media before consent; playback controls, persistent DOM, late live-play isolation, QR decoding, all artwork loading/credits and navigation in real Chromium |
+| Archive discovery | `node --test tests/data/theatre-archive-model.test.js` | Includes Python 3 standard-library parser fixtures; source-count reconciliation, exact-edition approval, URL safety, rating/filter/page behavior. Browser: lazy gzip/plain loading, retry, opt-in images/fallback, all-source search and preserved film DOM in all four viewports |
 | Guide | `node --test tests/epg/*.test.js` | Consent UI and country/status isolation |
 | UI models/copy | `node --test tests/ui/*.test.js tests/i18n/*.test.js` | Render the changed surface at desktop/Tesla baseline and narrow viewport |
 | PHP state | `node --test tests/php/installation-api.test.js` | Requires PHP; test skips when PHP is absent |
@@ -38,7 +39,7 @@ storage; do not replace them with live-provider calls.
 - `check`: syntax for JS/MJS under `src/`, `tests/`, `scripts/`, then version
   consistency across package/lock/changelog, selected docs and build wiring.
   It does not cover PHP, CSS/layout or every root JavaScript file.
-- `build`: Vite production assets plus private-entry relocation. It can expose
+- `build`: Vite production assets, private-entry relocation and discovery-index gzip. It can expose
   bundle-size warnings; a successful build is not a browser or deployment pass.
 
 For changed root JavaScript, use `node --check worker.js` or

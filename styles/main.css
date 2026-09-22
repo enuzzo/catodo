@@ -6913,3 +6913,57 @@ textarea {
 }
 .theatre-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .theatre-controls .button { min-height: 44px; padding: 10px 12px; font-size: 12px; }
+
+/* The large external index is fetched only when its view is explicitly opened. */
+.theatre-intro-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: end; gap: 8px; }
+.theatre-modes { display: flex; gap: 8px; }
+.theatre-modes .button { min-height: 44px; }
+.theatre-modes [aria-pressed="true"] { color: white; background: var(--signal); border-color: var(--signal); }
+.theatre-archive-status { color: var(--ink-soft); font: 12px var(--font-mono); margin: 0 0 14px; }
+.theatre-archive-tools { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: start; }
+.theatre-archive-primary { display: flex; gap: 12px; width: 100%; }
+.theatre-archive-primary .theatre-search { max-width: none; }
+.theatre-archive-primary .theatre-select { max-width: 320px; }
+.theatre-archive-refine { flex: 0 0 auto; }
+.theatre-archive-refine[open] { flex-basis: 100%; border-bottom: 1px solid var(--line); }
+.theatre-archive-refine summary, .theatre-archive-about summary { cursor: pointer; min-height: 44px; padding: 12px 0; font-size: 14px; }
+.theatre-archive-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding-bottom: 12px; }
+.theatre-archive-filters .theatre-select { width: 100%; font-size: 14px; }
+.theatre-archive-meta { display: flex; flex: 1; flex-wrap: wrap; gap: 10px; align-items: center; }
+.theatre-archive-meta [aria-pressed="true"] { color: var(--signal); border-color: var(--signal); }
+.theatre-archive-note { color: var(--ink-soft); font-size: 13px; line-height: 1.5; margin: 10px 0 18px; max-width: 86ch; }
+.theatre-archive-results { font: 13px var(--font-mono); color: var(--signal); margin: 16px 0; }
+.theatre-archive-card { display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--line-strong); background: var(--paper-raised); }
+.theatre-archive-art { position: relative; display: flex; flex-direction: column; justify-content: center; gap: 10px; aspect-ratio: 1.6; padding: 16px; overflow: hidden; background: #070e20; color: #e5eafa; }
+.theatre-archive-art::before { content: ''; position: absolute; inset: 12px; border: 1px solid #34466d; pointer-events: none; }
+.theatre-archive-year { font-size: clamp(30px, 4vw, 58px); line-height: 1; letter-spacing: -.035em; }
+.theatre-archive-type { font: 11px var(--font-mono); text-transform: uppercase; letter-spacing: .1em; }
+.theatre-archive-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #070e20; }
+.theatre-archive-card-body { padding: 16px; display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.theatre-archive-card h3 { font-size: clamp(20px, 1.8vw, 26px); line-height: 1.12; letter-spacing: -.025em; overflow-wrap: anywhere; margin: 8px 0 12px; }
+.theatre-archive-card p { margin: 0 0 10px; }
+.theatre-archive-card .theatre-card__creator { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font-size: 13px; }
+.theatre-archive-rating { font-size: 13px; line-height: 1.5; }
+.theatre-archive-rights { font-size: 12px; line-height: 1.5; color: var(--ink-soft); }
+.theatre-archive-card-links { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: auto; }
+.theatre-archive-card .theatre-link { font-size: 13px; line-height: 1.4; overflow-wrap: anywhere; }
+.theatre-archive-card > .theatre-link { padding: 8px 16px; border-top: 1px solid var(--line); }
+.theatre-archive-pagination { display: flex; justify-content: center; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 26px; }
+.theatre-archive-pagination input { width: 88px; }
+.theatre-archive-pagination .button { min-height: 48px; }
+.theatre-archive-about { margin-top: 26px; border-top: 1px solid var(--line); }
+.theatre-archive-about p { font-size: 14px; line-height: 1.6; max-width: 86ch; color: var(--ink-soft); }
+.theatre-archive-about .theatre-link { margin-inline-end: 20px; }
+@media (max-width: 760px) {
+  .theatre-intro-tools { width: 100%; justify-content: start; }
+  .theatre-archive-primary { flex-direction: column; }
+  .theatre-archive-primary .theatre-select { max-width: none; }
+  .theatre-archive-filters { grid-template-columns: minmax(0, 1fr); }
+  .theatre-archive-grid-results { grid-template-columns: minmax(0, 1fr); }
+  .theatre-archive-card { display: grid; grid-template-columns: 94px minmax(0, 1fr); }
+  .theatre-archive-art { aspect-ratio: auto; padding: 12px; min-height: 150px; }
+  .theatre-archive-year { font-size: 28px; }
+  .theatre-archive-card > .theatre-link { grid-column: 1 / -1; }
+  .theatre-archive-card-body { padding: 14px; }
+  .theatre-archive-meta .theatre-select { max-width: 100%; }
+}

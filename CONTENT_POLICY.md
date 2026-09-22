@@ -41,6 +41,22 @@ designed poster. Preserve complete frames, including embedded subtitles and
 credits; no compositing, recoloring or cropping of NoDerivatives excerpts. ESO
 films with an express whole-film limitation use separately licensed images.
 
+## Film discovery metadata
+
+The separate Explore archives index records public directory facts, links,
+categories and explicitly labelled rights declarations. Index membership never
+admits an edition to the active player. The exact reviewed edition register is
+the only source of in-app playback buttons. Similar titles are not merged; an
+exact Archive item identifier can consolidate references to that item.
+
+Do not redistribute the directories' editorial descriptions or film files.
+Unreviewed entries show factual context and link to the source's synopsis and
+edition notes. Source thumbnails are remote, credited and requested only after
+the viewer enables source images; these discovery images are not copied into
+CATODO's licensed local artwork collection. An unavailable image uses a text
+fallback. Directory public-domain claims remain qualified by their stated
+territory, including Public Domain Movies' U.S. scope.
+
 ## Logos and programme data
 
 Third-party marks are displayed only to identify channels. Their inclusion does

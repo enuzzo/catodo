@@ -10,6 +10,14 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.11.0] - 2026-09-22
+
+### ✨ Added
+
+- Added Theatre’s Explore archives catalog: 30,067 discovery entries from the complete Archive feature_films response and the direct Open Culture / Public Domain Movies directories, grouped by available categories with source, rights-declaration, decade, type and Archive-review filters.
+- Added weighted Archive rating order, search, bounded pagination, credited opt-in source images and links back to the exact reviewed Theatre editions. Unreviewed entries open their original sources; uploader license labels do not approve playback.
+- Added a reproducible directory indexer and a 1.58 MB compressed catalog loaded only on demand, with retry, plain-JSON compatibility fallback and image fallbacks.
+
 ## [2.10.1] - 2026-09-22
 
 ### 🐛 Fixed
@@ -233,7 +241,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.10.1...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.11.0...HEAD
+[2.11.0]: https://github.com/enuzzo/catodo/compare/v2.10.1...v2.11.0
 [2.10.1]: https://github.com/enuzzo/catodo/compare/v2.10.0...v2.10.1
 [2.10.0]: https://github.com/enuzzo/catodo/compare/v2.9.0...v2.10.0
 [2.9.0]: https://github.com/enuzzo/catodo/compare/v2.8.0...v2.9.0

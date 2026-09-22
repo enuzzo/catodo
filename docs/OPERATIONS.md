@@ -28,6 +28,33 @@ production data source. Use real imported channels for playback validation.
 
 ## Release checklist
 
+### Refresh the film discovery index
+
+Use Python 3, curl and a new dated cache **outside the repository**. No account,
+API token or movie download is needed:
+
+```sh
+npm run index:theatre -- --cache /tmp/catodo-index-YYYY-MM-DD --pdm-covers
+node --test tests/data/theatre-archive-model.test.js
+```
+
+The indexer follows all Archive cursors, reads the direct Open Culture / Public
+Domain Movies directory lists and (with `--pdm-covers`) retrieves public post
+image metadata at a maximum concurrency of two. Collection links are not
+recursively expanded. Failed directory parsing or incomplete/repeated Archive
+responses must not replace the previous snapshot. Inspect the manifest counts,
+cover failures and changes before publication; cached responses intentionally
+make a run reproducible, so use a fresh dated cache for a live refresh.
+
+For an offline replay, optional `--archive-input`, `--oc-input` and `--pdm-input`
+accept previously captured public data. Keep those raw captures outside Git;
+only the factual `public/theatre/archive-index.json` belongs in the release.
+`npm run build` also emits its gzip copy. Verify both deployed artifacts against
+the build and test the versioned request actually used by the browser. This
+refresh indexes discovery metadata only and never admits new player editions.
+
+### Publish a release
+
 Use this checklist when release/publication is in the authorized task scope;
 reading it during local maintenance does not authorize a deployment.
 

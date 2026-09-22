@@ -1,6 +1,6 @@
 # CATODO architecture
 
-This document is the maintainer map for CATODO 2.10.1. It describes the runtime
+This document is the maintainer map for CATODO 2.11.0. It describes the runtime
 boundaries, the data flow, and the invariants that should survive future UI and
 feature work. For task-to-file navigation use [CODE-MAP.md](CODE-MAP.md); for
 focused checks use [TESTING.md](TESTING.md). For operational procedures and
@@ -245,7 +245,7 @@ without IndexedDB/PHP schema changes, shared sync or backup inclusion. Each work
 has its own provenance, license, attribution, language/caption and edition notes.
 QR PNGs are generated locally by `scripts/theatre-qr.mjs` (authoring dependency:
 `qrencode`) and point to the authoritative source; no external QR endpoint or
-remote poster is loaded. Artwork is served from `public/theatre/artwork/`, with
+remote poster is loaded by the curated shelf. Artwork is served from `public/theatre/artwork/`, with
 separate source/license/credit records on each catalog entry and visible credits.
 Images use contain sizing to preserve the entire composition; poster/photograph/
 film-still provenance is disclosed in viewing notes. A full work with multiple
@@ -266,6 +266,37 @@ viewer turns Motion off. Motion preference is device-local
 (`catodo:theatre:motion:v1`). Extra images are not requested while these conditions
 block animation. ND excerpts stay static; gallery scale/pan preserves complete
 frames. No animated GIF or video preview is shipped.
+
+`theatre-archive.js` provides a second, integrated discovery mode. It pauses the
+persistent film and artwork motion when opened. Only then does it fetch
+`theatre/archive-index.json.gz?v=APP_VERSION` (1.58 MB in the initial snapshot).
+The build generates gzip from the committed factual JSON. DecompressionStream
+handles gzip; older browsers and a missing gzip artifact fall back to JSON. The
+client validates the schema, source URLs, identifiers and response size before
+publishing the result. A failed load offers Retry and leaves the reviewed shelf
+available. It never modifies IndexedDB, installation state or film admission.
+
+`theatre-archive-model.js` combines accent-insensitive search, source/category,
+declared rights, entry type, decade and Archive rating/review-count filters. It
+sorts before selecting 24 cards, so filters cover the full index. Weighted rating
+is `(stars × reviews + 35) / (reviews + 10)`; this is a heuristic using Archive's
+review count, which can include text-only reviews, not IMDb or an exact count of
+star votes. Missing reviews stay missing. Entry type and genre are inferred from
+source metadata; unknown categories remain browsable.
+
+Source images are opt-in for the current component visit. Remote images use
+lazy loading, allowlisted hosts, no referrer and an error fallback; no animation,
+GIF, media extraction or thumbnail proxy is involved. Existing reviewed local
+artwork can appear without external image consent. Only an exact Archive item
+reference present in a usable Theatre edition offers Open reviewed film; that
+action selects the existing film without autoplay or bypassing source consent.
+
+`scripts/theatre-index.py` follows Archive's cursor search API through exhaustion
+and parses the two public directory pages. It retains factual titles, years,
+categories, declared licenses, review counts and source/image references, not
+editorial descriptions. Exact Archive IDs consolidate references; linked film
+collections remain individual collection records rather than fabricated member
+counts. See the [snapshot handoff](work/2026-09-22-theatre-archive-index.md).
 
 Discover's Adrenaline and Documentaries collections operate solely on approved
 catalog records. All matching regional identities remain distinct. Overview rails

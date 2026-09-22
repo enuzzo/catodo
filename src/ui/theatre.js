@@ -3,6 +3,7 @@ import { THEATRE_COLLECTIONS, THEATRE_ARCHIVE_GUIDES } from '../data/theatre-col
 import { filterTheatre, randomTheatreTitle, readTheatreFavorites, saveTheatreFavorites, theatreTime } from '../data/theatre-model.js';
 import { TheatrePlayer } from '../player/theatre-player.js';
 import { createTheatreArtwork } from './theatre-artwork.js';
+import { createTheatreArchive } from './theatre-archive.js';
 
 /** Self-contained shelf and persistent player; catalog refreshes never remount it. */
 export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {}) {
@@ -34,6 +35,7 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
   const consentedOrigins = new Set();
   const state = { filter: 'all', collection: [], language: '', query: '' };
   const events = new AbortController();
+  let active = false, mode = 'curated';
   const view = node('section', 'page page--theatre'); view.dataset.page = 'theatre';
   const intro = node('header', 'theatre-intro');
   const introCopy = node('div');
@@ -46,7 +48,12 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
   try { motionEnabled = storage?.getItem('catodo:theatre:motion:v1') !== 'off'; } catch { /* Visit preference still works. */ }
   const motion = button(tr('motion', 'Motion'), 'motion'); motion.setAttribute('aria-pressed', String(motionEnabled));
   motion.title = tr('motionHint', 'Animate visible artwork. Reduced motion and data saver always take priority.');
-  introActions.append(count, randomize, motion); intro.append(introCopy, introActions);
+  introActions.append(count, randomize, motion);
+  const modes = node('div', 'theatre-modes'); modes.setAttribute('aria-label', tr('browsingMode', 'Theatre browsing mode'));
+  const curatedMode = button(tr('curatedMode', 'Curated films'), 'curated-mode'); curatedMode.setAttribute('aria-pressed', 'true');
+  const archiveMode = button(tr('archiveMode', 'Explore archives'), 'archive-mode'); archiveMode.setAttribute('aria-pressed', 'false');
+  curatedMode.hidden = true; modes.append(curatedMode, archiveMode);
+  const introTools = node('div', 'theatre-intro-tools'); introTools.append(introActions, modes); intro.append(introCopy, introTools);
   const stage = node('section', 'theatre-stage'); stage.setAttribute('aria-label', tr('playerLabel', 'Film player'));
   const screen = node('div', 'theatre-screen');
   const video = node('video', 'theatre-video'); video.controls = true; video.preload = 'none'; video.playsInline = true;
@@ -111,7 +118,10 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
       link(tr('browseArchive', 'Browse on Archive.org ↗'), guide.sourceUrl), link(guide.curator, guide.curatorUrl)); guideGrid.append(item);
   });
   archiveGuides.append(guideGrid);
-  view.append(intro, stage, credits, toolbar, grid, empty, archiveGuides, storageNote);
+  const archiveCatalog = createTheatreArchive({ t: tr, titles, onReviewed(title) {
+    setMode('curated'); selectTitle(title); stage.scrollIntoView({ block: 'start', behavior: 'instant' });
+  } });
+  view.append(intro, stage, credits, toolbar, grid, empty, archiveGuides, storageNote, archiveCatalog.root);
 
   const artworkMotion = createTheatreArtwork({ root: view, creditLabel: (credit) => tr('imageCredit', 'Image: {credit}', { credit }) });
   artworkMotion.setEnabled(motionEnabled);
@@ -163,7 +173,7 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
       artworkMotion.add(artwork, photo, imageCredit, title);
       wrapper.append(card, imageCredit); return wrapper;
     });
-    grid.replaceChildren(...cards); empty.hidden = cards.length > 0;
+    grid.replaceChildren(...cards); empty.hidden = mode !== 'curated' || cards.length > 0;
   }
   function renderSelection() {
     if (!selected) { stage.hidden = true; credits.hidden = true; return; }
@@ -211,9 +221,20 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
       heading.tabIndex = -1; heading.focus({ preventScroll: true }); stage.scrollIntoView({ block: 'start', behavior: 'instant' });
     }
   }
+  function setMode(next) {
+    mode = next; const browsingArchive = mode === 'archive';
+    player.setActive(active && !browsingArchive);
+    [introActions, stage, credits, toolbar, grid, archiveGuides, storageNote].forEach((element) => { element.hidden = browsingArchive; });
+    empty.hidden = browsingArchive || grid.childElementCount > 0;
+    curatedMode.setAttribute('aria-pressed', String(!browsingArchive)); archiveMode.setAttribute('aria-pressed', String(browsingArchive));
+    curatedMode.hidden = !browsingArchive; archiveMode.hidden = browsingArchive;
+    artworkMotion.setActive(active && !browsingArchive); archiveCatalog.setActive(active && browsingArchive);
+  }
   view.addEventListener('click', async (event) => {
     const target = event.target.closest('[data-theatre-action]'); if (!target) return;
     switch (target.dataset.theatreAction) {
+      case 'curated-mode': setMode('curated'); break;
+      case 'archive-mode': setMode('archive'); break;
       case 'select': {
         const next = titles.find((title) => title.id === target.dataset.title && title.decision === 'usable');
         selectTitle(next);
@@ -258,5 +279,5 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
   collection.addEventListener('change', () => { state.collection = THEATRE_COLLECTIONS.find((entry) => entry.id === collection.value)?.ids || []; renderShelf(); }, { signal: events.signal });
   editions.addEventListener('change', () => { player.clear(); editionIndex = Number(editions.value); renderSelection(); }, { signal: events.signal });
   renderSelection(); renderShelf();
-  return { view, video, player, setActive(active) { player.setActive(active); artworkMotion.setActive(active); }, destroy() { events.abort(); artworkMotion.destroy(); player.destroy(); } };
+  return { view, video, player, setActive(value) { active = value; player.setActive(value && mode === 'curated'); artworkMotion.setActive(value && mode === 'curated'); archiveCatalog.setActive(value && mode === 'archive'); }, destroy() { events.abort(); archiveCatalog.destroy(); artworkMotion.destroy(); player.destroy(); } };
 }

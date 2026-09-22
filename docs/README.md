@@ -22,6 +22,7 @@ requirement to read this entire directory before editing a file.
 ## Current work and release evidence
 
 - [Compact Theatre and expanded curation](work/2026-09-22-theatre-compact-curation.md): current handoff, Tesla viewport checks, motion/bandwidth decisions and catalog additions.
+- [Integrated archive discovery index](work/2026-09-22-theatre-archive-index.md): complete source-page coverage, counts, ratings, image consent, refresh procedure and release evidence.
 - [Theatre and Discover handoff](work/2026-09-22-theatre-integration.md): implementation, release verification and remaining editorial/device work.
 - [Artwork and vintage-film curation](work/2026-09-22-theatre-artwork-curation.md): image provenance and proposed horror/Elvis seasons.
 - [Theatre edition register](work/2026-09-22-theatre-register.md): active films,

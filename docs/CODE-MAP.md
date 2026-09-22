@@ -55,6 +55,8 @@ and dependency trees from content searches.
 
 - `src/ui/theatre.js`: persistent shelf/player, consent, filters, credits and QR.
 - `src/ui/theatre-artwork.js`: visibility-aware local artwork galleries and motion lifecycle.
+- `src/ui/theatre-archive.js`, `src/data/theatre-archive-model.js`: lazy discovery index, source-image consent, filtering/ranking/pagination and exact reviewed-edition links.
+- `scripts/theatre-index.py`, `scripts/compress-theatre-index.mjs`: reproducible public-directory snapshot and build-time gzip; parser/model fixtures in `tests/data/theatre-archive-model.test.js` and `tests/data/theatre-index-parser.py`.
 - `src/data/theatre-collections.js`: original editorial collections and external Archive discovery links.
 - `src/data/theatre-catalog.js`: reviewed edition metadata; evidence in the
   [register](work/2026-09-22-theatre-register.md).
