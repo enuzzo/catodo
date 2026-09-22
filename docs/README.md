@@ -21,6 +21,7 @@ requirement to read this entire directory before editing a file.
 
 ## Current work and release evidence
 
+- [Claude curation intake and discovery filters](work/2026-09-22-claude-featured-handoff.md): next-session brief, expected return files, Featured selection, editorial facets and accessible filter pictograms; waiting for Claude's output.
 - [Day/night appearance and palettes](work/2026-09-22-appearance.md): Auto signal/fallback, device-local storage, palette provenance, media invariants and viewport/release evidence.
 
 - [Compact Theatre and expanded curation](work/2026-09-22-theatre-compact-curation.md): current handoff, Tesla viewport checks, motion/bandwidth decisions and catalog additions.
