@@ -64,8 +64,21 @@ bundle also passed synthetic HLS single-player decoding, favorites, volume/mute,
 four decoded Multiview feeds, one-audible-feed selection, replacement and return
 navigation. Versioned final screenshots cover both Tesla dimensions.
 
-Commit/push and production deployment verification are recorded below once
-complete.
+Runtime commit `a02c7ea320b069e150a3c5413f36a2704115390f` was pushed to
+`origin/main` and deployed to SiteGround. Cache-busted production `version.json`
+returned 2.11.1; all 97 checked assets matched the local build byte-for-byte,
+including application JS/CSS, archive index/gzip, artwork, QR, locale, manifest
+and touch icon. The three authenticated services returned 401; private storage,
+private app entry and legacy app.html returned 403; manifest/touch icon returned
+200. The authenticated production app displayed 2.11.1.
+
+Live browser inspection at 1254×784 reproduced the 574.2 px shelf top, aligned
+film/filter columns, all seven navigation destinations and 29 cards. Selecting
+Look Up returned three films and clearing restored 29. At 773×601, Play ended at
+498.4 px with no horizontal overflow. Temporary browser viewport overrides were
+reset after validation. Production playback was not repeated: the local release
+bundle had already decoded the real film at both Tesla dimensions, and the
+published application assets matched that bundle.
 
 Physical Tesla/iOS viewing, audibility and Home Screen installation are not
 established by browser emulation. The open editorial/territory decisions remain
