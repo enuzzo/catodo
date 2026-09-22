@@ -5,7 +5,7 @@
 Requested: index the Archive feature_films collection, Public Domain Movies and
 Open Culture, integrate categories and covers, and use ratings where available.
 The session also authorizes version/changelog, commit, push and deployment.
-Release candidate: 2.11.0; final publication evidence will be recorded below.
+Published as 2.11.0; final publication evidence is recorded below.
 This extends the [compact Theatre release](2026-09-22-theatre-compact-curation.md).
 
 ## Snapshot coverage
@@ -133,7 +133,22 @@ neither physical Tesla audio/touch nor rights for unreviewed media.
 Durable evidence outside Git:
 `/Users/enuzzo/Documents/Codex/catodo-release-2.11.0-2026-09-22/` contains the
 four-viewport screenshots/results, error/transition checks, Live smoke, gate logs
-and SHA-256 build manifest. Authenticated live and public HTTP proof follows.
+and SHA-256 build manifest. The runtime was committed and pushed to `origin/main` as
+`23445ecef4cb33f0e08f979ded05cc0d2cdaaebe` and uploaded through the existing
+SiteGround script. Production version reports 2.11.0. All 97 checked public
+assets match the local build, including both JSON and gzip index files, active
+app JS/CSS, locale, artwork and QR files. The actual versioned locale request
+matches. Protected APIs return 401, private/legacy app and state paths return
+403, and public installable assets return 200.
+
+An existing authenticated Chrome session loaded the published 2.11.0 catalog:
+30,067 entries / 1,253 pages, 24 rendered cards. Horror + at least 4 stars + at
+least 10 reviews returned 27 entries across two pages. Enabling source images
+loaded 12 observed Archive thumbnails with visible image credits. These source
+thumbnails are 180×124; their quality is distinct from the curated shelf's
+locally reviewed artwork. No credential or cookie extraction was used. The tab
+was left open on this selection. Live proof is in `live-ui-verification.json`
+and `public-verification.json` in the evidence directory.
 
 ## Remaining work and next start
 
