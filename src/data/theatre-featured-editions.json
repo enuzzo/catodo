@@ -1,0 +1,91 @@
+{
+  "shoes-1916": {
+    "url": "https://archive.org/download/1916-shoes/1916-Shoes.mp4",
+    "sourceUrl": "https://archive.org/details/1916-shoes",
+    "duration": 2867.65,
+    "label": "Source edition",
+    "note": "47-minute surviving source edition; replaces the 20-minute excerpt. Running time differs from later restorations.",
+    "evidenceUrl": "https://archive.org/metadata/1916-shoes",
+    "audio": "silent"
+  },
+  "grass-1925": {
+    "url": "https://archive.org/download/grass-1925/Grass1925.mp4",
+    "sourceUrl": "https://archive.org/details/grass-1925",
+    "duration": 4197.6,
+    "label": "Source edition",
+    "note": "70-minute source edition; replaces the 21-minute excerpt.",
+    "evidenceUrl": "https://archive.org/metadata/grass-1925",
+    "audio": "present"
+  },
+  "land-of-head-hunters": {
+    "url": "https://archive.org/download/in_the_land_of_the_head_hunters/In.The.Land.Of.The.Head.Hunters.1914.720p.BluRay.x264-RedBlade.mp4",
+    "sourceUrl": "https://archive.org/details/in_the_land_of_the_head_hunters",
+    "duration": 3994.25,
+    "label": "Source edition",
+    "note": "66-minute reconstruction; replaces the 17-minute excerpt. Restoration and soundtrack rights remain separately attributed to their holders.",
+    "evidenceUrl": "https://archive.org/metadata/in_the_land_of_the_head_hunters",
+    "audio": "present"
+  },
+  "aelita": {
+    "url": "https://archive.org/download/AelitaQueenOfMarsoriginalVersion/AelitaQueenOfMarsoriginalVersion.mp4",
+    "sourceUrl": "https://archive.org/details/AelitaQueenOfMarsoriginalVersion",
+    "duration": 6691.75,
+    "label": "Source edition",
+    "note": "111-minute original-version source; replaces the 19-minute excerpt. The sampled audio track is silent or near-silent; no replacement score is added.",
+    "evidenceUrl": "https://archive.org/metadata/AelitaQueenOfMarsoriginalVersion",
+    "audio": "present"
+  },
+  "blood-and-sand": {
+    "url": "https://archive.org/download/BLOODANDSAND1922RudolphValentinoNitaNaldiLilaLee/BLOOD%20AND%20SAND%20%281922%29%20--%20Rudolph%20Valentino%2C%20Nita%20Naldi%2C%20Lila%20Lee.mp4",
+    "sourceUrl": "https://archive.org/details/BLOODANDSAND1922RudolphValentinoNitaNaldiLilaLee",
+    "duration": 6512.11,
+    "label": "Source edition",
+    "note": "108-minute source edition; replaces the 26-minute digest.",
+    "evidenceUrl": "https://archive.org/metadata/BLOODANDSAND1922RudolphValentinoNitaNaldiLilaLee",
+    "audio": "present"
+  },
+  "gilbreth-original-films": {
+    "url": "https://archive.org/download/0809_Original_Films_of_Frank_B_Gilbreth_02_12_34_00/0809_Original_Films_of_Frank_B_Gilbreth_02_12_34_00.mp4",
+    "sourceUrl": "https://archive.org/details/0809_Original_Films_of_Frank_B_Gilbreth_02_12_34_00",
+    "duration": 1933.03,
+    "label": "Source edition",
+    "note": "32-minute Prelinger compilation; replaces Part I alone. The sampled audio track is silent or near-silent; no replacement score is added.",
+    "evidenceUrl": "https://archive.org/metadata/0809_Original_Films_of_Frank_B_Gilbreth_02_12_34_00",
+    "audio": "present"
+  },
+  "the-cut-ups": {
+    "url": "https://archive.org/download/youtube-Uq_hztHJCM4/The_Cut_Ups_1966_William_S._Burroughs-Uq_hztHJCM4.mp4",
+    "sourceUrl": "https://archive.org/details/youtube-Uq_hztHJCM4",
+    "duration": 1178.43,
+    "label": "Source edition",
+    "note": "19-minute source of The Cut-Ups; replaces the conflicting Towers Open Fire file.",
+    "evidenceUrl": "https://archive.org/metadata/youtube-Uq_hztHJCM4",
+    "audio": "present"
+  },
+  "mickey-mouse-in-vietnam": {
+    "url": "https://archive.org/download/mmiv-1968-4k-16mm/MMIV1968.ia.mp4",
+    "sourceUrl": "https://archive.org/details/mmiv-1968-4k-16mm",
+    "duration": 65.79,
+    "label": "16mm scan · standalone short",
+    "note": "Standalone 16mm scan of Short Subject (Mickey Mouse in Vietnam). Replaces the mixed program and a separate copy with a decoder error when seeking.",
+    "evidenceUrl": "https://archive.org/metadata/mmiv-1968-4k-16mm"
+  },
+  "the-kid": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d1/The_Kid_%281921%29_by_Charlie_Chaplin.webm/The_Kid_%281921%29_by_Charlie_Chaplin.webm.480p.vp9.webm",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Kid_(1921)_by_Charlie_Chaplin.webm",
+    "duration": 4099.895,
+    "label": "1921 version · 68 min",
+    "note": "68-minute Chaplin film from Wikimedia Commons; replaces the unrelated Billy the Kid Wanted. The Commons page declares U.S. public domain; this is not a worldwide clearance for all soundtrack or edition rights.",
+    "evidenceUrl": "https://commons.wikimedia.org/wiki/File:The_Kid_(1921)_by_Charlie_Chaplin.webm",
+    "audio": "silent"
+  },
+  "duck-and-cover": {
+    "url": "https://archive.org/download/gov.ntis.ava11109vnb1/ava11109vnb1.mp4",
+    "sourceUrl": "https://archive.org/details/gov.ntis.ava11109vnb1",
+    "duration": 554.09,
+    "label": "Federal Civil Defense edition · 4:3",
+    "note": "Correctly proportioned 4:3 government-source edition; replaces the distorted portrait derivative.",
+    "evidenceUrl": "https://archive.org/metadata/gov.ntis.ava11109vnb1",
+    "audio": "present"
+  }
+}

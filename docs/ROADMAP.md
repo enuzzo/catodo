@@ -4,12 +4,12 @@ Resume from the [appearance handoff](work/2026-09-22-appearance.md) for the late
 publication status and theme evidence; the [wide Theatre handoff](work/2026-09-22-theatre-wide-layout.md)
 retains its layout evidence and the [archive index handoff](work/2026-09-22-theatre-archive-index.md)
 retains catalog coverage and the recommended editorial next task.
-The complete 305-work research is integrated as Featured editorial discovery.
-The [release handoff](work/2026-09-22-featured-release.md) records publication and
+The complete 305-work Featured selection now includes in-app Play.
+The [playback handoff](work/2026-09-22-featured-playback.md) records publication and
 UI verification; the [Featured review](work/2026-09-22-featured-review.md) retains
-the open edition-completeness and international-rights work for in-app playback.
+historical audit evidence and unresolved international-rights declarations.
 The [local UI polish handoff](work/2026-09-22-local-ui-polish.md) records the separately
-authorized, unreleased Home, shared-corner and Theatre preview/order changes.
+authorized Home, shared-corner and Theatre preview/order changes released in 2.13.0.
 
 Open work and ideas, reconciled with repository documentation and code on
 2026-09-20. Priorities combine retained ideas and the
@@ -53,7 +53,7 @@ features and detailed QA results are preserved in
 | CONTENT-02 | Partial: 29 usable works; 50-work target open | Theatre: internationally interesting films and substantive documentaries, with edition-specific rights | Compact persistent player, Randomize, six editorial collections, 61 credited images and 16 optional galleries. [Register](work/2026-09-22-theatre-register.md) separates active works and unresolved candidates. Rejected newsreels count zero; Metropolis/Chaplin remain conditional. Improve low-resolution copies and verified captions; publication tracked in the [current handoff](work/2026-09-22-theatre-compact-curation.md) |
 | CONTENT-03 | Published; physical scan open | Visible source, attribution, exact license and source QR | Local generation and independent decoding; no QR service, tracking or film bundle. Real-phone/Tesla scanning and viewing remain open. See [handoff](work/2026-09-22-theatre-integration.md) |
 | CONTENT-04 | Complete source index integrated; vintage playback remains research | Curated vintage horror and Elvis seasons; stronger official poster coverage | Explore archives indexes 30,067 entries from all returned Archive feature_films records and the direct Open Culture / Public Domain Movies lists, with categories, declared-rights and review filters, opt-in images and provenance. Linked collections are not recursively expanded; this does not add 30,067 playable films. Territory clarification and exact edition review remain open. [Vintage register](work/2026-09-22-theatre-artwork-curation.md) retains Midnight Monsters / Drive-in After Dark / Elvis on Screen; review edition, territory, score and artwork separately |
-| CONTENT-05 | Complete 305-work research integrated; playback clearance open | Integrate an editorial Featured selection of roughly 300 distinctive works, including about 100 unusual Archive discoveries | All 305 works and twelve corrected collections are discoverable in Featured, with Music/War, search, ordering, notes and external sources. Known identity/link corrections applied to the published discovery feed. Approved in-app playback remains a separate gate; see [release](work/2026-09-22-featured-release.md) and [remaining clearance](work/2026-09-22-featured-review.md) |
+| CONTENT-05 | All 305 works playable in-app; source rights remain qualified | Integrate an editorial Featured selection of roughly 300 distinctive works, including about 100 unusual Archive discoveries | Twelve collections, Music/War, search, ordering, source credits and direct Play from cards/details. Corrected wrong works and short/incompatible editions; GitHub reports are linked per work. See [playback release](work/2026-09-22-featured-playback.md). Technical playback does not establish worldwide rights. |
 
 ## Engineering candidates
 

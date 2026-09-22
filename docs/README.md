@@ -21,7 +21,8 @@ requirement to read this entire directory before editing a file.
 
 ## Current work and release evidence
 
-- [Featured and UI release](work/2026-09-22-featured-release.md): full 305-work research, complete session UI changes and release verification.
+- [Featured playback release](work/2026-09-22-featured-playback.md): in-app Play for all 305 works, corrected editions, source reports and playback verification.
+- [Featured and UI release](work/2026-09-22-featured-release.md): historical 2.13.0 research-only release, superseded for playback by the release above.
 
 - [Local UI polish](work/2026-09-22-local-ui-polish.md): unreleased corners/dropdowns, Home alignment/favorites, Theatre 4:3 preview, credits popup and Order by.
 - [Featured package review](work/2026-09-22-featured-review.md): 305-work intake, international territory, exact-edition tests, identity corrections, artwork and taxonomy review; clearance and integration remain open.

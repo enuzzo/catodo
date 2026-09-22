@@ -20,8 +20,11 @@ content in their jurisdiction.
 ## Curated films
 
 Theatre contains editorial metadata and external film links, not bundled films.
-Only records reviewed against a filmmaker, rights-holder or institutional
-publisher may be active. An Archive uploader's license tag alone is insufficient.
+The original curated shelf records reviews against filmmaker, rights-holder or
+institutional publishers. Featured additionally enables publicly accessible
+source editions at the installation owner's explicit request, retaining their
+qualified source declarations. An Archive uploader's license tag alone does not
+establish worldwide rights.
 Review the specific edition, soundtrack, restoration and subtitles; distinguish
 territorial public domain from an applicable license. Keep the source, exact
 license, requested attribution and edition notes visible beside the player.
@@ -32,7 +35,7 @@ replace soundtracks. The initial implementation is for the existing private,
 noncommercial installation. A later commercial distribution requires a fresh
 rights decision for restricted titles. Copyright in these films is not covered
 by CATODO's software license. A source QR supplements, never replaces, credits.
-Conditional or rejected research candidates must stay outside the active shelf.
+The separate 26-work editorial hold dossier remains outside Featured.
 
 Cover imagery has a separate provenance record, local file, attribution, source
 and license. Distinguish official covers, illustrative photographs and unaltered
@@ -45,8 +48,8 @@ films with an express whole-film limitation use separately licensed images.
 
 The separate Explore archives index records public directory facts, links,
 categories and explicitly labelled rights declarations. Index membership never
-admits an edition to the active player. The exact reviewed edition register is
-the only source of in-app playback buttons. Similar titles are not merged; an
+admits an edition to the active player. The curated edition register and explicit
+Featured edition catalog supply in-app playback buttons. Similar titles are not merged; an
 exact Archive item identifier can consolidate references to that item.
 
 Do not redistribute the directories' editorial descriptions or film files.
@@ -59,12 +62,18 @@ territory, including Public Domain Movies' U.S. scope.
 
 ## Featured editorial research
 
-Featured publishes the complete owner-supplied editorial research as discovery
-metadata, with original synopses and corrected source links. It is separate from
-the approved playback shelf. The public feed includes no direct media URLs or
-local copies of unlicensed artwork; source images are remote, credited and opt-in.
-Work-specific edition and international-rights notes remain accessible in each
-detail dialog. Research visibility does not imply playback or rights approval.
+Featured publishes all 305 owner-supplied editorial works with original synopses,
+corrected source editions and in-app playback. A viewer's Play action consents to
+connecting to the identified external source. The catalog contains HTTPS media
+links, never movie files or private credentials; no access controls, geographic
+restrictions or DRM are bypassed. Technically playable does not mean worldwide
+rights verified. Work-specific declarations, corrections and rights concerns
+remain accessible in each detail dialog, with a prefilled GitHub report link.
+
+The project is noncommercial and aims to celebrate artists and film history.
+Credits and any applicable fair-use argument do not create a blanket license.
+Credible claims can result in correction or removal of an edition. Source images
+remain remote, credited and opt-in; they are not copied into licensed local art.
 
 ## Logos and programme data
 

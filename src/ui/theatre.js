@@ -5,6 +5,7 @@ import { TheatrePlayer } from '../player/theatre-player.js';
 import { createTheatreArtwork } from './theatre-artwork.js';
 import { createTheatreArchive } from './theatre-archive.js';
 import { createTheatreFeatured } from './theatre-featured.js';
+import { featuredReportUrl } from '../data/theatre-featured-model.js';
 
 /** Self-contained shelf and persistent player; catalog refreshes never remount it. */
 export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {}) {
@@ -158,7 +159,7 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
   const archiveCatalog = createTheatreArchive({ t: tr, titles, onReviewed(title) {
     setMode('curated'); selectTitle(title); stage.scrollIntoView({ block: 'start', behavior: 'instant' });
   } });
-  const featuredCatalog = createTheatreFeatured({ t: tr });
+  const featuredCatalog = createTheatreFeatured({ t: tr, beforePlay });
   const opening = node('div', 'theatre-opening');
   const feature = node('div', 'theatre-feature'); feature.append(stage, credits);
   opening.append(feature, toolbar);
@@ -232,6 +233,7 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
     play.textContent = playLabel(); play.setAttribute('aria-pressed', 'false'); updateFavorite();
     const sourceLinks = node('div', 'theatre-source-links');
     sourceLinks.append(link(tr('source', 'Open source page'), selected.sourceUrl), link(selected.license, selected.licenseUrl));
+    sourceLinks.append(link(tr('featured.report', 'Report an issue or rights concern on GitHub ↗'), featuredReportUrl(selected)));
     if (url.hostname === 'archive.org' && url.pathname.startsWith('/download/')) {
       sourceLinks.append(link(tr('archiveEdition', 'This edition on Archive.org'), `https://archive.org/details/${url.pathname.split('/')[2]}`));
     }

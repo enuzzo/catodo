@@ -1,8 +1,9 @@
 import { APP_VERSION } from '../version.js';
-import { prepareFeatured, selectFeatured } from '../data/theatre-featured-model.js';
+import { prepareFeatured, selectFeatured, featuredReportUrl } from '../data/theatre-featured-model.js';
+import { createFeaturedPlayer } from './theatre-featured-player.js';
 
-/** Complete editorial selection, with external sources and no unreviewed player admission. */
-export function createTheatreFeatured({ t, fetchImpl = (...args) => fetch(...args) }) {
+/** Complete editorial selection and explicit-click playback from credited sources. */
+export function createTheatreFeatured({ t, beforePlay, fetchImpl = (...args) => fetch(...args) }) {
   const tr = (key, fallback, vars = {}) => t(`featured.${key}`, fallback, vars);
   const node = (tag, cls = '', text) => { const el = document.createElement(tag); el.className = cls; if (text !== undefined) el.textContent = text; return el; };
   const button = (text, cls = 'button button--ghost') => { const el = node('button', cls, text); el.type = 'button'; return el; };
@@ -38,7 +39,7 @@ export function createTheatreFeatured({ t, fetchImpl = (...args) => fetch(...arg
   const reset = button(tr('reset', 'Reset filters'));
   meta.append(results, images, reset); meta.hidden = true;
   const collectionNote = node('p', 'theatre-featured-collection-note'); collectionNote.hidden = true;
-  const note = node('p', 'theatre-archive-note', tr('sourceNote', 'Explore each film on its source site. Editions and international availability vary; viewing notes explain what has been checked. Source images load only when enabled.'));
+  const note = node('p', 'theatre-archive-note', tr('sourceNote', 'Play films here from their credited sources. Availability varies by source and territory. Source images load only when enabled.'));
   const grid = node('div', 'theatre-grid theatre-featured-grid');
   const empty = node('p', 'theatre-empty', tr('empty', 'No films match. Try another collection or reset the filters.')); empty.hidden = true;
   const pagination = node('nav', 'theatre-archive-pagination'); pagination.setAttribute('aria-label', tr('pages', 'Featured pages')); pagination.hidden = true;
@@ -48,7 +49,15 @@ export function createTheatreFeatured({ t, fetchImpl = (...args) => fetch(...arg
   const dialogHeader = node('header', 'theatre-credits__header'), dialogTitle = node('h2'); dialogTitle.id = 'featured-detail-title';
   const close = button('×', 'icon-button theatre-credits__close'); close.setAttribute('aria-label', tr('close', 'Close film details')); close.autofocus = true;
   const body = node('div', 'theatre-featured-detail'); dialogHeader.append(dialogTitle, close); dialog.append(dialogHeader, body);
-  root.append(header, status, retry, tools, collectionNote, meta, grid, empty, pagination, note, dialog);
+  const playback = createFeaturedPlayer({ t: tr, beforePlay, onDetails: show });
+  root.append(header, playback.root, status, retry, tools, collectionNote, meta, grid, empty, pagination, note, dialog);
+  function playButton(record) {
+    const play = button(tr('play', 'Play film'), 'button button--primary theatre-featured-play');
+    play.dataset.featuredPlay = record.id;
+    play.setAttribute('aria-label', tr('playTitle', 'Play {title}', { title: record.title }));
+    play.addEventListener('click', () => { if (dialog.open) dialog.close(); playback.play(record); playback.video.focus({ preventScroll: true }); });
+    return play;
+  }
 
   function cover(record) {
     const art = node('div', 'theatre-featured-art');
@@ -67,12 +76,16 @@ export function createTheatreFeatured({ t, fetchImpl = (...args) => fetch(...arg
     copy.append(node('p', 'theatre-meta', [record.year, ...record.creators].filter(Boolean).join(' · ')), node('p', '', record.synopsis));
     if (record.contentNote) copy.append(node('p', 'theatre-featured-context', record.contentNote));
     const sources = node('div', 'theatre-featured-sources');
+    sources.append(playButton(record));
     if (record.sourceUrl) sources.append(link(tr('openSource', 'Explore film at source ↗'), record.sourceUrl));
     copy.append(sources, node('h3', '', tr('viewingNotes', 'Edition & viewing notes')), node('p', '', record.editionNote));
     const rights = node('details', 'theatre-featured-rights'); rights.append(node('summary', '', tr('rights', 'International rights & sources')));
-    rights.append(node('p', '', record.rightsNote), node('p', '', tr('notCleared', 'This research entry is not an approval for worldwide in-app playback.')));
+    rights.append(node('p', '', record.attribution), node('p', '', record.rightsNote), node('p', '', tr('rightsScope', 'Source declarations are recorded as supplied; they are not a guarantee of rights in every country.')));
+    if (record.licenseUrl) rights.append(link(record.license, record.licenseUrl));
     record.rightsSources.forEach((url) => rights.append(link(new URL(url).hostname, url)));
     copy.append(rights);
+    copy.append(node('p', 'theatre-featured-mission', tr('mission', 'CATODO is a noncommercial project celebrating filmmakers and film history. Rights remain with their respective holders. Contact us to correct credits, report playback issues or request removal.')),
+      link(tr('report', 'Report an issue or rights concern on GitHub ↗'), featuredReportUrl(record)));
     const visual = node('div', 'theatre-featured-detail-art'); visual.append(cover(record));
     if (imagesAllowed && record.image) visual.append(link(tr('imageCredit', 'Image: {credit}', { credit: record.image.credit }), record.image.sourceUrl));
     body.replaceChildren(visual, copy); dialog.showModal(); body.scrollTop = 0;
@@ -84,6 +97,7 @@ export function createTheatreFeatured({ t, fetchImpl = (...args) => fetch(...arg
     copy.append(node('p', 'theatre-card__year', `${record.year || '—'} / ${record.genres.slice(0, 2).map((g) => t(`filters.${g}`, g)).join(' · ')}`), node('h3', '', record.title), node('p', 'theatre-card__creator', record.creators.join(' · ')), node('p', 'theatre-featured-hook', record.hook || record.synopsis));
     open.append(cover(record), copy); open.addEventListener('click', () => show(record, open), { signal: events.signal });
     const footer = node('div', 'theatre-featured-card-footer');
+    footer.append(playButton(record));
     if (record.sourceUrl) footer.append(link(tr('source', 'Source ↗'), record.sourceUrl));
     if (imagesAllowed && record.image) footer.append(link(tr('imageCredit', 'Image: {credit}', { credit: record.image.credit }), record.image.sourceUrl));
     item.append(open, footer); return item;
@@ -132,5 +146,5 @@ export function createTheatreFeatured({ t, fetchImpl = (...args) => fetch(...arg
     if (event.shiftKey && document.activeElement === list[0]) { event.preventDefault(); list.at(-1)?.focus(); }
     else if (!event.shiftKey && document.activeElement === list.at(-1)) { event.preventDefault(); list[0]?.focus(); }
   }, { signal: events.signal });
-  return { root, setActive(value) { active = value; root.hidden = !value; if (!value && dialog.open) dialog.close(); if (value) { if (data) render(); else load(); } }, destroy() { clearTimeout(debounce); if (dialog.open) dialog.close(); events.abort(); } };
+  return { root, setActive(value) { active = value; playback.setActive(value); root.hidden = !value; if (!value && dialog.open) dialog.close(); if (value) { if (data) render(); else load(); } }, destroy() { clearTimeout(debounce); if (dialog.open) dialog.close(); playback.destroy(); events.abort(); } };
 }

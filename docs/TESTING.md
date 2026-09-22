@@ -149,14 +149,19 @@ credits/QR, long titles, episode selection and warning text. Actual film decode,
 native fullscreen and Close must preserve the video node and restore the idle
 layout; switching to/from Explore archives must hide/show the whole opening.
 
-## Featured editorial discovery
+## Featured playback
 
 `tests/data/theatre-featured-model.test.js` checks all 305 records, complete
 pagination, composed filters, unknown-year ordering, corrected source identities
-and collection assignments, and rejection of playback grants/unsafe URLs.
+and collection assignments, media host/scheme boundaries, required editions and
+safe exact-work GitHub report links. Rights status is separate from availability.
 Rendered QA covers 1600×900, 1254×784, 773×601 and 390×844 in light/dark mode:
 search + collection, sorting, page changes, image opt-in, modal containment and
 X/backdrop/Escape/focus restoration, all three browsing modes, retained video
-identity, and no movie requests from Featured. Production bundle and live-feed
+identity, no movie requests before Play, card/detail Play, decoded moving frames,
+muted start, volume preservation across credits, fullscreen, pause on navigation,
+resume without a retune and Close releasing the source. Check all 305 selected
+URLs in Chromium; investigate failures and sample replacement editions.
+Production bundle and live-feed
 identity checks are recorded in the release handoff. No physical Tesla/iPhone
 or worldwide rights approval is inferred from these checks.

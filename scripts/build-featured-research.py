@@ -1,6 +1,6 @@
-"""Build factual/editorial discovery metadata from the preserved Claude review.
+"""Build the editorial playback catalog from the preserved Claude review.
 Usage: python3 scripts/build-featured-research.py --input /path/to/review-directory
-No movie bytes, direct media URLs, local artwork or private paths are published.
+Publishes source URLs, never movie bytes, local artwork or private paths.
 """
 import argparse, hashlib, json, pathlib, urllib.parse
 parser=argparse.ArgumentParser();parser.add_argument('--input',type=pathlib.Path,required=True);args=parser.parse_args()
@@ -13,6 +13,7 @@ def safe(url):
  u=urllib.parse.urlsplit(url)
  return url if u.scheme=='https' and u.hostname and not u.username and not u.password else None
 records=[]
+overrides=json.loads((pathlib.Path(__file__).resolve().parents[1]/'src/data/theatre-featured-editions.json').read_text())
 for r in rows:
  v=review[r['id']];candidate=v.get('replacementCandidate');source=r['edition']['pageUrl']
  if candidate:source='https://archive.org/details/'+urllib.parse.urlsplit(candidate['mediaUrl']).path.split('/')[2]
@@ -34,6 +35,18 @@ for r in rows:
  elif r['id']=='the-cut-ups':editionNote='The supplied item and filename identify different films. Follow the curator page while the exact edition is resolved.'
  elif r['id']=='story-kelly-gang':editionNote='Only fragments of the original film survive. Available restorations reconstruct those fragments.'
  elif r['id'] in notes['editorialHoldIds']:editionNote='A collection of commercials rather than a single film; its editorial scope is under review.'
- records.append({'id':r['id'],'rank':r['rank'],'title':r['title'],'year':r['year'],'creators':r['creators'],'synopsis':r['synopsisEn'],'hook':r['hookEn'],'languages':r['languages'],'genres':genres,'collections':[c['id'] for c in taxonomy['collections'] if r['id'] in c['titleIds']],'catalogIds':[i for i in r['catalogIds'] if i not in v['proposedUnlinks']],'sourceUrl':safe(source),'image':image,'contentNote':r.get('contentNoteEn'),'editionNote':editionNote,'rightsStatus':v['rights']['reviewStatus'],'rightsNote':v['rights']['reason'],'rightsSources':[u for u in v['rights']['evidenceUrls'] if safe(u)],'playbackApproved':False})
-output={'schemaVersion':1,'generatedAt':'2026-09-22','kind':'editorial-discovery','territory':'international','sourcePackageSha256':read('intake-provenance.json')['sha256'],'collections':collections,'records':records}
+ chosen=overrides.get(r['id'])
+ technical=(candidate or {}).get('technical') or v['technical']
+ url=chosen['url'] if chosen else candidate['mediaUrl'] if candidate else r['edition']['mediaUrl']
+ source=chosen['sourceUrl'] if chosen else 'https://archive.org/details/'+urllib.parse.urlsplit(url).path.split('/')[2]
+ duration=chosen['duration'] if chosen else technical.get('measuredDurationSeconds') or r['durationSeconds']
+ audio=chosen.get('audio','unverified') if chosen else 'present' if technical.get('audioTrackPresent') else 'silent'
+ editionNote=chosen['note'] if chosen else ('Browser-compatible replacement of the originally supplied edition.' if candidate else 'Source edition. Running time and available audio were sampled; the entire film has not been watched end to end.')
+ if r['id']=='story-kelly-gang':editionNote='Surviving fragments: the full original film is lost. This source presents the material that remains.'
+ if audio=='silent':editionNote+=' This edition has no audio track.'
+ if not poster or verdict!='visually-suitable':
+  if urllib.parse.urlsplit(source).hostname=='archive.org':image={'url':'https://archive.org/services/img/'+urllib.parse.urlsplit(source).path.split('/')[2],'sourceUrl':source,'credit':'Internet Archive'}
+ rightsSources=list(dict.fromkeys([u for u in v['rights']['evidenceUrls'] if safe(u)]+[source]))
+ records.append({'id':r['id'],'rank':r['rank'],'title':r['title'],'year':r['year'],'creators':r['creators'],'synopsis':r['synopsisEn'],'hook':r['hookEn'],'languages':r['languages'],'genres':genres,'collections':[c['id'] for c in taxonomy['collections'] if r['id'] in c['titleIds']],'catalogIds':[i for i in r['catalogIds'] if i not in v['proposedUnlinks']],'sourceUrl':safe(source),'image':image,'contentNote':r.get('contentNoteEn'),'editionNote':editionNote,'rightsStatus':v['rights']['reviewStatus'],'rightsNote':('Original delivery review: ' if candidate or chosen else '')+v['rights']['reason'],'rightsSources':rightsSources,'worldwideRightsVerified':False,'license':('Original dossier declaration: ' if candidate or chosen else '')+(r['rights'].get('license') or 'No license declared by source'),'licenseUrl':safe(r['rights'].get('licenseUrl')),'attribution':'; '.join(r['creators'])+' · '+r['title']+' ('+str(r['year'])+'). Film, restoration and soundtrack rights remain with their respective holders.','editions':[{'url':safe(url),'sourceUrl':safe(source),'duration':duration,'audio':audio,'label':chosen.get('label','Source edition') if chosen else 'Source edition'}]})
+output={'schemaVersion':2,'generatedAt':'2026-09-22','kind':'editorial-playback','territory':'international','sourcePackageSha256':read('intake-provenance.json')['sha256'],'collections':collections,'records':records}
 path=pathlib.Path(__file__).resolve().parents[1]/'public/theatre/featured-research.json';path.write_text(json.dumps(output,ensure_ascii=False,separators=(',',':'))+'\n');print(f'Wrote {len(records)} editorial records, {len(collections)} collections, {path.stat().st_size} bytes')

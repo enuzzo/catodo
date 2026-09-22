@@ -1,6 +1,6 @@
 # CATODO architecture
 
-This document is the maintainer map for CATODO 2.13.0. It describes the runtime
+This document is the maintainer map for CATODO 2.14.0. It describes the runtime
 boundaries, the data flow, and the invariants that should survive future UI and
 feature work. For task-to-file navigation use [CODE-MAP.md](CODE-MAP.md); for
 focused checks use [TESTING.md](TESTING.md). For operational procedures and
@@ -503,14 +503,22 @@ transitions and actual hosting headers.
 ### Featured research
 
 `public/theatre/featured-research.json` is the complete 305-work editorial
-discovery feed. `scripts/build-featured-research.py --input <review-directory>`
+playback feed (schema 2). `scripts/build-featured-research.py --input <review-directory>`
 rebuilds it from the preserved, external Claude review package; it applies the
-reviewed source/link and collection corrections. It exports no direct media URLs
-or private paths. `theatre-featured-model.js` projects only discovery fields and
-rejects any playback approval. `theatre-featured.js` lazily loads the versioned
+reviewed source/link and collection corrections plus the explicit replacements
+in `src/data/theatre-featured-editions.json`. It exports source media URLs but no
+movie bytes or private paths. `theatre-featured-model.js` validates bounded HTTPS
+Archive/Commons editions independently of source rights declarations.
+`theatre-featured.js` lazily loads the versioned
 feed, filters and paginates 24 records, and keeps image consent session-local.
 Featured details use a native dialog with a scrollable body, 60px vertical margins
 and X/backdrop/Escape dismissal. Curated/Featured/archive switches retain the
-existing video element and pause playback through the existing active-view gate.
-All 305 research works are visible; unresolved rights affect in-app admission,
-not discovery visibility. The 29-work reviewed player shelf is independent.
+existing video elements and pause playback through the existing active-view gate.
+`theatre-featured-player.js` owns one persistent native video and reuses
+`TheatrePlayer`; only a Play gesture attaches media. The shared `beforePlay`
+callback releases live/Multiview audio. Filtering and opening credits do not
+replace or retune the video. All 305 works have enabled source editions under
+the owner's explicit publication instruction; technical availability is not a
+worldwide rights clearance. The 29-work reviewed shelf remains independent.
+The detail dialog and curated credits expose a prefilled GitHub content-report
+link; opening it never submits an issue automatically.

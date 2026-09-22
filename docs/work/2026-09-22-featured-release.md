@@ -1,5 +1,8 @@
 # Complete Featured research and UI release
 
+Historical 2.13.0 checkpoint. In-app Play for all 305 works was subsequently
+requested explicitly and is delivered by the [2.14.0 playback release](2026-09-22-featured-playback.md).
+
 Date: 2026-09-22. Release: **2.13.0**. Publication explicitly authorized by the
 owner, including all 305 research works. This supersedes the local-only status
 of the [audit](2026-09-22-featured-review.md) and [UI work](2026-09-22-local-ui-polish.md).

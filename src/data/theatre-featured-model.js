@@ -1,19 +1,46 @@
-/** Editorial research is discovery metadata, never an admission to the player. */
+/** Source declarations and technical playback availability are separate facts. */
 export function featuredLink(value) {
   try { const url = new URL(value); return url.protocol === 'https:' && !url.username && !url.password ? url.href : null; }
   catch { return null; }
 }
 
+export function featuredMedia(value) {
+  const safe = featuredLink(value);
+  if (!safe) return null;
+  const url = new URL(safe);
+  return ((url.hostname === 'archive.org' && url.pathname.startsWith('/download/'))
+    || (url.hostname === 'upload.wikimedia.org' && url.pathname.startsWith('/wikipedia/commons/')))
+    && /\.(mp4|webm|mov)$/i.test(url.pathname) ? safe : null;
+}
+
+export function featuredPlaybackTitle(record) {
+  if (!record?.editions?.length) return null;
+  return { id: `featured:${record.id}`, title: record.title, decision: 'usable', editions: record.editions };
+}
+
+export function featuredReportUrl(record) {
+  const url = new URL('https://github.com/enuzzo/catodo/issues/new');
+  url.searchParams.set('title', `Content report: ${record.title}`);
+  url.searchParams.set('body', `Film: ${record.title}\nCATODO ID: ${record.id}\nSource: ${record.sourceUrl || ''}\n\nPlease describe the playback, attribution or rights issue and supporting public evidence. Do not include private personal information or credentials.\n`);
+  return url.href;
+}
+
 export function prepareFeatured(payload) {
-  if (payload?.schemaVersion !== 1 || payload.kind !== 'editorial-discovery' || !Array.isArray(payload.records)
+  if (payload?.schemaVersion !== 2 || payload.kind !== 'editorial-playback' || !Array.isArray(payload.records)
     || payload.records.length > 1000 || !Array.isArray(payload.collections)) throw new Error('Invalid Featured catalog');
   const seen = new Set();
   const records = payload.records.map((record) => {
     if (typeof record.id !== 'string' || seen.has(record.id) || typeof record.title !== 'string'
-      || record.playbackApproved !== false || !['creators', 'genres', 'languages', 'collections'].every((key) => Array.isArray(record[key]))) throw new Error('Invalid Featured record');
+      || !['creators', 'genres', 'languages', 'collections', 'editions'].every((key) => Array.isArray(record[key]))) throw new Error('Invalid Featured record');
     seen.add(record.id);
-    // Explicit projection prevents future feed additions from becoming playback URLs.
+    const editions = record.editions.map((edition) => {
+      const url = featuredMedia(edition.url), sourceUrl = featuredLink(edition.sourceUrl);
+      if (!url || !sourceUrl || typeof edition.label !== 'string') throw new Error('Invalid Featured edition');
+      return { url, sourceUrl, label: edition.label, duration: edition.duration, audio: edition.audio };
+    });
+    if (!editions.length || editions.length > 8) throw new Error('Missing Featured edition');
     return { id: record.id, rank: record.rank, title: record.title, year: record.year,
+      editions, attribution: record.attribution, license: record.license, licenseUrl: featuredLink(record.licenseUrl),
       creators: record.creators, genres: record.genres, languages: record.languages, collections: record.collections,
       synopsis: record.synopsis, hook: record.hook, contentNote: record.contentNote,
       sourceUrl: featuredLink(record.sourceUrl), editionNote: record.editionNote,

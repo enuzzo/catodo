@@ -10,6 +10,13 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.14.0] - 2026-09-22
+
+### ✨ Added
+
+- Play all 305 Featured films inside CATODO, directly from cards or details, with persistent native video, mute, fullscreen, source credits and prefilled GitHub issue reports. Playback starts only on a viewer's Play action and pauses when leaving the section.
+- Apply the 16 previously tested alternate editions plus ten additional source corrections, replacing wrong films, incompatible files, excerpts, a mixed program and a distorted portrait derivative. Preserve silent/fragment edition notes and qualified rights declarations.
+
 ## [2.13.0] - 2026-09-22
 
 ### ✨ Added
@@ -279,7 +286,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.13.0...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.14.0...HEAD
+[2.14.0]: https://github.com/enuzzo/catodo/compare/v2.13.0...v2.14.0
 [2.13.0]: https://github.com/enuzzo/catodo/compare/v2.12.0...v2.13.0
 [2.12.0]: https://github.com/enuzzo/catodo/compare/v2.11.1...v2.12.0
 [2.11.1]: https://github.com/enuzzo/catodo/compare/v2.11.0...v2.11.1
