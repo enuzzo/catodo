@@ -67,8 +67,9 @@ PHP gate copy without real credentials or shared installation state.
   during playback and a Dracula change during fullscreen preserved the video
   node, source, mute and volume; playback advanced and Close restored browsing.
   This is browser decoding evidence, not proof of physical speakers or Tesla.
-- A populated synthetic TV Guide and its programme drawer are included in the
-  final screenshot set; provider freshness is outside this theme change.
+- A populated synthetic TV Guide (six channels, 18 programmes) passed all eight
+  palettes in both Tesla sizes, including opening/closing its programme drawer.
+  Provider freshness is outside this theme change.
 
 Local scripts, screenshots, gate/test logs and JSON results are archived under
 `/Users/enuzzo/Documents/Codex/catodo-release-2.12.0-2026-09-22/`.
@@ -78,8 +79,16 @@ Final results, rather than those earlier harness failures, establish acceptance.
 
 ## Publication and next start
 
-Release 2.12.0 is prepared and locally verified. Commit, push, upload and live
-verification are pending at the time of this implementation commit.
+Release **2.12.0** is published on SiteGround. Implementation commit `8becfd2` was
+pushed to `origin/main`; the standard deployment completed successfully.
+Public verification checked 98 assets byte-for-byte against the build, including
+app JS/CSS, appearance bootstrap, versioned locale and existing Theatre assets.
+Versioned `appearance.js` and the public login's reference both report 2.12.0.
+All eight HTTP boundary checks passed: services 401, private/legacy app paths
+403, manifest and touch icon 200. The authenticated Chrome session opened the
+new Settings controls, applied Dracula, retained it after reload, and was left
+in Auto with the default CATODO Light/Dark pair. A documentation-only follow-up
+commit records this evidence; it does not change the deployed bundle.
 
 Next physical check: park the Tesla, leave CATODO in Auto → Browser preference,
 switch the car display between Light and Dark, and read the reported mode in
