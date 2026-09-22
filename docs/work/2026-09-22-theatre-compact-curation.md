@@ -6,7 +6,7 @@ Follow-up to the published [2.9.0 handoff](2026-09-22-theatre-integration.md):
 compact the opening film, add Randomize, readable synopsis/credits and subtle
 multi-image motion; always verify both Tesla browser layouts; continue source
 curation. The session explicitly authorizes version/changelog, commit, push and
-deployment. Publication evidence is appended below after the release gates.
+deployment. Published as 2.10.1 after the release gates and authenticated live checks below.
 
 ## Product decisions
 
@@ -147,7 +147,20 @@ still applies: the correction only changes locale request identity.
 
 Patch evidence is kept in
 `/Users/enuzzo/Documents/Codex/catodo-release-2.10.1-2026-09-22/`.
-Patch upload and final public verification are appended after completion.
+Final deployed runtime commit: `2d8b962623820d1da65479e46e0089127a6d24bf`
+(`Release 2.10.1: refresh translations with each app version`), pushed to
+`origin/main`. SiteGround upload completed successfully. Public `version.json`
+returns 2.10.1; all 95 checked assets match the local build, with no mismatches.
+The actual versioned locale URL also matches the build and returns No dialogue.
+All eight public-boundary assertions passed (401/403/200 as above).
+
+The same authenticated Chrome session that showed `zxx` was reopened on 2.10.1:
+29 films, the compact Theatre page and Big Buck Bunny's NO DIALOGUE label were
+confirmed through the rendered UI. No cache clearing or credential extraction
+was needed. Both task-owned loopback QA servers were stopped after verification.
+Remaining acceptance: parked physical Tesla touch/audio/fullscreen behavior,
+iPhone Safari and standalone installation; the 50-work target and vintage-film
+edition research remain open.
 
 ## Next start
 
