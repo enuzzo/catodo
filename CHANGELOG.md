@@ -10,6 +10,26 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.13.0] - 2026-09-22
+
+### ✨ Added
+
+- Published the complete 305-work editorial Featured research in Theatre, with twelve collections, Music/War genres, search, language/year/title ordering, 24-card pages, opt-in credited source imagery and accessible detail dialogs. Corrected known source identities and collection memberships; external research remains distinct from approved in-app film editions.
+- Added Theatre shelf ordering by editorial sequence, newest/oldest year, title A–Z and shortest duration; sorting composes with filters and preserves the selected film.
+
+### 🛠 Changed
+
+- Start Theatre with a random usable film, show preview artwork in a 4:3 frame and place edition/Play/Favorite controls below it. Removed the connection disclaimer while keeping explicit source consent before loading media.
+- Open Theatre source, credits and viewing notes in a scrollable modal with 60px of space above and below, with X, backdrop and Escape dismissal, keyboard focus handling and uninterrupted playback.
+
+### 🐛 Fixed
+
+- Aligned Home’s six random channel cards (three columns, two rows) with the Live Anchor’s top and bottom edges, with both headings sharing a row on wide layouts.
+- Restored readable Home favorites: up to 18 cards in six columns on wide layouts, responsive rows on smaller screens, and More opening the complete favorite Library only when additional favorites exist.
+- Softened remaining square cards, panels and Theatre fields with restrained 4–6 px corners, preserving joined panel edges and clipped artwork.
+- Kept Multiview presets and toolbar actions readable and reachable in compressed Tesla and phone layouts.
+- Gave native dropdowns across all sections a consistent inset arrow and a dedicated text gutter, including Theatre collections/languages, archive filters and Settings; retained keyboard selection, RTL placement and the system arrow in forced colors.
+
 ## [2.12.0] - 2026-09-22
 
 ### ✨ Added
@@ -259,7 +279,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.12.0...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.13.0...HEAD
+[2.13.0]: https://github.com/enuzzo/catodo/compare/v2.12.0...v2.13.0
 [2.12.0]: https://github.com/enuzzo/catodo/compare/v2.11.1...v2.12.0
 [2.11.1]: https://github.com/enuzzo/catodo/compare/v2.11.0...v2.11.1
 [2.11.0]: https://github.com/enuzzo/catodo/compare/v2.10.1...v2.11.0

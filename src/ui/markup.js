@@ -1,6 +1,7 @@
 import { renderCountryShape, renderWorldMap } from './lazy-world-map.js';
 import { connectedWorldSource } from './source-settings-model.js';
 import { isPrimaryNavActive, shouldActivateShellView } from './view-mode.js';
+import { HOME_FAVORITES_LIMIT, HOME_SUGGESTIONS_LIMIT } from './home-selection.js';
 import { EXPLORE_CATEGORIES } from './explore-model.js';
 import { featuredChannelIdentity } from './channel-identity.js';
 import { APP_VERSION } from '../version.js';
@@ -703,8 +704,10 @@ function createHomeView(t) {
     }),
   );
   const nearbyGrid = element('div', 'channel-grid channel-grid--nearby');
-  suggestions.append(suggestionsHeader, nearbyGrid);
-  directory.append(liveCard, suggestions);
+  suggestionsHeader.firstElementChild.id = 'home-random-title';
+  suggestions.setAttribute('aria-labelledby', 'home-random-title');
+  suggestions.append(nearbyGrid);
+  directory.append(headline, liveCard, suggestionsHeader, suggestions);
   top.append(directory);
 
   const bottom = element('div', 'home-bottom');
@@ -713,15 +716,15 @@ function createHomeView(t) {
     t,
     action: 'navigate',
     iconName: 'caret-right',
-    key: 'common.viewAll',
-    fallback: 'View all',
+    key: 'common.more',
+    fallback: 'More',
     className: 'button--text',
     dataset: { view: 'library', libraryFilter: 'favorites' },
   });
   const favoriteGrid = element('div', 'channel-grid channel-grid--favorites');
   favorites.append(createSectionTitle(t, 'favorites.title', 'Favorites', favoriteMore), favoriteGrid);
   bottom.append(favorites);
-  view.append(headline, top, bottom);
+  view.append(top, bottom);
 
   return {
     view,
@@ -746,6 +749,7 @@ function createHomeView(t) {
     suggestionsRefresh: suggestionsHeader.querySelector('[data-action="refresh-home-suggestions"]'),
     nearbyGrid,
     favoriteGrid,
+    favoriteMore,
   };
 }
 
@@ -3591,7 +3595,7 @@ export function mountAppUI(root, options = {}) {
         count: safeText(state.countryCount ?? state.totalCountries ?? 0),
       });
       const featuredId = safeId(featured.channelId || featured.id || featured.tvgId || featured.url);
-      const suggestions = channels.filter((channel) => safeId(channel?.channelId || channel?.id || channel?.tvgId || channel?.url) !== featuredId).slice(0, 9);
+      const suggestions = channels.filter((channel) => safeId(channel?.channelId || channel?.id || channel?.tvgId || channel?.url) !== featuredId).slice(0, HOME_SUGGESTIONS_LIMIT);
       home.suggestionsRefresh.disabled = !suggestions.length;
       renderChannelTiles(home.nearbyGrid, suggestions.map((channel) => ({ ...channel, active: false })), t, {
         schedule: true,
@@ -3599,10 +3603,11 @@ export function mountAppUI(root, options = {}) {
         ariaLabelKey: 'channel.tuneDashboardAriaLabel',
         ariaLabelFallback: 'Tune {name} in dashboard',
       });
+      home.favoriteMore.hidden = (state.favoriteCount ?? favorites.length) <= HOME_FAVORITES_LIMIT;
       if (favorites.length) {
         renderChannelTiles(
           home.favoriteGrid,
-          favorites.map((channel) => ({
+          favorites.slice(0, HOME_FAVORITES_LIMIT).map((channel) => ({
             ...channel,
             active: safeId(channel?.channelId || channel?.id || channel?.tvgId || channel?.url) === featuredId,
           })),

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { filterTheatre, randomTheatreTitle, readTheatreFavorites, saveTheatreFavorites } from '../../src/data/theatre-model.js';
+import { filterTheatre, sortTheatreTitles, randomTheatreTitle, readTheatreFavorites, saveTheatreFavorites } from '../../src/data/theatre-model.js';
 import { THEATRE_TITLES } from '../../src/data/theatre-catalog.js';
 import { THEATRE_COLLECTIONS } from '../../src/data/theatre-collections.js';
 import { existsSync, readFileSync } from 'node:fs';
@@ -56,4 +56,28 @@ test('Every active Theatre edition has provenance, original metadata and a local
       if (image.motionAllowed) assert.doesNotMatch(image.license, /ND|NoDerivatives/i, `${title.id}: ND excerpts must remain static`);
     }
   }
+});
+
+test('Theatre ordering keeps unknown numeric values last and editorial ties stable without mutating input', () => {
+  const titles = [
+    { id: 'missing', title: 'Z', year: null, duration: 0 },
+    { id: 'new', title: 'Film 10', year: 2010, duration: 600 },
+    { id: 'old', title: 'Film 2', year: 1950, duration: 120 },
+    { id: 'tie', title: 'Alpha', year: 2010, duration: 600 },
+    { id: 'invalid', title: 'Other', year: -1, duration: NaN },
+  ];
+  const ids = (order) => sortTheatreTitles(titles, order).map((title) => title.id);
+  assert.deepEqual(ids('newest'), ['new', 'tie', 'old', 'missing', 'invalid']);
+  assert.deepEqual(ids('oldest'), ['old', 'new', 'tie', 'missing', 'invalid']);
+  assert.deepEqual(ids('shortest'), ['old', 'new', 'tie', 'missing', 'invalid']);
+  assert.deepEqual(ids('title'), ['tie', 'old', 'new', 'invalid', 'missing']);
+  assert.deepEqual(ids('editorial'), ['missing', 'new', 'old', 'tie', 'invalid']);
+  assert.deepEqual(ids('unknown'), ids('editorial'));
+  assert.deepEqual(titles.map((title) => title.id), ids('editorial'));
+});
+
+test('Theatre sorting follows combined filters and cannot promote conditional works', () => {
+  const titles = films.map((film, index) => ({ ...film, year: 2020 - index }));
+  assert.deepEqual(filterTheatre(titles, { sort: 'oldest' }).map((film) => film.id), ['two', 'one']);
+  assert.deepEqual(filterTheatre(titles, { sort: 'newest', collection: ['two', 'uncleared'], language: 'it' }).map((film) => film.id), ['two']);
 });

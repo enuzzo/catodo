@@ -1,9 +1,9 @@
 # Claude curation intake and discovery filters
 
-Date: 2026-09-22. Status: prepared for a new session; waiting for the user to
-attach Claude's output. The user asked to close the current session and retain
-these ideas for the next one. Do not start catalog imports or filter changes
-before that return arrives.
+Date: 2026-09-22. Original return contract, now superseded for current status by
+the [305-work package review](2026-09-22-featured-review.md). The user supplied
+Claude's output and selected international access. Intake and technical triage
+are recorded; rights clearance and Featured integration remain open.
 
 ## Starting point
 

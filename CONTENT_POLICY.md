@@ -57,6 +57,15 @@ CATODO's licensed local artwork collection. An unavailable image uses a text
 fallback. Directory public-domain claims remain qualified by their stated
 territory, including Public Domain Movies' U.S. scope.
 
+## Featured editorial research
+
+Featured publishes the complete owner-supplied editorial research as discovery
+metadata, with original synopses and corrected source links. It is separate from
+the approved playback shelf. The public feed includes no direct media URLs or
+local copies of unlicensed artwork; source images are remote, credited and opt-in.
+Work-specific edition and international-rights notes remain accessible in each
+detail dialog. Research visibility does not imply playback or rights approval.
+
 ## Logos and programme data
 
 Third-party marks are displayed only to identify channels. Their inclusion does

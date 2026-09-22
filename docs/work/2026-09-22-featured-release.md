@@ -1,0 +1,67 @@
+# Complete Featured research and UI release
+
+Date: 2026-09-22. Release: **2.13.0**. Publication explicitly authorized by the
+owner, including all 305 research works. This supersedes the local-only status
+of the [audit](2026-09-22-featured-review.md) and [UI work](2026-09-22-local-ui-polish.md).
+
+## Delivered scope
+
+- Theatre → Featured exposes all 305 selections (209 dossier works and 96 new
+  discoveries), twelve collections, Music/War genres, search, language filters,
+  editorial/year/title sorting and 24-item pagination. No research work is
+  hidden solely because its edition is awaiting clearance.
+- Authored editorial copy, corrected source links and work-identity notes are
+  published as metadata. The 26 incorrect catalog associations are omitted;
+  originals and all 888 incoming references remain in the external audit.
+- Remote, credited source images load only after consent. Typographic artwork
+  remains visible while images load or fail; unlicensed audit captures are not
+  copied into the public bundle.
+- Detail dialogs support close button, backdrop, Escape and focus restoration;
+  60px vertical outside space makes the overlay clear at short screen heights.
+- Global 4–6px corners and dropdown gutters; Home has six random cards aligned
+  with the preview, up to eighteen roomy Favorites and More; curated Theatre
+  opens on a randomized film with a 4:3 preview, footer actions and year sorting.
+
+## Evidence
+
+The release evidence directory is
+`/Users/enuzzo/Documents/Codex/CATODO-2.13.0-release-2026-09-22/`.
+
+- `npm test`: 215 passed, zero failed/skipped. `npm run check`: syntax and 2.13.0
+  metadata passed. `npm run build`: passed; existing large-chunk advisory remains.
+- PHP syntax passed for the gate and three protected service endpoints.
+- Production-bundle Chromium Featured checks passed at 1600×900, 1254×784,
+  773×601 and 390×844, in light/dark: filters, sorting, pagination, modal
+  dismissal/focus, no eager third-party images or movie requests, and persistent
+  media DOM across Curated/Featured/Archives. Screenshots were inspected.
+- Curated UI regression passed on the same four sizes, including 4:3 preview,
+  startup random selection, modal margins and three dismissal methods.
+- Actual ESO movie playback decoded frames and advanced time; sorting/dialogs
+  preserved the video; fullscreen and archive round-trip passed on the build.
+- Production Home checks passed in all four sizes/light-dark using a local
+  synthetic playlist: six cards, exact desktop top/bottom alignment, eighteen
+  Favorites, More at twenty and hidden at eighteen, with no runtime errors.
+- Manifest/icon presence, square opaque installation icons, transparent website
+  icons, changed Markdown links and whitespace checks passed.
+- Browser plugin was unavailable; the installed Playwright runtime provided
+  isolated local Chromium checks. Production browser inspection uses CUA.
+
+## Publication
+
+Prepared for commit, push to official `main`, and SiteGround deployment.
+Deployment identity and live verification are recorded below after upload.
+
+## Remaining work and limits
+
+The research publication is complete. Its records are **not** 305 new approved
+in-app player editions: no `mediaUrl` or playback grant is present in this feed.
+International edition clearance, full-length completeness, sound assessment and
+image licensing remain explicit audit work. The existing curated player remains
+available. The 26 held works stay in the decisions dossier, outside the 305.
+
+Browser decode is not physical audibility or real Tesla/iPhone acceptance.
+No real-device Add to Home Screen acceptance was performed for this release.
+Multiview audio invariants are covered by the passing automated suite; no new
+manual multi-stream playback session was performed in this release pass.
+Resume unresolved edition work from the audit ledger and first-thirty priority
+notes, without withholding the now-published research catalog.

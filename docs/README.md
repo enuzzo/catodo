@@ -21,7 +21,11 @@ requirement to read this entire directory before editing a file.
 
 ## Current work and release evidence
 
-- [Claude curation intake and discovery filters](work/2026-09-22-claude-featured-handoff.md): next-session brief, expected return files, Featured selection, editorial facets and accessible filter pictograms; waiting for Claude's output.
+- [Featured and UI release](work/2026-09-22-featured-release.md): full 305-work research, complete session UI changes and release verification.
+
+- [Local UI polish](work/2026-09-22-local-ui-polish.md): unreleased corners/dropdowns, Home alignment/favorites, Theatre 4:3 preview, credits popup and Order by.
+- [Featured package review](work/2026-09-22-featured-review.md): 305-work intake, international territory, exact-edition tests, identity corrections, artwork and taxonomy review; clearance and integration remain open.
+- [Claude curation intake and discovery filters](work/2026-09-22-claude-featured-handoff.md): original return contract, editorial facets and accessible filter pictograms; the package has now arrived.
 - [Day/night appearance and palettes](work/2026-09-22-appearance.md): Auto signal/fallback, device-local storage, palette provenance, media invariants and viewport/release evidence.
 
 - [Compact Theatre and expanded curation](work/2026-09-22-theatre-compact-curation.md): current handoff, Tesla viewport checks, motion/bandwidth decisions and catalog additions.

@@ -34,6 +34,48 @@ Do not invent `npm run lint`, browser-test or coverage commands: none is defined
 in `package.json`. Existing Node tests use fixtures/fakes and PHP temporary
 storage; do not replace them with live-provider calls.
 
+## Theatre preview, credits and order
+
+Verify a random initial usable film, followed by stable selection across ordinary
+navigation. In all four viewports and both themes, check the 4:3 artwork frame,
+full image containment, the footer controls and popup bounds (at least 60px of
+space above and below the centered dialog). All current previews
+must keep Play fully visible initially on compressed Tesla, including long content
+notes and edition selectors. Credits must close with X, Escape and backdrop click,
+stay open for inside clicks, cycle keyboard focus, restore it to the trigger and
+keep the close button reachable while long credits scroll.
+
+Exercise every Order by option after filtering, editorial reset, unchanged preview
+selection, unknown-value ordering and archive round trips. Before consent, assert
+no film media request. During real decoded playback, sorting and credits must
+preserve the video node, source, current time, volume and mute; verify fullscreen
+and Close restore the 4:3 idle frame. Historical expanded-credits checks below
+refer to the former accordion; current behavior is the modal described here.
+
+## Home alignment and favorite limits
+
+Import the synthetic playlist through the real app and save 20 favorites. Home
+must show six random suggestions and 18 favorites; More must open all 20 in the
+favorite Library, then disappear when the total returns to 18. Refreshing random
+suggestions must preserve the preview video node and source. Compare preview
+and suggestion-grid top/bottom edges on wide layouts, including long channel
+names and five-digit live counts. Verify six favorite columns at 1600/1254px,
+three at 773px and two at 390px, with no hidden cards or fixed-height shelf.
+Capture both themes, the initial viewport and the favorite shelf after scrolling.
+Synthetic channels establish layout and navigation, not live playback.
+
+## Shared corners and dropdowns
+
+For shared CSS changes, inspect Live, Discover, Theatre (including archives),
+Countries, Multiview, Guide, Library and Settings in both themes and all four
+baseline viewports. Check clipped artwork against rounded outer borders, joined
+panel seams, selected/focus outlines, and native dropdown text with its reserved
+44px trailing gutter. Verify collection/language filtering, keyboard Tab order,
+RTL arrow placement and the native-arrow fallback in forced colors. The archive
+page-number input shares a field class but must never gain a dropdown arrow.
+Multiview presets and actions must remain reachable alongside the feed-count
+controls, including after a saved preset exposes rename/delete actions.
+
 ## What the gates establish
 
 - `test`: Node behavior tests. Read the summary for failures **and skips**.
@@ -106,3 +148,15 @@ header navigation, search → collection → language keyboard order, expanded
 credits/QR, long titles, episode selection and warning text. Actual film decode,
 native fullscreen and Close must preserve the video node and restore the idle
 layout; switching to/from Explore archives must hide/show the whole opening.
+
+## Featured editorial discovery
+
+`tests/data/theatre-featured-model.test.js` checks all 305 records, complete
+pagination, composed filters, unknown-year ordering, corrected source identities
+and collection assignments, and rejection of playback grants/unsafe URLs.
+Rendered QA covers 1600×900, 1254×784, 773×601 and 390×844 in light/dark mode:
+search + collection, sorting, page changes, image opt-in, modal containment and
+X/backdrop/Escape/focus restoration, all three browsing modes, retained video
+identity, and no movie requests from Featured. Production bundle and live-feed
+identity checks are recorded in the release handoff. No physical Tesla/iPhone
+or worldwide rights approval is inferred from these checks.

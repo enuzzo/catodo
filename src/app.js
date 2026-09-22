@@ -34,14 +34,13 @@ import {
 import { multiviewTelemetry, singleTelemetry, nativeMediaTelemetry } from "./ui/telemetry-model.js";
 import { advanceConnection, connectionView, startConnection } from "./ui/connection-model.js";
 import { resolvePlayerReturnView } from "./ui/view-mode.js";
-import { selectInitialHomeChannel } from "./ui/home-selection.js";
+import { HOME_FAVORITES_LIMIT, selectInitialHomeChannel } from "./ui/home-selection.js";
 import { favoriteGuidePlan } from "./ui/favorite-guide-model.js";
 import { defaultMultiviewPresetState, deleteMultiviewPreset, findMultiviewPreset, renameMultiviewPreset } from "./ui/multiview-preset-model.js";
 import { resetWorldMapView, zoomWorldMap } from "./ui/lazy-world-map.js";
 import { categoryOptions } from "./data/channel-categories.js";
 
 const UI_CHANNEL_LIMIT = 72;
-const HOME_FAVORITES_LIMIT = 10;
 const EXPLORE_PREVIEW_LIMIT = 8;
 const EXPLORE_PAGE_SIZE = 32;
 const MULTIVIEW_MAX = 4;
@@ -613,6 +612,7 @@ function renderHome() {
     featured: featured ? { ...decorateChannel(featured), muted: state.homeMuted, autoplay: true } : null,
     channels: worldMix.map(decorateChannel),
     favorites: favorites.slice(0, HOME_FAVORITES_LIMIT),
+    favoriteCount: favorites.length,
     liveCount: allPlayable.length,
     countryCount: allPlayableCountries.size,
     selectedIso2: inferredCountryCode(featured),

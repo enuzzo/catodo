@@ -1,6 +1,6 @@
 # CATODO architecture
 
-This document is the maintainer map for CATODO 2.12.0. It describes the runtime
+This document is the maintainer map for CATODO 2.13.0. It describes the runtime
 boundaries, the data flow, and the invariants that should survive future UI and
 feature work. For task-to-file navigation use [CODE-MAP.md](CODE-MAP.md); for
 focused checks use [TESTING.md](TESTING.md). For operational procedures and
@@ -203,6 +203,17 @@ Important event meanings:
 Use the media element's `playing`, `waiting`, `pause` and `error` events for UI
 truth. Remember watch history on `playing`, not on `tuned`.
 
+### Home shelf layout
+
+`ui/home-selection.js` owns the six-suggestion and 18-favorite display limits.
+`app.js` passes a bounded favorite list plus its full count; `ui/markup.js` uses
+that count to show More only above the cap. More reuses the existing navigation
+to Library with the favorites filter and cleared search/category/language filters.
+The headline and random-suggestions heading share a grid row above the preview
+and suggestion cards, whose outer edges stretch together. Narrow layouts stack
+these areas and reflow all displayed favorites; CSS does not hide extra favorites.
+Refreshing suggestions updates tiles without replacing or retuning the Live Anchor.
+
 ### Audio invariant
 
 All players attach muted to satisfy browser autoplay policy. Home stays muted
@@ -247,13 +258,25 @@ favorite IDs. `theatre-player.js` attaches a URL only after an explicit Play
 consent gesture in the active Theatre view. Consent is held per origin for that
 visit, never silently persisted or inferred from playlist approval.
 
-The persistent stage and credits share a `.theatre-feature` inside
+The persistent stage and credits trigger share a `.theatre-feature` inside
 `.theatre-opening`, alongside the shelf toolbar. At 1101 CSS pixels and above,
 an unloaded opening uses two columns, with search, collection/language selectors
 and genre chips in matching visual/keyboard order. The player's source state
 toggles `is-loaded` on both stage and opening: playback uses the full content
 width, and Close restores the two columns without replacing the video. Narrow
-layouts remain stacked; expanded credits and long titles grow naturally.
+layouts remain stacked. The initial film is picked randomly from usable works;
+returning to Theatre preserves the selection. Idle artwork uses a 4:3 contain
+frame and Play/Favorite/edition controls sit in a footer below image and synopsis.
+The explanatory connection sentence is removed; the explicit Allow source & play
+gesture remains the source-consent boundary.
+
+Credits use a native modal dialog with a scrollable body, persistent close button,
+backdrop dismissal, Escape, keyboard focus cycling and focus restoration. Leaving
+Theatre closes it. Opening or closing credits does not pause or replace the video.
+Shelf order is independent of selection and composes with existing filters:
+editorial, newest/oldest year, title A–Z or shortest duration. Numeric values that
+are missing/invalid stay last; ties keep editorial order, and catalog arrays are
+never sorted in place.
 
 Favorite/filter updates only rebuild shelf cards. Pause/resume preserves position
 and volume; selecting a different film or episode clears the source without
@@ -476,3 +499,18 @@ transitions and actual hosting headers.
 - EPG programme parsing is client-side and therefore intentionally bounded.
 - Tesla browser capabilities vary by vehicle software; graceful degradation is
   a product requirement, not an optional polish pass.
+
+### Featured research
+
+`public/theatre/featured-research.json` is the complete 305-work editorial
+discovery feed. `scripts/build-featured-research.py --input <review-directory>`
+rebuilds it from the preserved, external Claude review package; it applies the
+reviewed source/link and collection corrections. It exports no direct media URLs
+or private paths. `theatre-featured-model.js` projects only discovery fields and
+rejects any playback approval. `theatre-featured.js` lazily loads the versioned
+feed, filters and paginates 24 records, and keeps image consent session-local.
+Featured details use a native dialog with a scrollable body, 60px vertical margins
+and X/backdrop/Escape dismissal. Curated/Featured/archive switches retain the
+existing video element and pause playback through the existing active-view gate.
+All 305 research works are visible; unresolved rights affect in-app admission,
+not discovery visibility. The 29-work reviewed player shelf is independent.
