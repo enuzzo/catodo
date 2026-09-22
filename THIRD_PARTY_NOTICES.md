@@ -17,3 +17,15 @@ The iptv-org APIs/playlists, Open EPG programme feeds, and other user-selected
 XMLTV sources are fetched from their providers after user confirmation and are
 not included in this repository. Third-party playlist, stream, logo, and EPG
 rights are not sublicensed by CATODO.
+
+
+## Theatre film links
+
+Theatre links to complete film editions under their individual licenses; no complete film or
+score is bundled. Selected images are bundled separately under the licenses in
+the [artwork register](docs/work/2026-09-22-theatre-artwork-curation.md). The software license does not sublicense
+those works. Per-title creators, requested attribution, source and license URLs,
+version numbers and viewing conditions live in `src/data/theatre-catalog.js` and
+are shown beside the player. See the [edition register](docs/work/2026-09-22-theatre-register.md)
+for primary evidence and unresolved candidates. Source QR images are generated
+locally; `qrencode` is an optional authoring tool, not a shipped runtime dependency.

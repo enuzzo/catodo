@@ -27,7 +27,7 @@ test('Explore and Live are independent shell destinations', () => {
 });
 
 test('player return preserves every shell destination', () => {
-  for (const view of ['home', 'explore', 'countries', 'guide', 'library', 'sources']) {
+  for (const view of ['home', 'explore', 'theatre', 'countries', 'guide', 'library', 'sources']) {
     assert.equal(resolvePlayerReturnView(view), view);
   }
 });

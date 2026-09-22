@@ -31,7 +31,7 @@ import {
   randomizeExploreChannels,
   sortExploreChannels,
 } from "./ui/explore-model.js";
-import { multiviewTelemetry, singleTelemetry } from "./ui/telemetry-model.js";
+import { multiviewTelemetry, singleTelemetry, nativeMediaTelemetry } from "./ui/telemetry-model.js";
 import { advanceConnection, connectionView, startConnection } from "./ui/connection-model.js";
 import { resolvePlayerReturnView } from "./ui/view-mode.js";
 import { selectInitialHomeChannel } from "./ui/home-selection.js";
@@ -967,6 +967,7 @@ function renderAll() {
 }
 
 async function tuneHome(channel) {
+  if (state.view !== "home" || ui.refs.root.dataset.mode !== "shell") return;
   if (!channel || !isPlayableChannel(channel)) return;
   ui.refs.homeVideo.muted = state.homeMuted;
   await homePlayer.tune(playbackSource(channel), { muted: state.homeMuted }).catch((error) => {
@@ -975,6 +976,7 @@ async function tuneHome(channel) {
 }
 
 async function tuneExplore(channel) {
+  if (state.view !== "explore" || ui.refs.root.dataset.mode !== "shell") return;
   if (!channel || !isPlayableChannel(channel)) return;
   ui.refs.exploreVideo.muted = state.exploreMuted;
   await explorePlayer.tune(playbackSource(channel), { muted: state.exploreMuted }).catch((error) => {
@@ -2436,6 +2438,12 @@ async function selectMultiviewAudio(slotNumber) {
 }
 
 function bindVideoEvents() {
+  // A live tune may resolve after navigation. Theatre owns playback while visible.
+  [ui.refs.homeVideo, ui.refs.exploreVideo, ui.refs.playerVideo, ...ui.refs.multiviewVideos].forEach((video) => {
+    video.addEventListener("play", () => {
+      if (ui.theatre.player.active) { video.muted = true; video.pause(); }
+    });
+  });
   ui.refs.homeVideo.addEventListener("playing", () => {
     state.homeFailureCount = 0;
     state.homeFailedIds = [];
@@ -2486,7 +2494,13 @@ async function boot() {
   document.documentElement.lang = i18n.locale;
   document.documentElement.dir = i18n.direction;
 
-  ui = mountAppUI(root, { t, onAction: (action, detail) => void handleAction(action, detail) });
+  ui = mountAppUI(root, { t, onAction: (action, detail) => void handleAction(action, detail), onTheatrePlay: () => {
+    [ui.refs.homeVideo, ui.refs.exploreVideo, ui.refs.playerVideo, ...ui.refs.multiviewVideos].forEach((video) => {
+      video.muted = true;
+      video.pause();
+    });
+    multiview?.muteAll();
+  } });
   const legacyMultiviewLayout = readLocalJson("catodo:multiview-layout", null);
   state.multiviewLayout = normalizeMultiviewLayout(legacyMultiviewLayout);
   const legacyMultiviewPresets = normalizeMultiviewPresets(readLocalJson("catodo:multiview-presets", []));
@@ -2566,7 +2580,7 @@ async function boot() {
     ui.showImportDialog({ url: deepLink.url, provider: "Deep link", host: new URL(deepLink.url).host, source: "External playlist" });
   }
 
-  if (state.featuredId) {
+  if (state.featuredId && state.view === "home") {
     await tuneHome(findChannel(state.featuredId));
     void loadSchedules(state.worldMixIds.map(findChannel).filter(Boolean));
   }
@@ -2597,7 +2611,7 @@ async function boot() {
           waiting: footerMetrics.slots.some((entry) => entry.metrics.waiting),
         })
       : singleTelemetry(footerMetrics);
-    ui.updateHeader({ telemetry: footerTelemetry });
+    ui.updateHeader({ telemetry: ui.theatre.player.active ? nativeMediaTelemetry(ui.theatre.video) : footerTelemetry });
     if (!ui.refs.multiviewSignalLab.hidden && ui.refs.root.dataset.mode === "multiview") {
       state.multiviewTelemetry = multiviewTelemetry(footerMetrics, state.multiviewFeeds.slice(0, state.multiviewLayout).map(decorateChannel));
       ui.showMultiviewSignalLab(state.multiviewTelemetry);

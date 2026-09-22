@@ -1,4 +1,4 @@
-# CATODO 2.8.0
+# CATODO 2.9.0
 
 <img src="public/icons/catodo-netmilk-tv-transparent-512.png" alt="CATODO horned CRT" width="150" align="right">
 
@@ -29,7 +29,8 @@ the version source of truth; maintainers prepare releases with
 
 - **Soft Signal Grid:** an editorial broadcast UI with electric-blue and EBU accents.
 - **Home Live Anchor:** when a cached catalog is available, the first tile at left starts muted and stays live while you explore. Use **Random** beside it to switch quickly to another playable channel.
-- **Explore collections:** Explore is a separate editorial surface built entirely from real catalog metadata. **All** shows eight-channel previews that can be randomized independently; category views expose the complete News, Sports, Movies, Music, Kids, Culture, or Local catalog with progressive loading and sorting by relevance, name, quality, or country.
+- **Discover collections:** live discovery starts with **Adrenaline** and **Documentaries**, built from the user-approved imported catalog. Regional Red Bull and other action-sports feed identities stay separate. **All** shows eight-channel previews; **View all** opens the complete category with progressive loading, country filtering and sorting. No VOD catalog or new playlist is imported by this feature.
+- **Theatre:** a curated film shelf with credited cover images, original synopses, native MP4 playback, All/Favorited/genre/language/search filters, and credits, edition notes and a locally generated source QR for every work. External film playback starts only after **Allow source & play**. The [current register](docs/work/2026-09-22-theatre-register.md) contains 22 works; the requested 50-work selection and classic-cinema edition checks remain open.
 - **Library:** filter by genre and language, see shown/total counts, clear filters in one tap and search the complete catalog from the header.
 - **Signal Atlas:** explore every country exposed by the upstream catalog, with global search and country discovery. Map geometry loads on demand; worldwide imports contribute to its coverage highlights.
 - **Settings:** jump directly to connected playlists, TV Guide sources or backups. An already-connected world catalog shows its saved count and a Browse action.
@@ -56,6 +57,13 @@ The Italy preset uses the eight current plain-XML feeds published by [Open EPG](
 Publicly listed does not automatically mean universally licensed in every jurisdiction. Users remain responsible for ensuring they may access a source where they are. CATODO does not bypass DRM, subscriptions, authentication, geoblocking or provider controls. See [CONTENT_POLICY.md](CONTENT_POLICY.md), [TAKEDOWN.md](TAKEDOWN.md), and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Data and privacy
+
+Theatre favorites use the separate device-local `catodo:theatre:favorites:v1` key.
+They do not enter shared installation state or configuration backups. Film-source
+consent lasts for the current visit, per origin; browsing the shelf loads no
+external video or poster. Film files remain on their publishers’ or archives’
+servers. Several selected licenses restrict use to noncommercial viewing; see
+the per-title notes before any change in distribution or business model.
 
 On the authenticated PHP installation, approved playlist sources, favourites, proxy configuration, TV Guide source/cadence settings, and Multiview presets/layout are canonical installation data and follow the user across browsers. IndexedDB remains a fast per-browser catalog/cache and refreshes any installation source that is new to that browser. Existing browser-only Multiview presets and an explicitly chosen layout migrate once when the updated browser reconnects. A server-owned migration marker allows exactly one automatic merge of retained legacy browser data before the server becomes canonical; later retained data is offered as an explicit recovery instead of silently resurrecting deleted records. Shared changes use a persistent browser outbox, survive reloads and remain visibly pending after network failures. Static deployments without the PHP endpoints continue to use browser-only IndexedDB.
 

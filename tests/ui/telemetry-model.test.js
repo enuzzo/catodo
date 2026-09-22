@@ -1,7 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { multiviewTelemetry, singleTelemetry } from '../../src/ui/telemetry-model.js';
+import { multiviewTelemetry, singleTelemetry, nativeMediaTelemetry } from '../../src/ui/telemetry-model.js';
+
+test('Theatre reports its current buffer range without inventing transfer measurements', () => {
+  const video = { currentTime: 22, videoWidth: 1280, videoHeight: 720, paused: false, readyState: 4,
+    getAttribute: () => 'https://media.example/film.mp4',
+    buffered: { length: 2, start: (i) => [0, 20][i], end: (i) => [10, 35][i] },
+    getVideoPlaybackQuality: () => ({ droppedVideoFrames: 2 }) };
+  assert.deepEqual(nativeMediaTelemetry(video), {
+    download: '—', received: '—', buffer: '13.0 s', detail: '1280×720 · 2 drop', issue: false,
+  });
+  video.currentTime = 15; video.readyState = 2;
+  assert.equal(nativeMediaTelemetry(video).buffer, '0.0 s');
+  assert.equal(nativeMediaTelemetry(video).issue, true);
+});
 
 test('single telemetry reports measured download and received data', () => {
   assert.deepEqual(singleTelemetry({

@@ -28,7 +28,7 @@ test("Explore category matching uses normalized official metadata", () => {
 
 test("Explore builds real non-empty collections and preserves a selected hero", () => {
   const collections = buildExploreCollections(channels, { activeCategory: "all" });
-  assert.deepEqual(collections.map((item) => item.id), ["news", "sports", "culture"]);
+  assert.deepEqual(collections.map((item) => item.id), ["documentaries", "news", "sports", "culture"]);
   assert.equal(pickExploreFeatured(collections, "sport-it").channelId, "sport-it");
 });
 
@@ -135,4 +135,16 @@ test("Explore builds category country options and filters without losing the ful
     ['news-it-1', 'news-it-2'],
   );
   assert.equal(filterExploreChannelsByCountry(values).length, values.length);
+});
+
+
+test('Adrenaline preserves every authorized regional Red Bull feed and includes specialist identities', () => {
+  const feeds = ['Red Bull TV International', 'Red Bull TV US', 'Red Bull TV UK', 'Red Bull TV Germany', 'Red Bull TV France', 'Red Bull TV Spain', 'Red Bull TV Brazil', 'Red Bull TV Italy', 'Fuel TV', 'EDGEsport', 'Outside TV'].map((name, index) => ({ channelId: `approved-${index}`, name, countryCode: String(index) }));
+  const collections = buildExploreCollections([...channels, ...feeds], { limit: Number.MAX_SAFE_INTEGER });
+  assert.equal(collections[0].id, 'adrenaline');
+  assert.equal(collections[0].channels.length, feeds.length);
+  assert.equal(new Set(collections[0].channels.map((channel) => channel.channelId)).size, feeds.length);
+  assert.equal(matchesExploreCategory({ name: 'Red Bullish News' }, 'adrenaline'), false);
+  assert.equal(matchesExploreCategory({ name: 'Ordinary Sports', categories: ['sports'] }, 'adrenaline'), false);
+  assert.equal(matchesExploreCategory({ name: 'Action One', categoryNames: ['Action Sports'] }, 'adrenaline'), true);
 });

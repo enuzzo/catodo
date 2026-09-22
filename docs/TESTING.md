@@ -20,6 +20,7 @@ package (check its `engines` if setup fails).
 | --- | --- | --- |
 | Catalog/storage | `node --test tests/data/*.test.js` | Include PHP test for shared-state contracts |
 | Player/audio | `node --test tests/player/*.test.js` | Real gesture, playback, mute/volume and return path |
+| Theatre | `node --test tests/data/theatre-model.test.js tests/player/theatre-player.test.js tests/ui/telemetry-model.test.js` | No media before consent; playback controls, persistent DOM, late live-play isolation, QR decoding, all artwork loading/credits and navigation in real Chromium |
 | Guide | `node --test tests/epg/*.test.js` | Consent UI and country/status isolation |
 | UI models/copy | `node --test tests/ui/*.test.js tests/i18n/*.test.js` | Render the changed surface at desktop/Tesla baseline and narrow viewport |
 | PHP state | `node --test tests/php/installation-api.test.js` | Requires PHP; test skips when PHP is absent |
@@ -77,3 +78,13 @@ Report separately: static/code checks, Node/PHP tests, build, rendered browser,
 production HTTP behavior, live provider freshness and physical Tesla/iOS results.
 No fixed historical source count, screenshot or decoded-byte counter proves all
 of those. Once relevant checks pass, rerun only if changes or failures justify it.
+
+
+The September 22 Theatre/Discover run is recorded in the
+[local handoff](work/2026-09-22-theatre-integration.md). Its fresh-profile browser
+checks use an explicitly empty mocked PHP installation response; this isolates
+frontend behavior and does not prove server synchronization. Remote MP4 files
+must actually decode and advance before an edition is called playable. HTTP 200,
+file extensions, nominal “HD” filenames and uploader licensing labels alone do
+not establish compatibility, resolution or integration rights. QR decoding is
+separate from physical camera scanning.

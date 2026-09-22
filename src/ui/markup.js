@@ -10,6 +10,7 @@ import { favoriteEffectPosition, resolveFavoriteEffectHost } from './favorite-ef
 import { programmeCardNeedsExpansion } from './guide-programme-card.js';
 import { channelGuideSetupAction, countryGuideControlState, guideProgrammeFallback } from './country-guide-model.js';
 import { channelMetadataBadges } from './channel-meta-model.js';
+import { createTheatreView } from './theatre.js';
 import { createSignalEasterEgg } from './signal-easter-egg.js';
 
 const FLAG_URLS = import.meta.glob('../../assets/vendor/flags/4x3/*.svg', {
@@ -19,7 +20,7 @@ const FLAG_URLS = import.meta.glob('../../assets/vendor/flags/4x3/*.svg', {
 });
 
 const TONES = ['white', 'red', 'green', 'yellow', 'cyan', 'magenta', 'blue'];
-const VIEW_NAMES = ['home', 'explore', 'countries', 'guide', 'library', 'sources'];
+const VIEW_NAMES = ['home', 'explore', 'theatre', 'countries', 'guide', 'library', 'sources'];
 const MULTIVIEW_SIZE = 4;
 const CATODO_LOGO_URL = './icons/catodo-netmilk-tv-transparent-512.png';
 const mountedApps = new WeakMap();
@@ -485,7 +486,8 @@ function createHeader(t) {
   });
   const navDefinitions = [
     ['home', 'nav.live', 'Live'],
-    ['explore', 'nav.explore', 'Explore'],
+    ['explore', 'nav.explore', 'Discover'],
+    ['theatre', 'nav.theatre', 'Theatre'],
     ['countries', 'nav.countries', 'Countries'],
     ['multiview', 'nav.multiview', 'Multiview'],
     ['guide', 'nav.guide', 'TV Guide'],
@@ -506,8 +508,8 @@ function createHeader(t) {
   const moreSummary = element('button', 'primary-nav__item', { type: 'button', dataset: { action: 'toggle-more-menu' }, 'aria-expanded': 'false', 'aria-controls': 'primary-nav-overflow' });
   moreSummary.append(textNode('span', null, t, 'nav.more', 'More'), icon('caret-down'));
   const moreMenu = element('div', 'primary-nav__more-menu', { id: 'primary-nav-overflow', hidden: true });
-  [['guide', 'calendar-blank', 'nav.guide', 'TV Guide'], ['library', 'books', 'nav.library', 'Library'], ['sources', 'gear-six', 'nav.settings', 'Settings']].forEach(([view, iconName, key, fallback]) => {
-    const button = actionButton({ t, action: 'navigate', iconName, key, fallback, className: 'button--ghost', dataset: { view } });
+  [['multiview', 'squares-four', 'nav.multiview', 'Multiview'], ['guide', 'calendar-blank', 'nav.guide', 'TV Guide'], ['library', 'books', 'nav.library', 'Library'], ['sources', 'gear-six', 'nav.settings', 'Settings']].forEach(([view, iconName, key, fallback]) => {
+    const button = actionButton({ t, action: view === 'multiview' ? 'open-multiview' : 'navigate', iconName, key, fallback, className: 'button--ghost', dataset: { view } });
     moreMenu.append(button);
   });
   more.append(moreSummary, moreMenu);
@@ -751,7 +753,7 @@ function createExploreView(t) {
   const intro = element('header', 'explore-intro');
   const copy = element('div');
   copy.append(
-    textNode('h1', null, t, 'explore.title', 'Explore the signal'),
+    textNode('h1', null, t, 'explore.title', 'Discover the signal'),
     textNode('p', null, t, 'explore.description', 'Curated live television collections built from your imported catalog.'),
   );
   const surprise = actionButton({
@@ -793,7 +795,7 @@ function createExploreView(t) {
   heroCopy.append(heroCollection, heroName, heroMeta, heroSchedule, heroActions);
   hero.append(heroStage, heroCopy);
 
-  const filters = element('div', 'explore-filters', { role: 'tablist', 'aria-label': translate(t, 'explore.filterAriaLabel', 'Explore categories') });
+  const filters = element('div', 'explore-filters', { role: 'tablist', 'aria-label': translate(t, 'explore.filterAriaLabel', 'Discover categories') });
   const filterButtons = {};
   EXPLORE_CATEGORIES.forEach((category, index) => {
     const button = actionButton({
@@ -874,9 +876,9 @@ function renderExploreCollections(container, collections, t) {
     const header = element('div', 'explore-collection__header');
     const copy = element('div');
     const title = element('h2');
-    title.append(icon(collection?.icon || 'broadcast'), document.createTextNode(safeText(collection?.title)));
+    title.append(icon(collection?.icon || 'broadcast'), document.createTextNode(translate(t, `explore.collections.${collection.id}.title`, safeText(collection?.title))));
     const description = element('p');
-    description.textContent = safeText(collection?.description);
+    description.textContent = translate(t, `explore.collections.${collection.id}.description`, safeText(collection?.description));
     copy.append(title, description);
     const controls = element('div', 'explore-collection__controls');
     const count = element('span', 'explore-collection__count mono');
@@ -885,6 +887,10 @@ function renderExploreCollections(container, collections, t) {
       count: safeText(channelCount),
     });
     if (mode === 'overview') {
+      controls.append(actionButton({
+        t, action: 'filter-explore', iconName: 'arrow-right', key: 'explore.viewCollection',
+        fallback: 'View all', className: 'button--ghost', dataset: { category: safeId(collection?.id) },
+      }));
       controls.append(count, actionButton({
         t,
         action: 'randomize-explore-collection',
@@ -943,7 +949,7 @@ function renderExploreCollections(container, collections, t) {
       schedule: true,
       action: 'tune-explore-channel',
       ariaLabelKey: 'channel.tuneExploreAriaLabel',
-      ariaLabelFallback: 'Tune {name} in Explore preview',
+      ariaLabelFallback: 'Tune {name} in Discover preview',
     });
     else renderEmpty(
       rail,
@@ -3278,6 +3284,7 @@ export function mountAppUI(root, options = {}) {
   const header = createHeader(t);
   const home = createHomeView(t);
   const explore = createExploreView(t);
+  const theatre = createTheatreView({ t, beforePlay: options.onTheatrePlay });
   const countries = createCountriesView(t);
   const guide = createGuideView(t);
   const library = createLibraryView(t);
@@ -3293,7 +3300,7 @@ export function mountAppUI(root, options = {}) {
 
   const shell = element('div', 'catodo-shell');
   const main = element('main', 'app-content');
-  main.append(home.view, explore.view, countries.view, guide.view, library.view, sources.view);
+  main.append(home.view, explore.view, theatre.view, countries.view, guide.view, library.view, sources.view);
   shell.append(header.header, main, signalBar.bar);
   root.classList.add('catodo-app');
   root.replaceChildren(
@@ -3317,6 +3324,7 @@ export function mountAppUI(root, options = {}) {
   const views = {
     home: home.view,
     explore: explore.view,
+    theatre: theatre.view,
     countries: countries.view,
     guide: guide.view,
     library: library.view,
@@ -3368,6 +3376,7 @@ export function mountAppUI(root, options = {}) {
     shell.hidden = false;
     root.dataset.mode = 'shell';
     root.dataset.view = viewName;
+    theatre.setActive(viewName === 'theatre');
     Object.entries(header.navButtons).forEach(([key, button]) => {
       const active = isPrimaryNavActive(key, viewName);
       button.classList.toggle('is-active', active);
@@ -3392,6 +3401,7 @@ export function mountAppUI(root, options = {}) {
   };
 
   const api = {
+    theatre,
     setMoreMenuOpen,
     focusSettingsSection(name) {
       const section = sources.sections[name];
@@ -3860,6 +3870,7 @@ export function mountAppUI(root, options = {}) {
     },
 
     showPlayer(state = {}) {
+      theatre.setActive(false);
       shell.hidden = true;
       setViewVisible(multiview.overlay, false);
       setViewVisible(player.overlay, true);
@@ -3978,6 +3989,7 @@ export function mountAppUI(root, options = {}) {
     },
 
     showMultiview(state = {}) {
+      theatre.setActive(false);
       shell.hidden = true;
       setViewVisible(player.overlay, false);
       setViewVisible(multiview.overlay, true);
@@ -4270,6 +4282,7 @@ export function mountAppUI(root, options = {}) {
       root.removeEventListener('focusin', dismissMoreMenu);
       root.removeEventListener('keydown', escapeMoreMenu);
       signalEasterEgg.destroy();
+      theatre.destroy();
       dispatcher.destroy();
       root.replaceChildren();
       root.classList.remove('catodo-app');

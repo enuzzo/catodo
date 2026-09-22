@@ -1,5 +1,7 @@
 export const EXPLORE_CATEGORIES = Object.freeze([
   Object.freeze({ id: "all", label: "All", icon: "squares-four", terms: [] }),
+  Object.freeze({ id: "adrenaline", label: "Adrenaline", icon: "lightning", terms: ["extreme sports", "action sports", "adrenaline"] }),
+  Object.freeze({ id: "documentaries", label: "Documentaries", icon: "film-strip", terms: ["documentary", "documentaries"] }),
   Object.freeze({ id: "news", label: "News", icon: "newspaper", terms: ["news", "business", "weather"] }),
   Object.freeze({ id: "sports", label: "Sports", icon: "soccer-ball", terms: ["sports"] }),
   Object.freeze({ id: "movies", label: "Movies", icon: "film-strip", terms: ["movies", "series", "entertainment"] }),
@@ -10,6 +12,8 @@ export const EXPLORE_CATEGORIES = Object.freeze([
 ]);
 
 const COLLECTION_COPY = Object.freeze({
+  adrenaline: ["Adrenaline", "Red Bull and action sports feeds in your imported catalog. Live channels; availability varies by source."],
+  documentaries: ["Documentaries", "Real stories, natural history and discoveries from your imported live channels."],
   news: ["News around the clock", "Live reporting and perspectives across borders."],
   sports: ["Sports & events", "Live matches, events, analysis and specialist channels."],
   movies: ["Cinema & series", "Movie, series and entertainment channels on air now."],
@@ -33,6 +37,11 @@ export function matchesExploreCategory(channel, categoryId) {
   if (categoryId === "all") return true;
   const definition = EXPLORE_CATEGORIES.find((item) => item.id === categoryId);
   if (!definition) return false;
+  if (categoryId === 'adrenaline') {
+    // Match source identities without collapsing language or regional feeds.
+    const names = [channel?.name, channel?.tvgName, channel?.tvgId].map((value) => String(value || '').trim());
+    if (names.some((name) => /^(?:red\s*bull(?:\s*tv)?|fuel\s*tv|edge\s*sport|xtreme\s*sports|extreme\s*sports|outside\s*tv|x\s*games)(?=$|[\s.(_-])/i.test(name))) return true;
+  }
   const values = valuesFor(channel);
   return definition.terms.some((term) => values.some((value) => value === term || value.includes(term)));
 }

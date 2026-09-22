@@ -19,10 +19,23 @@ requirement to read this entire directory before editing a file.
 | Security/content/reporting boundaries | [SECURITY.md](../SECURITY.md), [CONTENT_POLICY.md](../CONTENT_POLICY.md), [TAKEDOWN.md](../TAKEDOWN.md) |
 | Third-party attribution | [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md), [TRADEMARKS.md](../TRADEMARKS.md) |
 
+## Current work and release evidence
+
+- [Theatre and Discover handoff](work/2026-09-22-theatre-integration.md): implementation, release verification and remaining editorial/device work.
+- [Artwork and vintage-film curation](work/2026-09-22-theatre-artwork-curation.md): image provenance and proposed horror/Elvis seasons.
+- [Theatre edition register](work/2026-09-22-theatre-register.md): active films,
+  exact source and license evidence, and assessed candidates that stay outside
+  the runtime. The target of 50 usable works is not complete.
+
 ## Historical material
 
-- [Latest release handoff](work/2026-09-20-release-handoff.md) is the resumption
-  point for September publication, verification and remaining product decisions.
+- [September source verification](work/2026-09-22-source-verification.md) records
+  Red Bull/Archive/ihavenotv findings, attribution/QR and the VOD decision; the
+  [50-item register](work/2026-09-22-licensed-title-register.md) is the **rejected**
+  Dutch historical-short selection. It contributes no titles to Theatre. The old
+  Video.js choice is superseded by the native MP4 implementation.
+- [2.8.0 release handoff](work/2026-09-20-release-handoff.md) preserves the earlier
+  publication. The September 22 Theatre handoff above is the current resumption point.
 - [Completed local UI/UX review](work/2026-09-20-ui-ux-review.md) records the
   September audit, implemented refinements, bundle measurements and evidence
   limits. The release handoff records its subsequent publication in 2.8.0.

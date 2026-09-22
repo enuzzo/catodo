@@ -59,6 +59,17 @@ this release. Local synthetic tests remain separate from the live checks above.
 
 ## Next product decision
 
+New user idea recorded after release: CONTENT-01/02, Red Bull TV and a dedicated
+Cinema & Docs section. The [source proposal](2026-09-20-cinema-docs-proposal.md)
+preserves ihavenotv, Internet Archive, GitHub research leads and open-film options,
+with the exact next investigation. This is queued, not implemented.
+
+The [September 22 source verification](2026-09-22-source-verification.md)
+records the next research pass: Red Bull upstream/browser evidence, ihavenotv
+rights limits, a 50-item licensed historical-short register with attribution/QR,
+and the VOD technology decision. Blender is now low priority. Runtime integration
+and publication remain unimplemented; read that note before resuming CONTENT work.
+
 Recommended order, all still proposals in [ROADMAP.md](../ROADMAP.md):
 
 1. PLAY-03: clearer connection, first-frame, buffering and recovery feedback.
@@ -70,3 +81,10 @@ EPG-02 covers country-level guide diagnostics; UX-03 covers mobile Countries
 density and quieter missing-logo placeholders. Do not start these solely because
 they are listed here. Physical Tesla/iOS, speaker audibility and device startup
 benchmarks remain open; browser checks cannot substitute for them.
+
+## Superseding September 22 implementation
+
+The [Theatre and Discover handoff](2026-09-22-theatre-integration.md) supersedes
+the content-research status above. It records the rejection of the Dutch shorts,
+22 active works, native playback, credited artwork and the subsequent publication
+authorization. Use it as the current restart point for content and release work.

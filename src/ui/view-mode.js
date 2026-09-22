@@ -1,5 +1,5 @@
 const OVERLAY_MODES = new Set(['player', 'multiview']);
-const SHELL_VIEWS = new Set(['home', 'explore', 'countries', 'guide', 'library', 'sources']);
+const SHELL_VIEWS = new Set(['home', 'explore', 'theatre', 'countries', 'guide', 'library', 'sources']);
 
 /**
  * Data refreshes may rerender shell views, but they must never dismiss an

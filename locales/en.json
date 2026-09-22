@@ -21,7 +21,9 @@
     "archive": "Archive",
     "settings": "Settings",
     "search": "Search",
-    "more": "More"
+    "more": "More",
+    "explore": "Discover",
+    "theatre": "Theatre"
   },
   "home": {
     "liveCount": "{count} live channels",
@@ -40,12 +42,12 @@
     "restoreErrorBody": "The shared list is safe, but its third-party playlists could not be downloaded on this browser."
   },
   "explore": {
-    "title": "Explore the signal",
+    "title": "Discover the signal",
     "description": "Curated live television collections built from your imported catalog.",
     "featuredCollection": "Featured collection",
     "watchLive": "Watch live",
     "surprise": "Surprise me",
-    "filterAriaLabel": "Explore categories",
+    "filterAriaLabel": "Discover categories",
     "channelCount": "{count} channels",
     "randomizeCollection": "Randomize",
     "sortLabel": "Sort by",
@@ -66,12 +68,25 @@
       "music": "Music",
       "kids": "Kids",
       "culture": "Culture",
-      "local": "Local"
+      "local": "Local",
+      "adrenaline": "Adrenaline",
+      "documentaries": "Documentaries"
     },
     "channelCountOne": "{count} channel",
     "countryLabel": "Country",
     "countryAriaLabel": "Filter this collection by country",
-    "allCountries": "All countries"
+    "allCountries": "All countries",
+    "collections": {
+      "adrenaline": {
+        "title": "Adrenaline",
+        "description": "Red Bull and action sports feeds in your imported catalog. Live channels; availability varies by source."
+      },
+      "documentaries": {
+        "title": "Documentaries",
+        "description": "Real stories, natural history and discoveries from your imported live channels."
+      }
+    },
+    "viewCollection": "View all"
   },
   "footer": {
     "global": "Global",
@@ -377,5 +392,70 @@
     "loading": "Loading the signal atlas…",
     "loadError": "Map unavailable. You can still choose a country from the list.",
     "retry": "Retry map"
+  },
+  "theatre": {
+    "eyebrow": "CATODO / CINEMA",
+    "title": "Theatre",
+    "description": "Films worth your time. A curated collection with a source behind every story.",
+    "playerLabel": "Film player",
+    "curtain": "Choose a film. Take your time.",
+    "edition": "Edition or episode",
+    "allowPlay": "Allow source & play",
+    "filterLabel": "Film collections",
+    "search": "Search films, directors…",
+    "languageFilter": "Film language",
+    "allLanguages": "All languages",
+    "empty": "No films match this selection. Try All or clear your search.",
+    "credits": "Source, credits & viewing notes",
+    "localFavorites": "Film favorites are saved on this device.",
+    "pause": "Pause",
+    "play": "Play film",
+    "gesture": "Press Play to start this film.",
+    "unavailable": "This source is unavailable. Try again or open the source page.",
+    "saved": "★ Favorited",
+    "save": "☆ Favorite",
+    "count": "{count} films",
+    "countOne": "1 film",
+    "imageCredit": "Image: {credit}",
+    "artworkNote": "Cover image: {note}",
+    "artworkSource": "Image source",
+    "consent": "Play connects to {host}, which receives your IP address. No film loads until you allow it.",
+    "source": "Open source page",
+    "qr": "QR code for the film source page",
+    "scan": "Take the source with you.",
+    "storageUnavailable": "Device storage is unavailable. Favorites will last for this visit.",
+    "filters": {
+      "all": "All",
+      "favorited": "Favorited",
+      "documentary": "Documentary",
+      "science": "Science",
+      "horror": "Horror",
+      "science-fiction": "Science fiction",
+      "drama": "Drama",
+      "comedy": "Comedy",
+      "silent": "Silent cinema",
+      "technology": "Technology",
+      "animation": "Animation",
+      "society": "Society",
+      "environment": "Environment"
+    },
+    "languages": {
+      "en": "English",
+      "it": "Italian",
+      "sv": "Swedish",
+      "de": "German",
+      "silent": "Silent",
+      "es": "Spanish",
+      "pt": "Portuguese"
+    },
+    "back": "−15 seconds",
+    "forward": "+15 seconds",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "fullscreen": "Fullscreen",
+    "fullscreenUnavailable": "Fullscreen is unavailable in this browser."
+  },
+  "channel": {
+    "tuneExploreAriaLabel": "Tune {name} in Discover preview"
   }
 }

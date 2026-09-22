@@ -1,6 +1,6 @@
 # CATODO architecture
 
-This document is the maintainer map for CATODO 2.8.0. It describes the runtime
+This document is the maintainer map for CATODO 2.9.0. It describes the runtime
 boundaries, the data flow, and the invariants that should survive future UI and
 feature work. For task-to-file navigation use [CODE-MAP.md](CODE-MAP.md); for
 focused checks use [TESTING.md](TESTING.md). For operational procedures and
@@ -218,6 +218,44 @@ URIs in HLS playlists, and restricts browser origins. Origin checks are not
 authentication against a determined non-browser client; abuse would require a
 stronger secret or authenticated edge architecture.
 
+## Theatre and curated editions
+
+`src/ui/theatre.js` owns a persistent native video and independent shelf. The
+catalog in `src/data/theatre-catalog.js` contains curated metadata and inert HTTPS
+file links only; `theatre-model.js` combines filters and validates device-local
+favorite IDs. `theatre-player.js` attaches a URL only after an explicit Play
+consent gesture in the active Theatre view. Consent is held per origin for that
+visit, never silently persisted or inferred from playlist approval.
+
+Favorite/filter updates only rebuild shelf cards. Pause/resume preserves position
+and volume; selecting a different film or episode clears the source without
+starting it. Navigation pauses the film. Native controls and focused large
+controls cover seeking, mute and fullscreen; no new player library or proxy is
+involved. Progressive playback omits `crossOrigin` because no frame extraction or
+cross-origin text-track fetch is performed. This is not a CORS bypass.
+
+Before Theatre plays, all live videos are paused and muted. Live play events that
+arrive after navigation are paused while Theatre owns the surface, and late home/
+Discover tune requests check their current destination. Existing Multiview audio
+focus is preserved. The footer uses native buffer and decoded-frame data; transfer
+counters are unavailable and hidden, rather than borrowed from the live player.
+
+Theatre favorites are intentionally device-local (`catodo:theatre:favorites:v1`),
+without IndexedDB/PHP schema changes, shared sync or backup inclusion. Each work
+has its own provenance, license, attribution, language/caption and edition notes.
+QR PNGs are generated locally by `scripts/theatre-qr.mjs` (authoring dependency:
+`qrencode`) and point to the authoritative source; no external QR endpoint or
+remote poster is loaded. Artwork is served from `public/theatre/artwork/`, with
+separate source/license/credit records on each catalog entry and visible credits.
+Images use contain sizing to preserve the entire composition; poster/photograph/
+film-still provenance is disclosed in viewing notes. A full work with multiple
+episodes counts once.
+
+Discover's Adrenaline and Documentaries collections operate solely on approved
+catalog records. All matching regional identities remain distinct. Overview rails
+show eight samples, with View all leading to the complete category. Matching a
+Red Bull live feed does not license or expose the provider's on-demand library.
+
 ## EPG and TV Guide
 
 `EpgService` combines installation-approved XMLTV sources with guide mappings
@@ -262,7 +300,8 @@ do not infer current coverage from discovery alone.
 
 ## UI, navigation and localization
 
-The primary destinations are Live, Explore, Countries, Multiview, TV Guide and
+The primary destinations are Live, Discover (internal key `explore`), Theatre,
+Countries, Multiview, TV Guide and
 Library. Settings is a separate setup surface. Fullscreen Player and Multiview
 are persistent overlays rather than page rebuilds; closing a player reached
 from Multiview returns to Multiview.

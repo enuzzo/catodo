@@ -27,7 +27,7 @@ behavior crosses consent, persistence, playback or hosting boundaries.
 | Task or symptom | Implementation entry points | Closest existing tests |
 | --- | --- | --- |
 | View/action/navigation | `src/app.js`, `src/ui/markup.js` (`makeActionDispatcher`, `mountAppUI`), `src/ui/view-mode.js` | `tests/ui/view-mode.test.js` plus rendered interaction |
-| Home/Explore/channel picker | `src/ui/home-selection.js`, `explore-model.js`, `channel-picker-filter.js` | Same-named tests under `tests/ui/` |
+| Home/Discover/channel picker | `src/ui/home-selection.js`, `explore-model.js`, `channel-picker-filter.js` | Same-named tests under `tests/ui/` |
 | Library genres/filter results | `src/data/channel-categories.js`, `catalog-service.js`, `m3u.js`, `src/app.js`, `src/ui/markup.js` | `tests/data/channel-categories.test.js`, `m3u.test.js`, rendered search/reset/pagination |
 | Connected source state/Settings sections | `src/ui/source-settings-model.js`, `markup.js`, `src/app.js` | `tests/ui/source-settings-model.test.js`, Settings shortcut/focus checks |
 | Layout/branding/copy | `styles/main.css`, `app.html`, `src/ui/markup.js`, `src/i18n/index.js`, both locale mirrors | `tests/ui/branding-assets.test.js`, `tests/i18n/index.test.js`, rendered viewport checks |
@@ -50,6 +50,17 @@ Basenames in a cell share the directory of that cell's preceding full path
 unless a new directory is specified. Use `rg --files src tests scripts public`
 when the route needs more detail; exclude `.env`, private data, generated output
 and dependency trees from content searches.
+
+## Theatre entry points
+
+- `src/ui/theatre.js`: persistent shelf/player, consent, filters, credits and QR.
+- `src/data/theatre-catalog.js`: reviewed edition metadata; evidence in the
+  [register](work/2026-09-22-theatre-register.md).
+- `src/data/theatre-model.js`, `src/player/theatre-player.js`: local favorites,
+  filtering and native media lifecycle; corresponding `tests/data/` and
+  `tests/player/` files.
+- `src/ui/telemetry-model.js`: native buffer/frame evidence without transfer
+  counters; `scripts/theatre-qr.mjs`: local source-QR regeneration.
 
 ## Cross-area changes to notice
 

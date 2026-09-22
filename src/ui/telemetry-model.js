@@ -35,6 +35,24 @@ export function singleTelemetry(metrics = {}) {
   };
 }
 
+/** Progressive media exposes buffer/frame data, but no reliable transfer counter. */
+export function nativeMediaTelemetry(video) {
+  let bufferSeconds = 0;
+  for (let index = 0; index < (video?.buffered?.length || 0); index += 1) {
+    if (video.buffered.start(index) <= video.currentTime && video.buffered.end(index) >= video.currentTime) {
+      bufferSeconds = video.buffered.end(index) - video.currentTime;
+      break;
+    }
+  }
+  const value = singleTelemetry({
+    bufferSeconds,
+    resolution: { width: video?.videoWidth, height: video?.videoHeight },
+    frames: { dropped: video?.getVideoPlaybackQuality?.().droppedVideoFrames },
+    waiting: Boolean(video?.getAttribute('src') && !video.paused && video.readyState < 3),
+  });
+  return { ...value, download: '—', received: '—' };
+}
+
 export function multiviewTelemetry(aggregate = {}, channels = []) {
   const slots = aggregate.slots || [];
   const feeds = slots.map((entry, index) => {

@@ -10,6 +10,19 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.9.0] - 2026-09-22
+
+### 🛠 Changed
+
+- Renamed Explore to Discover, with Adrenaline first, a Documentaries collection and View all actions over the existing approved catalog; regional live-feed identities remain separate.
+- Superseded the rejected Dutch-newsreel shortlist and unverified Video.js pilot with a new edition-specific film register; the 50-work editorial target remains open.
+
+### ✨ Added
+
+- Added Theatre with 22 curated works, native MP4 controls, explicit external-source consent, device-local favorites, combined filters, original synopses, visible attribution and source/license links with locally generated QR codes. Film files are not bundled.
+- Added images for all 22 works: two official covers, one licensed observatory photograph and 19 selected film stills, with local loading and visible image credits.
+- Isolated Theatre from live audio and late autoplay, preserved its video across shelf updates, and used native buffer/frame telemetry without inventing download measurements.
+
 ## [2.8.0] - 2026-09-20
 
 ### 🛠 Changed
@@ -200,7 +213,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.8.0...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.9.0...HEAD
+[2.9.0]: https://github.com/enuzzo/catodo/compare/v2.8.0...v2.9.0
 [2.8.0]: https://github.com/enuzzo/catodo/compare/v2.7.1...v2.8.0
 [2.7.1]: https://github.com/enuzzo/catodo/compare/v2.7.0...v2.7.1
 [2.7.0]: https://github.com/enuzzo/catodo/compare/v2.6.0...v2.7.0

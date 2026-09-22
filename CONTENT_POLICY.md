@@ -17,6 +17,30 @@ logos.
 Users are responsible for confirming that they may access a source and its
 content in their jurisdiction.
 
+## Curated films
+
+Theatre contains editorial metadata and external film links, not bundled films.
+Only records reviewed against a filmmaker, rights-holder or institutional
+publisher may be active. An Archive uploader's license tag alone is insufficient.
+Review the specific edition, soundtrack, restoration and subtitles; distinguish
+territorial public domain from an applicable license. Keep the source, exact
+license, requested attribution and edition notes visible beside the player.
+
+External media starts only after source consent. Noncommercial and NoDerivatives
+conditions apply where recorded; preserve original credits and do not trim or
+replace soundtracks. The initial implementation is for the existing private,
+noncommercial installation. A later commercial distribution requires a fresh
+rights decision for restricted titles. Copyright in these films is not covered
+by CATODO's software license. A source QR supplements, never replaces, credits.
+Conditional or rejected research candidates must stay outside the active shelf.
+
+Cover imagery has a separate provenance record, local file, attribution, source
+and license. Distinguish official covers, illustrative photographs and unaltered
+film stills. Do not assume a film grant automatically licenses a separately
+designed poster. Preserve complete frames, including embedded subtitles and
+credits; no compositing, recoloring or cropping of NoDerivatives excerpts. ESO
+films with an express whole-film limitation use separately licensed images.
+
 ## Logos and programme data
 
 Third-party marks are displayed only to identify channels. Their inclusion does
