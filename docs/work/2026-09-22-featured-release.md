@@ -48,8 +48,27 @@ The release evidence directory is
 
 ## Publication
 
-Prepared for commit, push to official `main`, and SiteGround deployment.
-Deployment identity and live verification are recorded below after upload.
+Published to official `main` as **fd9d56c** and deployed successfully to
+[catodo.app](https://catodo.app/) on 2026-09-22. The primary checkout was
+fast-forwarded from its clean state. The temporary deployment credential link
+was removed; no credential contents were displayed or committed.
+
+Live verification at **17:25:16 UTC** is recorded in `live-verification.json`:
+
+- Cache-busted `version.json` reports **2.13.0**; the browser login page also
+  visibly shows 2.13.0.
+- The deployed Featured feed contains **305 records and 12 collections** and
+  matches the local artifact byte for byte (SHA-256
+  `df920803a0d925c0967f71e9e5bd310535f147760abf03da5eff4656bcd5c970`).
+- The deployed application JS/CSS, HLS chunk, locale, appearance script and
+  discovery index (plain and gzip) match the tested build byte for byte.
+- Three authenticated services return 401; private storage, private entry and
+  legacy app route return 403; manifest and touch icon return 200.
+- The verification browser has no authenticated session. The live login page
+  was inspected; authenticated live navigation was **not** claimed or bypassed.
+  Full interaction and responsive checks above ran on the identical built
+  assets locally. Curl provided the release HTTP checks; the initial Python
+  HTTP client received an intermediary 403 and was not used as server evidence.
 
 ## Remaining work and limits
 
