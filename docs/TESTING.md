@@ -96,3 +96,12 @@ must actually decode and advance before an edition is called playable. HTTP 200,
 file extensions, nominal “HD” filenames and uploader licensing labels alone do
 not establish compatibility, resolution or integration rights. QR decoding is
 separate from physical camera scanning.
+
+The [wide Theatre opening run](work/2026-09-22-theatre-wide-layout.md) covers
+1254×784 and 773×601 Tesla viewports, 1600×900 desktop, 390×844 phone, and
+1181/1101-pixel layout boundaries. Check side-by-side film/filter alignment only
+above 1100 pixels, visible Play on the compressed Tesla viewport, complete
+header navigation, search → collection → language keyboard order, expanded
+credits/QR, long titles, episode selection and warning text. Actual film decode,
+native fullscreen and Close must preserve the video node and restore the idle
+layout; switching to/from Explore archives must hide/show the whole opening.

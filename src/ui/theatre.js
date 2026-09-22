@@ -102,7 +102,7 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
   [...new Set(titles.flatMap((title) => title.languages))].forEach((code) => {
     const option = node('option', '', tr(`languages.${code}`, code)); option.value = code; language.append(option);
   });
-  refinements.append(collection, search, language); toolbar.append(filters, refinements);
+  refinements.append(search, collection, language); toolbar.append(refinements, filters);
   const grid = node('div', 'theatre-grid'), empty = node('p', 'theatre-empty', tr('empty', 'No films match this selection. Try All or clear your search.'));
   const credits = node('details', 'theatre-credits');
   credits.append(node('summary', '', tr('credits', 'Source, credits & viewing notes')));
@@ -121,7 +121,10 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
   const archiveCatalog = createTheatreArchive({ t: tr, titles, onReviewed(title) {
     setMode('curated'); selectTitle(title); stage.scrollIntoView({ block: 'start', behavior: 'instant' });
   } });
-  view.append(intro, stage, credits, toolbar, grid, empty, archiveGuides, storageNote, archiveCatalog.root);
+  const opening = node('div', 'theatre-opening');
+  const feature = node('div', 'theatre-feature'); feature.append(stage, credits);
+  opening.append(feature, toolbar);
+  view.append(intro, opening, grid, empty, archiveGuides, storageNote, archiveCatalog.root);
 
   const artworkMotion = createTheatreArtwork({ root: view, creditLabel: (credit) => tr('imageCredit', 'Image: {credit}', { credit }) });
   artworkMotion.setEnabled(motionEnabled);
@@ -132,6 +135,7 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
     curtain.hidden = Boolean(video.getAttribute('src'));
     controls.hidden = !video.getAttribute('src');
     stage.classList.toggle('is-loaded', Boolean(video.getAttribute('src')));
+    opening.classList.toggle('is-loaded', Boolean(video.getAttribute('src')));
     artworkMotion.setPlaying(snapshot.playing);
     mute.textContent = snapshot.muted ? tr('unmute', 'Unmute') : tr('mute', 'Mute');
     status.textContent = snapshot.error === 'gesture' ? tr('gesture', 'Press Play to start this film.')
@@ -224,7 +228,7 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
   function setMode(next) {
     mode = next; const browsingArchive = mode === 'archive';
     player.setActive(active && !browsingArchive);
-    [introActions, stage, credits, toolbar, grid, archiveGuides, storageNote].forEach((element) => { element.hidden = browsingArchive; });
+    [introActions, opening, grid, archiveGuides, storageNote].forEach((element) => { element.hidden = browsingArchive; });
     empty.hidden = browsingArchive || grid.childElementCount > 0;
     curatedMode.setAttribute('aria-pressed', String(!browsingArchive)); archiveMode.setAttribute('aria-pressed', String(browsingArchive));
     curatedMode.hidden = !browsingArchive; archiveMode.hidden = browsingArchive;

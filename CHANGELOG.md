@@ -10,6 +10,13 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.11.1] - 2026-09-22
+
+### 🐛 Fixed
+
+- Used Theatre's wide opening for a film-and-credits panel beside search, collection, language and genre filters. The first shelf now starts about 174 CSS pixels earlier at the extended Tesla viewport; Play expands the persistent player to the full content width, and Close restores browsing.
+- Kept every primary navigation destination visible at intermediate desktop/Tesla widths without reducing the brand or touch targets. Narrow Theatre layouts retain their single column and visible Play action.
+
 ## [2.11.0] - 2026-09-22
 
 ### ✨ Added
@@ -241,7 +248,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.11.0...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.11.1...HEAD
+[2.11.1]: https://github.com/enuzzo/catodo/compare/v2.11.0...v2.11.1
 [2.11.0]: https://github.com/enuzzo/catodo/compare/v2.10.1...v2.11.0
 [2.10.1]: https://github.com/enuzzo/catodo/compare/v2.10.0...v2.10.1
 [2.10.0]: https://github.com/enuzzo/catodo/compare/v2.9.0...v2.10.0

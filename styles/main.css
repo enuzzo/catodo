@@ -5968,6 +5968,11 @@ textarea {
   }
 }
 
+@media (min-width: 1181px) and (max-width: 1450px) {
+  .app-header { grid-template-columns: 292px minmax(0, 1fr) 260px 58px; }
+  .primary-nav { gap: 22px; }
+}
+
 @media (max-width: 1180px) {
   .explore-hero { grid-template-columns: minmax(0, 1fr) minmax(360px, 0.95fr); }
   .explore-filters { grid-template-columns: repeat(8, minmax(120px, 1fr)); }
@@ -6913,6 +6918,27 @@ textarea {
 }
 .theatre-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .theatre-controls .button { min-height: 44px; padding: 10px 12px; font-size: 12px; }
+
+.theatre-feature { min-width: 0; }
+@media (min-width: 1101px) {
+  .theatre-opening:not(.is-loaded) {
+    display: grid;
+    grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr);
+    gap: 22px;
+    align-items: start;
+    margin-bottom: 24px;
+  }
+  .theatre-opening:not(.is-loaded) .theatre-stage { grid-template-columns: 132px minmax(0, 1fr); }
+  .theatre-opening:not(.is-loaded) .theatre-info { padding: 16px 18px; }
+  .theatre-opening:not(.is-loaded) .theatre-credits { margin-bottom: 0; }
+  .theatre-opening:not(.is-loaded) .theatre-credits__body { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .theatre-opening:not(.is-loaded) .theatre-qr-block { display: flex; align-items: center; gap: 16px; }
+  .theatre-opening:not(.is-loaded) .theatre-toolbar { min-width: 0; margin: 0; gap: 16px; }
+  .theatre-opening:not(.is-loaded) .theatre-refinements { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+  .theatre-opening:not(.is-loaded) .theatre-search { grid-column: 1 / -1; max-width: none; width: 100%; }
+  .theatre-opening:not(.is-loaded) .theatre-select { width: 100%; }
+  .theatre-opening:not(.is-loaded) .theatre-filters .button { padding-inline: 12px; }
+}
 
 /* The large external index is fetched only when its view is explicitly opened. */
 .theatre-intro-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: end; gap: 8px; }

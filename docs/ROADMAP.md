@@ -1,7 +1,8 @@
 # CATODO roadmap
 
-Resume from the [archive index handoff](work/2026-09-22-theatre-archive-index.md) for
-publication status and the recommended next task.
+Resume from the [wide Theatre handoff](work/2026-09-22-theatre-wide-layout.md) for
+publication status and viewport evidence; the [archive index handoff](work/2026-09-22-theatre-archive-index.md)
+retains catalog coverage and the recommended editorial next task.
 
 Open work and ideas, reconciled with repository documentation and code on
 2026-09-20. Priorities combine retained ideas and the

@@ -1,6 +1,6 @@
 # CATODO architecture
 
-This document is the maintainer map for CATODO 2.11.0. It describes the runtime
+This document is the maintainer map for CATODO 2.11.1. It describes the runtime
 boundaries, the data flow, and the invariants that should survive future UI and
 feature work. For task-to-file navigation use [CODE-MAP.md](CODE-MAP.md); for
 focused checks use [TESTING.md](TESTING.md). For operational procedures and
@@ -226,6 +226,14 @@ file links only; `theatre-model.js` combines filters and validates device-local
 favorite IDs. `theatre-player.js` attaches a URL only after an explicit Play
 consent gesture in the active Theatre view. Consent is held per origin for that
 visit, never silently persisted or inferred from playlist approval.
+
+The persistent stage and credits share a `.theatre-feature` inside
+`.theatre-opening`, alongside the shelf toolbar. At 1101 CSS pixels and above,
+an unloaded opening uses two columns, with search, collection/language selectors
+and genre chips in matching visual/keyboard order. The player's source state
+toggles `is-loaded` on both stage and opening: playback uses the full content
+width, and Close restores the two columns without replacing the video. Narrow
+layouts remain stacked; expanded credits and long titles grow naturally.
 
 Favorite/filter updates only rebuild shelf cards. Pause/resume preserves position
 and volume; selecting a different film or episode clears the source without
