@@ -1,6 +1,6 @@
 # CATODO architecture
 
-This document is the maintainer map for CATODO 2.10.0. It describes the runtime
+This document is the maintainer map for CATODO 2.10.1. It describes the runtime
 boundaries, the data flow, and the invariants that should survive future UI and
 feature work. For task-to-file navigation use [CODE-MAP.md](CODE-MAP.md); for
 focused checks use [TESTING.md](TESTING.md). For operational procedures and
@@ -329,7 +329,10 @@ i18n key. Locale files currently exist in two places:
 - `public/locales/en.json` is what Vite serves and copies to `dist/`.
 
 Keep both files synchronized until the build has a single generated locale
-source. Design for strings 30–40% longer than English and do not assume LTR in
+source. Locale requests include `?v=APP_VERSION`, so browser/CDN caches cannot
+reuse an earlier release's translations for a new bundle. The in-memory map
+still loads each locale only once per instance.
+Design for strings 30–40% longer than English and do not assume LTR in
 new layout logic.
 
 `styles/main.css` is the single design system and responsive stylesheet. The

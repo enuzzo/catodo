@@ -1,3 +1,5 @@
+import { APP_VERSION } from "../version.js";
+
 const DEFAULT_LOCALE = "en";
 const interpolate = (template, vars) => String(template).replace(/\{([\w.]+)\}/g, (match, key) => vars[key] ?? match);
 
@@ -7,9 +9,11 @@ export class I18n {
   #listeners = new Set();
   #baseUrl;
   #fetch;
+  #version;
 
   constructor(options = {}) {
     this.#locale = options.locale || DEFAULT_LOCALE;
+    this.#version = options.version || APP_VERSION;
     this.#baseUrl = options.baseUrl || new URL("locales/", globalThis.location?.href || import.meta.url);
     const fetchImpl = options.fetchImpl || globalThis.fetch;
     this.#fetch = typeof fetchImpl === "function" ? fetchImpl.bind(globalThis) : fetchImpl;
@@ -21,7 +25,9 @@ export class I18n {
   async load(locale = this.#locale) {
     if (!this.#messages.has(locale)) {
       if (!this.#fetch) throw new Error("Fetch is not available for loading locale data");
-      const response = await this.#fetch(new URL(`${locale}.json`, this.#baseUrl));
+      const url = new URL(`${locale}.json`, this.#baseUrl);
+      url.searchParams.set("v", this.#version);
+      const response = await this.#fetch(url);
       if (!response.ok) throw new Error(`Could not load locale ${locale}: HTTP ${response.status}`);
       this.#messages.set(locale, await response.json());
     }

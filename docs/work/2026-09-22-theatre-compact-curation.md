@@ -122,9 +122,32 @@ Safari/iPhone behavior, all-network availability or complete-film integrity.
 
 ## Publication
 
-Version 2.10.0 prepared with `npm run release -- 2.10.0`; changelog and release
-metadata are consistent. Local release gates are complete. Commit/push, upload
-and public verification are recorded below when they finish.
+Version 2.10.0 was prepared with `npm run release -- 2.10.0`, committed and pushed
+as `ce89694e446f502f252e4d648d21a93947f5c37b`, then uploaded with the existing
+SiteGround deployment script. Public verification matched all 95 checked assets
+(active app JS/CSS, 61 images, 29 QR codes, locale, manifest and touch icon).
+Authenticated API routes returned 401; private storage/app routes 403; installable
+assets 200. An authenticated Chrome visit showed 2.10.0 / 29 films, working
+Randomize and decoded Big Buck Bunny playback at 640×360, followed by Close player.
+
+### Cache correction found during live acceptance
+
+The existing browser displayed the new no-dialogue language as `zxx`. A public
+GET of the unversioned locale still returned the previous language table, while
+the release-query URL matched the new build. This was a cache identity problem,
+not a missing translation. Translation requests now carry `?v=APP_VERSION`;
+each locale remains memoized within the running instance.
+
+The corrective patch is version **2.10.1**, prepared with the release script.
+The full suite passed 195 tests; syntax/release checks and build passed. A focused
+production-bundle check simulates stale unversioned translations and verifies
+the correct No dialogue label, language filtering, Randomize and containment
+at all four viewport sizes. Full movie transport and Multiview evidence above
+still applies: the correction only changes locale request identity.
+
+Patch evidence is kept in
+`/Users/enuzzo/Documents/Codex/catodo-release-2.10.1-2026-09-22/`.
+Patch upload and final public verification are appended after completion.
 
 ## Next start
 
