@@ -17,9 +17,11 @@ locale mirrors. Data, player and EPG subtrees add their own guidance.
   avoid assuming left-to-right layout.
 - `boot/signal-hyperjump.js` owns boot; `ui/signal-easter-egg.js` and its model
   own footer effects. Keep dismissal, silence and reduced-motion paths intact.
-- Use relevant `tests/ui/*.test.js` and `tests/i18n/index.test.js`. Visible
-  changes need rendered checks at affected viewports; 1600×900 is the Tesla
-  layout baseline, not proof of actual vehicle behavior.
+- Use relevant `tests/ui/*.test.js` and `tests/i18n/index.test.js`. Every visible
+  change must be rendered in both Tesla layouts: 773×601 CSS pixels with the car
+  column and 1254×784 as the fullscreen simulation. Also retain the 1600×900
+  desktop baseline and a narrow phone check where relevant. These are browser
+  checks, not proof of physical vehicle behavior; see [TESTING.md](../docs/TESTING.md).
 
 See [CODE-MAP.md](../docs/CODE-MAP.md) for cross-file routes and
 [TESTING.md](../docs/TESTING.md) for commands and browser limitations.

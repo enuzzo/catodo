@@ -54,6 +54,8 @@ and dependency trees from content searches.
 ## Theatre entry points
 
 - `src/ui/theatre.js`: persistent shelf/player, consent, filters, credits and QR.
+- `src/ui/theatre-artwork.js`: visibility-aware local artwork galleries and motion lifecycle.
+- `src/data/theatre-collections.js`: original editorial collections and external Archive discovery links.
 - `src/data/theatre-catalog.js`: reviewed edition metadata; evidence in the
   [register](work/2026-09-22-theatre-register.md).
 - `src/data/theatre-model.js`, `src/player/theatre-player.js`: local favorites,

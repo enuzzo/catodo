@@ -1,9 +1,9 @@
 # Theatre edition register — 2026-09-22
 
-**22 active works / 29 playable files. The target of at least 50 usable, editorially
+**29 active works / 37 playable files. The target of at least 50 usable, editorially
 strong works is NOT complete.** BBS is one eight-part documentary, not eight films.
-The former 50 Dutch newsreels are rejected and contribute zero. The following
-active works are a local, noncommercial implementation, not a published release.
+The former 50 Dutch newsreels are rejected and contribute zero. The works are selected for the existing private, noncommercial installation.
+Current release state is recorded in the [compact Theatre handoff](2026-09-22-theatre-compact-curation.md).
 
 See [handoff](2026-09-22-theatre-integration.md) for product and verification. The
 remaining-candidate section is a research queue with explicit blockers, not a
@@ -53,6 +53,13 @@ Native playback tests do not establish complete-film integrity or physical sound
 | 20 | [The Yes Men Fix the World](#yes-men) — Andy Bichlbaum, Mike Bonanno & Kurt Engfehr | 2009 | 1:35:40 | en; no attached verified captions | [CC BY-NC-ND 3.0](https://creativecommons.org/licenses/by-nc-nd/3.0/) |
 | 21 | [The Forbidden Education](#forbidden-education) — Germán Doin | 2012 | 2:25:19 | es; caption notes below | [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/) |
 | 22 | [Nasty Old People](#nasty-old-people) — Hanna Sköld | 2009 | 1:24:25 | sv; no attached verified captions | [CC BY-NC-SA 2.5 Sweden](https://creativecommons.org/licenses/by-nc-sa/2.5/se/) |
+| 23 | [The Lionshare](#lionshare) — Josh Bernhard | 2009 | 1:08:13 | en; caption notes below | [CC BY-NC 3.0](https://creativecommons.org/licenses/by-nc/3.0/) |
+| 24 | [Snowblind](#snowblind) — Kilian Manning | 2010 | 1:32:44 | en; caption notes below | [CC BY-ND 3.0](https://creativecommons.org/licenses/by-nd/3.0/) |
+| 25 | [Sintel](#sintel) — Colin Levy | 2010 | 0:14:48 | en; caption notes below | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
+| 26 | [Elephants Dream](#elephants-dream) — Bassam Kurdali | 2006 | 0:10:54 | en; caption notes below | [CC BY 2.5](https://creativecommons.org/licenses/by/2.5/) |
+| 27 | [Tears of Steel](#tears-of-steel) — Ian Hubert | 2012 | 0:12:14 | en; caption notes below | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
+| 28 | [Big Buck Bunny](#big-buck-bunny) — Sacha Goedegebure | 2008 | 0:09:56 | zxx; caption notes below | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
+| 29 | [The Internet’s Own Boy](#internet-own-boy) — Brian Knappenberger | 2014 | 1:45:00 | en; caption notes below | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
 
 Language fields describe dialogue; caption fields distinguish in-picture subtitles from external files. Runtime is the selected file length, not a rounded theatrical listing.
 
@@ -359,6 +366,113 @@ A young care worker caught up with a neo-Nazi gang begins to see her life differ
 - **Viewing note:** Racist behaviour, violence and adult themes.
 - [Complete film · Swedish · SD](https://archive.org/download/nasty-old-people/Nasty%20Old%20People.mp4) — 1024×576, 1:24:25, 26 decoded frames / 1.01 s in the browser sample.
 
+<a id="lionshare"></a>
+
+### The Lionshare
+
+A new friendship begins with an invitation to a private file-sharing community. Josh Bernhard follows young New Yorkers through awkward conversations, shared music and mismatched expectations, in an intimate portrait of connection at the edge of the social-web era.
+
+- **Authority:** [Filmmaker’s original VODO release (archived)](https://web.archive.org/web/20130116102019/http://vodo.net/lionshare); reviewed 2026-09-22.
+- **Grant:** [CC BY-NC 3.0](https://creativecommons.org/licenses/by-nc/3.0/). The original distributor licenses this exact VODO package under CC BY-NC 3.0 and links the matching Lionshare.2009.Legacy.2008 release filename. The Archive uploader’s later ND 4.0 label is not adopted.
+- **Edition:** Complete 68-minute VODO package, including the opening short Legacy (2008, Grzegorz Jonkajtys). The combined edition counts as one catalog entry. Actual copy is 854×480, despite the 720p filename.
+- **Captions:** English dialogue. No verified caption track attached to this edition.
+- **Attribution:** The Lionshare (2009), directed by Josh Bernhard. Josh Bernhard. CC BY-NC 3.0. Complete film and original credits retained. Opening short: Legacy (2008), Grzegorz Jonkajtys; retained as part of the distributor’s original package.
+- **Viewing note:** Adult language and relationship themes.
+- [Complete film · SD](https://archive.org/download/lionshare.2009.legacy.2008.720p.x264-vodo/Lionshare.2009.Legacy.2008.720p.x264-VODO.mp4)
+
+<a id="snowblind"></a>
+
+### Snowblind
+
+In a frozen wasteland, a condemned gunslinger accepts a dangerous bargain: track down an outlaw and earn his freedom. This deliberately rough-edged independent B-western mixes frontier revenge with a post-apocalyptic winter and low-budget visual invention.
+
+- **Authority:** [Mangofilm / original VODO release (archived)](https://web.archive.org/web/20120103004738/http://vodo.net/snowblindmovie); reviewed 2026-09-22.
+- **Grant:** [CC BY-ND 3.0](https://creativecommons.org/licenses/by-nd/3.0/). Mangofilm’s archived VODO page links CC BY-ND 3.0. The selected file retains the original Attribution / No Derivative Works opening slate. It is played complete, without edits; the Archive uploader’s 4.0 tag is not substituted.
+- **Edition:** Complete 92-minute VODO edition, 720×360. A contemporary 2010 B-movie, not a vintage western; selected for the user’s interest in offbeat genre cinema.
+- **Captions:** English dialogue. No verified caption track attached to this edition.
+- **Attribution:** Snowblind (2010), directed by Kilian Manning. Kilian Manning. CC BY-ND 3.0. Complete film and original credits retained.
+- **Viewing note:** Violence, strong language and intentionally rough low-budget effects.
+- [Complete film · SD](https://archive.org/download/Snowblind-film__2010/Snowblind.2010.Xvid-VODO.mp4)
+
+<a id="sintel"></a>
+
+### Sintel
+
+A young traveller searching for a dragon crosses a harsh, unfamiliar world. The rescue story grows into a compact fantasy about attachment, persistence and the terrible cost of losing sight of time.
+
+- **Authority:** [Blender Foundation / Durian Open Movie](https://www.sintel.org/about/); reviewed 2026-09-22.
+- **Grant:** [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). The producer’s about and sharing pages explicitly license the complete film under CC BY 3.0, with the entire credit scroll retained.
+- **Edition:** Complete original stereo edition, 2048×872. Publisher-provided subtitle downloads are separate; no external subtitle track is attached here.
+- **Captions:** English dialogue. No verified caption track attached to this edition.
+- **Attribution:** Sintel (2010), directed by Colin Levy. © Blender Foundation | www.sintel.org. CC BY 3.0. Complete film and original credits retained.
+- **Viewing note:** Fantasy violence and a sad ending.
+- [Complete film · HD](https://archive.org/download/Sintel/sintel-2048-stereo.mp4)
+
+<a id="elephants-dream"></a>
+
+### Elephants Dream
+
+Two companions explore a machine that seems to contain an entire world. As the younger traveller questions the rules, their guide’s certainty begins to fracture. An unsettling animated short about imagination, control and the stories we insist other people inhabit.
+
+- **Authority:** [Blender Foundation / Netherlands Media Art Institute](https://orange.blender.org/download/); reviewed 2026-09-22.
+- **Grant:** [CC BY 2.5](https://creativecommons.org/licenses/by/2.5/). The producer’s original Creative Commons statement licenses the film under CC BY 2.5. Its download page links this Archive item. Separate downloadable soundtrack terms are not substituted for the intact film grant.
+- **Edition:** Complete English-language edition, 640×360. The linked archive filename says 1024 but this progressive derivative is SD. Original soundtrack and credits retained.
+- **Captions:** English dialogue. No verified caption track attached to this edition.
+- **Attribution:** Elephants Dream (2006), directed by Bassam Kurdali. © 2006 Blender Foundation / Netherlands Media Art Institute / www.elephantsdream.org. CC BY 2.5. Complete film and original credits retained.
+- **Viewing note:** Surreal imagery and an unsettling ending.
+- [Complete film · SD](https://archive.org/download/ElephantsDream/ed_1024.mp4)
+
+<a id="tears-of-steel"></a>
+
+### Tears of Steel
+
+A group of scientists and fighters restages a painful memory in a ruined Amsterdam, hoping to avert a robotic catastrophe. Live action and visual effects turn a small relationship drama into an inventive piece of apocalyptic science fiction.
+
+- **Authority:** [Blender Foundation / Mango Open Movie](https://mango.blender.org/about/); reviewed 2026-09-22.
+- **Grant:** [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). The producer licenses the complete film and project material under CC BY 3.0. Keep the original credit scroll and the requested Blender Foundation attribution.
+- **Edition:** Complete publisher-hosted H.264 MOV edition, 1280×534, with original audio and credits. An Archive MP4 copy is also offered as an SD alternative.
+- **Captions:** English dialogue. No verified caption track attached to this edition.
+- **Attribution:** Tears of Steel (2012), directed by Ian Hubert. (CC) Blender Foundation | mango.blender.org. CC BY 3.0. Complete film and original credits retained.
+- **Viewing note:** Science-fiction violence and strong language.
+- [Complete film · HD](https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov)
+- [Archive edition · SD](https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4)
+
+<a id="big-buck-bunny"></a>
+
+### Big Buck Bunny
+
+A peaceful rabbit’s day is ruined by three forest bullies. Patience gives way to a carefully planned comic revenge, in a bright, wordless short built around physical timing and the pleasures of classic cartoon mischief.
+
+- **Authority:** [Blender Foundation / Peach Open Movie](https://www.bigbuckbunny.org/about/); reviewed 2026-09-22.
+- **Grant:** [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). The producer licenses the film under CC BY 3.0. The original soundtrack and complete credit roll are retained. The separate DVD cover is excluded from that grant and is not used.
+- **Edition:** Complete original 2008 edition from Archive.org. This is not the later 60 fps or stereoscopic remaster. Wordless storytelling; no dialogue captions are needed.
+- **Captions:** Wordless film. No dialogue captions required.
+- **Attribution:** Big Buck Bunny (2008), directed by Sacha Goedegebure. © 2008 Blender Foundation / www.bigbuckbunny.org. CC BY 3.0. Complete film and original credits retained.
+- [Complete film · SD](https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4)
+
+<a id="internet-own-boy"></a>
+
+### The Internet’s Own Boy
+
+Family, friends and collaborators trace Aaron Swartz’s path from a precocious programmer to an advocate for public access to knowledge. The documentary connects personal memories with the political and legal struggles that shaped his life and the early open web.
+
+- **Authority:** [UNT Libraries / original 2014 Archive deposit](https://digital.library.unt.edu/ark:/67531/metadc305466/); reviewed 2026-09-22.
+- **Grant:** [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). UNT Libraries independently identifies the film’s Attribution–NonCommercial–ShareAlike grant in its institutional metadata. The linked contemporary June 2014 Archive deposit specifies version 4.0. The complete film, soundtrack and credits are retained.
+- **Edition:** Complete 105-minute English edition deposited on Archive.org on 28 June 2014. License family corroborated by UNT; version 4.0 comes from this original deposit, not a later relabelled re-upload.
+- **Captions:** English dialogue. No verified caption track attached to this edition.
+- **Attribution:** The Internet’s Own Boy (2014), directed by Brian Knappenberger. Brian Knappenberger. CC BY-NC-SA 4.0. Complete film and original credits retained.
+- **Viewing note:** Discussion of suicide, bereavement and legal persecution.
+- [Complete film · HD](https://archive.org/download/TheInternetsOwnBoyTheStoryOfAaronSwartz/TheInternetsOwnBoy_TheStoryofAaronSwartz-HD.mp4)
+
+## September 22 expansion decisions
+
+- The Lionshare’s original VODO grant links the exact Lionshare.2009.Legacy.2008 package. Preserve the opening short and identify its author; it contributes no extra film count.
+- Snowblind’s BY-ND 3.0 slate matches its original distributor. Reconsidered after the user explicitly requested offbeat genre selections; the copy is labelled a contemporary B-western with rough effects, not a vintage classic.
+- The Internet’s Own Boy now pairs the [UNT institutional license-family record](https://digital.library.unt.edu/ark:/67531/metadc305466/metadata.untl.xml) with the contemporaneous 28 June 2014 Archive deposit specifying 4.0. Version evidence comes from that deposit, not a claim that UNT metadata names a version.
+- Four authored Blender shorts form a small animation/science-fiction selection. Original producer grants and full credits are retained; these are not newsreels. Big Buck Bunny and Elephants Dream DVD covers are expressly excluded, so the artwork uses licensed film stills instead.
+- The Cosmonaut remains conditional: a newly located Archive copy has inconsistent duration/aspect metadata and no decoded frame near its declared end. Its uploader’s NC 4.0 label also conflicts with the project’s BY-SA description.
+- Public Domain Review is useful discovery evidence, but its Night of the Living Dead and Plan 9 records explicitly distinguish PD U.S. from unclear digital-copy rights. Archive collections are linked as external guides; they are not silently bulk-imported as playable titles.
+
 ## Corroborating rights evidence and discrepancies
 
 - ESO identifies BY-ND 4.0 on the three selected complete-video pages; the full
@@ -411,8 +525,8 @@ promise English subtitles within the picture.
 
 ## Assessed candidates kept out of the player
 
-These 43 named candidates bring the research universe to **65 distinct works**,
-but **only the 22 active works above count as usable**. A conditional row records
+These 40 remaining candidates bring the research universe to **69 distinct works**,
+but **only the 29 active works above count as usable**. A conditional row records
 what prevented admission; it is not an integration license. Runtime, exact media
 file, language and subtitle verification remain incomplete where stated. Do not
 replace missing evidence with generic public-domain or free-to-watch claims.
@@ -437,7 +551,6 @@ replace missing evidence with generic public-domain or free-to-watch claims.
 | The General (1926, Buster Keaton & Clyde Bruckman) | Large-scale physical action and spatial storytelling | [Library of Congress preservation programme](https://www.loc.gov/programs/national-film-preservation-board/) | Conditional: exact edition, territorial rights, music and subtitles not verified; catalog lead only |
 | Sherlock Jr. (1924, Buster Keaton) | Film-within-film invention and visual effects | [Copyright Office discussion](https://blogs.loc.gov/copyright/2020/02/the-lifecycle-of-copyright-1924-works-enter-the-public-domain/) | Conditional: underlying US status identified, exact scored copy and territory not cleared |
 | Steamboat Bill, Jr. (1928, Charles Reisner & Buster Keaton) | Physical comedy and storm-set staging | [Library of Congress preservation programme](https://www.loc.gov/programs/national-film-preservation-board/) | Conditional: edition-specific research incomplete; no playable claim |
-| The Internet’s Own Boy (2014, Brian Knappenberger) | Substantive documentary about Aaron Swartz and public access | [UNT institutional deposit](https://digital.library.unt.edu/ark:/67531/metadc305466/) | Conditional: institutional metadata confirms BY-NC-SA family but did not resolve the exact version of the selected Archive file; do not inherit its 4.0 uploader label |
 | GET LAMP (2010, Jason Scott) | Oral history of text adventures and interactive fiction | [Filmmaker](http://www.getlamp.com/) | Conditional: primary site links a CC DVD-ISO edition; a corresponding verified progressive MP4 was not located |
 | DEF CON: The Documentary (2013, Jason Scott) | History and culture of a major hacker gathering | [Filmmaker release announcement](https://ascii.textfiles.com/archives/3984) | Conditional: official Archive MP4 identified, but free distribution alone did not establish the exact reuse grant |
 | Patent Absurdity (2010, Luca Lucarini) | Focused documentary about software patents | [Official download page](https://patentabsurdity.com/download.html) | Conditional: Ogg film and BY-SA animation assets found; the asset license must not be silently applied to the entire movie; exact film grant/MP4 pending |
@@ -455,13 +568,11 @@ replace missing evidence with generic public-domain or free-to-watch claims.
 | PressPausePlay (2011, David Dworsky & Victor Köhler) | Documentary about digital tools and creative work | [Original project, archived](https://web.archive.org/web/20130101000000/http://www.presspauseplay.com/) | Conditional: original license/file pairing remains incomplete; research lead, not a verified title |
 | Money & Life (2013, Katie Teague) | Documentary examining how people organise exchange and value | [Filmmaker project](https://www.moneyandlifemovie.com/) | Conditional: exact rights and durable compatible edition pending; no license inferred from free viewing |
 | 97% Owned (2012, Michael Oswald) | Long-form documentary about the monetary system | [Producer](https://www.independentpov.org/) | Conditional: exact film edition, grant and file need confirmation; its arguments would be described as the film’s perspective |
-| The Lionshare (2009, Josh Bernhard) | Small-scale drama about online relationships and sharing culture | [Original VODO edition](https://web.archive.org/web/20130116102019/http://vodo.net/lionshare) | Conditional: BY-NC 3.0 grant identified; matching MP4 not yet probed or admitted |
 | The Long Road to the Hall of Fame (2015, Reda Zine) | Documentary linking music, sport and civil-rights history | [Creative Commons release report](https://creativecommons.org/2019/09/19/documentary-the-long-road-to-the-hall-of-fame-available-under-cc-license/) | Conditional: promising release report, but authoritative exact-license/version/file verification remains incomplete; do not count the report as clearance |
 | Interferències (2011, ODG / Quepo) | Spanish-language documentary about economic and civic responsibility | [Project](https://interferencies.cc/) | Conditional: exact edition, rights and captions remain to be established; research lead only |
 | Panorama Ephemera (2004, Rick Prelinger) | A feature-length archival collage, rather than individual newsreel padding | [Filmmaker’s page](https://www.panix.com/~footage/panorama.html) | Conditional: page text says NC-SA while its deed link is NC 2.0; resolve the edition-specific attribution/grant before admission |
 | Hubble: 15 Years of Discovery (2005, Lars Lindberg Christensen) | Substantive astronomy documentary and strong HD source potential | [ESA/Hubble complete-film page](https://esahubble.org/videos/hubble_15_full_movie/) | Conditional: check the complete-film grant against music exceptions instead of inheriting a generic media-library footer |
 | A Simpler Way (2016, Jordan Osmond & Antoinette Wilson) | Observational documentary about a community attempting a different way of living | [Publisher](https://happenfilms.com/) | Excluded from this batch: current screening/licensing offers do not establish a freely reusable complete-film edition |
-| Snowblind (2010, Kilian Manning) | Independent post-apocalyptic western; technically suitable comparison | [Original VODO edition](https://web.archive.org/web/20120103004738/http://vodo.net/snowblindmovie) | Excluded editorially from this batch: BY-ND 3.0 and a playable copy were found, but rights availability alone is not sufficient reason to fill the selection |
 
 The archival classic rows are **work-level investigations only**. Their shared
 primary guidance resolves why public-domain labels cannot be applied to any

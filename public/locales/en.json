@@ -437,7 +437,9 @@
       "technology": "Technology",
       "animation": "Animation",
       "society": "Society",
-      "environment": "Environment"
+      "environment": "Environment",
+      "western": "Western",
+      "fantasy": "Fantasy"
     },
     "languages": {
       "en": "English",
@@ -446,14 +448,47 @@
       "de": "German",
       "silent": "Silent",
       "es": "Spanish",
-      "pt": "Portuguese"
+      "pt": "Portuguese",
+      "zxx": "No dialogue"
     },
     "back": "−15 seconds",
     "forward": "+15 seconds",
     "mute": "Mute",
     "unmute": "Unmute",
     "fullscreen": "Fullscreen",
-    "fullscreenUnavailable": "Fullscreen is unavailable in this browser."
+    "fullscreenUnavailable": "Fullscreen is unavailable in this browser.",
+    "randomize": "Randomize",
+    "motion": "Motion",
+    "motionHint": "Animate visible artwork. Reduced motion and data saver always take priority.",
+    "closePlayer": "Close player",
+    "archiveEdition": "This edition on Archive.org",
+    "collection": "Curated collection",
+    "allCollections": "All collections",
+    "archiveGuides": "Further into the archive",
+    "archiveGuideNote": "Explore these collections on their source sites. Individual editions, restorations and territorial rights need their own review.",
+    "browseArchive": "Browse on Archive.org ↗",
+    "collections": {
+      "after-dark": "After dark",
+      "digital-lives": "Digital lives",
+      "look-up": "Look up",
+      "human-connections": "Human connections",
+      "other-worlds": "Small, strange worlds",
+      "change-makers": "Questions worth asking"
+    },
+    "archive": {
+      "midnight": {
+        "title": "Midnight monsters",
+        "description": "Haunted houses, unexpected visitors and science gone wrong. Start with the archive’s science-fiction and horror collection."
+      },
+      "noir": {
+        "title": "Shadows & double-crosses",
+        "description": "Private eyes, dangerous bargains and the wrong turn home. Explore crime films from the 1940s and 1950s."
+      },
+      "silent": {
+        "title": "Before the first word",
+        "description": "Visual comedy, impossible journeys and early screen nightmares. Discover silent cinema, with attention to each copy’s score and restoration."
+      }
+    }
   },
   "channel": {
     "tuneExploreAriaLabel": "Tune {name} in Discover preview"

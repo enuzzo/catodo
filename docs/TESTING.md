@@ -63,8 +63,15 @@ login/sync environment. For the authenticated production shell, use a PHP-capabl
 environment; SiteGround Nginx/Apache denial rules still require hosting checks.
 Do not publish a temporary unprotected app entry to make a smoke test convenient.
 
-Visible UI changes: check the affected path at 1600×900 and a representative
-390×844 phone viewport when responsive behavior matters. Check focus/keyboard,
+Every visible UI change must cover **both Tesla browser layouts**: **773×601 CSS
+pixels** for the view beside the car column, and **1254×784** for the fullscreen
+simulation. The split dimensions were measured on a real Tesla in earlier
+diagnostics (logical screen 1254×784, DPR 1.53). The fullscreen dimensions are a
+simulation based on that screen, not a fresh measurement of browser chrome.
+Keep the **1600×900** desktop baseline and a representative **390×844** phone
+viewport when responsive behavior matters. Test the initial viewport before
+scrolling, touch target reachability, expanded video and return to browsing.
+Parked vehicle acceptance remains a separate physical check. Check focus/keyboard,
 containment and the relevant player transitions. QA fixtures show layout; real
 HLS playback requires an approved source. Fresh profiles isolate test state.
 

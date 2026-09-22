@@ -1,6 +1,6 @@
 # CATODO architecture
 
-This document is the maintainer map for CATODO 2.9.0. It describes the runtime
+This document is the maintainer map for CATODO 2.10.0. It describes the runtime
 boundaries, the data flow, and the invariants that should survive future UI and
 feature work. For task-to-file navigation use [CODE-MAP.md](CODE-MAP.md); for
 focused checks use [TESTING.md](TESTING.md). For operational procedures and
@@ -250,6 +250,22 @@ separate source/license/credit records on each catalog entry and visible credits
 Images use contain sizing to preserve the entire composition; poster/photograph/
 film-still provenance is disclosed in viewing notes. A full work with multiple
 episodes counts once.
+
+The idle stage uses a small cover column. Attaching media expands the same video;
+Close player clears its source and restores the compact card. Randomize selects a
+different eligible work inside the current combined filters, without playing it.
+`theatre-collections.js` owns original editorial groupings and separately labelled
+external archive guides. Guides navigate to the original collection/curator sites;
+they never fetch or import a catalog and do not bypass edition review.
+
+`theatre-artwork.js` observes the scrollable Theatre viewport. It animates at most
+two visible galleries, requests one local alternate image per eight-second step,
+updates its visible credit with the image, and stops when the view is inactive,
+the document is hidden, a film plays, reduced motion/data saver is enabled, or the
+viewer turns Motion off. Motion preference is device-local
+(`catodo:theatre:motion:v1`). Extra images are not requested while these conditions
+block animation. ND excerpts stay static; gallery scale/pan preserves complete
+frames. No animated GIF or video preview is shipped.
 
 Discover's Adrenaline and Documentaries collections operate solely on approved
 catalog records. All matching regional identities remain distinct. Overview rails

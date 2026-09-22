@@ -10,6 +10,20 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.10.0] - 2026-09-22
+
+### 🛠 Changed
+
+- Made Theatre’s opening film card compact, expanding the persistent video only after Play; added Close player, synopsis excerpts on every thumbnail and larger image credits.
+- Made both Tesla browser layouts mandatory for visible UI work: 773×601 split view and a 1254×784 fullscreen simulation, alongside desktop and phone checks.
+
+### ✨ Added
+
+- Added Randomize within the current collection and filters, avoiding the selected film and preserving source consent.
+- Added six editorial collections and seven reviewed works: The Lionshare, Snowblind, Sintel, Elephants Dream, Tears of Steel, Big Buck Bunny and The Internet’s Own Boy. Theatre now contains 29 works and 37 editions/episodes; the 50-work target remains open.
+- Added alternate artwork with subtle Ken Burns motion and crossfades for 16 films. At most two visible thumbnails animate; Motion, reduced-motion, data-saver, navigation and film playback pause the effect. All 61 images load locally; no GIFs or preview videos are bundled.
+- Added explicit Archive.org edition links and external discovery guides for horror/science fiction, film noir and silent cinema, with credited curatorial references. External guides do not imply that their entire catalogs are cleared for the player.
+
 ## [2.9.0] - 2026-09-22
 
 ### 🛠 Changed
@@ -213,7 +227,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.9.0...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.10.0...HEAD
+[2.10.0]: https://github.com/enuzzo/catodo/compare/v2.9.0...v2.10.0
 [2.9.0]: https://github.com/enuzzo/catodo/compare/v2.8.0...v2.9.0
 [2.8.0]: https://github.com/enuzzo/catodo/compare/v2.7.1...v2.8.0
 [2.7.1]: https://github.com/enuzzo/catodo/compare/v2.7.0...v2.7.1

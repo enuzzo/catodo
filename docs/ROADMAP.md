@@ -1,6 +1,6 @@
 # CATODO roadmap
 
-Resume from the [2.8.0 release handoff](work/2026-09-20-release-handoff.md) for
+Resume from the [compact Theatre handoff](work/2026-09-22-theatre-compact-curation.md) for
 publication status and the recommended next task.
 
 Open work and ideas, reconciled with repository documentation and code on
@@ -20,7 +20,7 @@ features and detailed QA results are preserved in
 
 | ID | Priority | Remaining acceptance | Existing evidence / limit |
 | --- | --- | --- | --- |
-| QA-01 | P0 | Native Tesla touch: navigation, Guide drag, fullscreen return, 2/3/4-feed audio focus | September desktop/browser checks at 1600×900; not physical vehicle acceptance |
+| QA-01 | P0 | Native Tesla touch: navigation, Guide drag, fullscreen return, 2/3/4-feed audio focus | Both Tesla browser layouts are now mandatory: 773×601 split and 1254×784 fullscreen simulation, plus 1600×900 baseline. Browser checks are not physical vehicle acceptance |
 | QA-02 | P0 | Real iPhone/iPad Home Screen installation, standalone safe areas, rotation, cookie continuity and system-fullscreen exit; corrected mobile header in Safari | September 390×844 browser checks plus earlier iOS Simulator evidence; no new physical iOS test |
 | QA-03 | P0 | Recheck current EPG country coverage with a bounded, reproducible provider sample | Earlier IT/FR/DE counts and stale feeds are dated; later provider discovery changes shipped |
 | EPG-01 | Decision | Decide whether removing a guide should purge its retained local programme cache | Retention was observed and documented; no new removal policy selected |
@@ -37,9 +37,9 @@ features and detailed QA results are preserved in
 | EPG-02 | P1 | Guide coverage summary by country with direct repair actions | Separate downloaded feed, matched channel, current programme and stale schedule counts; use explicit denominators and timestamps |
 | UX-03 | P2 | Compact Countries entry on phones and quieter missing-logo placeholders | Keep map accessible, reduce unselected-detail space and maintain readable channel identity; check both genuine logos and fallbacks |
 | CONTENT-01 | Published; provider/device acceptance open | Discover: Adrenaline first, Documentaries and full-category navigation | Groups all matching approved catalog identities without importing sources or promising Red Bull VOD rights. Synthetic multi-feed rendering and browser transitions verified; actual installation coverage and Tesla playback remain open. See [handoff](work/2026-09-22-theatre-integration.md) |
-| CONTENT-02 | Partial: 22 usable works; 50-work target open | Theatre: internationally interesting films and substantive documentaries, with edition-specific rights | Native MP4 shelf/player and 22 credited images implemented. [Register](work/2026-09-22-theatre-register.md) separates active works, conditional titles and exclusions. Rejected Dutch newsreels count zero; Metropolis/Chaplin remain conditional. Improve low-resolution copies and verified English captions; release publication tracked in the handoff |
+| CONTENT-02 | Partial: 29 usable works; 50-work target open | Theatre: internationally interesting films and substantive documentaries, with edition-specific rights | Compact persistent player, Randomize, six editorial collections, 61 credited images and 16 optional galleries. [Register](work/2026-09-22-theatre-register.md) separates active works and unresolved candidates. Rejected newsreels count zero; Metropolis/Chaplin remain conditional. Improve low-resolution copies and verified captions; publication tracked in the [current handoff](work/2026-09-22-theatre-compact-curation.md) |
 | CONTENT-03 | Published; physical scan open | Visible source, attribution, exact license and source QR | Local generation and independent decoding; no QR service, tracking or film bundle. Real-phone/Tesla scanning and viewing remain open. See [handoff](work/2026-09-22-theatre-integration.md) |
-| CONTENT-04 | Research, not playable | Curated vintage horror and Elvis seasons; stronger official poster coverage | [Artwork and curation register](work/2026-09-22-theatre-artwork-curation.md): Midnight Monsters / Drive-in After Dark / Elvis on Screen. Clear each edition, territory, score and poster separately before adding titles; no empty collection presented as available |
+| CONTENT-04 | External discovery guides implemented; vintage editions remain research | Curated vintage horror and Elvis seasons; stronger official poster coverage | Three labelled external guides open Archive.org collections and PDR references. They do not make all linked films playable in CATODO. [Vintage register](work/2026-09-22-theatre-artwork-curation.md) retains Midnight Monsters / Drive-in After Dark / Elvis on Screen; review edition, territory, score and artwork separately |
 
 ## Engineering candidates
 

@@ -201,11 +201,48 @@ export const THEATRE_TITLES = [
       "license": "CC BY-NC 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-nc/3.0/",
       "timeSeconds": 1963,
-      "note": "Unaltered film still at 32:43 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster.",
+      "note": "Unaltered film still at 32:43 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster. Displayed with gentle scale/pan and crossfade under the same license.",
       "rightsSource": "https://www.decayfilm.com/",
       "reviewed": "2026-09-22",
-      "sha256": "75dd9fc0f00048cf21d1e0a985e4fc3d4e47747c9d1fac4ef56050745542046d"
-    }
+      "sha256": "75dd9fc0f00048cf21d1e0a985e4fc3d4e47747c9d1fac4ef56050745542046d",
+      "motionAllowed": true
+    },
+    "artworks": [
+      {
+        "src": "/theatre/artwork/decay-scene-1.jpg",
+        "width": 640,
+        "height": 320,
+        "sourceUrl": "https://www.decayfilm.com/",
+        "originalUrl": "https://archive.org/download/Decay2012-TheLhcZombieFilmfullFilm/Decay_2012_Low.mp4",
+        "credit": "H2ZZ Productions",
+        "kind": "film-still",
+        "license": "CC BY-NC 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc/3.0/",
+        "timeSeconds": 456,
+        "note": "Film still at 7:36 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://www.decayfilm.com/",
+        "reviewed": "2026-09-22",
+        "sha256": "d2c7025363eae42e59c1e4b36e1aef7b67d4cebbd87ba31161562d7d9f70c6a3",
+        "motionAllowed": true
+      },
+      {
+        "src": "/theatre/artwork/decay-scene-2.jpg",
+        "width": 640,
+        "height": 320,
+        "sourceUrl": "https://www.decayfilm.com/",
+        "originalUrl": "https://archive.org/download/Decay2012-TheLhcZombieFilmfullFilm/Decay_2012_Low.mp4",
+        "credit": "H2ZZ Productions",
+        "kind": "film-still",
+        "license": "CC BY-NC 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc/3.0/",
+        "timeSeconds": 1096,
+        "note": "Film still at 18:16 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://www.decayfilm.com/",
+        "reviewed": "2026-09-22",
+        "sha256": "8f5ea89feaa59c045a4428790a81d69ea3127f41b8824fdb0a5cf8024144cfeb",
+        "motionAllowed": true
+      }
+    ]
   },
   {
     "id": "just-do-it",
@@ -299,11 +336,48 @@ export const THEATRE_TITLES = [
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "timeSeconds": 1340,
-      "note": "Unaltered film still at 22:20 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster. Nonsquare video samples normalized to square image pixels, preserving display aspect ratio.",
+      "note": "Unaltered film still at 22:20 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster. Nonsquare video samples normalized to square image pixels, preserving display aspect ratio. Displayed with gentle scale/pan and crossfade under the same license.",
       "rightsSource": "https://www.valkaama.com/index.php?page=movie",
       "reviewed": "2026-09-22",
-      "sha256": "9d85c880c3d0803ba060d20883c48cb332a33eefd5481222bdb4104991c85aac"
-    }
+      "sha256": "9d85c880c3d0803ba060d20883c48cb332a33eefd5481222bdb4104991c85aac",
+      "motionAllowed": true
+    },
+    "artworks": [
+      {
+        "src": "/theatre/artwork/valkaama-scene-1.jpg",
+        "width": 640,
+        "height": 360,
+        "sourceUrl": "https://www.valkaama.com/index.php?page=movie",
+        "originalUrl": "https://archive.org/download/valkaama/Valkaama_720p.mp4",
+        "credit": "Tim Baumann",
+        "kind": "film-still",
+        "license": "CC BY-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+        "timeSeconds": 558,
+        "note": "Film still at 9:18 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://www.valkaama.com/index.php?page=movie",
+        "reviewed": "2026-09-22",
+        "sha256": "30f418a10b7c32e58a0b9312818ffe42758004bfa3abc85c19f2a2752d2be320",
+        "motionAllowed": true
+      },
+      {
+        "src": "/theatre/artwork/valkaama-scene-2.jpg",
+        "width": 640,
+        "height": 360,
+        "sourceUrl": "https://www.valkaama.com/index.php?page=movie",
+        "originalUrl": "https://archive.org/download/valkaama/Valkaama_720p.mp4",
+        "credit": "Tim Baumann",
+        "kind": "film-still",
+        "license": "CC BY-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+        "timeSeconds": 2401,
+        "note": "Film still at 40:01 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://www.valkaama.com/index.php?page=movie",
+        "reviewed": "2026-09-22",
+        "sha256": "ef2560522dd83c87e7f7840e31ad3948e9a23387de724b2303affd6635cea7f4",
+        "motionAllowed": true
+      }
+    ]
   },
   {
     "id": "the-romantic",
@@ -350,11 +424,48 @@ export const THEATRE_TITLES = [
       "license": "CC BY-NC-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
       "timeSeconds": 1369,
-      "note": "Unaltered film still at 22:49 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster. Nonsquare video samples normalized to square image pixels, preserving display aspect ratio.",
+      "note": "Unaltered film still at 22:49 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster. Nonsquare video samples normalized to square image pixels, preserving display aspect ratio. Displayed with gentle scale/pan and crossfade under the same license.",
       "rightsSource": "https://web.archive.org/web/20120705035604/http://www.theromanticmovie.com/",
       "reviewed": "2026-09-22",
-      "sha256": "d92d6fcdd9442eeb2e7483c910fd5486d62cfec813a134f7b570671673949478"
-    }
+      "sha256": "d92d6fcdd9442eeb2e7483c910fd5486d62cfec813a134f7b570671673949478",
+      "motionAllowed": true
+    },
+    "artworks": [
+      {
+        "src": "/theatre/artwork/the-romantic-scene-1.jpg",
+        "width": 480,
+        "height": 256,
+        "sourceUrl": "https://web.archive.org/web/20120705035604/http://www.theromanticmovie.com/",
+        "originalUrl": "https://archive.org/download/the-romantic-2009/The%20Romantic%20%5B2009%5D.mp4",
+        "credit": "Michael P. Heneghan",
+        "kind": "film-still",
+        "license": "CC BY-NC-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+        "timeSeconds": 570,
+        "note": "Film still at 9:30 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://web.archive.org/web/20120705035604/http://www.theromanticmovie.com/",
+        "reviewed": "2026-09-22",
+        "sha256": "ab9ffa079e226c103185aceaeafaad27b7de099546d8a6d6f09515c9fcd4785b",
+        "motionAllowed": true
+      },
+      {
+        "src": "/theatre/artwork/the-romantic-scene-2.jpg",
+        "width": 480,
+        "height": 256,
+        "sourceUrl": "https://web.archive.org/web/20120705035604/http://www.theromanticmovie.com/",
+        "originalUrl": "https://archive.org/download/the-romantic-2009/The%20Romantic%20%5B2009%5D.mp4",
+        "credit": "Michael P. Heneghan",
+        "kind": "film-still",
+        "license": "CC BY-NC-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+        "timeSeconds": 2454,
+        "note": "Film still at 40:54 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://web.archive.org/web/20120705035604/http://www.theromanticmovie.com/",
+        "reviewed": "2026-09-22",
+        "sha256": "4793b9b88eaf3f9fa29da0cb0aeddeededcd54d12b3f6ce1951504fb4cc674e2",
+        "motionAllowed": true
+      }
+    ]
   },
   {
     "id": "insecurity",
@@ -551,11 +662,48 @@ export const THEATRE_TITLES = [
       "license": "CC BY-NC-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
       "timeSeconds": 193,
-      "note": "Unaltered film still at 3:13 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster.",
+      "note": "Unaltered film still at 3:13 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster. Displayed with gentle scale/pan and crossfade under the same license.",
       "rightsSource": "https://mural.maynoothuniversity.ie/id/eprint/8930/",
       "reviewed": "2026-09-22",
-      "sha256": "de47bd7a7d34cc8455fa64794e2c795a13baf6c30b9d3aa2765ae6d2737ed92a"
-    }
+      "sha256": "de47bd7a7d34cc8455fa64794e2c795a13baf6c30b9d3aa2765ae6d2737ed92a",
+      "motionAllowed": true
+    },
+    "artworks": [
+      {
+        "src": "/theatre/artwork/bookbinders-daughter-scene-1.jpg",
+        "width": 640,
+        "height": 360,
+        "sourceUrl": "https://mural.maynoothuniversity.ie/id/eprint/8930/",
+        "originalUrl": "https://mural.maynoothuniversity.ie/id/eprint/8930/1/Bookbinder_FFF.mp4",
+        "credit": "Denis Murphy",
+        "kind": "film-still",
+        "license": "CC BY-NC-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+        "timeSeconds": 45,
+        "note": "Film still at 0:45 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://mural.maynoothuniversity.ie/id/eprint/8930/",
+        "reviewed": "2026-09-22",
+        "sha256": "b3aca1d4e40b8d18b6e9a711a8b0b5ed29a7b2c5222acf7ede14262f1410b1fa",
+        "motionAllowed": true
+      },
+      {
+        "src": "/theatre/artwork/bookbinders-daughter-scene-2.jpg",
+        "width": 640,
+        "height": 360,
+        "sourceUrl": "https://mural.maynoothuniversity.ie/id/eprint/8930/",
+        "originalUrl": "https://mural.maynoothuniversity.ie/id/eprint/8930/1/Bookbinder_FFF.mp4",
+        "credit": "Denis Murphy",
+        "kind": "film-still",
+        "license": "CC BY-NC-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+        "timeSeconds": 108,
+        "note": "Film still at 1:48 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://mural.maynoothuniversity.ie/id/eprint/8930/",
+        "reviewed": "2026-09-22",
+        "sha256": "8090798cfbeb07e3359b1f02bb760ad6b54d8dd1a9cc2fad3922ffeb361a5783",
+        "motionAllowed": true
+      }
+    ]
   },
   {
     "id": "bbs-documentary",
@@ -629,11 +777,48 @@ export const THEATRE_TITLES = [
       "license": "CC BY-SA 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
       "timeSeconds": 1006,
-      "note": "Unaltered film still at 16:46 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster. Nonsquare video samples normalized to square image pixels, preserving display aspect ratio.",
+      "note": "Unaltered film still at 16:46 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster. Nonsquare video samples normalized to square image pixels, preserving display aspect ratio. Displayed with gentle scale/pan and crossfade under the same license.",
       "rightsSource": "https://ascii.textfiles.com/archives/865",
       "reviewed": "2026-09-22",
-      "sha256": "f0f9150a8ac7f00a4abcfae39bdf24860a0c47a6d0c32e47dd8489dc6bfcc157"
-    }
+      "sha256": "f0f9150a8ac7f00a4abcfae39bdf24860a0c47a6d0c32e47dd8489dc6bfcc157",
+      "motionAllowed": true
+    },
+    "artworks": [
+      {
+        "src": "/theatre/artwork/bbs-documentary-scene-1.jpg",
+        "width": 312,
+        "height": 240,
+        "sourceUrl": "https://ascii.textfiles.com/archives/865",
+        "originalUrl": "https://archive.org/download/BBS.The.Documentary/BBS.The.Documentary.ep1_512kb.mp4",
+        "credit": "Jason Scott",
+        "kind": "film-still",
+        "license": "CC BY-SA 2.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+        "timeSeconds": 234,
+        "note": "Film still at 3:54 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://ascii.textfiles.com/archives/865",
+        "reviewed": "2026-09-22",
+        "sha256": "474cf8415a1652c4c58c67a4669fafd941d8fe3dcbcad809561da46c86da7901",
+        "motionAllowed": true
+      },
+      {
+        "src": "/theatre/artwork/bbs-documentary-scene-2.jpg",
+        "width": 312,
+        "height": 240,
+        "sourceUrl": "https://ascii.textfiles.com/archives/865",
+        "originalUrl": "https://archive.org/download/BBS.The.Documentary/BBS.The.Documentary.ep1_512kb.mp4",
+        "credit": "Jason Scott",
+        "kind": "film-still",
+        "license": "CC BY-SA 2.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+        "timeSeconds": 561,
+        "note": "Film still at 9:21 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://ascii.textfiles.com/archives/865",
+        "reviewed": "2026-09-22",
+        "sha256": "7d90464899bd23ce3cf7dd9bc539cc5002e8ac022ac51999646930c93f8814e7",
+        "motionAllowed": true
+      }
+    ]
   },
   {
     "id": "code-rush",
@@ -679,11 +864,48 @@ export const THEATRE_TITLES = [
       "license": "CC BY-NC-SA 3.0 US",
       "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/us/",
       "timeSeconds": 346,
-      "note": "Unaltered film still at 5:46 from the linked edition. Technical JPEG conversion only; no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster. Nonsquare video samples normalized to square image pixels, preserving display aspect ratio.",
+      "note": "Unaltered film still at 5:46 from the linked edition. Technical JPEG conversion only; no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster. Nonsquare video samples normalized to square image pixels, preserving display aspect ratio. Displayed with gentle scale/pan and crossfade under the same license.",
       "rightsSource": "https://web.archive.org/web/20091227053816/http://clickmovement.org/coderush",
       "reviewed": "2026-09-22",
-      "sha256": "51cb413d654e60a1a70c940cfa8070c77e3beea16d30482bb9665704dd2bcbb4"
-    }
+      "sha256": "51cb413d654e60a1a70c940cfa8070c77e3beea16d30482bb9665704dd2bcbb4",
+      "motionAllowed": true
+    },
+    "artworks": [
+      {
+        "src": "/theatre/artwork/code-rush-scene-1.jpg",
+        "width": 640,
+        "height": 366,
+        "sourceUrl": "https://web.archive.org/web/20091227053816/http://clickmovement.org/coderush",
+        "originalUrl": "https://archive.org/download/code-rush/Code%20Rush.mp4",
+        "credit": "David Winton",
+        "kind": "film-still",
+        "license": "CC BY-NC-SA 3.0 US",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/us/",
+        "timeSeconds": 900,
+        "note": "Film still at 15:00 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://web.archive.org/web/20091227053816/http://clickmovement.org/coderush",
+        "reviewed": "2026-09-22",
+        "sha256": "81a178a27bbae20c8078fa79c349f8f4ddfa9d6399a3f9408f67e75020029131",
+        "motionAllowed": true
+      },
+      {
+        "src": "/theatre/artwork/code-rush-scene-2.jpg",
+        "width": 640,
+        "height": 366,
+        "sourceUrl": "https://web.archive.org/web/20091227053816/http://clickmovement.org/coderush",
+        "originalUrl": "https://archive.org/download/code-rush/Code%20Rush.mp4",
+        "credit": "David Winton",
+        "kind": "film-still",
+        "license": "CC BY-NC-SA 3.0 US",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/us/",
+        "timeSeconds": 1500,
+        "note": "Film still at 25:00 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://web.archive.org/web/20091227053816/http://clickmovement.org/coderush",
+        "reviewed": "2026-09-22",
+        "sha256": "69d70da7a6a3afbe078602029ce036db19154c3e47fcf4b9615588bc42368ccd",
+        "motionAllowed": true
+      }
+    ]
   },
   {
     "id": "four-eyed-monsters",
@@ -730,11 +952,48 @@ export const THEATRE_TITLES = [
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "timeSeconds": 1822,
-      "note": "Unaltered film still at 30:22 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster.",
+      "note": "Unaltered film still at 30:22 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster. Displayed with gentle scale/pan and crossfade under the same license.",
       "rightsSource": "https://web.archive.org/web/20130116102004/http://vodo.net/foureyedmonsters",
       "reviewed": "2026-09-22",
-      "sha256": "5be0aa4ce9ec6ce8cc9c99697f08f67dec1fa8c49c7c2b4b8f208461aeee0524"
-    }
+      "sha256": "5be0aa4ce9ec6ce8cc9c99697f08f67dec1fa8c49c7c2b4b8f208461aeee0524",
+      "motionAllowed": true
+    },
+    "artworks": [
+      {
+        "src": "/theatre/artwork/four-eyed-monsters-scene-1.jpg",
+        "width": 640,
+        "height": 354,
+        "sourceUrl": "https://web.archive.org/web/20130116102004/http://vodo.net/foureyedmonsters",
+        "originalUrl": "https://archive.org/download/VODO142FourEyedMonsters/Four.Eyed.Monsters.HQ.x264-VODO.mp4",
+        "credit": "Susan Buice & Arin Crumley",
+        "kind": "film-still",
+        "license": "CC BY-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+        "timeSeconds": 423,
+        "note": "Film still at 7:03 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://web.archive.org/web/20130116102004/http://vodo.net/foureyedmonsters",
+        "reviewed": "2026-09-22",
+        "sha256": "006777b2f78fbf0cfd75b3768cf878699013326f77a055284d68c724f1b3a3ba",
+        "motionAllowed": true
+      },
+      {
+        "src": "/theatre/artwork/four-eyed-monsters-scene-2.jpg",
+        "width": 640,
+        "height": 354,
+        "sourceUrl": "https://web.archive.org/web/20130116102004/http://vodo.net/foureyedmonsters",
+        "originalUrl": "https://archive.org/download/VODO142FourEyedMonsters/Four.Eyed.Monsters.HQ.x264-VODO.mp4",
+        "credit": "Susan Buice & Arin Crumley",
+        "kind": "film-still",
+        "license": "CC BY-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+        "timeSeconds": 1017,
+        "note": "Film still at 16:57 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://web.archive.org/web/20130116102004/http://vodo.net/foureyedmonsters",
+        "reviewed": "2026-09-22",
+        "sha256": "ee92cb78a8529973a8aa7b37a615bf2aa0675700f90d71785083fb4abaa12c7c",
+        "motionAllowed": true
+      }
+    ]
   },
   {
     "id": "california-dreaming",
@@ -780,11 +1039,48 @@ export const THEATRE_TITLES = [
       "license": "CC BY-NC-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
       "timeSeconds": 296,
-      "note": "Unaltered film still at 4:56 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster.",
+      "note": "Unaltered film still at 4:56 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster. Displayed with gentle scale/pan and crossfade under the same license.",
       "rightsSource": "https://tegenlicht.vpro.nl/artikelen/download-california-dreaming",
       "reviewed": "2026-09-22",
-      "sha256": "286615e5ed4f92ee8ec70b45cca6ed2863f8b3085812479fec700722d5d2448e"
-    }
+      "sha256": "286615e5ed4f92ee8ec70b45cca6ed2863f8b3085812479fec700722d5d2448e",
+      "motionAllowed": true
+    },
+    "artworks": [
+      {
+        "src": "/theatre/artwork/california-dreaming-scene-1.jpg",
+        "width": 424,
+        "height": 240,
+        "sourceUrl": "https://tegenlicht.vpro.nl/artikelen/download-california-dreaming",
+        "originalUrl": "https://archive.org/download/DocumentaryCaliforniaDreaming2010/CaliforniaDreaming_512kb.mp4",
+        "credit": "Bregtje van der Haak",
+        "kind": "film-still",
+        "license": "CC BY-NC-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+        "timeSeconds": 712,
+        "note": "Film still at 11:52 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://tegenlicht.vpro.nl/artikelen/download-california-dreaming",
+        "reviewed": "2026-09-22",
+        "sha256": "9122cc527165440e1d18175af708b96f2544cbb270fc51358fec22dbf460b58e",
+        "motionAllowed": true
+      },
+      {
+        "src": "/theatre/artwork/california-dreaming-scene-2.jpg",
+        "width": 424,
+        "height": 240,
+        "sourceUrl": "https://tegenlicht.vpro.nl/artikelen/download-california-dreaming",
+        "originalUrl": "https://archive.org/download/DocumentaryCaliforniaDreaming2010/CaliforniaDreaming_512kb.mp4",
+        "credit": "Bregtje van der Haak",
+        "kind": "film-still",
+        "license": "CC BY-NC-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+        "timeSeconds": 1276,
+        "note": "Film still at 21:16 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://tegenlicht.vpro.nl/artikelen/download-california-dreaming",
+        "reviewed": "2026-09-22",
+        "sha256": "70b5013435def202dc98179877927f962a51e8d0c247a4cf6d2bafffde41514a",
+        "motionAllowed": true
+      }
+    ]
   },
   {
     "id": "tpb-afk",
@@ -935,11 +1231,48 @@ export const THEATRE_TITLES = [
       "license": "CC BY-NC-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
       "timeSeconds": 1549,
-      "note": "Unaltered film still at 25:49 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster.",
+      "note": "Unaltered film still at 25:49 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster. Displayed with gentle scale/pan and crossfade under the same license.",
       "rightsSource": "https://web.archive.org/web/20111216150620/http://vodo.net/usnow",
       "reviewed": "2026-09-22",
-      "sha256": "ad1be2f3aa896c2d725829ec720fcfb31226e16e60356f327cb48378c5d526f7"
-    }
+      "sha256": "ad1be2f3aa896c2d725829ec720fcfb31226e16e60356f327cb48378c5d526f7",
+      "motionAllowed": true
+    },
+    "artworks": [
+      {
+        "src": "/theatre/artwork/us-now-scene-1.jpg",
+        "width": 640,
+        "height": 360,
+        "sourceUrl": "https://web.archive.org/web/20111216150620/http://vodo.net/usnow",
+        "originalUrl": "https://archive.org/download/VODO12UsNow/US_NOW-720.mp4",
+        "credit": "Ivo Gormley",
+        "kind": "film-still",
+        "license": "CC BY-NC-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+        "timeSeconds": 360,
+        "note": "Film still at 6:00 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://web.archive.org/web/20111216150620/http://vodo.net/usnow",
+        "reviewed": "2026-09-22",
+        "sha256": "dc031c851e81f3f8f782cfce7b36a95606b7e776d5f0ffd16e3c81e432172414",
+        "motionAllowed": true
+      },
+      {
+        "src": "/theatre/artwork/us-now-scene-2.jpg",
+        "width": 640,
+        "height": 360,
+        "sourceUrl": "https://web.archive.org/web/20111216150620/http://vodo.net/usnow",
+        "originalUrl": "https://archive.org/download/VODO12UsNow/US_NOW-720.mp4",
+        "credit": "Ivo Gormley",
+        "kind": "film-still",
+        "license": "CC BY-NC-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+        "timeSeconds": 864,
+        "note": "Film still at 14:24 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://web.archive.org/web/20111216150620/http://vodo.net/usnow",
+        "reviewed": "2026-09-22",
+        "sha256": "2d57ea569ff84119504aa08de9ddfd376488fcbc7831b0f27291b190208e874e",
+        "motionAllowed": true
+      }
+    ]
   },
   {
     "id": "story-of-healing",
@@ -1089,11 +1422,48 @@ export const THEATRE_TITLES = [
       "license": "CC BY-NC-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
       "timeSeconds": 871,
-      "note": "Unaltered film still at 14:31 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster.",
+      "note": "Unaltered film still at 14:31 from the linked edition. Technical JPEG conversion only; original aspect ratio, no cropping, recoloring or text added to the image. This is a catalog illustration, not an official poster. Displayed with gentle scale/pan and crossfade under the same license.",
       "rightsSource": "https://educacionprohibida.com/?p=legales",
       "reviewed": "2026-09-22",
-      "sha256": "8ff43c4bf8d8c45e0228a84fe7fb6e3ee18651b872c934271160a97b96b51a5e"
-    }
+      "sha256": "8ff43c4bf8d8c45e0228a84fe7fb6e3ee18651b872c934271160a97b96b51a5e",
+      "motionAllowed": true
+    },
+    "artworks": [
+      {
+        "src": "/theatre/artwork/forbidden-education-scene-1.jpg",
+        "width": 640,
+        "height": 360,
+        "sourceUrl": "https://educacionprohibida.com/?p=legales",
+        "originalUrl": "https://archive.org/download/LaEducacionProhibida-WithEnglishSubtitles/LaEducacinProhibida-720pHD-en_subtitles.mp4",
+        "credit": "Germán Doin",
+        "kind": "film-still",
+        "license": "CC BY-NC-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+        "timeSeconds": 2092,
+        "note": "Film still at 34:52 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://educacionprohibida.com/?p=legales",
+        "reviewed": "2026-09-22",
+        "sha256": "e66724ba3437381f324a22cc52cb5c2a63aa515e24bec7bdc12cf8101d6b008b",
+        "motionAllowed": true
+      },
+      {
+        "src": "/theatre/artwork/forbidden-education-scene-2.jpg",
+        "width": 640,
+        "height": 360,
+        "sourceUrl": "https://educacionprohibida.com/?p=legales",
+        "originalUrl": "https://archive.org/download/LaEducacionProhibida-WithEnglishSubtitles/LaEducacinProhibida-720pHD-en_subtitles.mp4",
+        "credit": "Germán Doin",
+        "kind": "film-still",
+        "license": "CC BY-NC-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+        "timeSeconds": 3749,
+        "note": "Film still at 62:29 from the credited edition. Complete frame, square-pixel technical conversion. Displayed with gentle scale/pan and crossfade under the same license; not an official poster.",
+        "rightsSource": "https://educacionprohibida.com/?p=legales",
+        "reviewed": "2026-09-22",
+        "sha256": "bc3e604b8c129fdabb510765d624c2e7d412a63fd489996ab6b0088ffe68f250",
+        "motionAllowed": true
+      }
+    ]
   },
   {
     "id": "nasty-old-people",
@@ -1145,5 +1515,587 @@ export const THEATRE_TITLES = [
       "reviewed": "2026-09-22",
       "sha256": "23cc4f976cf78890a3508e5e09091e5e44b108ddddf02b4053e05ff104840406"
     }
+  },
+  {
+    "id": "lionshare",
+    "title": "The Lionshare",
+    "creator": "Josh Bernhard",
+    "year": 2009,
+    "genres": [
+      "drama",
+      "technology"
+    ],
+    "synopsis": "A new friendship begins with an invitation to a private file-sharing community. Josh Bernhard follows young New Yorkers through awkward conversations, shared music and mismatched expectations, in an intimate portrait of connection at the edge of the social-web era.",
+    "sourceUrl": "https://web.archive.org/web/20130116102019/http://vodo.net/lionshare",
+    "sourceName": "Filmmaker’s original VODO release (archived)",
+    "license": "CC BY-NC 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-nc/3.0/",
+    "rights": "The original distributor licenses this exact VODO package under CC BY-NC 3.0 and links the matching Lionshare.2009.Legacy.2008 release filename. The Archive uploader’s later ND 4.0 label is not adopted.",
+    "editionNote": "Complete 68-minute VODO package, including the opening short Legacy (2008, Grzegorz Jonkajtys). The combined edition counts as one catalog entry. Actual copy is 854×480, despite the 720p filename.",
+    "contentNote": "Adult language and relationship themes.",
+    "duration": 4093,
+    "languages": [
+      "en"
+    ],
+    "subtitleLanguages": [],
+    "subtitles": "English dialogue. No verified caption track attached to this edition.",
+    "decision": "usable",
+    "reviewed": "2026-09-22",
+    "attribution": "The Lionshare (2009), directed by Josh Bernhard. Josh Bernhard. CC BY-NC 3.0. Complete film and original credits retained. Opening short: Legacy (2008), Grzegorz Jonkajtys; retained as part of the distributor’s original package.",
+    "editions": [
+      {
+        "label": "Complete film · SD",
+        "url": "https://archive.org/download/lionshare.2009.legacy.2008.720p.x264-vodo/Lionshare.2009.Legacy.2008.720p.x264-VODO.mp4"
+      }
+    ],
+    "qr": "/theatre/qr/lionshare.png",
+    "tone": "blue",
+    "artwork": {
+      "src": "/theatre/artwork/lionshare.jpg",
+      "width": 640,
+      "height": 360,
+      "sourceUrl": "https://web.archive.org/web/20130116102019/http://vodo.net/lionshare",
+      "originalUrl": "https://archive.org/download/lionshare.2009.legacy.2008.720p.x264-vodo/Lionshare.2009.Legacy.2008.720p.x264-VODO.mp4",
+      "credit": "Josh Bernhard",
+      "kind": "film-still",
+      "license": "CC BY-NC 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-nc/3.0/",
+      "timeSeconds": 1500,
+      "note": "Complete film still at 25:00, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+      "rightsSource": "https://web.archive.org/web/20130116102019/http://vodo.net/lionshare",
+      "reviewed": "2026-09-22",
+      "sha256": "87e1b5603c419ede8175c5dee115221b8532f984cd4b184b92a7e3ef917dcd3c",
+      "motionAllowed": true
+    },
+    "artworks": [
+      {
+        "src": "/theatre/artwork/lionshare-scene-1.jpg",
+        "width": 640,
+        "height": 360,
+        "sourceUrl": "https://web.archive.org/web/20130116102019/http://vodo.net/lionshare",
+        "originalUrl": "https://archive.org/download/lionshare.2009.legacy.2008.720p.x264-vodo/Lionshare.2009.Legacy.2008.720p.x264-VODO.mp4",
+        "credit": "Josh Bernhard",
+        "kind": "film-still",
+        "license": "CC BY-NC 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc/3.0/",
+        "timeSeconds": 1100,
+        "note": "Complete film still at 18:20, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+        "rightsSource": "https://web.archive.org/web/20130116102019/http://vodo.net/lionshare",
+        "reviewed": "2026-09-22",
+        "sha256": "14754aea68d9c792c1a2158353e8281e1baa3ca70a5ad061c0a46ec486f41e6a",
+        "motionAllowed": true
+      },
+      {
+        "src": "/theatre/artwork/lionshare-scene-2.jpg",
+        "width": 640,
+        "height": 360,
+        "sourceUrl": "https://web.archive.org/web/20130116102019/http://vodo.net/lionshare",
+        "originalUrl": "https://archive.org/download/lionshare.2009.legacy.2008.720p.x264-vodo/Lionshare.2009.Legacy.2008.720p.x264-VODO.mp4",
+        "credit": "Josh Bernhard",
+        "kind": "film-still",
+        "license": "CC BY-NC 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc/3.0/",
+        "timeSeconds": 600,
+        "note": "Complete film still at 10:00, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+        "rightsSource": "https://web.archive.org/web/20130116102019/http://vodo.net/lionshare",
+        "reviewed": "2026-09-22",
+        "sha256": "00af35c0975ffdef9e1d19b87379211308a79e48b01bd0a233af9478a9d0cb18",
+        "motionAllowed": true
+      }
+    ]
+  },
+  {
+    "id": "snowblind",
+    "title": "Snowblind",
+    "creator": "Kilian Manning",
+    "year": 2010,
+    "genres": [
+      "science-fiction",
+      "western"
+    ],
+    "synopsis": "In a frozen wasteland, a condemned gunslinger accepts a dangerous bargain: track down an outlaw and earn his freedom. This deliberately rough-edged independent B-western mixes frontier revenge with a post-apocalyptic winter and low-budget visual invention.",
+    "sourceUrl": "https://web.archive.org/web/20120103004738/http://vodo.net/snowblindmovie",
+    "sourceName": "Mangofilm / original VODO release (archived)",
+    "license": "CC BY-ND 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-nd/3.0/",
+    "rights": "Mangofilm’s archived VODO page links CC BY-ND 3.0. The selected file retains the original Attribution / No Derivative Works opening slate. It is played complete, without edits; the Archive uploader’s 4.0 tag is not substituted.",
+    "editionNote": "Complete 92-minute VODO edition, 720×360. A contemporary 2010 B-movie, not a vintage western; selected for the user’s interest in offbeat genre cinema.",
+    "contentNote": "Violence, strong language and intentionally rough low-budget effects.",
+    "duration": 5564,
+    "languages": [
+      "en"
+    ],
+    "subtitleLanguages": [],
+    "subtitles": "English dialogue. No verified caption track attached to this edition.",
+    "decision": "usable",
+    "reviewed": "2026-09-22",
+    "attribution": "Snowblind (2010), directed by Kilian Manning. Kilian Manning. CC BY-ND 3.0. Complete film and original credits retained.",
+    "editions": [
+      {
+        "label": "Complete film · SD",
+        "url": "https://archive.org/download/Snowblind-film__2010/Snowblind.2010.Xvid-VODO.mp4"
+      }
+    ],
+    "qr": "/theatre/qr/snowblind.png",
+    "tone": "blue",
+    "artwork": {
+      "src": "/theatre/artwork/snowblind.jpg",
+      "width": 640,
+      "height": 320,
+      "sourceUrl": "https://web.archive.org/web/20120103004738/http://vodo.net/snowblindmovie",
+      "originalUrl": "https://archive.org/download/Snowblind-film__2010/Snowblind.2010.Xvid-VODO.mp4",
+      "credit": "Kilian Manning",
+      "kind": "film-still",
+      "license": "CC BY-ND 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-nd/3.0/",
+      "timeSeconds": 700,
+      "note": "Complete film still at 11:40, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster.",
+      "rightsSource": "https://web.archive.org/web/20120103004738/http://vodo.net/snowblindmovie",
+      "reviewed": "2026-09-22",
+      "sha256": "bfada4cfb4969f3010cc66b84d177fd2f72df54c78dd4e7dd13cdd201be748eb"
+    }
+  },
+  {
+    "id": "sintel",
+    "title": "Sintel",
+    "creator": "Colin Levy",
+    "year": 2010,
+    "genres": [
+      "animation",
+      "fantasy"
+    ],
+    "synopsis": "A young traveller searching for a dragon crosses a harsh, unfamiliar world. The rescue story grows into a compact fantasy about attachment, persistence and the terrible cost of losing sight of time.",
+    "sourceUrl": "https://www.sintel.org/about/",
+    "sourceName": "Blender Foundation / Durian Open Movie",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+    "rights": "The producer’s about and sharing pages explicitly license the complete film under CC BY 3.0, with the entire credit scroll retained.",
+    "editionNote": "Complete original stereo edition, 2048×872. Publisher-provided subtitle downloads are separate; no external subtitle track is attached here.",
+    "contentNote": "Fantasy violence and a sad ending.",
+    "duration": 888,
+    "languages": [
+      "en"
+    ],
+    "subtitleLanguages": [],
+    "subtitles": "English dialogue. No verified caption track attached to this edition.",
+    "decision": "usable",
+    "reviewed": "2026-09-22",
+    "attribution": "Sintel (2010), directed by Colin Levy. © Blender Foundation | www.sintel.org. CC BY 3.0. Complete film and original credits retained.",
+    "editions": [
+      {
+        "label": "Complete film · HD",
+        "url": "https://archive.org/download/Sintel/sintel-2048-stereo.mp4"
+      }
+    ],
+    "qr": "/theatre/qr/sintel.png",
+    "tone": "blue",
+    "artwork": {
+      "src": "/theatre/artwork/sintel.jpg",
+      "width": 640,
+      "height": 272,
+      "sourceUrl": "https://www.sintel.org/about/",
+      "originalUrl": "https://archive.org/download/Sintel/sintel-2048-stereo.mp4",
+      "credit": "© Blender Foundation | www.sintel.org",
+      "kind": "film-still",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "timeSeconds": 330,
+      "note": "Complete film still at 5:30, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+      "rightsSource": "https://www.sintel.org/sharing/",
+      "reviewed": "2026-09-22",
+      "sha256": "8d2fcfd4472ee476565a60cca763cf82a88e5f4b85c63d8e4cecfcbd83b9226c",
+      "motionAllowed": true
+    },
+    "artworks": [
+      {
+        "src": "/theatre/artwork/sintel-scene-1.jpg",
+        "width": 640,
+        "height": 272,
+        "sourceUrl": "https://www.sintel.org/about/",
+        "originalUrl": "https://archive.org/download/Sintel/sintel-2048-stereo.mp4",
+        "credit": "© Blender Foundation | www.sintel.org",
+        "kind": "film-still",
+        "license": "CC BY 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+        "timeSeconds": 140,
+        "note": "Complete film still at 2:20, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+        "rightsSource": "https://www.sintel.org/sharing/",
+        "reviewed": "2026-09-22",
+        "sha256": "d2caa1bec155a2347c5acbc7ff8e8802866a0003414e57f00d2a350a2906271f",
+        "motionAllowed": true
+      },
+      {
+        "src": "/theatre/artwork/sintel-scene-2.jpg",
+        "width": 640,
+        "height": 272,
+        "sourceUrl": "https://www.sintel.org/about/",
+        "originalUrl": "https://archive.org/download/Sintel/sintel-2048-stereo.mp4",
+        "credit": "© Blender Foundation | www.sintel.org",
+        "kind": "film-still",
+        "license": "CC BY 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+        "timeSeconds": 550,
+        "note": "Complete film still at 9:10, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+        "rightsSource": "https://www.sintel.org/sharing/",
+        "reviewed": "2026-09-22",
+        "sha256": "602945a68220364aeb5e1d11255bf1435dfb0ef877436d0c5dd3640f56036f12",
+        "motionAllowed": true
+      }
+    ]
+  },
+  {
+    "id": "elephants-dream",
+    "title": "Elephants Dream",
+    "creator": "Bassam Kurdali",
+    "year": 2006,
+    "genres": [
+      "animation",
+      "science-fiction"
+    ],
+    "synopsis": "Two companions explore a machine that seems to contain an entire world. As the younger traveller questions the rules, their guide’s certainty begins to fracture. An unsettling animated short about imagination, control and the stories we insist other people inhabit.",
+    "sourceUrl": "https://orange.blender.org/download/",
+    "sourceName": "Blender Foundation / Netherlands Media Art Institute",
+    "license": "CC BY 2.5",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.5/",
+    "rights": "The producer’s original Creative Commons statement licenses the film under CC BY 2.5. Its download page links this Archive item. Separate downloadable soundtrack terms are not substituted for the intact film grant.",
+    "editionNote": "Complete English-language edition, 640×360. The linked archive filename says 1024 but this progressive derivative is SD. Original soundtrack and credits retained.",
+    "contentNote": "Surreal imagery and an unsettling ending.",
+    "duration": 654,
+    "languages": [
+      "en"
+    ],
+    "subtitleLanguages": [],
+    "subtitles": "English dialogue. No verified caption track attached to this edition.",
+    "decision": "usable",
+    "reviewed": "2026-09-22",
+    "attribution": "Elephants Dream (2006), directed by Bassam Kurdali. © 2006 Blender Foundation / Netherlands Media Art Institute / www.elephantsdream.org. CC BY 2.5. Complete film and original credits retained.",
+    "editions": [
+      {
+        "label": "Complete film · SD",
+        "url": "https://archive.org/download/ElephantsDream/ed_1024.mp4"
+      }
+    ],
+    "qr": "/theatre/qr/elephants-dream.png",
+    "tone": "blue",
+    "artwork": {
+      "src": "/theatre/artwork/elephants-dream.jpg",
+      "width": 640,
+      "height": 360,
+      "sourceUrl": "https://orange.blender.org/download/",
+      "originalUrl": "https://archive.org/download/ElephantsDream/ed_1024.mp4",
+      "credit": "© 2006 Blender Foundation / Netherlands Media Art Institute / www.elephantsdream.org",
+      "kind": "film-still",
+      "license": "CC BY 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.5/",
+      "timeSeconds": 210,
+      "note": "Complete film still at 3:30, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+      "rightsSource": "https://orange.blender.org/blog/creative-commons-license-2/",
+      "reviewed": "2026-09-22",
+      "sha256": "ce4943106da908f5eeff802383204c1b512e11934cdd4e141ea89de241b48f3b",
+      "motionAllowed": true
+    },
+    "artworks": [
+      {
+        "src": "/theatre/artwork/elephants-dream-scene-1.jpg",
+        "width": 640,
+        "height": 360,
+        "sourceUrl": "https://orange.blender.org/download/",
+        "originalUrl": "https://archive.org/download/ElephantsDream/ed_1024.mp4",
+        "credit": "© 2006 Blender Foundation / Netherlands Media Art Institute / www.elephantsdream.org",
+        "kind": "film-still",
+        "license": "CC BY 2.5",
+        "licenseUrl": "https://creativecommons.org/licenses/by/2.5/",
+        "timeSeconds": 110,
+        "note": "Complete film still at 1:50, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+        "rightsSource": "https://orange.blender.org/blog/creative-commons-license-2/",
+        "reviewed": "2026-09-22",
+        "sha256": "3dd6032a901fbec68e9a75eeeb8f289d3894b1000481fa6efcf488ac02a391dd",
+        "motionAllowed": true
+      },
+      {
+        "src": "/theatre/artwork/elephants-dream-scene-2.jpg",
+        "width": 640,
+        "height": 360,
+        "sourceUrl": "https://orange.blender.org/download/",
+        "originalUrl": "https://archive.org/download/ElephantsDream/ed_1024.mp4",
+        "credit": "© 2006 Blender Foundation / Netherlands Media Art Institute / www.elephantsdream.org",
+        "kind": "film-still",
+        "license": "CC BY 2.5",
+        "licenseUrl": "https://creativecommons.org/licenses/by/2.5/",
+        "timeSeconds": 350,
+        "note": "Complete film still at 5:50, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+        "rightsSource": "https://orange.blender.org/blog/creative-commons-license-2/",
+        "reviewed": "2026-09-22",
+        "sha256": "60a30c18baa5073523703e322af6263263e05d8c280dde2ba7592497f61f2df7",
+        "motionAllowed": true
+      }
+    ]
+  },
+  {
+    "id": "tears-of-steel",
+    "title": "Tears of Steel",
+    "creator": "Ian Hubert",
+    "year": 2012,
+    "genres": [
+      "science-fiction"
+    ],
+    "synopsis": "A group of scientists and fighters restages a painful memory in a ruined Amsterdam, hoping to avert a robotic catastrophe. Live action and visual effects turn a small relationship drama into an inventive piece of apocalyptic science fiction.",
+    "sourceUrl": "https://mango.blender.org/about/",
+    "sourceName": "Blender Foundation / Mango Open Movie",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+    "rights": "The producer licenses the complete film and project material under CC BY 3.0. Keep the original credit scroll and the requested Blender Foundation attribution.",
+    "editionNote": "Complete publisher-hosted H.264 MOV edition, 1280×534, with original audio and credits. An Archive MP4 copy is also offered as an SD alternative.",
+    "contentNote": "Science-fiction violence and strong language.",
+    "duration": 734,
+    "languages": [
+      "en"
+    ],
+    "subtitleLanguages": [],
+    "subtitles": "English dialogue. No verified caption track attached to this edition.",
+    "decision": "usable",
+    "reviewed": "2026-09-22",
+    "attribution": "Tears of Steel (2012), directed by Ian Hubert. (CC) Blender Foundation | mango.blender.org. CC BY 3.0. Complete film and original credits retained.",
+    "editions": [
+      {
+        "label": "Complete film · HD",
+        "url": "https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov"
+      },
+      {
+        "label": "Archive edition · SD",
+        "url": "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4"
+      }
+    ],
+    "qr": "/theatre/qr/tears-of-steel.png",
+    "tone": "blue",
+    "artwork": {
+      "src": "/theatre/artwork/tears-of-steel.jpg",
+      "width": 640,
+      "height": 266,
+      "sourceUrl": "https://mango.blender.org/about/",
+      "originalUrl": "https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov",
+      "credit": "(CC) Blender Foundation | mango.blender.org",
+      "kind": "film-still",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "timeSeconds": 220,
+      "note": "Complete film still at 3:40, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+      "rightsSource": "https://mango.blender.org/sharing/",
+      "reviewed": "2026-09-22",
+      "sha256": "e41f4486a0029eac94b9347614ba87d104605e9e1bd74dcbb7b960953b82a620",
+      "motionAllowed": true
+    },
+    "artworks": [
+      {
+        "src": "/theatre/artwork/tears-of-steel-scene-1.jpg",
+        "width": 640,
+        "height": 266,
+        "sourceUrl": "https://mango.blender.org/about/",
+        "originalUrl": "https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov",
+        "credit": "(CC) Blender Foundation | mango.blender.org",
+        "kind": "film-still",
+        "license": "CC BY 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+        "timeSeconds": 100,
+        "note": "Complete film still at 1:40, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+        "rightsSource": "https://mango.blender.org/sharing/",
+        "reviewed": "2026-09-22",
+        "sha256": "70657c478e3b5faa7fe0b5560222c338ce9041e8a092f0a927e7a66597f5d2e2",
+        "motionAllowed": true
+      },
+      {
+        "src": "/theatre/artwork/tears-of-steel-scene-2.jpg",
+        "width": 640,
+        "height": 266,
+        "sourceUrl": "https://mango.blender.org/about/",
+        "originalUrl": "https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov",
+        "credit": "(CC) Blender Foundation | mango.blender.org",
+        "kind": "film-still",
+        "license": "CC BY 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+        "timeSeconds": 440,
+        "note": "Complete film still at 7:20, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+        "rightsSource": "https://mango.blender.org/sharing/",
+        "reviewed": "2026-09-22",
+        "sha256": "4045612d0e2879a2fef00ce2c041b72cda74a2a5aa986f6262e30006012f0f7b",
+        "motionAllowed": true
+      }
+    ]
+  },
+  {
+    "id": "big-buck-bunny",
+    "title": "Big Buck Bunny",
+    "creator": "Sacha Goedegebure",
+    "year": 2008,
+    "genres": [
+      "animation",
+      "comedy"
+    ],
+    "synopsis": "A peaceful rabbit’s day is ruined by three forest bullies. Patience gives way to a carefully planned comic revenge, in a bright, wordless short built around physical timing and the pleasures of classic cartoon mischief.",
+    "sourceUrl": "https://www.bigbuckbunny.org/about/",
+    "sourceName": "Blender Foundation / Peach Open Movie",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+    "rights": "The producer licenses the film under CC BY 3.0. The original soundtrack and complete credit roll are retained. The separate DVD cover is excluded from that grant and is not used.",
+    "editionNote": "Complete original 2008 edition from Archive.org. This is not the later 60 fps or stereoscopic remaster. Wordless storytelling; no dialogue captions are needed.",
+    "duration": 596,
+    "languages": [
+      "zxx"
+    ],
+    "subtitleLanguages": [],
+    "subtitles": "Wordless film. No dialogue captions required.",
+    "decision": "usable",
+    "reviewed": "2026-09-22",
+    "attribution": "Big Buck Bunny (2008), directed by Sacha Goedegebure. © 2008 Blender Foundation / www.bigbuckbunny.org. CC BY 3.0. Complete film and original credits retained.",
+    "editions": [
+      {
+        "label": "Complete film · SD",
+        "url": "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4"
+      }
+    ],
+    "qr": "/theatre/qr/big-buck-bunny.png",
+    "tone": "blue",
+    "artwork": {
+      "src": "/theatre/artwork/big-buck-bunny.jpg",
+      "width": 640,
+      "height": 360,
+      "sourceUrl": "https://www.bigbuckbunny.org/about/",
+      "originalUrl": "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
+      "credit": "© 2008 Blender Foundation / www.bigbuckbunny.org",
+      "kind": "film-still",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "timeSeconds": 220,
+      "note": "Complete film still at 3:40, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+      "rightsSource": "https://www.bigbuckbunny.org/about/",
+      "reviewed": "2026-09-22",
+      "sha256": "cf3420877e8a275ab97b59ed8bee9cf9bab9df1cfeb4f6652ee87f3fa4da73aa",
+      "motionAllowed": true
+    },
+    "artworks": [
+      {
+        "src": "/theatre/artwork/big-buck-bunny-scene-1.jpg",
+        "width": 640,
+        "height": 360,
+        "sourceUrl": "https://www.bigbuckbunny.org/about/",
+        "originalUrl": "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
+        "credit": "© 2008 Blender Foundation / www.bigbuckbunny.org",
+        "kind": "film-still",
+        "license": "CC BY 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+        "timeSeconds": 90,
+        "note": "Complete film still at 1:30, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+        "rightsSource": "https://www.bigbuckbunny.org/about/",
+        "reviewed": "2026-09-22",
+        "sha256": "7af658f5d89c51dd0c51dfe0876d066481c276ab2ea10295fcacdf0624c37909",
+        "motionAllowed": true
+      },
+      {
+        "src": "/theatre/artwork/big-buck-bunny-scene-2.jpg",
+        "width": 640,
+        "height": 360,
+        "sourceUrl": "https://www.bigbuckbunny.org/about/",
+        "originalUrl": "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
+        "credit": "© 2008 Blender Foundation / www.bigbuckbunny.org",
+        "kind": "film-still",
+        "license": "CC BY 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+        "timeSeconds": 340,
+        "note": "Complete film still at 5:40, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+        "rightsSource": "https://www.bigbuckbunny.org/about/",
+        "reviewed": "2026-09-22",
+        "sha256": "aaacbe364541574fac29eb381642f704ead79ed829d646a184344c9b9f092cd2",
+        "motionAllowed": true
+      }
+    ]
+  },
+  {
+    "id": "internet-own-boy",
+    "title": "The Internet’s Own Boy",
+    "creator": "Brian Knappenberger",
+    "year": 2014,
+    "genres": [
+      "documentary",
+      "technology",
+      "society"
+    ],
+    "synopsis": "Family, friends and collaborators trace Aaron Swartz’s path from a precocious programmer to an advocate for public access to knowledge. The documentary connects personal memories with the political and legal struggles that shaped his life and the early open web.",
+    "sourceUrl": "https://digital.library.unt.edu/ark:/67531/metadc305466/",
+    "sourceName": "UNT Libraries / original 2014 Archive deposit",
+    "license": "CC BY-NC-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "rights": "UNT Libraries independently identifies the film’s Attribution–NonCommercial–ShareAlike grant in its institutional metadata. The linked contemporary June 2014 Archive deposit specifies version 4.0. The complete film, soundtrack and credits are retained.",
+    "editionNote": "Complete 105-minute English edition deposited on Archive.org on 28 June 2014. License family corroborated by UNT; version 4.0 comes from this original deposit, not a later relabelled re-upload.",
+    "contentNote": "Discussion of suicide, bereavement and legal persecution.",
+    "duration": 6300,
+    "languages": [
+      "en"
+    ],
+    "subtitleLanguages": [],
+    "subtitles": "English dialogue. No verified caption track attached to this edition.",
+    "decision": "usable",
+    "reviewed": "2026-09-22",
+    "attribution": "The Internet’s Own Boy (2014), directed by Brian Knappenberger. Brian Knappenberger. CC BY-NC-SA 4.0. Complete film and original credits retained.",
+    "editions": [
+      {
+        "label": "Complete film · HD",
+        "url": "https://archive.org/download/TheInternetsOwnBoyTheStoryOfAaronSwartz/TheInternetsOwnBoy_TheStoryofAaronSwartz-HD.mp4"
+      }
+    ],
+    "qr": "/theatre/qr/internet-own-boy.png",
+    "tone": "blue",
+    "artwork": {
+      "src": "/theatre/artwork/internet-own-boy.jpg",
+      "width": 640,
+      "height": 360,
+      "sourceUrl": "https://digital.library.unt.edu/ark:/67531/metadc305466/",
+      "originalUrl": "https://archive.org/download/TheInternetsOwnBoyTheStoryOfAaronSwartz/TheInternetsOwnBoy_TheStoryofAaronSwartz-HD.mp4",
+      "credit": "Brian Knappenberger",
+      "kind": "film-still",
+      "license": "CC BY-NC-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "timeSeconds": 600,
+      "note": "Complete film still at 10:00, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+      "rightsSource": "https://digital.library.unt.edu/ark:/67531/metadc305466/",
+      "reviewed": "2026-09-22",
+      "sha256": "cecefa0ae70569f3ea8285221f53e94ea8435d76664be861d91cd9eb28a573f8",
+      "motionAllowed": true
+    },
+    "artworks": [
+      {
+        "src": "/theatre/artwork/internet-own-boy-scene-1.jpg",
+        "width": 640,
+        "height": 360,
+        "sourceUrl": "https://digital.library.unt.edu/ark:/67531/metadc305466/",
+        "originalUrl": "https://archive.org/download/TheInternetsOwnBoyTheStoryOfAaronSwartz/TheInternetsOwnBoy_TheStoryofAaronSwartz-HD.mp4",
+        "credit": "Brian Knappenberger",
+        "kind": "film-still",
+        "license": "CC BY-NC-SA 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+        "timeSeconds": 2100,
+        "note": "Complete film still at 35:00, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+        "rightsSource": "https://digital.library.unt.edu/ark:/67531/metadc305466/",
+        "reviewed": "2026-09-22",
+        "sha256": "1432d8746a1813203383b3bdaeec3829bc8a52cedb8d5dde3961f3c6c1a1ec0b",
+        "motionAllowed": true
+      },
+      {
+        "src": "/theatre/artwork/internet-own-boy-scene-2.jpg",
+        "width": 640,
+        "height": 360,
+        "sourceUrl": "https://digital.library.unt.edu/ark:/67531/metadc305466/",
+        "originalUrl": "https://archive.org/download/TheInternetsOwnBoyTheStoryOfAaronSwartz/TheInternetsOwnBoy_TheStoryofAaronSwartz-HD.mp4",
+        "credit": "Brian Knappenberger",
+        "kind": "film-still",
+        "license": "CC BY-NC-SA 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+        "timeSeconds": 3450,
+        "note": "Complete film still at 57:30, technically converted to square-pixel JPEG without cropping or retouching. Catalog illustration, not an official poster. Gentle display scale/pan and crossfade use the same license.",
+        "rightsSource": "https://digital.library.unt.edu/ark:/67531/metadc305466/",
+        "reviewed": "2026-09-22",
+        "sha256": "cfcc3962cf8f6315658492f7fd5b3237b323f4afecb760d7f16d8eec1ab9efe7",
+        "motionAllowed": true
+      }
+    ]
   }
 ];

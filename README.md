@@ -1,4 +1,4 @@
-# CATODO 2.9.0
+# CATODO 2.10.0
 
 <img src="public/icons/catodo-netmilk-tv-transparent-512.png" alt="CATODO horned CRT" width="150" align="right">
 
@@ -30,7 +30,7 @@ the version source of truth; maintainers prepare releases with
 - **Soft Signal Grid:** an editorial broadcast UI with electric-blue and EBU accents.
 - **Home Live Anchor:** when a cached catalog is available, the first tile at left starts muted and stays live while you explore. Use **Random** beside it to switch quickly to another playable channel.
 - **Discover collections:** live discovery starts with **Adrenaline** and **Documentaries**, built from the user-approved imported catalog. Regional Red Bull and other action-sports feed identities stay separate. **All** shows eight-channel previews; **View all** opens the complete category with progressive loading, country filtering and sorting. No VOD catalog or new playlist is imported by this feature.
-- **Theatre:** a curated film shelf with credited cover images, original synopses, native MP4 playback, All/Favorited/genre/language/search filters, and credits, edition notes and a locally generated source QR for every work. External film playback starts only after **Allow source & play**. The [current register](docs/work/2026-09-22-theatre-register.md) contains 22 works; the requested 50-work selection and classic-cinema edition checks remain open.
+- **Theatre:** a compact film shelf with Randomize, six editorial collections, synopsis excerpts, readable image credits and optional Ken Burns galleries. The persistent video expands after **Allow source & play**; no film loads before consent. Favorites, genre, collection, language and search filters combine. Credits include edition notes, source/license links, Archive.org links where applicable and a local source QR. The [current register](docs/work/2026-09-22-theatre-register.md) contains 29 works and 37 editions/episodes. Three external guides open curated Archive collections; the 50-work selection and classic-cinema edition checks remain open.
 - **Library:** filter by genre and language, see shown/total counts, clear filters in one tap and search the complete catalog from the header.
 - **Signal Atlas:** explore every country exposed by the upstream catalog, with global search and country discovery. Map geometry loads on demand; worldwide imports contribute to its coverage highlights.
 - **Settings:** jump directly to connected playlists, TV Guide sources or backups. An already-connected world catalog shows its saved count and a Browse action.

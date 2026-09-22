@@ -6804,27 +6804,37 @@ textarea {
 
 /* Theatre keeps its video mounted while the shelf and saved selection change. */
 .page--theatre { padding: 28px 36px 64px; }
-.theatre-intro { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
-.theatre-intro h1 { margin: 4px 0 7px; font-size: clamp(36px, 4vw, 58px); line-height: 1; letter-spacing: -.035em; text-transform: uppercase; }
-.theatre-lead { color: var(--ink-soft); max-width: 640px; font-size: 16px; line-height: 1.5; }
+.theatre-intro { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
+.theatre-intro h1 { margin: 4px 0 7px; font-size: clamp(32px, 3vw, 44px); line-height: 1; letter-spacing: -.035em; text-transform: uppercase; }
+.theatre-intro-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: end; gap: 8px; }
+.theatre-intro-actions .button { min-height: 44px; }
+.theatre-intro-actions [aria-pressed="true"] { border-color: var(--signal); color: var(--signal); }
+.theatre-intro p { margin: 0; }
+.theatre-lead { color: var(--ink-soft); max-width: 640px; font-size: 14px; line-height: 1.5; }
 .theatre-count, .theatre-meta { font: 12px var(--font-mono); text-transform: uppercase; letter-spacing: .05em; }
 .theatre-count { flex-shrink: 0; color: var(--signal); }
-.theatre-stage { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(300px, 1fr); border: 1px solid var(--line-strong); background: var(--paper-raised); scroll-margin-top: 20px; }
-.theatre-screen { position: relative; display: flex; align-items: center; min-width: 0; background: #070e20; aspect-ratio: 16 / 10; }
+.theatre-stage { display: grid; grid-template-columns: 190px minmax(0, 1fr); border: 1px solid var(--line-strong); background: var(--paper-raised); scroll-margin-top: 16px; }
+.theatre-screen { position: relative; display: flex; align-items: center; min-width: 0; min-height: 228px; background: #070e20; }
+.theatre-stage:not(.is-loaded) .theatre-video { visibility: hidden; height: 0; }
+.theatre-stage.is-loaded { grid-template-columns: minmax(0, 1.4fr) minmax(300px, 1fr); }
+.theatre-stage.is-loaded .theatre-screen { aspect-ratio: 16 / 9; }
 .theatre-video { display: block; width: 100%; height: 100%; max-height: 560px; object-fit: contain; }
 .theatre-curtain { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #dce8ff; background: #070e20; }
-.theatre-cover { width: 100%; height: calc(100% - 36px); min-height: 0; object-fit: contain; }
-.theatre-cover-credit { display: flex; align-items: center; justify-content: center; min-height: 36px; padding: 5px 12px; font-size: 11px; color: #c6d4ee; text-align: center; }
-.theatre-info { padding: clamp(22px, 2.5vw, 40px); min-width: 0; }
-.theatre-meta { color: var(--ink-soft); margin-bottom: 14px; }
-.theatre-info h2 { margin: 0 0 7px; font-size: clamp(26px, 2.4vw, 40px); line-height: 1.04; letter-spacing: -.035em; }
-.theatre-creator { color: var(--signal); font-size: 14px; margin-bottom: 20px; }
-.theatre-synopsis { font-size: 15px; line-height: 1.6; max-width: 68ch; }
+.theatre-cover { width: 100%; flex: 1; height: 0; min-height: 0; object-fit: contain; }
+.theatre-cover-credit { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 6px 10px; font-size: 13px; line-height: 1.35; color: #c6d4ee; text-align: center; }
+.theatre-info { padding: 18px 22px; min-width: 0; }
+.theatre-info p { margin-top: 0; }
+.theatre-meta { color: var(--ink-soft); margin: 0 0 7px; }
+.theatre-info h2 { margin: 0 0 6px; font-size: clamp(24px, 2vw, 30px); line-height: 1.08; letter-spacing: -.035em; }
+.theatre-creator { color: var(--signal); font-size: 14px; margin-bottom: 10px; }
+.theatre-synopsis { font-size: 14px; line-height: 1.5; max-width: 88ch; }
+.theatre-stage:not(.is-loaded) .theatre-synopsis { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin-bottom: 10px; }
 .theatre-warning { font-size: 13px; color: var(--danger); margin-top: 12px; }
-.theatre-consent { color: var(--ink-soft); font-size: 12px; line-height: 1.5; margin: 20px 0 12px; overflow-wrap: anywhere; }
+.theatre-consent { color: var(--ink-soft); font-size: 12px; line-height: 1.5; margin: 10px 0; overflow-wrap: anywhere; }
 .theatre-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .theatre-actions .button { min-height: 48px; }
 .theatre-status { color: var(--danger); margin-top: 10px; font-size: 13px; line-height: 1.5; }
+.theatre-status:empty { display: none; }
 .theatre-credits { border: 1px solid var(--line); border-top: 0; margin-bottom: 28px; }
 .theatre-credits summary { padding: 17px 22px; min-height: 52px; font-size: 14px; cursor: pointer; }
 .theatre-credits__body { display: grid; grid-template-columns: minmax(0, 1fr) 212px; gap: 28px; padding: 0 22px 24px; }
@@ -6839,43 +6849,67 @@ textarea {
 .theatre-filters { display: flex; flex-wrap: wrap; gap: 8px; }
 .theatre-filters .button { min-height: 46px; }
 .theatre-filters [aria-pressed="true"] { color: white; background: var(--signal); border-color: var(--signal); }
-.theatre-refinements { display: flex; gap: 12px; }
+.theatre-refinements { display: flex; flex-wrap: wrap; gap: 12px; }
 .theatre-search, .theatre-select { min-height: 48px; border: 1px solid var(--line-strong); background: var(--paper-raised); padding: 10px 14px; border-radius: 0; color: var(--ink); font: inherit; min-width: 0; }
 .theatre-search { flex: 1; max-width: 480px; }
 .theatre-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; }
 .theatre-card-wrap { min-width: 0; display: flex; flex-direction: column; }
 .theatre-card { position: relative; display: flex; flex-direction: column; padding: 0; text-align: start; border: 1px solid var(--line-strong); background: var(--paper-raised); cursor: pointer; min-width: 0; width: 100%; flex: 1; color: var(--ink); }
 .theatre-card[aria-pressed="true"] { outline: 3px solid var(--signal); outline-offset: 3px; }
-.theatre-card__art { display: flex; width: 100%; aspect-ratio: 1.6; background: #070e20; overflow: hidden; }
+.theatre-card__art { position: relative; display: flex; width: 100%; aspect-ratio: 1.6; background: #070e20; overflow: hidden; }
 .theatre-card__image { width: 100%; height: 100%; object-fit: contain; }
+.theatre-card__art.has-gallery .theatre-card__image { position: absolute; inset: 0; opacity: 0; transition: opacity 1.2s ease; }
+.theatre-card__art.has-gallery .theatre-card__image.is-front { opacity: 1; }
+.theatre-card__art.is-moving .theatre-card__image.is-front { animation: theatre-ken-burns 9s ease-in-out both; }
+@keyframes theatre-ken-burns { from { transform: scale(.94) translateX(-1%); } to { transform: scale(.98) translateX(1%); } }
 .theatre-card__year { font: 10px var(--font-mono); color: var(--signal); }
 .theatre-card__title { display: block; font-size: clamp(20px, 1.8vw, 28px); line-height: 1.07; letter-spacing: -.025em; margin: 10px 0 12px; font-weight: 600; max-width: 22ch; overflow-wrap: anywhere; }
 .theatre-card__label { display: block; padding: 17px 28px 18px 16px; font-size: 13px; }
 .theatre-card__creator { color: var(--ink-soft); line-height: 1.4; }
-.theatre-image-credit { display: flex; align-items: center; min-height: 44px; padding: 8px 0; color: var(--ink-soft); font-size: 10px; line-height: 1.4; text-decoration: underline; overflow-wrap: anywhere; }
+.theatre-card__synopsis { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; font-size: 14px; line-height: 1.5; margin-top: 10px; }
+.theatre-image-credit { display: flex; align-items: center; min-height: 44px; padding: 8px 0; color: var(--ink-soft); font-size: 13px; line-height: 1.4; text-decoration: underline; overflow-wrap: anywhere; }
 .theatre-card__saved { position: absolute; bottom: 14px; right: 12px; color: var(--signal); }
 .theatre-storage, .theatre-empty { color: var(--ink-soft); font-size: 13px; line-height: 1.6; margin-top: 24px; }
+.theatre-archive-guides { margin-top: 44px; padding-top: 24px; border-top: 1px solid var(--line-strong); }
+.theatre-archive-guides h2 { font-size: 26px; margin: 0 0 10px; }
+.theatre-archive-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; margin-top: 20px; }
+.theatre-archive-guide { border-top: 3px solid var(--signal); padding: 18px; background: var(--paper-raised); }
+.theatre-archive-guide h3 { font-size: 21px; line-height: 1.15; margin: 0 0 12px; }
+.theatre-archive-guide p { font-size: 14px; line-height: 1.6; }
+.theatre-archive-guide .theatre-link { display: flex; }
 @media (max-width: 1100px) {
-  .theatre-stage { grid-template-columns: minmax(0, 1fr) minmax(280px, .9fr); }
+  .theatre-stage { grid-template-columns: 148px minmax(0, 1fr); }
+  .theatre-stage.is-loaded { grid-template-columns: minmax(0, 1fr); }
+  .theatre-stage.is-loaded .theatre-screen { max-height: 60vh; }
   .theatre-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .theatre-screen { aspect-ratio: auto; min-height: 300px; }
+  .theatre-intro { align-items: center; }
+  .theatre-intro-actions { min-width: 180px; }
+  .theatre-intro .theatre-lead { display: none; }
 }
 @media (max-width: 760px) {
   .page--theatre { padding: 22px 16px 42px; }
-  .theatre-intro { align-items: start; gap: 12px; }
+  .theatre-intro { align-items: start; flex-direction: column; gap: 12px; }
+  .theatre-intro-actions { width: 100%; justify-content: start; }
   .theatre-lead { font-size: 14px; }
-  .theatre-count { margin-top: 9px; font-size: 10px; }
-  .theatre-stage { grid-template-columns: minmax(0, 1fr); }
-  .theatre-screen { aspect-ratio: 16 / 9; min-height: 0; }
-  .theatre-info { padding: 22px 18px; }
+  .theatre-count { margin: 0 auto 0 0; font-size: 12px; }
+  .theatre-stage { grid-template-columns: 86px minmax(0, 1fr); }
+  .theatre-screen { min-height: 0; }
+  .theatre-info { padding: 16px 12px; }
+  .theatre-cover-credit { font-size: 12px; padding-inline: 4px; }
+  .theatre-info h2 { font-size: 23px; }
   .theatre-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
   .theatre-card__art { aspect-ratio: 1.25; }
   .theatre-card__title { font-size: 20px; }
+  .theatre-card__synopsis { font-size: 13px; }
   .theatre-card__label { font-size: 12px; padding-inline-start: 12px; }
   .theatre-refinements { flex-direction: column; }
+  .theatre-archive-grid { grid-template-columns: 1fr; }
   .theatre-search { width: 100%; max-width: none; }
   .theatre-credits__body { grid-template-columns: minmax(0, 1fr); }
   .theatre-qr-block { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theatre-card__image { animation: none !important; transition: none !important; }
 }
 .theatre-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .theatre-controls .button { min-height: 44px; padding: 10px 12px; font-size: 12px; }
