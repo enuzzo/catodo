@@ -25,7 +25,7 @@ requirement to read this entire directory before editing a file.
 - [Featured and UI release](work/2026-09-22-featured-release.md): historical 2.13.0 research-only release, superseded for playback by the release above.
 
 - [Local UI polish](work/2026-09-22-local-ui-polish.md): unreleased corners/dropdowns, Home alignment/favorites, Theatre 4:3 preview, credits popup and Order by.
-- [Featured package review](work/2026-09-22-featured-review.md): 305-work intake, international territory, exact-edition tests, identity corrections, artwork and taxonomy review; clearance and integration remain open.
+- [Featured package review](work/2026-09-22-featured-review.md): historical 305-work intake, exact-edition tests, identity corrections, artwork and taxonomy review; source rights remain qualified, while playback integration is now delivered above.
 - [Claude curation intake and discovery filters](work/2026-09-22-claude-featured-handoff.md): original return contract, editorial facets and accessible filter pictograms; the package has now arrived.
 - [Day/night appearance and palettes](work/2026-09-22-appearance.md): Auto signal/fallback, device-local storage, palette provenance, media invariants and viewport/release evidence.
 

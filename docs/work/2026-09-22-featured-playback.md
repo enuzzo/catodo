@@ -65,7 +65,31 @@ Final local results:
   Final-color screenshots were inspected after disabling capture-time theme
   transitions; controls fit the 773×601 player view.
 
-Commit, deployment identity and public HTTP checks are recorded after upload.
+The final Mickey edition also passed Play, forward seek and rewind through the
+actual production-bundle Featured UI (`mickey-in-app.json`).
+
+## Publication
+
+Application commit **fb85847** was pushed to official `main` and deployed to
+[catodo.app](https://catodo.app/) using the existing SiteGround script. The clean
+primary checkout was fast-forwarded; the temporary credential symlink was
+removed without displaying credential contents.
+
+Live checks at **2026-09-22 18:44:21 UTC** (`live-verification.json`) confirm:
+
+- Version endpoint and rendered public gate report **2.14.0**.
+- All **305 records** contain source editions; all twelve collections remain.
+- Featured feed SHA-256:
+  `eba191c8584780fac721d72d645e77b2d276e878f3b23c27ef48c3b786c61d19`.
+- The feed, application JS/CSS, HLS chunk, locale, appearance script and plain/
+  gzip archive index match the tested build byte for byte.
+- Three protected APIs return 401; private storage, private entry and legacy
+  app route return 403; manifest and touch icon return 200.
+
+No authenticated production browser session was available. Interaction QA ran
+on the final production bundle locally; public deployed artifacts and the gate
+were checked live. No authentication was bypassed and no installation data was
+used for the synthetic app checks.
 
 ## Limits retained honestly
 

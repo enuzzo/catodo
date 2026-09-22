@@ -1,7 +1,7 @@
 # CATODO roadmap
 
-Resume from the [appearance handoff](work/2026-09-22-appearance.md) for the latest
-publication status and theme evidence; the [wide Theatre handoff](work/2026-09-22-theatre-wide-layout.md)
+Resume from the [Featured playback handoff](work/2026-09-22-featured-playback.md) for current publication status.
+The [appearance handoff](work/2026-09-22-appearance.md) retains theme evidence; the [wide Theatre handoff](work/2026-09-22-theatre-wide-layout.md)
 retains its layout evidence and the [archive index handoff](work/2026-09-22-theatre-archive-index.md)
 retains catalog coverage and the recommended editorial next task.
 The complete 305-work Featured selection now includes in-app Play.
