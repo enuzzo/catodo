@@ -51,6 +51,15 @@ unless a new directory is specified. Use `rg --files src tests scripts public`
 when the route needs more detail; exclude `.env`, private data, generated output
 and dependency trees from content searches.
 
+## Appearance entry points
+
+Appearance starts in `public/appearance.js`: shared synchronous PHP/app bootstrap,
+palette registry, preference validation, Auto resolution and browser-local storage.
+`src/ui/appearance-settings.js` owns Settings controls; `src/app.js` dispatches their
+changes. `styles/main.css` uses semantic tokens. Start verification with
+`tests/ui/appearance.test.js`; the bootstrap deliberately has no application or
+media dependency.
+
 ## Theatre entry points
 
 - `src/ui/theatre.js`: persistent shelf/player, consent, filters, credits and QR.

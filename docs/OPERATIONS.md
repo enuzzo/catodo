@@ -177,6 +177,16 @@ canonical state. Do not delete `.catodo-data/installation-state.json` to reset a
 library: a deliberate empty state is a revisioned write with `updatedAt > 0`,
 whereas a missing/pristine file intentionally reopens the recovery window.
 
+## Appearance diagnosis
+
+Settings → Appearance shows the active palette and whether the browser or local
+clock chose it. Auto respects the browser's light/dark response; Tesla display
+Auto is not proof that its browser forwards this preference. Select **Local time**
+if it stays light at night: day is 07:00–19:00 in the device's timezone. Appearance
+is browser-local and excluded from shared configuration/backups. A blocked store
+retains a session-only choice. Verify the versioned `appearance.js` on the login
+and authenticated app after deployment; it is a public script with no credentials.
+
 ## Playback diagnosis
 
 ### Video opens but has no sound

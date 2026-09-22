@@ -1,4 +1,4 @@
-# CATODO 2.11.1
+# CATODO 2.12.0
 
 <img src="public/icons/catodo-netmilk-tv-transparent-512.png" alt="CATODO horned CRT" width="150" align="right">
 
@@ -28,13 +28,14 @@ the version source of truth; maintainers prepare releases with
 ## Experience
 
 - **Soft Signal Grid:** an editorial broadcast UI with electric-blue and EBU accents.
+- **Day and night:** Settings → Appearance offers Light, Dark and **Auto** (the default). Auto follows the browser color preference; choose **Local time** for a 07:00–19:00 day schedule when a car browser does not follow its display. Pick separate day/night palettes from CATODO, Catppuccin Latte/Mocha, Solarized Light/Dark, Dracula and Monokai. Choices stay on that browser, including the login page, and changing a theme preserves playback. The [appearance handoff](docs/work/2026-09-22-appearance.md) records Tesla limits and verification.
 - **Home Live Anchor:** when a cached catalog is available, the first tile at left starts muted and stays live while you explore. Use **Random** beside it to switch quickly to another playable channel.
 - **Discover collections:** live discovery starts with **Adrenaline** and **Documentaries**, built from the user-approved imported catalog. Regional Red Bull and other action-sports feed identities stay separate. **All** shows eight-channel previews; **View all** opens the complete category with progressive loading, country filtering and sorting. No VOD catalog or new playlist is imported by this feature.
 - **Theatre:** a compact film shelf with Randomize, six editorial collections, synopsis excerpts, readable image credits and optional Ken Burns galleries. Wide screens place film and credits beside the combined search and filters, bringing the covers into the first screen. The persistent player expands to full content width after **Allow source & play**; Close restores browsing and no film loads before consent. Narrow screens retain a single column. Credits include edition notes, source/license links and a local source QR. The [current register](docs/work/2026-09-22-theatre-register.md) contains 29 reviewed works and 37 editions/episodes; the 50-work selection and classic-cinema edition checks remain open.
 - **Explore archives:** an integrated, searchable [30,067-entry discovery index](docs/work/2026-09-22-theatre-archive-index.md) from Archive.org, Open Culture and Public Domain Movies. Browse categories, source rights declarations, decades and Archive ratings; enable credited source thumbnails when wanted. The catalog loads only when opened, renders 24 entries per page and links reviewed editions back to Theatre. Other entries open the original sources. Counts include distinct uploads, shorts, trailers and collection listings, not 30,067 cleared feature films.
 - **Library:** filter by genre and language, see shown/total counts, clear filters in one tap and search the complete catalog from the header.
 - **Signal Atlas:** explore every country exposed by the upstream catalog, with global search and country discovery. Map geometry loads on demand; worldwide imports contribute to its coverage highlights.
-- **Settings:** jump directly to connected playlists, TV Guide sources or backups. An already-connected world catalog shows its saved count and a Browse action.
+- **Settings:** jump directly to appearance, connected playlists, TV Guide sources or backups. An already-connected world catalog shows its saved count and a Browse action.
 - **Country directories and guides:** load country channels progressively or reveal the complete filtered collection in one action. When enriched catalog metadata exposes listed XMLTV URLs, a country guide can be connected directly from its profile; the sources are saved in Settings and keep the existing refresh cadence.
 - **Country flags:** the Countries index and country detail use self-hosted SVG artwork from the MIT-licensed `flag-icons` collection, with an ISO-code fallback.
 - **Multiview:** 2-, 3-, or 4-feed layouts with a remembered four-feed default, renameable/deletable user presets, and exactly one selected audio feed.

@@ -1,7 +1,8 @@
 # CATODO roadmap
 
-Resume from the [wide Theatre handoff](work/2026-09-22-theatre-wide-layout.md) for
-publication status and viewport evidence; the [archive index handoff](work/2026-09-22-theatre-archive-index.md)
+Resume from the [appearance handoff](work/2026-09-22-appearance.md) for the latest
+publication status and theme evidence; the [wide Theatre handoff](work/2026-09-22-theatre-wide-layout.md)
+retains its layout evidence and the [archive index handoff](work/2026-09-22-theatre-archive-index.md)
 retains catalog coverage and the recommended editorial next task.
 
 Open work and ideas, reconciled with repository documentation and code on
@@ -23,6 +24,7 @@ features and detailed QA results are preserved in
 | --- | --- | --- | --- |
 | QA-01 | P0 | Native Tesla touch: navigation, Guide drag, fullscreen return, 2/3/4-feed audio focus | Both Tesla browser layouts are now mandatory: 773×601 split and 1254×784 fullscreen simulation, plus 1600×900 baseline. Browser checks are not physical vehicle acceptance |
 | QA-02 | P0 | Real iPhone/iPad Home Screen installation, standalone safe areas, rotation, cookie continuity and system-fullscreen exit; corrected mobile header in Safari | September 390×844 browser checks plus earlier iOS Simulator evidence; no new physical iOS test |
+| QA-04 | P1 | Check whether the parked Tesla browser forwards native display day/night changes to `prefers-color-scheme` | Auto, manual modes, eight palettes and a 07:00–19:00 local-clock option are implemented. Browser emulation establishes app behavior; only the vehicle can establish its signal |
 | QA-03 | P0 | Recheck current EPG country coverage with a bounded, reproducible provider sample | Earlier IT/FR/DE counts and stale feeds are dated; later provider discovery changes shipped |
 | EPG-01 | Decision | Decide whether removing a guide should purge its retained local programme cache | Retention was observed and documented; no new removal policy selected |
 

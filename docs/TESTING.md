@@ -24,6 +24,7 @@ package (check its `engines` if setup fails).
 | Archive discovery | `node --test tests/data/theatre-archive-model.test.js` | Includes Python 3 standard-library parser fixtures; source-count reconciliation, exact-edition approval, URL safety, rating/filter/page behavior. Browser: lazy gzip/plain loading, retry, opt-in images/fallback, all-source search and preserved film DOM in all four viewports |
 | Guide | `node --test tests/epg/*.test.js` | Consent UI and country/status isolation |
 | UI models/copy | `node --test tests/ui/*.test.js tests/i18n/*.test.js` | Render the changed surface at desktop/Tesla baseline and narrow viewport |
+| Appearance | `node --test tests/ui/appearance.test.js` | Auto/browser/clock boundaries, persistence failure, cross-tab changes, listener cleanup and palette contrast. Render all palettes, themed PHP login and populated guide; change theme during decoded playback without replacing videos or changing audio focus |
 | PHP state | `node --test tests/php/installation-api.test.js` | Requires PHP; test skips when PHP is absent |
 | Hosting boundary/Worker | `node --test tests/security/*.test.js tests/worker/*.test.js` | Actual hosting routing and configured proxy behavior are separate |
 | One regression | `node --test tests/ui/view-mode.test.js` | Substitute the owning test from CODE-MAP |
@@ -36,7 +37,7 @@ storage; do not replace them with live-provider calls.
 ## What the gates establish
 
 - `test`: Node behavior tests. Read the summary for failures **and skips**.
-- `check`: syntax for JS/MJS under `src/`, `tests/`, `scripts/`, then version
+- `check`: syntax for JS/MJS under `src/`, `tests/`, `scripts/`, `public/`, then version
   consistency across package/lock/changelog, selected docs and build wiring.
   It does not cover PHP, CSS/layout or every root JavaScript file.
 - `build`: Vite production assets, private-entry relocation and discovery-index gzip. It can expose

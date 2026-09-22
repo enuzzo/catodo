@@ -10,6 +10,17 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.12.0] - 2026-09-22
+
+### ✨ Added
+
+- Added Light / Dark / Auto appearance, defaulting to the browser preference, with an optional local-time schedule and automatic fallback for browsers without a color-scheme signal.
+- Added independent day and night palettes: CATODO, Catppuccin Latte/Mocha, Solarized Light/Dark, Dracula and Monokai, with local previews, readable semantic colors and browser-local persistence.
+
+### 🛠 Changed
+
+- Applied appearance before the app and PHP login render, including browser chrome, TV Guide, maps, dialogs and player controls. Theme changes preserve existing media and Multiview audio focus; Settings stays touch-friendly in both Tesla layouts.
+
 ## [2.11.1] - 2026-09-22
 
 ### 🐛 Fixed
@@ -248,7 +259,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.11.1...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.12.0...HEAD
+[2.12.0]: https://github.com/enuzzo/catodo/compare/v2.11.1...v2.12.0
 [2.11.1]: https://github.com/enuzzo/catodo/compare/v2.11.0...v2.11.1
 [2.11.0]: https://github.com/enuzzo/catodo/compare/v2.10.1...v2.11.0
 [2.10.1]: https://github.com/enuzzo/catodo/compare/v2.10.0...v2.10.1

@@ -1767,6 +1767,11 @@ async function handleAction(action, detail) {
     case "settings-section":
       ui.focusSettingsSection(detail.dataset.section);
       break;
+    case "appearance-setting":
+      if (["mode", "autoSource", "dayTheme", "nightTheme"].includes(detail.dataset.preference)) {
+        globalThis.CatodoAppearance.controller.set({ [detail.dataset.preference]: detail.value || detail.dataset.value });
+      }
+      break;
     case "retry-world-map":
       renderCountries();
       break;
@@ -2494,7 +2499,7 @@ async function boot() {
   document.documentElement.lang = i18n.locale;
   document.documentElement.dir = i18n.direction;
 
-  ui = mountAppUI(root, { t, onAction: (action, detail) => void handleAction(action, detail), onTheatrePlay: () => {
+  ui = mountAppUI(root, { t, appearance: globalThis.CatodoAppearance.controller, onAction: (action, detail) => void handleAction(action, detail), onTheatrePlay: () => {
     [ui.refs.homeVideo, ui.refs.exploreVideo, ui.refs.playerVideo, ...ui.refs.multiviewVideos].forEach((video) => {
       video.muted = true;
       video.pause();
@@ -2635,6 +2640,7 @@ window.addEventListener("beforeunload", () => {
   multiview?.destroy();
   catalog?.destroy();
   ui?.destroy();
+  globalThis.CatodoAppearance.controller.destroy();
 }, { once: true });
 
 document.addEventListener("visibilitychange", () => {

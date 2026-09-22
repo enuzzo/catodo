@@ -12,6 +12,7 @@ import { channelGuideSetupAction, countryGuideControlState, guideProgrammeFallba
 import { channelMetadataBadges } from './channel-meta-model.js';
 import { createTheatreView } from './theatre.js';
 import { createSignalEasterEgg } from './signal-easter-egg.js';
+import { createAppearanceSettings } from './appearance-settings.js';
 
 const FLAG_URLS = import.meta.glob('../../assets/vendor/flags/4x3/*.svg', {
   eager: true,
@@ -1558,7 +1559,7 @@ function renderGuideSourceManager(refs, state, t) {
   });
 }
 
-function createSourcesView(t) {
+function createSourcesView(t, appearanceController) {
   const view = element('section', 'page page--sources', { dataset: { page: 'sources' }, hidden: true });
   const heading = element('div', 'page-heading');
   const copy = element('div');
@@ -1808,18 +1809,21 @@ function createSourcesView(t) {
   );
   backup.append(backupCopy, backupActions);
   const sectionNav = element('nav', 'settings-sections', { 'aria-label': translate(t, 'settings.sections', 'Settings sections') });
+  const appearance = createAppearanceSettings({ t, appearance: appearanceController });
   [
+    ['appearance', 'palette', 'appearance.title', 'Appearance'],
     ['playlists', 'stack', 'sources.connected', 'Connected playlists'],
     ['guide', 'calendar-blank', 'guide.settingsTitle', 'TV Guide sources'],
     ['backup', 'download-simple', 'backup.title', 'Data & backup'],
   ].forEach(([section, iconName, key, fallback]) => {
     sectionNav.append(actionButton({ t, action: 'settings-section', iconName, key, fallback, className: 'button--ghost', dataset: { section } }));
   });
-  view.append(heading, syncStatus, sectionNav, worldCatalog, layout, guideSettings, backup);
+  view.append(heading, sectionNav, appearance.element, syncStatus, worldCatalog, layout, guideSettings, backup);
   return {
     view,
     list,
-    sections: { playlists: layout, guide: guideSettings, backup },
+    appearance,
+    sections: { appearance: appearance.element, playlists: layout, guide: guideSettings, backup },
     worldCatalog,
     worldEyebrow,
     worldBody,
@@ -3021,7 +3025,8 @@ function drawSignalChart(canvas, values, maximum) {
     ? Number(maximum)
     : Math.max(20, ...points, 1);
   context.clearRect(0, 0, width, height);
-  context.strokeStyle = '#d8d8d5';
+  const colors = getComputedStyle(canvas);
+  context.strokeStyle = colors.getPropertyValue('--line').trim() || '#d8d8d5';
   context.lineWidth = 1;
   context.setLineDash([5, 6]);
   [0.15, 0.5, 0.85].forEach((ratio) => {
@@ -3032,7 +3037,7 @@ function drawSignalChart(canvas, values, maximum) {
   });
   context.setLineDash([]);
   if (!points.length) return;
-  context.strokeStyle = '#065dff';
+  context.strokeStyle = colors.getPropertyValue('--signal').trim() || '#065dff';
   context.lineWidth = 3;
   context.lineJoin = 'round';
   context.lineCap = 'round';
@@ -3288,7 +3293,7 @@ export function mountAppUI(root, options = {}) {
   const countries = createCountriesView(t);
   const guide = createGuideView(t);
   const library = createLibraryView(t);
-  const sources = createSourcesView(t);
+  const sources = createSourcesView(t, options.appearance);
   const player = createPlayer(t);
   const programmeOverlay = createProgrammeOverlay(t);
   const multiview = createMultiview(t);
@@ -4282,6 +4287,7 @@ export function mountAppUI(root, options = {}) {
       root.removeEventListener('focusin', dismissMoreMenu);
       root.removeEventListener('keydown', escapeMoreMenu);
       signalEasterEgg.destroy();
+      sources.appearance.destroy();
       theatre.destroy();
       dispatcher.destroy();
       root.replaceChildren();

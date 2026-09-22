@@ -576,5 +576,25 @@
   },
   "channel": {
     "tuneExploreAriaLabel": "Tune {name} in Discover preview"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "description": "A palette for daylight. Another for after dark.",
+    "mode": "Color mode",
+    "auto": "Auto",
+    "light": "Light",
+    "dark": "Dark",
+    "dayPalette": "Day palette",
+    "nightPalette": "Night palette",
+    "autoFollows": "Auto follows",
+    "browserPreference": "Browser preference",
+    "localTime": "Local time · 07:00–19:00",
+    "autoHelp": "If your car’s browser does not follow the display, choose Local time. Day runs from 07:00 to 19:00 on this device.",
+    "statusBrowser": "Browser reports {scheme}",
+    "statusFallback": "No browser preference available · using local time",
+    "statusClock": "Following local time",
+    "statusManual": "Manual selection",
+    "deviceNote": "Saved on this browser. Your other screens keep their own appearance.",
+    "sessionNote": "Browser storage is unavailable. Your choice will last for this session."
   }
 }

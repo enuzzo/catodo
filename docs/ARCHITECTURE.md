@@ -1,6 +1,6 @@
 # CATODO architecture
 
-This document is the maintainer map for CATODO 2.11.1. It describes the runtime
+This document is the maintainer map for CATODO 2.12.0. It describes the runtime
 boundaries, the data flow, and the invariants that should survive future UI and
 feature work. For task-to-file navigation use [CODE-MAP.md](CODE-MAP.md); for
 focused checks use [TESTING.md](TESTING.md). For operational procedures and
@@ -53,6 +53,26 @@ retry after a loading failure; the country list remains usable without the map.
 | `public/*.php` | Installation-wide state, private logo and EPG caches | All three services require the signed login cookie |
 | `index.php` + `.htaccess` | Official deployment login gate | The private app entry, credentials and `.catodo-data/` must remain inaccessible directly |
 | `worker.js` | Optional stream proxy and HLS URI rewriting | This is not an anonymous general-purpose proxy |
+
+## Browser-local appearance
+
+`public/appearance.js` is a small synchronous, dependency-free classic script
+shared by the PHP login and `app.html`. The versioned public asset applies semantic
+CSS tokens and `color-scheme` before page paint; the bundled UI uses its explicit
+`CatodoAppearance` API. A single palette registry avoids gate/app color drift.
+Settings changes only update root tokens and the appearance controls: they never
+render the application again or touch a media element.
+
+`catodo:appearance:v1` in localStorage contains allowlisted mode, Auto source, day
+palette and night palette. It is intentionally excluded from installation sync
+and shared backups. Invalid values fall back to Auto with CATODO Light/Dark; a
+storage failure retains a session-only choice and is visible in Settings.
+Auto follows `prefers-color-scheme` changes, with legacy listener support. A valid
+light response is respected even at night: it cannot establish whether a Tesla
+forwards its native display setting. The user can choose the device-local clock
+(day 07:00–19:00); unsupported queries use that same fallback. Visibility, focus,
+page restoration, storage events and a 30-second clock check keep an open page
+current without GPS, network requests or account preferences.
 
 ## Catalog and identity
 

@@ -21,6 +21,8 @@ requirement to read this entire directory before editing a file.
 
 ## Current work and release evidence
 
+- [Day/night appearance and palettes](work/2026-09-22-appearance.md): Auto signal/fallback, device-local storage, palette provenance, media invariants and viewport/release evidence.
+
 - [Compact Theatre and expanded curation](work/2026-09-22-theatre-compact-curation.md): current handoff, Tesla viewport checks, motion/bandwidth decisions and catalog additions.
 - [Wide Theatre opening](work/2026-09-22-theatre-wide-layout.md): film/filter composition, extended and compressed Tesla checks, persistent playback and current release evidence.
 - [Integrated archive discovery index](work/2026-09-22-theatre-archive-index.md): complete source-page coverage, counts, ratings, image consent, refresh procedure and release evidence.

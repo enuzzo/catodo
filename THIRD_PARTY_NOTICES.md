@@ -29,3 +29,17 @@ version numbers and viewing conditions live in `src/data/theatre-catalog.js` and
 are shown beside the player. See the [edition register](docs/work/2026-09-22-theatre-register.md)
 for primary evidence and unresolved candidates. Source QR images are generated
 locally; `qrencode` is an optional authoring tool, not a shipped runtime dependency.
+
+## Appearance palette references
+
+CATODO's semantic UI palettes are original adaptations of these published color
+references. Muted text, status colors and some accents are adjusted for normal-text
+contrast; no editor extension, proprietary Monokai Pro package or remote theme
+service is bundled. Theme names identify their inspiration, not affiliation.
+
+- [Catppuccin Latte and Mocha](https://github.com/catppuccin/palette): Catppuccin contributors, MIT; [published palette](https://raw.githubusercontent.com/catppuccin/palette/main/palette.json).
+- [Dracula](https://draculatheme.com/contribute): Zeno Rocha and Dracula contributors, MIT; classic dark palette.
+- [Monokai classic](https://github.com/microsoft/vscode/blob/main/extensions/theme-monokai/themes/monokai-color-theme.json): classic Monokai reference distributed by Microsoft VS Code under MIT.
+- [Solarized](https://ethanschoonover.com/solarized/): Ethan Schoonover, MIT; light and dark base colors.
+
+All theme definitions live in `public/appearance.js` and load from the CATODO host.

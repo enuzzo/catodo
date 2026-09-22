@@ -170,6 +170,8 @@ $appVersion = readAppVersion();
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#F2F1EA">
+<meta name="color-scheme" content="light dark">
+<script src="./appearance.js?v=<?= htmlspecialchars($appVersion, ENT_QUOTES, 'UTF-8') ?>"></script>
 <meta name="application-name" content="CATODO">
 <meta name="description" content="Tesla-first world TV explorer for user-approved public IPTV sources. Zero bundled streams, zero DRM bypass, zero pezzotto.">
 <meta name="mobile-web-app-capable" content="yes">
@@ -186,8 +188,8 @@ $appVersion = readAppVersion();
 :root{
   --ebu-white:#BFBFBF; --ebu-yellow:#BFBF00; --ebu-cyan:#00BFBF; --ebu-green:#00BF00;
   --ebu-magenta:#BF00BF; --ebu-red:#BF0000; --ebu-blue:#1D1DBF;
-  --c-red:#E05545; --c-amber:#FFB03A;
-  --glass:#F2F1EA; --cabinet:#FFFFFF; --line:#D8D5CA; --dim:#6E6D68; --ink:#0A0B0D;
+  --c-red:var(--danger,#C0262D); --c-amber:var(--signal,#075DF6);
+  --glass:var(--paper,#F2F1EA); --cabinet:var(--paper-raised,#FFFFFF); --line:#D8D5CA; --dim:var(--ink-soft,#6E6D68); --ink:#0A0B0D;
   --mono: ui-monospace, "SF Mono", "Roboto Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "DejaVu Sans", Arial, sans-serif;
   --tap:84px; --r:2px;
@@ -211,9 +213,9 @@ form{display:flex;flex-direction:column;gap:12px;width:100%}
 input[type=text],input[type=password]{height:var(--tap);border:2px solid var(--line);border-radius:16px;
   background:var(--cabinet);font-family:var(--mono);font-size:22px;font-weight:600;padding:0 22px;width:100%}
 input[type=text]:focus,input[type=password]:focus{border-color:var(--c-amber)}
-button[type=submit]{height:var(--tap);border:2px solid #1457FF;border-radius:16px;background:#1457FF;color:#fff;
+button[type=submit]{height:var(--tap);border:2px solid var(--signal,#1457FF);border-radius:16px;background:var(--signal,#1457FF);color:var(--on-signal,#fff);
   font-family:var(--mono);font-size:18px;font-weight:700;letter-spacing:.1em;transition:background .07s,color .07s,border-color .07s}
-button[type=submit]:active{background:var(--c-amber);border-color:var(--c-amber);color:#000}
+button[type=submit]:active{background:var(--signal-hover,#004bd4);border-color:var(--signal-hover,#004bd4)}
 #note{font-size:11px;color:var(--dim);max-width:340px;text-align:center;line-height:1.6}
 @media (max-width:520px){
   :root{--tap:76px}
