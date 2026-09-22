@@ -1,6 +1,6 @@
 # Theatre and Discover — editorial reset and local implementation
 
-Status: release preparation. Started 2026-09-22 on `main`, application 2.8.0.
+Status: published and verified on SiteGround. Started 2026-09-22 on `main`, application 2.8.0.
 The subsequent user instruction explicitly authorized version/changelog update,
 commit, push and SiteGround deployment; it also requested artwork and research
 into curated vintage horror and Elvis films. Publication evidence is appended below.
@@ -172,6 +172,28 @@ browser profiles; this is not a production authentication test or a replacement
 for the public hosting boundary checks. No production credentials or stored
 installation data are copied into QA.
 
-Publication result will be appended after upload and public verification.
+Publication completed:
+
+- Runtime release commit: `e3667eb581d214db52be1c3d13d630cdc257338a` on `main`.
+  Native Git push succeeded; remote main matched that SHA before the evidence commit.
+- `npm run deploy:siteground` completed successfully. Existing deploy script
+  consumed credentials privately; no credential, cookie or installation-state
+  extraction was used for verification.
+- Cache-busted production `version.json` returned CATODO 2.9.0. All 30 selected
+  public assets (compiled app JS/CSS, 22 artwork files, locale, manifest and touch
+  icon) matched local build bytes exactly. Unversioned English locale also matched.
+- Public HEAD requests: installation/logo/EPG APIs returned 401; private state,
+  private app entry and legacy app.html returned 403; manifest/touch icon returned 200.
+- Existing authenticated Chrome session loaded the actual 2.9.0 app and Theatre
+  with 22 works, rendered artwork and English language labels. Europe to the Stars
+  played with visible moving frames and 1280×720 telemetry; mute worked. Selecting
+  Eyes on the Skies cleared the media and stopped playback. The Theatre tab was
+  left open without a running film. No installation catalog edits were made.
+- Python urllib received a public-resource 403 during verification; the runbook's
+  standard curl client succeeded. Only the successful curl results are used for
+  hosting/byte-identity conclusions.
+
+The evidence-only follow-up commit updates this handoff and roadmap; it does not
+change the deployed runtime and does not require another upload.
 Physical Tesla/iPhone playback, audibility, fullscreen and camera scanning remain
 open. Short browser samples do not establish uninterrupted full-film availability.
