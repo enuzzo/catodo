@@ -75,3 +75,12 @@ stay English. Use 🌟 for advice and ❓ for questions requiring a reply. Prese
 useful ideas in [ROADMAP.md](docs/ROADMAP.md) with their actual status. Close with
 changes, checks and their limits, publication status, open work and next start.
 For longer work, use the lightweight [workflow](docs/AGENT-WORKFLOW.md).
+
+
+## Generated folders stay out of Dropbox
+
+This repo lives in Dropbox, which must not sync generated folders: thousands of small files slow Dropbox down on every Mac and break across architectures. Each Mac makes its own: `dist`. On 2026-11-03 these were flagged on the Mac Studio:
+
+- `dist/`
+
+On a Mac where one is missing, create the empty folder, flag it with `xattr -w 'com.apple.fileprovider.ignore#P' 1 <folder>`, check that `xattr -p` prints 1, and only then install or build into it. Flag any new generated folder the same way before its first build, keep it in `.gitignore`, and never commit it.
