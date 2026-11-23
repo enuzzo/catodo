@@ -1,3 +1,5 @@
+import { FILM_EDITORIAL } from './theatre-editorial.js';
+
 /** Source declarations and technical playback availability are separate facts. */
 export function featuredLink(value) {
   try { const url = new URL(value); return url.protocol === 'https:' && !url.username && !url.password ? url.href : null; }
@@ -42,7 +44,7 @@ export function prepareFeatured(payload) {
     return { id: record.id, rank: record.rank, title: record.title, year: record.year,
       editions, attribution: record.attribution, license: record.license, licenseUrl: featuredLink(record.licenseUrl),
       creators: record.creators, genres: record.genres, languages: record.languages, collections: record.collections,
-      synopsis: record.synopsis, hook: record.hook, contentNote: record.contentNote,
+      synopsis: record.synopsis, hook: FILM_EDITORIAL.get(record.id)?.note ?? record.hook, contentNote: record.contentNote,
       sourceUrl: featuredLink(record.sourceUrl), editionNote: record.editionNote,
       rightsStatus: record.rightsStatus, rightsNote: record.rightsNote,
       rightsSources: (record.rightsSources || []).map(featuredLink).filter(Boolean),
@@ -63,6 +65,10 @@ export function selectFeatured(records, { query = '', collection = '', genre = '
       const validA = Number.isFinite(a.year) && a.year > 0, validB = Number.isFinite(b.year) && b.year > 0;
       if (validA !== validB) return validA ? -1 : 1;
       if (validA && a.year !== b.year) return (sort === 'oldest' ? 1 : -1) * (a.year - b.year);
+    }
+    if (sort === 'editorial') {
+      const difference = (FILM_EDITORIAL.get(a.id)?.rank ?? Infinity) - (FILM_EDITORIAL.get(b.id)?.rank ?? Infinity);
+      if (difference) return difference;
     }
     return a.rank - b.rank;
   });

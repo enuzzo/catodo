@@ -1,5 +1,5 @@
-import { APP_VERSION } from '../version.js';
-import { ARCHIVE_GENRES, ARCHIVE_PROVIDERS, archiveThumbnail, prepareArchiveIndex, selectArchivePage } from '../data/theatre-archive-model.js';
+import { loadTheatreJson } from '../data/theatre-json.js';
+import { ARCHIVE_GENRES, ARCHIVE_PROVIDERS, archiveThumbnail, prepareArchiveIndex, prepareArchiveRecordings, selectArchivePage } from '../data/theatre-archive-model.js';
 
 /** A paginated discovery catalog. Only the existing reviewed shelf can play. */
 export function createTheatreArchive({ t, titles, onReviewed, fetchImpl = (...args) => fetch(...args) }) {
@@ -14,7 +14,7 @@ export function createTheatreArchive({ t, titles, onReviewed, fetchImpl = (...ar
   const root = node('section', 'theatre-archive'); root.hidden = true;
   root.setAttribute('aria-label', tr('title', 'Explore archives'));
   const events = new AbortController(); let data, loading, debounce, active = false, imagesAllowed = false;
-  const state = { query: '', genre: '', source: '', rights: '', kind: '', decade: '', minVotes: '', minRating: '', sort: 'rating', page: 1 };
+  const state = { query: '', genre: '', source: '', rights: '', kind: '', decade: '', minVotes: '', minRating: '', sort: 'editorial', page: 1 };
   const status = node('p', 'theatre-archive-status'); status.setAttribute('role', 'status');
   const retry = button(tr('retry', 'Retry catalog')); retry.hidden = true;
   const controls = node('div', 'theatre-archive-tools'); controls.hidden = true;
@@ -31,16 +31,16 @@ export function createTheatreArchive({ t, titles, onReviewed, fetchImpl = (...ar
   select('genre', tr('category', 'Archive category'), [['', tr('allCategories', 'All categories')], ...Object.entries(ARCHIVE_GENRES).map(([key, label]) => [key, tr(`categories.${key}`, label)])]);
   const refine = node('details', 'theatre-archive-refine'); refine.append(node('summary', '', tr('refine', 'Source, rights & ratings')));
   const refinements = node('div', 'theatre-archive-filters');
-  select('source', tr('source', 'Catalog source'), [['', tr('allSources', 'All three sources')], ...Object.entries(ARCHIVE_PROVIDERS)], refinements);
+  select('source', tr('source', 'Catalog source'), [['', tr('allSources', 'All sources')], ...Object.entries(ARCHIVE_PROVIDERS)], refinements);
   select('rights', tr('rights', 'Rights information'), [['', tr('allRights', 'All rights information')], ['reviewed', tr('reviewed', 'Reviewed for Theatre')], ['cc', tr('cc', 'Creative Commons declared')], ['public-domain', tr('pd', 'Public domain declared')], ['public-domain-us', tr('pdUs', 'Public domain U.S. — directory')], ['unknown', tr('unknown', 'Rights not established')]], refinements);
   select('minRating', tr('minRating', 'Minimum Archive rating'), [['', tr('anyRating', 'Any rating')], ['3', '3+ / 5'], ['4', '4+ / 5'], ['4.5', '4.5+ / 5']], refinements);
   select('minVotes', tr('minVotes', 'Minimum review count'), [['', tr('anyVotes', 'Any review count')], ['3', '3+'], ['10', '10+'], ['25', '25+'], ['100', '100+']], refinements);
   select('decade', tr('decade', 'Film decade'), [['', tr('allYears', 'All decades')], ...Array.from({ length: 15 }, (_, index) => [String(1880 + index * 10), `${1880 + index * 10}s`]), ['unknown', tr('unknownYear', 'Year not listed')]], refinements);
-  select('kind', tr('kind', 'Entry type'), [['', tr('allKinds', 'All entry types')], ['film', tr('film', 'Films & shorts')], ['episode', tr('episode', 'Episodes & serials')], ['trailer', tr('trailer', 'Trailers')], ['collection', tr('collection', 'Collections & guides')]], refinements);
+  select('kind', tr('kind', 'Entry type'), [['', tr('allKinds', 'All entry types')], ['film', tr('film', 'Films & shorts')], ['episode', tr('episode', 'Episodes & serials')], ['trailer', tr('trailer', 'Trailers')], ['collection', tr('collection', 'Collections & guides')], ['recording', tr('recording', 'TV & archive recordings')]], refinements);
   const reset = button(tr('reset', 'Reset filters')); refinements.append(reset);
   refine.append(refinements, node('p', 'theatre-archive-note', tr('ratingsNote', 'Archive stars rate a particular upload. Best rated balances stars with the number of reviews; these are not IMDb ratings.')));
   const meta = node('div', 'theatre-archive-meta');
-  select('sort', tr('sort', 'Archive order'), [['rating', tr('bestRated', 'Best rated · weighted')], ['popular', tr('popular', 'Most downloaded')], ['title', tr('alphabetical', 'Title A–Z')], ['oldest', tr('oldest', 'Oldest first')], ['newest', tr('newest', 'Newest first')]], meta);
+  select('sort', tr('sort', 'Archive order'), [['editorial', tr('editorial', 'Editorial order')], ['rating', tr('bestRated', 'Best rated · weighted')], ['popular', tr('popular', 'Most downloaded')], ['title', tr('alphabetical', 'Title A–Z')], ['oldest', tr('oldest', 'Oldest first')], ['newest', tr('newest', 'Newest first')]], meta);
   const images = button(tr('showImages', 'Show source images')); images.setAttribute('aria-pressed', 'false');
   meta.append(images);
   const imageNote = node('p', 'theatre-archive-note', tr('imageConsent', 'Source images connect to Archive.org, Public Domain Movies or YouTube. Text-only browsing stays on CATODO.'));
@@ -67,7 +67,7 @@ export function createTheatreArchive({ t, titles, onReviewed, fetchImpl = (...ar
     const body = node('div', 'theatre-archive-card-body');
     body.append(node('p', 'theatre-card__year', record.genres.map((genre) => tr(`categories.${genre}`, ARCHIVE_GENRES[genre])).join(' · ')), node('h3', '', record.title));
     if (record.creators.length) body.append(node('p', 'theatre-card__creator', record.creators.join(' · ')));
-    const synopsis = record.reviewed?.synopsis || tr('entryContext', '{year} · {kind}. {languages} Read the synopsis and edition notes on the source page.', { year: record.year || tr('unknownYear', 'Year not listed'), kind: tr(record.kind, record.kind), languages: record.languages.join(' / ') });
+    const synopsis = record.editorial?.note || record.reviewed?.synopsis || tr('entryContext', '{year} · {kind}. {languages} Read the synopsis and edition notes on the source page.', { year: record.year || tr('unknownYear', 'Year not listed'), kind: tr(record.kind, record.kind), languages: record.languages.join(' / ') });
     body.append(node('p', 'theatre-card__synopsis', synopsis));
     const rating = record.rating ? tr('rating', '★ {stars}/5 · {votes} Archive reviews', { stars: record.rating.value.toFixed(1), votes: record.rating.count.toLocaleString('en') }) : tr('unrated', 'No Archive reviews listed');
     body.append(node('p', 'theatre-archive-rating', rating));
@@ -94,25 +94,27 @@ export function createTheatreArchive({ t, titles, onReviewed, fetchImpl = (...ar
     pagination.hidden = selection.total === 0;
   }
   async function load() {
-    if (data || loading) return loading;
+    if (loading) return loading;
     status.textContent = tr('loading', 'Loading the archive index…'); retry.hidden = true;
     loading = (async () => {
       try {
         const compressed = typeof DecompressionStream === 'function' && !import.meta.env.DEV;
-        const url = `./theatre/archive-index.json${compressed ? '.gz' : ''}?v=${encodeURIComponent(APP_VERSION)}`;
-        let response = await fetchImpl(url, { signal: events.signal });
-        if (compressed && response.status === 404) response = await fetchImpl(`./theatre/archive-index.json?v=${encodeURIComponent(APP_VERSION)}`, { signal: events.signal });
-        if (!response.ok || Number(response.headers.get('content-length')) > 30_000_000) throw new Error('Catalog unavailable');
-        const bytes = new Uint8Array(await response.arrayBuffer()); if (bytes.length > 30_000_000) throw new Error('Catalog too large');
-        // Some hosts apply Content-Encoding themselves; only decode gzip magic.
-        const content = bytes[0] === 31 && bytes[1] === 139
-          ? await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text()
-          : new TextDecoder().decode(bytes);
-        if (content.length > 30_000_000) throw new Error('Catalog too large');
-        data = prepareArchiveIndex(JSON.parse(content), titles); controls.hidden = false;
-        status.textContent = tr('coverage', '{count} indexed entries · {date}', { count: data.records.length.toLocaleString('en'), date: data.manifest.generatedAt.slice(0, 10) });
+        const options = { signal: events.signal, fetchImpl };
+        const [index, recordings] = await Promise.all([
+          loadTheatreJson('archive-index.json', { ...options, limit: 30_000_000, compressed }),
+          loadTheatreJson('archive-recordings.json', { ...options, limit: 10_000_000, compressed }).then(prepareArchiveRecordings).catch(() => null),
+        ]);
+        data = prepareArchiveIndex(index, titles, recordings?.records); controls.hidden = false;
+        const count = data.records.length.toLocaleString('en');
+        status.textContent = recordings ? tr('combinedCoverage', '{count} indexed entries', { count })
+          : tr('coverage', '{count} indexed entries · {date}', { count, date: data.manifest.generatedAt.slice(0, 10) });
+        if (!recordings) {
+          status.textContent += ` · ${tr('recordingsUnavailable', 'Additional recordings unavailable')}`;
+          retry.hidden = false;
+        }
+        aboutBody.replaceChildren();
         aboutBody.append(imageNote, node('p', '', tr('rightsNote', 'This is a discovery index. Directory membership and uploader license labels do not approve an edition for Theatre. Source links open the original sites; only reviewed editions have an in-app film button.')),
-          node('p', '', tr('scopeNote', 'The index includes Archive’s feature_films collection and the direct entries in the two directories. Linked collections remain single collection entries; similar titles can be different editions. Years and categories follow source metadata.')));
+          node('p', '', tr('scopeNote', 'The index includes Archive’s feature_films collection together with additional Archive recordings and the direct entries in the two directories. Linked collections remain single collection entries; similar titles can be different editions. Years and categories follow source metadata.')));
         for (const source of data.manifest.sources) aboutBody.append(link(`${source.name}: ${data.manifest.sourceCounts[source.id].toLocaleString('en')}`, source.url));
         render();
       } catch (error) {
@@ -129,7 +131,7 @@ export function createTheatreArchive({ t, titles, onReviewed, fetchImpl = (...ar
   }, { signal: events.signal });
   images.addEventListener('click', () => { imagesAllowed = !imagesAllowed; images.setAttribute('aria-pressed', String(imagesAllowed)); images.textContent = imagesAllowed ? tr('hideImages', 'Hide source images') : tr('showImages', 'Show source images'); render(); }, { signal: events.signal });
   reset.addEventListener('click', () => {
-    for (const key of Object.keys(state)) state[key] = key === 'page' ? 1 : key === 'sort' ? 'rating' : '';
+    for (const key of Object.keys(state)) state[key] = key === 'page' ? 1 : key === 'sort' ? 'editorial' : '';
     clearTimeout(debounce); search.value = ''; controls.querySelectorAll('[data-archive-filter]').forEach((select) => { select.value = state[select.dataset.archiveFilter]; }); render();
   }, { signal: events.signal });
   function go(value) { state.page = value; render(); controls.scrollIntoView({ block: 'start', behavior: 'instant' }); }

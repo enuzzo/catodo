@@ -1,3 +1,5 @@
+import { ARCHIVE_EDITORIAL } from './theatre-editorial.js';
+
 /** Discovery metadata is never a playback allowlist. Ratings belong to IA items. */
 export const ARCHIVE_PAGE_SIZE = 24;
 export const ARCHIVE_PROVIDERS = { archive: 'Internet Archive', pdm: 'Public Domain Movies', openculture: 'Open Culture' };
@@ -7,10 +9,28 @@ export const ARCHIVE_GENRES = {
   thriller: 'Thriller', action: 'Action', adventure: 'Adventure', fantasy: 'Fantasy',
   romance: 'Romance', musical: 'Musicals', war: 'War & propaganda', silent: 'Silent cinema',
   'comedy-drama': 'Comedy & drama collections', 'noir-horror-thriller': 'Noir, horror & thriller collections',
-  'martial-arts': 'Martial arts', unclassified: 'Not categorized',
+  'martial-arts': 'Martial arts', 'broadcast-history': 'Broadcast recordings',
+  'retro-technology': 'Retro technology', 'music-performance': 'Music & performance',
+  'home-movies': 'Home movies', 'public-information': 'Public information films', unclassified: 'Not categorized',
 };
 const plain = (value, limit = 240) => String(value ?? '').replace(/[\u0000-\u001f\u202a-\u202e\u2066-\u2069]/g, ' ').slice(0, limit);
 const imageHosts = new Set(['publicdomainmovies.info', 'www.publicdomainmovies.info', 'i0.wp.com', 'i1.wp.com', 'i2.wp.com', 'i.ytimg.com']);
+const archiveItemPattern = /^[A-Za-z0-9_-][A-Za-z0-9_.-]{0,199}$/;
+export function prepareArchiveRecordings(data) {
+  if (data?.schema !== 1 || !Number.isFinite(Date.parse(data.generatedAt))
+    || !Array.isArray(data.records) || !data.records.length || data.records.length > 20_000) throw new Error('Invalid recordings index');
+  const seen = new Set();
+  for (const record of data.records) {
+    const id = record?.archiveId;
+    if (typeof id !== 'string' || !archiveItemPattern.test(id) || seen.has(id) || record.id !== `ia:${id}`
+      || typeof record.title !== 'string' || !record.title.trim()
+      || !Array.isArray(record.genres) || record.genres.some((genre) => !Object.hasOwn(ARCHIVE_GENRES, genre))
+      || (record.creators != null && !Array.isArray(record.creators))
+      || (record.languages != null && !Array.isArray(record.languages))) throw new Error('Invalid Archive recording');
+    seen.add(id);
+  }
+  return data;
+}
 
 export function safeArchiveLink(value) {
   try {
@@ -35,7 +55,7 @@ export function archiveThumbnail(record) {
   return null;
 }
 
-export function prepareArchiveIndex(data, reviewedTitles = []) {
+export function prepareArchiveIndex(data, reviewedTitles = [], recordings = []) {
   if (data?.manifest?.schema !== 1 || !Array.isArray(data.records) || data.records.length > 100_000 || data.manifest.records !== data.records.length) {
     throw new Error('Invalid archive index');
   }
@@ -49,12 +69,12 @@ export function prepareArchiveIndex(data, reviewedTitles = []) {
     }
   }
   const ids = new Set();
-  const records = data.records.map((raw) => {
+  function prepareRecord(raw) {
     if (!raw || typeof raw.id !== 'string' || ids.has(raw.id) || !Array.isArray(raw.sources)) throw new Error('Invalid archive record');
     ids.add(raw.id);
     const record = { id: plain(raw.id), title: plain(raw.title), year: Number.isInteger(raw.year) && raw.year >= 1880 && raw.year <= 2099 ? raw.year : null,
       genres: [...new Set((raw.genres || []).filter((genre) => Object.hasOwn(ARCHIVE_GENRES, genre)))],
-      kind: ['film', 'episode', 'trailer', 'collection'].includes(raw.kind) ? raw.kind : 'film',
+      kind: ['film', 'episode', 'trailer', 'collection', 'recording'].includes(raw.kind) ? raw.kind : 'film',
       creators: (raw.creators || []).slice(0, 3).map((creator) => plain(creator, 120)),
       languages: (raw.languages || []).slice(0, 3).map((language) => plain(language, 35)),
       sources: raw.sources.flatMap((source) => Object.hasOwn(ARCHIVE_PROVIDERS, source.provider) && safeArchiveLink(source.url) ? [{ provider: source.provider, url: safeArchiveLink(source.url) }] : []),
@@ -66,9 +86,28 @@ export function prepareArchiveIndex(data, reviewedTitles = []) {
     if (typeof raw.archiveId === 'string' && /^[A-Za-z0-9_.-]{1,200}$/.test(raw.archiveId)) record.archiveId = raw.archiveId;
     if (Number.isFinite(raw.rating?.value) && raw.rating.value > 0 && raw.rating.value <= 5 && Number.isSafeInteger(raw.rating.count) && raw.rating.count > 0) record.rating = raw.rating;
     record.reviewed = reviewed.get(record.archiveId);
-    record.search = [record.title, record.year, ...record.creators, ...record.genres.map((genre) => ARCHIVE_GENRES[genre]), record.archiveId].join(' ').normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase();
     return record;
-  });
+  }
+  const records = data.records.map(prepareRecord);
+  const byArchive = new Map(records.filter((record) => record.archiveId).map((record) => [record.archiveId, record]));
+  for (const raw of recordings) {
+    const source = { provider: 'archive', url: `https://archive.org/details/${raw.archiveId}` };
+    const existing = byArchive.get(raw.archiveId);
+    if (!existing) {
+      records.push(prepareRecord({ ...raw, sources: [source] }));
+      continue;
+    }
+    existing.genres = [...new Set([...existing.genres, ...raw.genres])].filter((genre) => genre !== 'unclassified');
+    if (!existing.genres.length) existing.genres = ['unclassified'];
+    if (raw.kind === 'recording' && existing.kind === 'film') existing.kind = raw.kind;
+    if (!existing.sources.some(({ provider }) => provider === 'archive')) existing.sources.push(source);
+    existing.archiveTitle = plain(raw.title);
+  }
+  for (const record of records) {
+    const editorial = ARCHIVE_EDITORIAL.get(record.archiveId);
+    if (editorial) record.editorial = editorial;
+    record.search = [record.title, record.archiveTitle, record.year, ...record.creators, record.editorial?.note, ...record.genres.map((genre) => ARCHIVE_GENRES[genre]), record.archiveId].join(' ').normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase();
+  }
   return { manifest: data.manifest, records };
 }
 
@@ -92,6 +131,10 @@ export function selectArchivePage(records, state = {}) {
   });
   found.sort((a, b) => {
     let order = 0;
+    if (state.sort === 'editorial') {
+      const difference = (a.editorial?.rank ?? Infinity) - (b.editorial?.rank ?? Infinity);
+      if (difference) return difference;
+    }
     if (state.sort === 'title') order = a.title.localeCompare(b.title, 'en');
     else if (state.sort === 'oldest') order = (a.year || 9999) - (b.year || 9999);
     else if (state.sort === 'newest') order = (b.year || 0) - (a.year || 0);

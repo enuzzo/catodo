@@ -10,6 +10,15 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.15.0] - 2026-11-23
+
+### ✨ Added
+
+- Explore more Internet Archive recordings in Theatre, with original titles and categories for broadcasts, retro technology, music, home movies and public information films.
+- Start CATODO TV to shuffle enabled Archive editions, advance automatically or change programmes with on-screen controls and arrow keys. An optional overlay shows the current programme and its context.
+- Open Theatre on a random film from the complete playable catalog. Roll the in-player die to choose another film independently of shelf filters.
+- Lead the Films, Featured and Explore archives editorial orders with hand-picked discoveries and original viewing notes.
+
 ## [2.14.0] - 2026-09-22
 
 ### ✨ Added
@@ -286,7 +295,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.14.0...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.15.0...HEAD
+[2.15.0]: https://github.com/enuzzo/catodo/compare/v2.14.0...v2.15.0
 [2.14.0]: https://github.com/enuzzo/catodo/compare/v2.13.0...v2.14.0
 [2.13.0]: https://github.com/enuzzo/catodo/compare/v2.12.0...v2.13.0
 [2.12.0]: https://github.com/enuzzo/catodo/compare/v2.11.1...v2.12.0

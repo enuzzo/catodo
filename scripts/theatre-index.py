@@ -12,10 +12,12 @@ import hashlib
 import html
 from html.parser import HTMLParser
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
 import time
+from tempfile import NamedTemporaryFile
 import unicodedata
 from urllib.parse import urlencode, urlparse, unquote, parse_qs
 
@@ -24,6 +26,14 @@ IA_QUERY = "collection:(feature_films) AND mediatype:(movies)"
 IA_FIELDS = "identifier,title,year,date,creator,genre,subject,licenseurl,rights,avg_rating,num_reviews,downloads,language"
 OC_URL = "https://www.openculture.com/freemoviesonline"
 PDM_URL = "https://publicdomainmovies.info/all-movies/"
+BROADCAST_URL = "https://spelunkr.tv/broadcast/"
+RECORDING_CATEGORIES = {
+    "broadcast-history": r"\b(?:vhs|television|tvprograms|public access|broadcast|commercials|station ident)\b",
+    "retro-technology": r"\b(?:computerchronicles|computersandtechvideos|computer chronicles|retrocomputing|video games?|gaming|computers?)\b",
+    "music-performance": r"\b(?:concerts?|music|performances?|musicians?|bands?)\b",
+    "home-movies": r"\b(?:home[ -]?movies?|amateur films?|family (?:film|footage)|travelogue)\b",
+    "public-information": r"\b(?:prelinger|educational|instructional|civil defen[cs]e|public service|training films?)\b",
+}
 GENRES = {
     "horror": r"\bhorror\b|\bterror\b",
     "science-fiction": r"\bsci[ -]?fi\b|science fiction|\bfantascienza\b",
@@ -302,6 +312,116 @@ def collect_ia(cache):
     raise ValueError("Archive collection exceeds safety bound; no snapshot published")
 
 
+def recording_references(cache):
+    lineup = json.loads(fetch(BROADCAST_URL + "lineup.json", cache))
+    channels = [channel for channel in lineup["channels"]
+                if not any(channel.get(key) for key in ("hidden", "debug", "comingSoon"))]
+    manifests = set()
+    channel_ids = set()
+    for channel in channels:
+        identifier = channel["id"]
+        if (not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", identifier) or len(identifier) > 64
+                or identifier in channel_ids or not channel["versions"]):
+            raise ValueError("Invalid discovery lineup")
+        channel_ids.add(identifier)
+        for version in channel["versions"]:
+            number = version["v"]
+            path = f"manifests/{identifier}/v{number}.json"
+            if type(number) is not int or number < 1 or version["manifest"] != path or (identifier, number, path) in manifests:
+                raise ValueError("Invalid discovery manifest reference")
+            manifests.add((identifier, number, path))
+    if not 0 < len(manifests) <= 256:
+        raise ValueError("Discovery lineup out of bounds")
+
+    def read_manifest(reference):
+        identifier, number, path = reference
+        data = json.loads(fetch(BROADCAST_URL + path, cache))
+        if data["channel"] != identifier or data["version"] != number or not 0 < len(data["items"]) <= 5000:
+            raise ValueError("Incomplete discovery manifest")
+        return {entry["id"] for entry in data["items"]}
+
+    identifiers = set()
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+        for group in pool.map(read_manifest, sorted(manifests)):
+            identifiers.update(group)
+    if not 0 < len(identifiers) <= 20_000 or any(not re.fullmatch(r"[A-Za-z0-9_-][A-Za-z0-9_.-]{0,199}", i) for i in identifiers):
+        raise ValueError("Invalid Archive reference list")
+    return sorted(identifiers)
+
+
+def normalize_recording(item):
+    record = normalize_ia(item)
+    context = " ".join(str(value).replace("_", " ") for field in ("title", "genre", "subject", "collection")
+                       for value in values(item.get(field)) if not str(value).startswith("fav-"))
+    tags = {key for key, pattern in RECORDING_CATEGORIES.items() if re.search(pattern, clean(context, 5000), re.I)}
+    record["genres"] = sorted(tags.union(record["genres"]) - {"unclassified"}) or ["unclassified"]
+    if record["kind"] == "film" and tags & {"broadcast-history", "home-movies"}:
+        record["kind"] = "recording"
+    return record
+
+
+def recording_search_batches(identifiers):
+    def search_url(batch):
+        query = "identifier:(" + " OR ".join(f'"{identifier}"' for identifier in batch) + ")"
+        params = {"q": query, "fl": f"{IA_FIELDS},collection,mediatype,access-restricted-item", "rows": 100, "output": "json"}
+        return "https://archive.org/advancedsearch.php?" + urlencode(params)
+
+    batch = []
+    for identifier in identifiers:
+        if batch and (len(batch) == 100 or len(search_url(batch + [identifier])) > 1800):
+            yield batch, search_url(batch)
+            batch = []
+        batch.append(identifier)
+    if batch:
+        yield batch, search_url(batch)
+
+
+def write_recordings(args):
+    args.cache.mkdir(parents=True, exist_ok=True)
+    identifiers = recording_references(args.cache)
+    found = {}
+    for index, (batch, url) in enumerate(recording_search_batches(identifiers), 1):
+        data = json.loads(fetch(url, args.cache))["response"]
+        if data["numFound"] != len(data["docs"]):
+            raise ValueError("Incomplete Archive metadata batch")
+        for item in data["docs"]:
+            identifier = item["identifier"]
+            # Search can include a differently cased item with the same name.
+            if identifier not in batch:
+                continue
+            if identifier in found:
+                raise ValueError("Repeated Archive metadata identifier")
+            found[identifier] = item
+        if index % 20 == 0:
+            print(f"Archive metadata: {index} batches, {len(found)} items matched", flush=True)
+        time.sleep(.5)
+    for identifier in sorted(set(identifiers) - found.keys()):
+        result = json.loads(fetch(f"https://archive.org/metadata/{identifier}", args.cache))
+        if result and (result.get("error") or result.get("metadata", {}).get("identifier") != identifier):
+            raise ValueError(f"Unexpected Archive metadata response for {identifier}")
+        if result and not result.get("is_dark"):
+            found[identifier] = result["metadata"]
+        time.sleep(1)
+    records = [normalize_recording(item) for item in found.values() if item.get("mediatype") == "movies"
+               and clean(next(iter(values(item.get("title"))), ""))
+               and str(item.get("access-restricted-item", "")).lower() != "true"]
+    if not records:
+        raise ValueError("No public Archive recordings resolved")
+    report = {"schema": 1, "generatedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+              "candidates": len(identifiers), "records": sorted(records, key=lambda record: record["archiveId"])}
+    with NamedTemporaryFile("w", encoding="utf-8", dir=args.output.parent, delete=False) as temporary:
+        path = Path(temporary.name)
+        try:
+            json.dump(report, temporary, ensure_ascii=False, separators=(",", ":"))
+            temporary.write("\n")
+            os.fchmod(temporary.fileno(), 0o644)
+            temporary.close()
+            path.replace(args.output)
+        finally:
+            path.unlink(missing_ok=True)
+    print(f"Archive recordings: {len(records)} public movies from {len(identifiers)} candidate identifiers")
+
+
 def pdm_image(content, source_url):
     for meta in Tree(content).root.walk("meta"):
         if meta.attrs.get("property") != "og:image":
@@ -369,9 +489,13 @@ def write_catalog(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cache", type=Path, required=True, help="Dated scratch cache outside the repository")
-    parser.add_argument("--output", type=Path, default=ROOT / "public/theatre/archive-index.json")
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--recordings", action="store_true", help="Resolve discovery references against Archive metadata")
     parser.add_argument("--archive-input", type=Path)
     parser.add_argument("--oc-input", type=Path)
     parser.add_argument("--pdm-input", type=Path)
     parser.add_argument("--pdm-covers", action="store_true", help="Read public post metadata, at most two requests concurrently")
-    write_catalog(parser.parse_args())
+    args = parser.parse_args()
+    if args.output is None:
+        args.output = ROOT / "public/theatre" / ("archive-recordings.json" if args.recordings else "archive-index.json")
+    (write_recordings if args.recordings else write_catalog)(args)

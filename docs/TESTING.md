@@ -21,7 +21,7 @@ package (check its `engines` if setup fails).
 | Catalog/storage | `node --test tests/data/*.test.js` | Include PHP test for shared-state contracts |
 | Player/audio | `node --test tests/player/*.test.js` | Real gesture, playback, mute/volume and return path |
 | Theatre | `node --test tests/data/theatre-model.test.js tests/player/theatre-player.test.js tests/ui/telemetry-model.test.js` | No media before consent; playback controls, persistent DOM, late live-play isolation, QR decoding, all artwork loading/credits and navigation in real Chromium |
-| Archive discovery | `node --test tests/data/theatre-archive-model.test.js` | Includes Python 3 standard-library parser fixtures; source-count reconciliation, exact-edition approval, URL safety, rating/filter/page behavior. Browser: lazy gzip/plain loading, retry, opt-in images/fallback, all-source search and preserved film DOM in all four viewports |
+| Archive discovery and CATODO TV | `node --test tests/data/theatre-archive-model.test.js tests/player/theatre-player.test.js` | Exact Archive merge, category search and enabled TV editions. Browser: lazy loading and fallback, no media before Start, muted playback, Info, keyboard/buttons, automatic advance and pause on exit in all four viewports |
 | Guide | `node --test tests/epg/*.test.js` | Consent UI and country/status isolation |
 | UI models/copy | `node --test tests/ui/*.test.js tests/i18n/*.test.js` | Render the changed surface at desktop/Tesla baseline and narrow viewport |
 | Appearance | `node --test tests/ui/appearance.test.js` | Auto/browser/clock boundaries, persistence failure, cross-tab changes, listener cleanup and palette contrast. Render all palettes, themed PHP login and populated guide; change theme during decoded playback without replacing videos or changing audio focus |
@@ -36,8 +36,12 @@ storage; do not replace them with live-provider calls.
 
 ## Theatre preview, credits and order
 
-Verify a random initial usable film, followed by stable selection across ordinary
-navigation. In all four viewports and both themes, check the 4:3 artwork frame,
+Verify a random initial usable film from the complete playable shelf, followed
+by stable selection across navigation. The in-frame die ignores filters,
+excludes the current film and keeps the video element. It continues playback
+when the next source origin has already been approved. Verify the editorial
+opening in Films, Featured and Explore archives. In all four viewports and both
+themes, check the 4:3 artwork frame,
 full image containment, the footer controls and popup bounds (at least 60px of
 space above and below the centered dialog). All current previews
 must keep Play fully visible initially on compressed Tesla, including long content

@@ -54,6 +54,7 @@ features and detailed QA results are preserved in
 | CONTENT-03 | Published; physical scan open | Visible source, attribution, exact license and source QR | Local generation and independent decoding; no QR service, tracking or film bundle. Real-phone/Tesla scanning and viewing remain open. See [handoff](work/2026-09-22-theatre-integration.md) |
 | CONTENT-04 | Complete source index integrated; vintage playback remains research | Curated vintage horror and Elvis seasons; stronger official poster coverage | Explore archives indexes 30,067 entries from all returned Archive feature_films records and the direct Open Culture / Public Domain Movies lists, with categories, declared-rights and review filters, opt-in images and provenance. Linked collections are not recursively expanded; this does not add 30,067 playable films. Territory clarification and exact edition review remain open. [Vintage register](work/2026-09-22-theatre-artwork-curation.md) retains Midnight Monsters / Drive-in After Dark / Elvis on Screen; review edition, territory, score and artwork separately |
 | CONTENT-05 | All 305 works playable in-app; source rights remain qualified | Integrate an editorial Featured selection of roughly 300 distinctive works, including about 100 unusual Archive discoveries | Twelve collections, Music/War, search, ordering, source credits and direct Play from cards/details. Corrected wrong works and short/incompatible editions; GitHub reports are linked per work. See [playback release](work/2026-09-22-featured-playback.md). Technical playback does not establish worldwide rights. |
+| CONTENT-06 | Archive discovery, CATODO TV and Theatre editorial refresh implemented | Broaden Archive discovery and shuffle enabled editions in Theatre | [CATODO TV handoff](work/2026-11-23-catodo-tv.md) records data provenance and browser verification. More editions and physical Tesla acceptance remain open. |
 
 ## Engineering candidates
 
@@ -74,3 +75,6 @@ proposal, an implementation and browser/provider/device acceptance. When shipped
 move its behavior to the changelog and leave only genuinely open acceptance here.
 For a task that spans sessions, link a short active work note as described in
 [AGENT-WORKFLOW.md](AGENT-WORKFLOW.md); do not treat old checkboxes as a work queue.
+
+The next joint design review covers UI and UX alignment, hierarchy and copy,
+followed by four or five new light themes and four or five dark themes.

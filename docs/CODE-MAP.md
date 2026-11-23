@@ -66,6 +66,9 @@ media dependency.
 - `src/ui/theatre-artwork.js`: visibility-aware local artwork galleries and motion lifecycle.
 - `src/ui/theatre-archive.js`, `src/data/theatre-archive-model.js`: lazy discovery index, source-image consent, filtering/ranking/pagination and exact reviewed-edition links.
 - `scripts/theatre-index.py`, `scripts/compress-theatre-index.mjs`: reproducible public-directory snapshot and build-time gzip; parser/model fixtures in `tests/data/theatre-archive-model.test.js` and `tests/data/theatre-index-parser.py`.
+- `scripts/theatre-index.py --recordings`: exact Archive item lookup and CATODO recording categories. `theatre-json.js` loads the local snapshots.
+- `src/ui/theatre-tv.js`, `src/data/theatre-tv-model.js`: CATODO TV controls, persistent player, shuffle and exact match against enabled Featured editions.
+- `src/data/theatre-editorial.js`: ordered film and Archive discoveries with original viewing notes. `theatre-model.js` merges playable titles for the Films shelf, preview and in-frame die.
 - `src/data/theatre-collections.js`: original editorial collections and external Archive discovery links.
 - `src/data/theatre-catalog.js`: reviewed edition metadata; evidence in the
   [register](work/2026-09-22-theatre-register.md).

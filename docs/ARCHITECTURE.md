@@ -1,6 +1,6 @@
 # CATODO architecture
 
-This document is the maintainer map for CATODO 2.14.0. It describes the runtime
+This document is the maintainer map for CATODO 2.15.0. It describes the runtime
 boundaries, the data flow, and the invariants that should survive future UI and
 feature work. For task-to-file navigation use [CODE-MAP.md](CODE-MAP.md); for
 focused checks use [TESTING.md](TESTING.md). For operational procedures and
@@ -348,6 +348,29 @@ categories, declared licenses, review counts and source/image references, not
 editorial descriptions. Exact Archive IDs consolidate references; linked film
 collections remain individual collection records rather than fabricated member
 counts. See the [snapshot handoff](work/2026-09-22-theatre-archive-index.md).
+
+The archive view merges the same-origin `theatre/archive-recordings.json` by
+exact Archive item ID. The supplemental snapshot provides Archive metadata
+and CATODO categories inferred from titles, subjects and collections. The
+main archive remains browsable if the supplemental snapshot fails, with Retry
+available. Text-only browsing fetches local data.
+
+`theatre-editorial.js` owns the opening orders and original notes for films and
+Archive discoveries. Films lazily joins the original 29 selections and the
+enabled Featured works. Its initial selection and in-frame die use the full pool,
+while the toolbar randomizer uses the active filters. The die excludes the
+current title and resumes playback for an already-consented origin. A different
+origin opens a new preview and waits for Play. Shelf controls preserve the video
+element. Archive editorial order leads with curated items and uses weighted
+Archive ratings thereafter.
+
+CATODO TV intersects that snapshot with exact Internet Archive item identifiers
+in existing Featured playback editions. It shuffles the eligible programmes
+once per page visit and cycles through the resulting order. Start explicitly
+authorizes media from Archive and begins muted. Previous, Next and the video’s
+end event move within the rotation. One persistent `TheatrePlayer` owns that
+video. Leaving the mode pauses it, and its state persists for manual resume.
+The title overlay and credits use the selected Featured edition's metadata.
 
 Discover's Adrenaline and Documentaries collections operate solely on approved
 catalog records. All matching regional identities remain distinct. Overview rails

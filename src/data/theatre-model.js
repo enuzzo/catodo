@@ -1,5 +1,32 @@
-// Curated works are separate from user-imported live channels and shared state.
+import { FILM_EDITORIAL } from './theatre-editorial.js';
+import { featuredPlaybackTitle } from './theatre-featured-model.js';
+
+// Film works are separate from user-imported live channels and shared state.
 export const THEATRE_FAVORITES_KEY = 'catodo:theatre:favorites:v1';
+
+export function theatrePlayableTitles(curated, featured = []) {
+  const playable = featured.map((record) => ({
+    ...featuredPlaybackTitle(record),
+    editorialId: record.id,
+    year: record.year,
+    duration: record.editions[0].duration,
+    synopsis: record.synopsis,
+    creator: record.creators.join(' · '),
+    languages: record.languages,
+    genres: record.genres,
+    contentNote: record.contentNote,
+    sourceUrl: record.sourceUrl || record.editions[0].sourceUrl,
+    rights: record.rightsNote,
+    license: record.license,
+    licenseUrl: record.licenseUrl,
+    attribution: record.attribution,
+    editionNote: record.editionNote,
+  }));
+  const ranks = (title) => FILM_EDITORIAL.get(title.editorialId || title.id)?.rank ?? Infinity;
+  return [...playable, ...curated.filter((title) => title.decision === 'usable')].map((title) => ({
+    ...title, editorialNote: FILM_EDITORIAL.get(title.editorialId || title.id)?.note,
+  })).sort((a, b) => ranks(a) - ranks(b));
+}
 
 export function filterTheatre(titles, { filter = 'all', collection = [], language = '', query = '', favorites = [], sort = 'editorial' } = {}) {
   const saved = new Set(favorites);
@@ -10,7 +37,7 @@ export function filterTheatre(titles, { filter = 'all', collection = [], languag
     if (filter === 'favorited' && !saved.has(title.id)) return false;
     if (!['all', 'favorited'].includes(filter) && !title.genres.includes(filter)) return false;
     if (language && !title.languages.includes(language)) return false;
-    return !needle || [title.title, title.creator, title.synopsis, ...title.genres]
+    return !needle || [title.title, title.creator, title.synopsis, title.editorialNote, ...title.genres]
       .join(' ').toLocaleLowerCase('en').includes(needle);
   });
   return sortTheatreTitles(filtered, sort);
@@ -42,7 +69,7 @@ export function readTheatreFavorites(storage, titles) {
   try {
     const saved = JSON.parse(storage?.getItem(THEATRE_FAVORITES_KEY) || '[]');
     const known = new Set(titles.map((title) => title.id));
-    return Array.isArray(saved) ? [...new Set(saved.filter((id) => known.has(id)))] : [];
+    return Array.isArray(saved) ? [...new Set(saved.filter((id) => known.has(id) || (typeof id === 'string' && /^featured:[a-z0-9-]+$/.test(id))))] : [];
   } catch { return []; }
 }
 

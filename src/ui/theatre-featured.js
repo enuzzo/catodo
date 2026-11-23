@@ -1,9 +1,9 @@
-import { APP_VERSION } from '../version.js';
+import { loadTheatreJson } from '../data/theatre-json.js';
 import { prepareFeatured, selectFeatured, featuredReportUrl } from '../data/theatre-featured-model.js';
 import { createFeaturedPlayer } from './theatre-featured-player.js';
 
 /** Complete editorial selection and explicit-click playback from credited sources. */
-export function createTheatreFeatured({ t, beforePlay, fetchImpl = (...args) => fetch(...args) }) {
+export function createTheatreFeatured({ t, beforePlay, loadCatalog, fetchImpl = (...args) => fetch(...args) }) {
   const tr = (key, fallback, vars = {}) => t(`featured.${key}`, fallback, vars);
   const node = (tag, cls = '', text) => { const el = document.createElement(tag); el.className = cls; if (text !== undefined) el.textContent = text; return el; };
   const button = (text, cls = 'button button--ghost') => { const el = node('button', cls, text); el.type = 'button'; return el; };
@@ -116,16 +116,13 @@ export function createTheatreFeatured({ t, beforePlay, fetchImpl = (...args) => 
     status.textContent = tr('loading', 'Loading the Featured selection…'); retry.hidden = true;
     loading = (async () => {
       try {
-        const response = await fetchImpl(`./theatre/featured-research.json?v=${encodeURIComponent(APP_VERSION)}`, { signal: events.signal });
-        if (!response.ok || Number(response.headers.get('content-length')) > 2_000_000) throw new Error('Featured unavailable');
-        const text = await response.text(); if (text.length > 2_000_000) throw new Error('Featured too large');
-        data = prepareFeatured(JSON.parse(text));
+        data = loadCatalog ? await loadCatalog() : prepareFeatured(await loadTheatreJson('featured-research.json', { fetchImpl, limit: 2_000_000, signal: events.signal }));
         const add = (el, value, label) => { const option = node('option', '', label); option.value = value; el.append(option); };
         data.collections.forEach((c) => add(collection, c.id, c.title));
         [...new Set(data.records.flatMap((r) => r.genres))].sort().forEach((g) => add(genre, g, t(`filters.${g}`, g.charAt(0).toUpperCase() + g.slice(1))));
         [...new Set(data.records.flatMap((r) => r.languages))].sort().forEach((lang) => { let name = lang; try { name = new Intl.DisplayNames(['en'], { type: 'language' }).of(lang); } catch { /* Preserve source code. */ } add(language, lang, name); });
         tools.hidden = false; meta.hidden = false; status.textContent = ''; render();
-      } catch (error) { if (error.name !== 'AbortError') { status.textContent = tr('failed', 'Featured is temporarily unavailable. Try again or browse Curated films.'); retry.hidden = false; } }
+      } catch (error) { if (error.name !== 'AbortError') { status.textContent = tr('failed', 'Featured is temporarily unavailable. Try again or browse Films.'); retry.hidden = false; } }
       finally { loading = null; }
     })(); return loading;
   }

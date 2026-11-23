@@ -1,8 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { filterTheatre, sortTheatreTitles, randomTheatreTitle, readTheatreFavorites, saveTheatreFavorites } from '../../src/data/theatre-model.js';
+import { filterTheatre, sortTheatreTitles, randomTheatreTitle, readTheatreFavorites, saveTheatreFavorites, theatrePlayableTitles } from '../../src/data/theatre-model.js';
 import { THEATRE_TITLES } from '../../src/data/theatre-catalog.js';
 import { THEATRE_COLLECTIONS } from '../../src/data/theatre-collections.js';
+import { prepareFeatured } from '../../src/data/theatre-featured-model.js';
 import { existsSync, readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
@@ -35,6 +36,18 @@ test('Randomize stays inside the visible collection, avoids repeats and never se
   assert.equal(randomTheatreTitle(films, 'two', () => .999).id, 'one');
   assert.equal(randomTheatreTitle(filterTheatre(films, { filter: 'drama' }), 'two'), null);
   assert.equal(randomTheatreTitle([], 'one'), null);
+});
+test('The full opening pool combines both playable shelves and preserves deliberate editorial leads', () => {
+  const payload = JSON.parse(readFileSync(new URL('../../public/theatre/featured-research.json', import.meta.url)));
+  const { records } = prepareFeatured(payload);
+  const pool = theatrePlayableTitles(THEATRE_TITLES, records);
+  assert.equal(pool.length, records.length + THEATRE_TITLES.length);
+  assert.deepEqual(pool.slice(0, 4).map(({ id }) => id),
+    ['featured:quasi-at-the-quackadero', 'featured:trip-down-market-street', 'featured:one-got-fat', 'code-rush']);
+  assert.ok(pool.every((title) => title.synopsis.trim() && title.editions.length));
+  assert.equal(randomTheatreTitle(pool, pool[0].id, () => 0), pool[1]);
+  assert.deepEqual(readTheatreFavorites({ getItem: () => '["featured:quasi-at-the-quackadero"]' }, THEATRE_TITLES),
+    ['featured:quasi-at-the-quackadero']);
 });
 test('Every active Theatre edition has provenance, original metadata and a local QR asset', () => {
   const ids = new Set();

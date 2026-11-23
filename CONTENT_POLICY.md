@@ -52,6 +52,11 @@ admits an edition to the active player. The curated edition register and explici
 Featured edition catalog supply in-app playback buttons. Similar titles are not merged; an
 exact Archive item identifier can consolidate references to that item.
 
+CATODO TV draws from Featured editions enabled for in-app playback whose exact
+Archive item occurs in the recordings index. Start authorizes sequential playback
+from Internet Archive for that viewing session. The player exposes the current
+edition’s source and credits and pauses on exit.
+
 Do not redistribute the directories' editorial descriptions or film files.
 Unreviewed entries show factual context and link to the source's synopsis and
 edition notes. Source thumbnails are remote, credited and requested only after

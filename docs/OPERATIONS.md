@@ -53,6 +53,19 @@ only the factual `public/theatre/archive-index.json` belongs in the release.
 the build and test the versioned request actually used by the browser. This
 refresh indexes discovery metadata only and never admits new player editions.
 
+Refresh the Archive recordings independently with Python 3 and curl:
+
+```sh
+python3 -B scripts/theatre-index.py --recordings --cache /tmp/catodo-recordings-YYYY-MM-DD
+node --test tests/data/theatre-archive-model.test.js
+```
+
+The indexer resolves candidate identifiers against Internet Archive metadata in
+bounded batches. Review the counts and category coverage before shipping. The
+local `public/theatre/archive-recordings.json` contains Archive titles, item
+identifiers and other factual metadata. The build emits a compressed copy.
+Keep raw responses in the scratch cache and use a fresh cache for a live refresh.
+
 ### Publish a release
 
 Use this checklist when release/publication is in the authorized task scope;

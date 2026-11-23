@@ -2,7 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { prepareArchiveIndex, selectArchivePage, archiveThumbnail, safeArchiveLink } from '../../src/data/theatre-archive-model.js';
+import { prepareArchiveIndex, prepareArchiveRecordings, selectArchivePage, archiveThumbnail, safeArchiveLink } from '../../src/data/theatre-archive-model.js';
+import { prepareFeatured } from '../../src/data/theatre-featured-model.js';
+import { shuffleTvPrograms, theatreTvPrograms } from '../../src/data/theatre-tv-model.js';
 import { THEATRE_TITLES } from '../../src/data/theatre-catalog.js';
 
 const entry = (id, extras = {}) => ({ id, title: 'Café mystery', year: 1940, genres: ['horror'], sources: [{ provider: 'archive', url: `https://archive.org/details/${id}` }], ...extras });
@@ -69,4 +71,42 @@ test('published snapshot reconciles source coverage and keeps reviews separate',
     if (record.archiveId || record.image) assert.ok(archiveThumbnail(record));
     assert.equal(Object.hasOwn(record, 'editions'), false);
   }
+});
+
+test('the recording supplement adds canonical Archive links and merges exact identities', () => {
+  const raw = JSON.parse(readFileSync(new URL('../../public/theatre/archive-index.json', import.meta.url)));
+  const supplemental = prepareArchiveRecordings(JSON.parse(readFileSync(new URL('../../public/theatre/archive-recordings.json', import.meta.url))));
+  const ids = new Set(supplemental.records.map(({ archiveId }) => archiveId));
+  const { records } = prepareArchiveIndex(raw, [], supplemental.records);
+  const references = records.filter(({ archiveId }) => ids.has(archiveId));
+  assert.equal(references.length, ids.size);
+  for (const record of references) {
+    assert.ok(record.sources.some(({ provider, url }) => provider === 'archive' && url === `https://archive.org/details/${record.archiveId}`));
+    assert.equal(record.reviewed, undefined);
+  }
+  const cyber = selectArchivePage(records, { query: 'Cyber Privacy', genre: 'retro-technology' }).records;
+  assert.ok(cyber.some(({ archiveId, title }) => archiveId === 'CyberPri98' && title === 'Cyber Privacy'));
+});
+
+test('invalid or repeated Archive identities reject the recording supplement', () => {
+  const item = entry('ia:sample', { archiveId: 'sample' });
+  const supplemental = { schema: 1, generatedAt: '2026-11-23T05:58:37Z', records: [item] };
+  assert.equal(prepareArchiveRecordings(supplemental).records.length, 1);
+  assert.throws(() => prepareArchiveRecordings({ ...supplemental, records: [item, item] }), /Invalid Archive recording/);
+  assert.throws(() => prepareArchiveRecordings({ ...supplemental, records: [{ ...item, id: 'ia:..', archiveId: '..' }] }), /Invalid Archive recording/);
+});
+
+test('CATODO TV shuffles only already enabled Archive editions found in the recordings index', () => {
+  const read = (name) => JSON.parse(readFileSync(new URL(`../../public/theatre/${name}`, import.meta.url)));
+  const { records } = prepareArchiveRecordings(read('archive-recordings.json'));
+  const featured = prepareFeatured(read('featured-research.json'));
+  const programs = theatreTvPrograms(featured.records, records);
+  assert.ok(programs.length > 1 && programs.length < featured.records.length);
+  const shuffled = shuffleTvPrograms(programs, () => 0);
+  assert.deepEqual(new Set(shuffled), new Set(programs));
+  assert.notDeepEqual(shuffled, programs);
+  const [program] = programs;
+  const editionUrl = new URL(program.record.editions[program.editionIndex].url);
+  assert.equal(editionUrl.hostname, 'archive.org');
+  assert.deepEqual(theatreTvPrograms([program.record], [{ archiveId: 'different-edition' }]), []);
 });
