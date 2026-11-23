@@ -34,8 +34,9 @@ import {
 import { multiviewTelemetry, singleTelemetry, nativeMediaTelemetry } from "./ui/telemetry-model.js";
 import { advanceConnection, connectionView, startConnection } from "./ui/connection-model.js";
 import { resolvePlayerReturnView } from "./ui/view-mode.js";
-import { HOME_FAVORITES_LIMIT, selectInitialHomeChannel } from "./ui/home-selection.js";
+import { HOME_FAVORITES_LIMIT, needsFirstPlaylist, selectInitialHomeChannel } from "./ui/home-selection.js";
 import { favoriteGuidePlan } from "./ui/favorite-guide-model.js";
+import { guideScanCandidates, hasMappedGuide } from "./ui/country-guide-model.js";
 import { defaultMultiviewPresetState, deleteMultiviewPreset, findMultiviewPreset, renameMultiviewPreset } from "./ui/multiview-preset-model.js";
 import { resetWorldMapView, zoomWorldMap } from "./ui/lazy-world-map.js";
 import { categoryOptions } from "./data/channel-categories.js";
@@ -609,6 +610,7 @@ function renderHome() {
   const sync = snapshot.installationSync || {};
   ui.renderHome({
     activate: state.view === "home",
+    firstPlaylist: needsFirstPlaylist(snapshot),
     featured: featured ? { ...decorateChannel(featured), muted: state.homeMuted, autoplay: true } : null,
     channels: worldMix.map(decorateChannel),
     favorites: favorites.slice(0, HOME_FAVORITES_LIMIT),
@@ -696,6 +698,7 @@ function renderExplore() {
   if (featured) state.exploreFeaturedId = channelId(featured);
   ui.renderExplore({
     activate: state.view === "explore",
+    firstPlaylist: needsFirstPlaylist(state.lastCatalog),
     category: state.exploreCategory,
     collections,
     featured: featured ? { ...featured, muted: state.exploreMuted, autoplay: state.view === "explore" } : null,
@@ -935,7 +938,7 @@ function guideCandidateChannels() {
   const codes = new Set(groups.map((group) => group.countryCode || countryCodeForGuideName(group.name)).filter(Boolean));
   const hasCustom = groups.some((group) => group.id === "custom");
   if (hasCustom || !groups.length) {
-    return playableChannels().filter((channel) => channel?.hasGuide || channel?.guides?.length || channel?.endpoints?.some((endpoint) => endpoint?.guides?.length)).slice(0, 320);
+    return guideScanCandidates(playableChannels(), { customSource: hasCustom });
   }
   return playableChannels().filter((channel) => codes.has(inferredCountryCode(channel)));
 }
@@ -962,6 +965,7 @@ function renderAll() {
     view: state.view,
     query: state.query,
     time: formatClock(),
+    hideTelemetry: (state.view === "home" || state.view === "explore") && needsFirstPlaylist(state.lastCatalog),
     signalOk: !state.lastCatalog?.error,
   });
 }
@@ -1053,7 +1057,7 @@ function isPlayerSurfaceActive() {
 
 async function loadSchedules(channels, { force = false, preferMapped = false, sourceUrls } = {}) {
   const values = (Array.isArray(channels) ? channels : []).filter(Boolean);
-  if (!values.length || (!state.epgSources.length && !values.some((channel) => channel?.hasGuide || channel?.guides?.length || channel?.endpoints?.some((endpoint) => endpoint?.guides?.length)))) return;
+  if (!values.length || (!state.epgSources.length && !values.some(hasMappedGuide))) return;
   if (!force && values.every((channel) => state.schedules.has(channelId(channel)))) return;
   state.guideLoading = true;
   state.guideError = "";
@@ -1608,6 +1612,7 @@ async function handleAction(action, detail) {
       if (shouldRandomizeExplore) refreshExploreCollectionSamples();
       renderAll();
       ui.showView(state.view);
+      if (state.view === "theatre" && detail.dataset.film) ui.theatre.previewTitle(detail.dataset.film);
       if (state.view === "sources" && detail.dataset.section) ui.focusSettingsSection(detail.dataset.section);
       if (state.view === "guide") void loadSchedules(guideCandidateChannels());
       if (state.view === "sources" && !state.guideCatalogCountries.length) void loadGuideCatalog();

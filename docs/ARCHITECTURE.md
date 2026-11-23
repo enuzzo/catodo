@@ -1,6 +1,6 @@
 # CATODO architecture
 
-This document is the maintainer map for CATODO 2.15.0. It describes the runtime
+This document is the maintainer map for CATODO 2.16.0. It describes the runtime
 boundaries, the data flow, and the invariants that should survive future UI and
 feature work. For task-to-file navigation use [CODE-MAP.md](CODE-MAP.md); for
 focused checks use [TESTING.md](TESTING.md). For operational procedures and
@@ -63,6 +63,10 @@ CSS tokens and `color-scheme` before page paint; the bundled UI uses its explici
 Settings changes only update root tokens and the appearance controls: they never
 render the application again or touch a media element.
 
+Settings exposes each scheme in a disclosure with native radio buttons. Its
+summary shows the saved palette and marks the scheme actually in use. The
+samples use the same paper, ink and accent tokens as the app and login gate.
+
 `catodo:appearance:v1` in localStorage contains allowlisted mode, Auto source, day
 palette and night palette. It is intentionally excluded from installation sync
 and shared backups. Invalid values fall back to Auto with CATODO Light/Dark; a
@@ -75,6 +79,11 @@ page restoration, storage events and a 30-second clock check keep an open page
 current without GPS, network requests or account preferences.
 
 ## Catalog and identity
+
+`needsFirstPlaylist` uses the complete catalog and the installation sync state.
+Live and Discover show first-visit actions only when the ready installation has
+zero sources and channels. Hydration, failure, recovery and empty filter results
+have separate presentations. Both preview videos stay mounted across these states.
 
 Playlist import follows this sequence:
 
@@ -261,11 +270,15 @@ visit, never silently persisted or inferred from playlist approval.
 The persistent stage and credits trigger share a `.theatre-feature` inside
 `.theatre-opening`, alongside the shelf toolbar. At 1101 CSS pixels and above,
 an unloaded opening uses two columns, with search, collection/language selectors
-and genre chips in matching visual/keyboard order. The player's source state
+and a Genres & favorites disclosure in matching visual/keyboard order. Pick from
+results chooses within those filters, then focuses and reveals the selected film.
+The in-frame die uses the complete playable catalog. The player's source state
 toggles `is-loaded` on both stage and opening: playback uses the full content
 width, and Close restores the two columns without replacing the video. Narrow
 layouts remain stacked. The initial film is picked randomly from usable works;
-returning to Theatre preserves the selection. Idle artwork uses a 4:3 contain
+returning to Theatre preserves the selection. The first-visit Sintel still opens
+its specific preview, including when the viewer previously scrolled away from
+that same film. Idle artwork uses a 4:3 contain
 frame and Play/Favorite/edition controls sit in a footer below image and synopsis.
 The explanatory connection sentence is removed; the explicit Allow source & play
 gesture remains the source-consent boundary.
@@ -395,6 +408,11 @@ site IDs, then compares conservative normalized channel names with XMLTV
 suffix are ignored; aggressive fuzzy matching is intentionally avoided. Source
 diagnostics separately report download success, registry matches and the latest
 programme timestamp, because a valid XML file can contain stale schedules.
+
+The general guide scan preserves its 320-channel budget and prefers mapped
+channels. When the viewer connects a custom XMLTV source, the remaining slots
+also consider plain M3U channels so their identifiers and names can match.
+Country-provider scans continue to use channel country.
 
 The TV Guide exposes a shared horizontal timeline, search, a Favorites-only
 view, honest coverage counts and only channels with programmes in the active

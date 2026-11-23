@@ -12,7 +12,7 @@ export function createAppearanceSettings({ t, appearance }) {
   panel.tabIndex = -1;
   const heading = node('div', 'appearance-settings__heading');
   const copy = node('div');
-  copy.append(node('h2', null, translate('title', 'Appearance')), node('p', null, translate('description', 'A palette for daylight. Another for after dark.')));
+  copy.append(node('h2', null, translate('title', 'Appearance')), node('p', null, translate('description', 'Choose a palette for each mode.')));
   const modes = node('div', 'appearance-modes');
   modes.setAttribute('role', 'group');
   modes.setAttribute('aria-label', translate('mode', 'Color mode'));
@@ -26,27 +26,49 @@ export function createAppearanceSettings({ t, appearance }) {
     return button;
   });
   heading.append(copy, modes);
+  const setSwatch = (swatch, theme) => {
+    for (const token of ['paper', 'ink', 'signal']) swatch.style.setProperty('--swatch-' + token, theme.tokens[token]);
+  };
+  const swatch = () => {
+    const sample = node('span', 'palette-swatch');
+    sample.setAttribute('aria-hidden', 'true');
+    return sample;
+  };
   const choices = node('div', 'appearance-palettes');
   const cards = ['light', 'dark'].map((scheme) => {
     const preference = scheme === 'light' ? 'dayTheme' : 'nightTheme';
-    const card = node('div', 'appearance-palette');
-    const preview = node('div', 'appearance-palette__preview');
-    preview.setAttribute('aria-hidden', 'true');
-    preview.append(node('i'), node('i'), node('i'), node('b'));
-    const label = node('label', 'appearance-palette__label', translate(scheme === 'light' ? 'dayPalette' : 'nightPalette', scheme === 'light' ? 'Day palette' : 'Night palette'));
-    const select = node('select');
-    select.setAttribute('aria-label', label.textContent);
-    select.dataset.action = 'appearance-setting';
-    select.dataset.preference = preference;
+    const family = scheme === 'light' ? translate('dayPalette', 'Day palette') : translate('nightPalette', 'Night palette');
+    const card = node('details', 'appearance-palette');
+    card.setAttribute('name', 'appearance-palettes');
+    const summary = node('summary');
+    const preview = swatch();
+    const names = node('span', 'appearance-palette__names');
+    const selectedName = node('strong');
+    const inUse = node('span', 'appearance-palette__active', translate('inUse', 'In use'));
+    names.append(node('span', null, family), selectedName);
+    const caret = node('i', 'ph ph-caret-down');
+    caret.setAttribute('aria-hidden', 'true');
+    summary.append(preview, names, inUse, caret);
+    const options = node('fieldset', 'appearance-palette__options');
+    options.append(node('legend', 'sr-only', family));
+    const radios = new Map();
     for (const theme of globalThis.CatodoAppearance.THEMES.filter((item) => item.scheme === scheme)) {
-      const option = node('option', null, theme.name);
-      option.value = theme.id;
-      select.append(option);
+      const label = node('label', 'appearance-palette__option');
+      const sample = swatch();
+      setSwatch(sample, theme);
+      const radio = node('input');
+      radio.type = 'radio';
+      radio.name = preference;
+      radio.value = theme.id;
+      radio.dataset.action = 'appearance-setting';
+      radio.dataset.preference = preference;
+      label.append(sample, node('span', null, theme.name), radio);
+      options.append(label);
+      radios.set(theme.id, { radio, theme });
     }
-    label.append(select);
-    card.append(preview, label);
+    card.append(summary, options);
     choices.append(card);
-    return { preference, preview, select };
+    return { scheme, preference, preview, selectedName, inUse, radios };
   });
   const auto = node('div', 'appearance-auto');
   const autoLabel = node('label', 'appearance-auto__label', translate('autoFollows', 'Auto follows'));
@@ -60,7 +82,7 @@ export function createAppearanceSettings({ t, appearance }) {
     autoSource.append(option);
   }
   autoLabel.append(autoSource);
-  const autoHelp = node('p', 'appearance-auto__help', translate('autoHelp', 'If your car’s browser does not follow the display, choose Local time. Day runs from 07:00 to 19:00 on this device.'));
+  const autoHelp = node('p', 'appearance-auto__help', translate('autoHelp', 'Choose Local time if the browser stays light after dark.'));
   autoHelp.id = 'appearance-auto-help';
   autoSource.setAttribute('aria-describedby', autoHelp.id);
   auto.append(autoLabel, autoHelp);
@@ -75,10 +97,12 @@ export function createAppearanceSettings({ t, appearance }) {
       button.classList.toggle('is-active', selected);
       button.setAttribute('aria-pressed', String(selected));
     });
-    cards.forEach(({ preference, preview, select }) => {
-      select.value = preferences[preference];
-      const palette = globalThis.CatodoAppearance.THEMES.find((item) => item.id === select.value);
-      ['paper', 'paper-raised', 'ink', 'signal'].forEach((token) => preview.style.setProperty('--preview-' + token, palette.tokens[token]));
+    cards.forEach((card) => {
+      const selected = card.radios.get(preferences[card.preference]);
+      selected.radio.checked = true;
+      card.selectedName.textContent = selected.theme.name;
+      card.inUse.hidden = card.scheme !== scheme;
+      setSwatch(card.preview, selected.theme);
     });
     autoSource.value = preferences.autoSource;
     auto.hidden = preferences.mode !== 'auto';
@@ -91,7 +115,7 @@ export function createAppearanceSettings({ t, appearance }) {
           : translate('statusManual', 'Manual selection');
     status.textContent = `${theme.name} · ${sourceText}`;
     deviceNote.textContent = persisted
-      ? translate('deviceNote', 'Saved on this browser. Your other screens keep their own appearance.')
+      ? translate('deviceNote', 'Saved on this browser.')
       : translate('sessionNote', 'Browser storage is unavailable. Your choice will last for this session.');
   });
   return { element: panel, destroy: () => unsubscribe?.() };

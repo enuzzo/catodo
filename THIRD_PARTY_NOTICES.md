@@ -32,10 +32,10 @@ locally; `qrencode` is an optional authoring tool, not a shipped runtime depende
 
 ## Appearance palette references
 
-CATODO's semantic UI palettes are original adaptations of these published color
-references. Muted text, status colors and some accents are adjusted for normal-text
-contrast; no editor extension, proprietary Monokai Pro package or remote theme
-service is bundled. Theme names identify their inspiration, not affiliation.
+CATODO Light, CATODO Dark, Newsprint, Rose Glass, Field Guide, Lithograph,
+Amber Monitor, Velvet, Vectorscope and Silver Halide are original CATODO palettes.
+The other six adapt these published references with adjustments for readable
+text, statuses and accents. Their names identify the original color families.
 
 - [Catppuccin Latte and Mocha](https://github.com/catppuccin/palette): Catppuccin contributors, MIT; [published palette](https://raw.githubusercontent.com/catppuccin/palette/main/palette.json).
 - [Dracula](https://draculatheme.com/contribute): Zeno Rocha and Dracula contributors, MIT; classic dark palette.

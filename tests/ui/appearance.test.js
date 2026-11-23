@@ -121,6 +121,25 @@ function luminance(hex) {
 }
 function contrast(a, b) { const pair = [luminance(a), luminance(b)].sort((a, b) => b - a); return (pair[0] + 0.05) / (pair[1] + 0.05); }
 
+test('each new palette can be saved independently and restored when its mode becomes active', () => {
+  const days = ['newsprint', 'rose-glass', 'field-guide', 'lithograph'];
+  const nights = ['amber-monitor', 'velvet', 'vectorscope', 'silver-halide'];
+  assert.equal(new Set(THEMES.map((theme) => theme.id)).size, THEMES.length);
+  const { env } = environment();
+  for (const [index, dayTheme] of days.entries()) {
+    const nightTheme = nights[index];
+    const first = createController(env);
+    first.set({ mode: 'light', dayTheme, nightTheme });
+    first.destroy();
+    const restored = createController(env);
+    assert.equal(restored.getState().theme.id, dayTheme);
+    restored.set({ mode: 'dark' });
+    assert.equal(restored.getState().theme.id, nightTheme);
+    assert.equal(restored.getState().preferences.dayTheme, dayTheme);
+    restored.destroy();
+  }
+});
+
 test('every palette keeps normal text, links, status text and filled-button labels above 4.5:1', () => {
   for (const theme of THEMES) {
     const tokens = theme.tokens;

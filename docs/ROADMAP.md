@@ -1,6 +1,6 @@
 # CATODO roadmap
 
-Resume from the [Featured playback handoff](work/2026-09-22-featured-playback.md) for current publication status.
+Resume from the [Astra UI review](work/2026-11-23-astra-ui-review.md) for current design and device acceptance, and the [CATODO TV handoff](work/2026-11-23-catodo-tv.md) for catalog scope.
 The [appearance handoff](work/2026-09-22-appearance.md) retains theme evidence; the [wide Theatre handoff](work/2026-09-22-theatre-wide-layout.md)
 retains its layout evidence and the [archive index handoff](work/2026-09-22-theatre-archive-index.md)
 retains catalog coverage and the recommended editorial next task.
@@ -30,7 +30,7 @@ features and detailed QA results are preserved in
 | --- | --- | --- | --- |
 | QA-01 | P0 | Native Tesla touch: navigation, Guide drag, fullscreen return, 2/3/4-feed audio focus | Both Tesla browser layouts are now mandatory: 773×601 split and 1254×784 fullscreen simulation, plus 1600×900 baseline. Browser checks are not physical vehicle acceptance |
 | QA-02 | P0 | Real iPhone/iPad Home Screen installation, standalone safe areas, rotation, cookie continuity and system-fullscreen exit; corrected mobile header in Safari | September 390×844 browser checks plus earlier iOS Simulator evidence; no new physical iOS test |
-| QA-04 | P1 | Check whether the parked Tesla browser forwards native display day/night changes to `prefers-color-scheme` | Auto, manual modes, eight palettes and a 07:00–19:00 local-clock option are implemented. Browser emulation establishes app behavior; only the vehicle can establish its signal |
+| QA-04 | P1 | Check whether the parked Tesla browser forwards native display day/night changes to `prefers-color-scheme` | Auto, manual modes, sixteen palettes and a 07:00–19:00 local-clock option are implemented. Browser emulation establishes app behavior. The vehicle's signal and readability under glare require a parked-car check. |
 | QA-03 | P0 | Recheck current EPG country coverage with a bounded, reproducible provider sample | Earlier IT/FR/DE counts and stale feeds are dated; later provider discovery changes shipped |
 | EPG-01 | Decision | Decide whether removing a guide should purge its retained local programme cache | Retention was observed and documented; no new removal policy selected |
 
@@ -76,5 +76,4 @@ move its behavior to the changelog and leave only genuinely open acceptance here
 For a task that spans sessions, link a short active work note as described in
 [AGENT-WORKFLOW.md](AGENT-WORKFLOW.md); do not treat old checkboxes as a work queue.
 
-The next joint design review covers UI and UX alignment, hierarchy and copy,
-followed by four or five new light themes and four or five dark themes.
+The [November design review](work/2026-11-23-astra-ui-review.md) covered UI hierarchy, alignments, wording and four new palettes for each scheme. QA-01, QA-02 and QA-04 track physical acceptance.

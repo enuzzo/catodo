@@ -9,7 +9,7 @@
   "search": {
     "open": "Open search",
     "close": "Close search",
-    "placeholder": "Search channels, countries, languages…",
+    "placeholder": "Search live channels",
     "ariaLabel": "Search channels, countries, and languages"
   },
   "nav": {
@@ -39,7 +39,9 @@
     "syncErrorTitle": "Shared library unavailable",
     "syncErrorBody": "Open Settings to retry shared storage. Queued browser changes remain safe.",
     "restoreErrorTitle": "Saved playlists unavailable",
-    "restoreErrorBody": "The shared list is safe, but its third-party playlists could not be downloaded on this browser."
+    "restoreErrorBody": "The shared list is safe, but its third-party playlists could not be downloaded on this browser.",
+    "firstTitle": "Live television",
+    "firstBody": "Add a playlist to start watching. Choose the world catalog or bring your own M3U link."
   },
   "explore": {
     "title": "Discover the signal",
@@ -86,7 +88,8 @@
         "description": "Real stories, natural history and discoveries from your imported live channels."
       }
     },
-    "viewCollection": "View all"
+    "viewCollection": "View all",
+    "firstTitle": "Discover live channels"
   },
   "footer": {
     "global": "Global",
@@ -165,7 +168,8 @@
     "worldConnected": "Already in your library",
     "worldConnectedBody": "{count} channels in the saved world playlist. Manage or refresh it below.",
     "worldBrowse": "Browse channels",
-    "sections": "Settings sections"
+    "sections": "Settings sections",
+    "openLibrary": "Open library"
   },
   "import": {
     "presetsTitle": "Recommended playlists",
@@ -396,7 +400,7 @@
   "theatre": {
     "eyebrow": "CATODO / CINEMA",
     "title": "Theatre",
-    "description": "Films worth your time. A curated collection with a source behind every story.",
+    "description": "Independent films, animation and discoveries from the archives.",
     "playerLabel": "Film player",
     "shuffleFilm": "Random film from the full catalog",
     "moreFilms": "Show more films",
@@ -670,14 +674,21 @@
       "rightsScope": "Source declarations are recorded as supplied; they are not a guarantee of rights in every country.",
       "mission": "CATODO is a noncommercial project celebrating filmmakers and film history. Rights remain with their respective holders. Contact us to correct credits, report playback issues or request removal.",
       "report": "Report an issue or rights concern on GitHub ↗"
-    }
+    },
+    "browse": "Browse Theatre",
+    "inTheatre": "In Theatre",
+    "previewFilm": "Preview {title} in Theatre",
+    "pickFromResults": "Pick from results",
+    "artworkMotion": "Animate artwork",
+    "genreFilters": "Genres & favorites",
+    "selectedFilter": "Genres & favorites · {filter}"
   },
   "channel": {
     "tuneExploreAriaLabel": "Tune {name} in Discover preview"
   },
   "appearance": {
     "title": "Appearance",
-    "description": "A palette for daylight. Another for after dark.",
+    "description": "Choose a palette for each mode.",
     "mode": "Color mode",
     "auto": "Auto",
     "light": "Light",
@@ -687,12 +698,13 @@
     "autoFollows": "Auto follows",
     "browserPreference": "Browser preference",
     "localTime": "Local time · 07:00–19:00",
-    "autoHelp": "If your car’s browser does not follow the display, choose Local time. Day runs from 07:00 to 19:00 on this device.",
+    "autoHelp": "Choose Local time if the browser stays light after dark.",
     "statusBrowser": "Browser reports {scheme}",
     "statusFallback": "No browser preference available · using local time",
     "statusClock": "Following local time",
     "statusManual": "Manual selection",
-    "deviceNote": "Saved on this browser. Your other screens keep their own appearance.",
-    "sessionNote": "Browser storage is unavailable. Your choice will last for this session."
+    "deviceNote": "Saved on this browser.",
+    "sessionNote": "Browser storage is unavailable. Your choice will last for this session.",
+    "inUse": "In use"
   }
 }

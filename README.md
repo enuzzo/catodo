@@ -1,4 +1,4 @@
-# CATODO 2.15.0
+# CATODO 2.16.0
 
 <img src="public/icons/catodo-netmilk-tv-transparent-512.png" alt="CATODO horned CRT" width="150" align="right">
 
@@ -28,10 +28,11 @@ the version source of truth; maintainers prepare releases with
 ## Experience
 
 - **Soft Signal Grid:** an editorial broadcast UI with electric-blue and EBU accents.
-- **Day and night:** Settings → Appearance offers Light, Dark and **Auto** (the default). Auto follows the browser color preference; choose **Local time** for a 07:00–19:00 day schedule when a car browser does not follow its display. Pick separate day/night palettes from CATODO, Catppuccin Latte/Mocha, Solarized Light/Dark, Dracula and Monokai. Choices stay on that browser, including the login page, and changing a theme preserves playback. The [appearance handoff](docs/work/2026-09-22-appearance.md) records Tesla limits and verification.
+- **Day and night.** Settings → Appearance offers seven day palettes and nine night palettes. Open either group to compare color samples and choose one for that mode. **Auto** follows the browser by default. **Local time** switches to day at 07:00 and night at 19:00. Choices apply to this browser, including the login page, and preserve playback. [Palette guide and review](docs/work/2026-11-23-astra-ui-review.md)
+- **First visit.** Live and Discover offer **Add playlist** and **Browse Theatre** when the installation has no channels or playlists. Select the credited Sintel still to preview that film. Play and playlist import each have their own consent step.
 - **Home Live Anchor:** when a cached catalog is available, the preview at left starts muted and stays live while you explore. Six random suggestions align with its top and bottom edges on wide layouts; **Randomize** refreshes these suggestions without retuning the preview. Use **Random** beside the preview to switch its channel. Home favorites show up to 18 readable cards (three rows of six on wide screens); **More** opens the complete favorite Library when needed. Smaller screens reflow the cards without hiding favorites.
 - **Discover collections:** live discovery starts with **Adrenaline** and **Documentaries**, built from the user-approved imported catalog. Regional Red Bull and other action-sports feed identities stay separate. **All** shows eight-channel previews; **View all** opens the complete category with progressive loading, country filtering and sorting. No VOD catalog or new playlist is imported by this feature.
-- **Theatre:** the Films shelf combines the 29 original selections with the 305 Featured works. The opening preview and the die in the video frame choose from the whole playable shelf. **Randomize** in the toolbar follows the current filters. **Editorial order** opens with hand-picked discoveries and original notes, and the full shelf is searchable and paginated. The persistent player and source credits remain available across browsing. Locally licensed covers and source QR codes appear where available.
+- **Theatre.** The Films shelf combines the 29 original selections with the 305 Featured works. The opening preview and the die in the video frame choose from the whole playable shelf. **Pick from results** selects a film matching the current filters and brings it into view. Open **Genres & favorites** to refine the results. **Editorial order** opens with hand-picked discoveries and original notes. The shelf is searchable and paginated, with a persistent player, source credits, licensed covers and source QR codes where available.
 - **Featured:** play all 305 editorial selections inside CATODO, with twelve thematic collections, Music/War genres, filmmaker/story search, language filters and editorial/year/title ordering. Play from a card or its detail popup; mute, seek and enter fullscreen with native video controls. Sorting and credits preserve the current film; leaving the section pauses it. Source attribution, edition notes and a GitHub contact for playback/rights reports remain available. External media loads only after Play; source imagery remains opt-in. Source declarations do not guarantee rights in every country.
 - **Explore archives:** search Internet Archive, Open Culture and Public Domain Movies on demand. The editorial opening highlights unusual broadcasts, home movies and early-computing finds with original notes. The full index remains searchable by genre, source and other metadata. Results link directly to the source, with optional credited source images.
 - **CATODO TV:** shuffle a selection of enabled Archive recordings in Theatre. Start muted on demand, use Previous and Next or the arrow keys, and let another programme begin automatically at the end. The in-player Info overlay presents the title, year and context, with source and edition credits below the player.
@@ -154,8 +155,7 @@ Treat every imported playlist and stream endpoint as untrusted input. Read [SECU
 ## Maintainer documentation
 
 - [Documentation index](docs/README.md): choose the right guide for the task.
-- [Latest release handoff](docs/work/2026-09-20-release-handoff.md): publication,
-  verification limits and where to resume product work.
+- [Latest UI review and release handoff](docs/work/2026-11-23-astra-ui-review.md) covers the new palettes, compact layouts and device checks.
 - [Agent instructions](AGENTS.md): repository rules and scoped working guides.
 - [Code map](docs/CODE-MAP.md) and [test map](docs/TESTING.md): implementation
   entry points, neighboring checks and evidence limits.

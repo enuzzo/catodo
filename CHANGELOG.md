@@ -10,6 +10,22 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.16.0] - 2026-11-23
+
+### ✨ Added
+
+- Choose from four new day palettes (Newsprint, Rose Glass, Field Guide and Lithograph) and four night palettes (Amber Monitor, Velvet, Vectorscope and Silver Halide). Settings previews each palette and marks the one currently in use.
+- First-time visitors can add a playlist, browse Theatre or preview Sintel directly from Live and Discover.
+
+### 🛠 Changed
+
+- Compact Tesla navigation gives more space to the film and its controls. Theatre groups genres and favorites, separates browsing modes from filters, and brings a film chosen with **Pick from results** into view.
+
+### 🐛 Fixed
+
+- Restored mute and volume to compact live-player layouts. Improved the contrast of saved favorites and Now/Next labels, enlarged favorite buttons and kept Discover category names together.
+- The TV Guide can now match a manually connected XMLTV file to plain M3U channels without a provider guide mapping.
+
 ## [2.15.0] - 2026-11-23
 
 ### ✨ Added
@@ -295,7 +311,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.15.0...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.16.0...HEAD
+[2.16.0]: https://github.com/enuzzo/catodo/compare/v2.15.0...v2.16.0
 [2.15.0]: https://github.com/enuzzo/catodo/compare/v2.14.0...v2.15.0
 [2.14.0]: https://github.com/enuzzo/catodo/compare/v2.13.0...v2.14.0
 [2.13.0]: https://github.com/enuzzo/catodo/compare/v2.12.0...v2.13.0

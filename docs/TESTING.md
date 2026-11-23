@@ -24,7 +24,8 @@ package (check its `engines` if setup fails).
 | Archive discovery and CATODO TV | `node --test tests/data/theatre-archive-model.test.js tests/player/theatre-player.test.js` | Exact Archive merge, category search and enabled TV editions. Browser: lazy loading and fallback, no media before Start, muted playback, Info, keyboard/buttons, automatic advance and pause on exit in all four viewports |
 | Guide | `node --test tests/epg/*.test.js` | Consent UI and country/status isolation |
 | UI models/copy | `node --test tests/ui/*.test.js tests/i18n/*.test.js` | Render the changed surface at desktop/Tesla baseline and narrow viewport |
-| Appearance | `node --test tests/ui/appearance.test.js` | Auto/browser/clock boundaries, persistence failure, cross-tab changes, listener cleanup and palette contrast. Render all palettes, themed PHP login and populated guide; change theme during decoded playback without replacing videos or changing audio focus |
+| Appearance | `node --test tests/ui/appearance.test.js` | Check both saved palettes, native radio arrow keys, inactive-scheme changes and the In use indicator. Render all sixteen palettes, the themed PHP login and a populated guide. Change theme in another tab during decoded playback and check the video node, source, time, volume and mute. |
+| First visit | `node --test tests/ui/home-selection.test.js` | Check Live and Discover with a fresh installation, then import the synthetic playlist with consent. Verify restoration, failures and filters keep their own states. Open the Sintel still twice after scrolling in Theatre and confirm the film is revealed before Play. |
 | PHP state | `node --test tests/php/installation-api.test.js` | Requires PHP; test skips when PHP is absent |
 | Hosting boundary/Worker | `node --test tests/security/*.test.js tests/worker/*.test.js` | Actual hosting routing and configured proxy behavior are separate |
 | One regression | `node --test tests/ui/view-mode.test.js` | Substitute the owning test from CODE-MAP |
@@ -55,6 +56,11 @@ no film media request. During real decoded playback, sorting and credits must
 preserve the video node, source, current time, volume and mute; verify fullscreen
 and Close restore the 4:3 idle frame. Historical expanded-credits checks below
 refer to the former accordion; current behavior is the modal described here.
+
+With a genre selected, use **Pick from results** and verify that the matching
+film comes into view with its heading focused. In compact single-player layouts,
+reveal the controls, adjust the range and toggle mute. Record the observed
+viewport and playback fixture with the result. [November UI review](work/2026-11-23-astra-ui-review.md)
 
 ## Home alignment and favorite limits
 

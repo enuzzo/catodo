@@ -1,7 +1,16 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { channelGuideSetupAction, countryGuideControlState, guideProgrammeFallback } from '../../src/ui/country-guide-model.js';
+import { channelGuideSetupAction, countryGuideControlState, guideProgrammeFallback, guideScanCandidates } from '../../src/ui/country-guide-model.js';
+
+test('a manual XMLTV guide also considers plain playlist channels within the existing scan limit', () => {
+  const plain = Array.from({ length: 350 }, (_, index) => ({ tvgId: 'custom-' + index }));
+  const mapped = { endpoints: [{ guides: [{ siteId: 'provider-id' }] }] };
+  const channels = [...plain, mapped];
+  assert.deepEqual(guideScanCandidates(channels), [mapped]);
+  assert.deepEqual(guideScanCandidates(channels, { customSource: true }), [mapped, ...plain.slice(0, 319)]);
+  assert.deepEqual(guideScanCandidates(plain.slice(0, 2), { customSource: true }), plain.slice(0, 2));
+});
 
 test('country guide discovery remains actionable before a provider lookup', () => {
   assert.deepEqual(countryGuideControlState(), {

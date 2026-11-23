@@ -1,3 +1,16 @@
+const GUIDE_SCAN_LIMIT = 320;
+
+export function hasMappedGuide(channel) {
+  return Boolean(channel?.hasGuide || channel?.guides?.length || channel?.endpoints?.some((endpoint) => endpoint?.guides?.length));
+}
+
+export function guideScanCandidates(channels, { customSource = false } = {}) {
+  const mapped = channels.filter(hasMappedGuide).slice(0, GUIDE_SCAN_LIMIT);
+  if (!customSource || mapped.length === GUIDE_SCAN_LIMIT) return mapped;
+  const unmapped = channels.filter((channel) => !hasMappedGuide(channel));
+  return mapped.concat(unmapped.slice(0, GUIDE_SCAN_LIMIT - mapped.length));
+}
+
 function countryGuideControlState({
   sourceCount = 0,
   configuredCount = 0,

@@ -46,23 +46,23 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
   const view = node('section', 'page page--theatre'); view.dataset.page = 'theatre';
   const intro = node('header', 'theatre-intro');
   const introCopy = node('div');
-  introCopy.append(node('p', 'eyebrow', tr('eyebrow', 'CATODO / CINEMA')), node('h1', '', tr('title', 'Theatre')),
-    node('p', 'theatre-lead', tr('description', 'Films worth your time. A curated collection with a source behind every story.')));
+  introCopy.append(node('h1', '', tr('title', 'Theatre')),
+    node('p', 'theatre-lead', tr('description', 'Independent films, animation and discoveries from the archives.')));
   const count = node('p', 'theatre-count');
-  const introActions = node('div', 'theatre-intro-actions');
-  const randomize = button(tr('randomize', 'Randomize'), 'randomize');
+  const catalogActions = node('div', 'theatre-catalog-actions');
+  const randomize = button(tr('pickFromResults', 'Pick from results'), 'randomize');
   let motionEnabled = true;
   try { motionEnabled = storage?.getItem('catodo:theatre:motion:v1') !== 'off'; } catch { /* Visit preference still works. */ }
-  const motion = button(tr('motion', 'Motion'), 'motion'); motion.setAttribute('aria-pressed', String(motionEnabled));
+  const motion = button(tr('artworkMotion', 'Animate artwork'), 'motion'); motion.setAttribute('aria-pressed', String(motionEnabled));
   motion.title = tr('motionHint', 'Animate visible artwork. Reduced motion and data saver always take priority.');
-  introActions.append(count, randomize, motion);
-  const modes = node('div', 'theatre-modes'); modes.setAttribute('aria-label', tr('browsingMode', 'Theatre browsing mode'));
+  catalogActions.append(count, randomize, motion);
+  const modes = node('div', 'theatre-modes'); modes.setAttribute('role', 'group'); modes.setAttribute('aria-label', tr('browsingMode', 'Theatre browsing mode'));
   const curatedMode = button(tr('curatedMode', 'Films'), 'curated-mode'); curatedMode.setAttribute('aria-pressed', 'true');
   const archiveMode = button(tr('archiveMode', 'Explore archives'), 'archive-mode'); archiveMode.setAttribute('aria-pressed', 'false');
   const featuredMode = button(tr('featuredMode', 'Featured'), 'featured-mode'); featuredMode.setAttribute('aria-pressed', 'false');
   const tvMode = button(tr('tv.title', 'CATODO TV'), 'tv-mode'); tvMode.setAttribute('aria-pressed', 'false');
   modes.append(curatedMode, featuredMode, archiveMode, tvMode);
-  const introTools = node('div', 'theatre-intro-tools'); introTools.append(introActions, modes); intro.append(introCopy, introTools);
+  intro.append(introCopy, modes);
   const stage = node('section', 'theatre-stage'); stage.setAttribute('aria-label', tr('playerLabel', 'Film player'));
   const screen = node('div', 'theatre-screen');
   const video = node('video', 'theatre-video'); video.controls = true; video.preload = 'none'; video.playsInline = true;
@@ -99,7 +99,10 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
   stageFooter.append(editions, actions, coverCredit, controls, status);
   stage.append(screen, info, stageFooter);
   const toolbar = node('div', 'theatre-toolbar');
-  const filters = node('div', 'theatre-filters'); filters.setAttribute('aria-label', tr('filterLabel', 'Film collections'));
+  const facets = node('details', 'theatre-facets');
+  const facetLabel = node('summary');
+  const filters = node('div', 'theatre-filters');
+  facets.append(facetLabel, filters);
   const refinements = node('div', 'theatre-refinements');
   const collection = node('select', 'theatre-select'); collection.setAttribute('aria-label', tr('collection', 'Curated collection'));
   const allCollections = node('option', '', tr('allCollections', 'All collections')); allCollections.value = ''; collection.append(allCollections);
@@ -114,7 +117,7 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
   for (const [value, label] of [['editorial', 'Editorial order'], ['newest', 'Year · newest first'], ['oldest', 'Year · oldest first'], ['title', 'Title · A–Z'], ['shortest', 'Duration · shortest first']]) {
     const option = node('option', '', tr(`sort.${value}`, label)); option.value = value; order.append(option);
   }
-  refinements.append(search, collection, language, order); toolbar.append(refinements, filters);
+  refinements.append(search, collection, language, order); toolbar.append(refinements, facets, catalogActions);
   const grid = node('div', 'theatre-grid'), empty = node('p', 'theatre-empty', tr('empty', 'No films match this selection. Try All or clear your search.'));
   const more = button(tr('moreFilms', 'Show more films'), 'more', 'button button--ghost theatre-more');
   const fetching = node('p', 'theatre-loading', tr('loadingFilms', 'Loading the film catalog…'));
@@ -223,6 +226,10 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
     filters.querySelectorAll('button').forEach((el) => {
       el.setAttribute('aria-pressed', String(el.dataset.filter === state.filter));
     });
+    const activeFilter = filters.querySelector('[aria-pressed="true"]');
+    facetLabel.textContent = state.filter === 'all' || !activeFilter
+      ? tr('genreFilters', 'Genres & favorites')
+      : tr('selectedFilter', 'Genres & favorites · {filter}', { filter: activeFilter.textContent });
     const cards = visible.slice(0, shelfLimit).map((title) => {
       const card = button('', 'select', 'theatre-card'); card.dataset.title = title.id;
       card.dataset.tone = title.tone || 'blue'; card.setAttribute('aria-pressed', String(title.id === selected?.id));
@@ -323,8 +330,10 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
     }).finally(() => { openingRequest = null; });
   }
   function selectTitle(next, { keepPosition = false } = {}) {
-    if (!next || next.id === selected?.id) return;
-    player.clear(); selected = next; editionIndex = 0; renderSelection(); renderShelf();
+    if (!next) return;
+    if (next.id !== selected?.id) {
+      player.clear(); selected = next; editionIndex = 0; renderSelection(); renderShelf();
+    }
     if (!keepPosition) {
       heading.tabIndex = -1; heading.focus({ preventScroll: true }); stage.scrollIntoView({ block: 'start', behavior: 'instant' });
     }
@@ -333,7 +342,7 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
     if (creditDialog.open) creditDialog.close();
     mode = next; const curated = mode === 'curated';
     player.setActive(active && curated);
-    [introActions, opening, grid, archiveGuides, storageNote].forEach((element) => { element.hidden = !curated; });
+    [opening, grid, archiveGuides, storageNote].forEach((element) => { element.hidden = !curated; });
     if (curated) { loadOpening(); renderShelf(); }
     else { empty.hidden = true; more.hidden = true; }
     curatedMode.setAttribute('aria-pressed', String(curated));
@@ -359,7 +368,7 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
         selectTitle(next);
         break;
       }
-      case 'randomize': selectTitle(randomTheatreTitle(filterTheatre(pool, { ...state, favorites }), selected?.id), { keepPosition: true }); break;
+      case 'randomize': selectTitle(randomTheatreTitle(filterTheatre(pool, { ...state, favorites }), selected?.id)); break;
       case 'dice': {
         const next = randomTheatreTitle(pool, selected?.id);
         if (!next) break;
@@ -418,6 +427,12 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
     view,
     get video() { return mode === 'tv' ? tv.video : video; },
     get player() { return mode === 'tv' ? tv.player : player; },
+    previewTitle(id) {
+      const title = pool.find((entry) => entry.id === id);
+      if (!title) return;
+      setMode('curated');
+      selectTitle(title);
+    },
     setActive(value) {
       active = value;
       if (!value && creditDialog.open) creditDialog.close();

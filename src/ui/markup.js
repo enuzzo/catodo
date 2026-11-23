@@ -12,6 +12,7 @@ import { programmeCardNeedsExpansion } from './guide-programme-card.js';
 import { channelGuideSetupAction, countryGuideControlState, guideProgrammeFallback } from './country-guide-model.js';
 import { channelMetadataBadges } from './channel-meta-model.js';
 import { createTheatreView } from './theatre.js';
+import { THEATRE_TITLES } from '../data/theatre-catalog.js';
 import { createSignalEasterEgg } from './signal-easter-egg.js';
 import { createAppearanceSettings } from './appearance-settings.js';
 
@@ -528,7 +529,7 @@ function createHeader(t) {
     name: 'query',
     autocomplete: 'off',
     spellcheck: false,
-    placeholder: translate(t, 'search.placeholder', 'Search channels, countries, languages…'),
+    placeholder: translate(t, 'search.placeholder', 'Search live channels'),
     'aria-label': translate(t, 'search.ariaLabel', 'Search channels, countries, and languages'),
     dataset: { action: 'search-query' },
   });
@@ -585,6 +586,47 @@ function createHeader(t) {
     moreSummary,
     moreMenu,
   };
+}
+
+function createFirstPlaylist(t, view) {
+  const section = element('section', 'first-playlist', { hidden: true });
+  const copy = element('div', 'first-playlist__copy');
+  const actions = element('div', 'first-playlist__actions');
+  actions.append(
+    actionButton({ t, action: 'open-import-dialog', iconName: 'plus', key: 'library.addPlaylist', fallback: 'Add playlist', className: 'button--primary' }),
+    actionButton({ t, action: 'navigate', iconName: 'film-strip', key: 'theatre.browse', fallback: 'Browse Theatre', className: 'button--ghost', dataset: { view: 'theatre' } }),
+  );
+  copy.append(
+    view === 'home'
+      ? textNode('h1', null, t, 'home.firstTitle', 'Live television')
+      : textNode('h1', null, t, 'explore.firstTitle', 'Discover live channels'),
+    textNode('p', null, t, 'home.firstBody', 'Add a playlist to start watching. Choose the world catalog or bring your own M3U link.'),
+    actions,
+  );
+  section.append(copy);
+  const film = THEATRE_TITLES.find((title) => title.id === 'sintel');
+  if (film?.artwork) {
+    const artwork = film.artwork;
+    const figure = element('figure', 'first-playlist__film');
+    const preview = element('button', 'first-playlist__preview', {
+      type: 'button', dataset: { action: 'navigate', view: 'theatre', film: film.id },
+      'aria-label': translate(t, 'theatre.previewFilm', 'Preview {title} in Theatre', { title: film.title }),
+    });
+    const caption = element('span', 'first-playlist__caption');
+    const name = element('strong');
+    name.textContent = film.title;
+    caption.append(textNode('span', null, t, 'theatre.inTheatre', 'In Theatre'), name, icon('arrow-right'));
+    preview.append(element('img', null, { src: artwork.src, alt: '', width: artwork.width, height: artwork.height, loading: 'lazy' }), caption);
+    const credit = element('figcaption');
+    const source = element('a', null, { href: artwork.sourceUrl, target: '_blank', rel: 'noopener noreferrer' });
+    source.textContent = artwork.credit;
+    const license = element('a', null, { href: artwork.licenseUrl, target: '_blank', rel: 'noopener noreferrer' });
+    license.textContent = artwork.license;
+    credit.append(source, ' · ', license);
+    figure.append(preview, credit);
+    section.append(figure);
+  }
+  return section;
 }
 
 function createHomeView(t) {
@@ -724,10 +766,12 @@ function createHomeView(t) {
   const favoriteGrid = element('div', 'channel-grid channel-grid--favorites');
   favorites.append(createSectionTitle(t, 'favorites.title', 'Favorites', favoriteMore), favoriteGrid);
   bottom.append(favorites);
-  view.append(top, bottom);
+  const firstPlaylist = createFirstPlaylist(t, 'home');
+  view.append(firstPlaylist, top, bottom);
 
   return {
     view,
+    firstPlaylist, top, bottom,
     headline,
     liveCount,
     countryCount,
@@ -814,8 +858,9 @@ function createExploreView(t) {
   });
 
   const collections = element('div', 'explore-collections');
-  view.append(intro, hero, filters, collections);
-  return { view, video, hero, heroCollection, heroName, heroMeta, heroSchedule, heroLiveText, mute, fullscreen, watch, favorite, random, surprise, filters, filterButtons, collections };
+  const firstPlaylist = createFirstPlaylist(t, 'explore');
+  view.append(firstPlaylist, intro, hero, filters, collections);
+  return { view, firstPlaylist, intro, video, hero, heroStage, heroCollection, heroName, heroMeta, heroSchedule, heroLiveText, mute, fullscreen, watch, favorite, random, surprise, filters, filterButtons, collections };
 }
 
 function setExploreHero(refs, channel, collection, t) {
@@ -1566,22 +1611,10 @@ function renderGuideSourceManager(refs, state, t) {
 function createSourcesView(t, appearanceController) {
   const view = element('section', 'page page--sources', { dataset: { page: 'sources' }, hidden: true });
   const heading = element('div', 'page-heading');
-  const copy = element('div');
-  copy.append(
-    textNode('p', 'eyebrow', t, 'settings.eyebrow', 'Setup & preferences'),
+  heading.append(
     textNode('h1', null, t, 'settings.title', 'Settings'),
-    textNode('p', 'page-heading__description', t, 'settings.description', 'Manage channel sources, playback routing, and device preferences.'),
+    actionButton({ t, action: 'navigate', iconName: 'books', key: 'settings.openLibrary', fallback: 'Open library', className: 'button--text', dataset: { view: 'library' } }),
   );
-  const back = actionButton({
-    t,
-    action: 'navigate',
-    iconName: 'arrow-left',
-    key: 'common.backToLibrary',
-    fallback: 'Back to library',
-    className: 'button--ghost',
-    dataset: { view: 'library' },
-  });
-  heading.append(copy, back);
 
   const syncStatus = element('section', 'installation-sync-status', {
     role: 'status',
@@ -3499,6 +3532,7 @@ export function mountAppUI(root, options = {}) {
         signalBar.clock.textContent = safeText(state.time);
       }
       if (state.network !== undefined) signalBar.network.dataset.state = safeText(state.network).toLowerCase();
+      if (state.hideTelemetry !== undefined) signalBar.status.hidden = state.hideTelemetry;
       if (state.telemetry) {
         signalBar.downValue.textContent = safeText(state.telemetry.download, '0.00 Mbps');
         signalBar.receivedValue.textContent = safeText(state.telemetry.received, '0 B');
@@ -3543,6 +3577,8 @@ export function mountAppUI(root, options = {}) {
 
     renderHome(state = {}) {
       if (shouldActivateShellView(root.dataset.mode, state.activate)) activateShellView('home');
+      home.firstPlaylist.hidden = !state.firstPlaylist;
+      home.top.hidden = home.bottom.hidden = Boolean(state.firstPlaylist);
       const channels = normaliseArray(state.channels || state.nearbyChannels || state.liveChannels);
       const favorites = normaliseArray(state.favorites);
       const placeholder = state.restoring
@@ -3575,6 +3611,7 @@ export function mountAppUI(root, options = {}) {
       const featured = state.featured || state.currentChannel || channels[0] || placeholder;
       setFeatured(home, featured, t);
       const playable = Boolean(safeId(featured.channelId || featured.id || featured.tvgId || featured.url));
+      home.liveStage.hidden = !playable;
       home.openPlayer.disabled = !playable;
       home.random.disabled = !playable;
       home.favorite.disabled = !playable;
@@ -3651,6 +3688,10 @@ export function mountAppUI(root, options = {}) {
       const featured = state.featured || featuredCollection?.channels?.[0] || placeholder;
       setExploreHero(explore, featured, featuredCollection, t);
       const playable = Boolean(safeId(featured.channelId || featured.id || featured.tvgId || featured.url));
+      explore.firstPlaylist.hidden = !state.firstPlaylist;
+      explore.intro.hidden = explore.filters.hidden = explore.collections.hidden = Boolean(state.firstPlaylist);
+      explore.hero.hidden = !playable && !state.restoring && !state.syncError && !state.restoreError;
+      explore.heroStage.hidden = !playable;
       explore.watch.disabled = !playable;
       explore.fullscreen.disabled = !playable;
       explore.mute.disabled = !playable;
