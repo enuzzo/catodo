@@ -3,11 +3,11 @@ import { THEATRE_COLLECTIONS, THEATRE_ARCHIVE_GUIDES } from '../data/theatre-col
 import { filterTheatre, randomTheatreTitle, readTheatreFavorites, saveTheatreFavorites, theatrePlayableTitles, theatreTime } from '../data/theatre-model.js';
 import { TheatrePlayer } from '../player/theatre-player.js';
 import { createTheatreArtwork } from './theatre-artwork.js';
+import { createSourceImage, setImageCredit } from './theatre-source-image.js';
 import { createTheatreArchive } from './theatre-archive.js';
 import { createTheatreFeatured } from './theatre-featured.js';
 import { createTheatreTv } from './theatre-tv.js';
-import { featuredReportUrl, prepareFeatured } from '../data/theatre-featured-model.js';
-import { loadTheatreJson } from '../data/theatre-json.js';
+import { featuredReportUrl, loadFeaturedCatalog } from '../data/theatre-featured-model.js';
 
 const SHELF_PAGE_SIZE = 24;
 
@@ -35,6 +35,7 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
   };
   let storage;
   try { storage = window.localStorage; } catch { /* Device storage may be unavailable. */ }
+  const imageLabel = (credit) => tr('imageCredit', 'Image: {credit}', { credit });
   let favorites = readTheatreFavorites(storage, titles);
   let pool = theatrePlayableTitles(titles);
   let selected = null, shelfLimit = SHELF_PAGE_SIZE, catalogReady = false, catalogRequest, openingRequest;
@@ -46,8 +47,8 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
   const view = node('section', 'page page--theatre'); view.dataset.page = 'theatre';
   const intro = node('header', 'theatre-intro');
   const introCopy = node('div');
-  introCopy.append(node('h1', '', tr('title', 'Theatre')),
-    node('p', 'theatre-lead', tr('description', 'Independent films, animation and discoveries from the archives.')));
+  const lead = node('p', 'theatre-lead', tr('description', 'Watch the film selection here. Find more recordings in Explore archives.'));
+  introCopy.append(node('h1', '', tr('title', 'Theatre')), lead);
   const count = node('p', 'theatre-count');
   const catalogActions = node('div', 'theatre-catalog-actions');
   const randomize = button(tr('pickFromResults', 'Pick from results'), 'randomize');
@@ -68,14 +69,14 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
   const video = node('video', 'theatre-video'); video.controls = true; video.preload = 'none'; video.playsInline = true;
   video.setAttribute('aria-label', tr('playerLabel', 'Film player'));
   const curtain = node('div', 'theatre-curtain');
-  const cover = node('img', 'theatre-cover'); cover.alt = ''; cover.decoding = 'async';
+  let cover = null;
   const titleCover = node('p', 'theatre-cover-title'); titleCover.setAttribute('aria-hidden', 'true');
   const coverCredit = node('a', 'theatre-cover-credit'); coverCredit.target = '_blank'; coverCredit.rel = 'noopener noreferrer';
   const dice = button('', 'dice', 'theatre-dice');
-  const diceLabel = tr('shuffleFilm', 'Random film from the full catalog');
+  const diceLabel = tr('shuffleFilm', 'Random film from the full film selection');
   dice.title = diceLabel; dice.setAttribute('aria-label', diceLabel);
   const diceIcon = node('i', 'ph ph-dice-five'); diceIcon.setAttribute('aria-hidden', 'true'); dice.append(diceIcon);
-  curtain.append(cover, titleCover);
+  curtain.append(titleCover);
   screen.append(video, curtain, dice);
   const info = node('div', 'theatre-info');
   const meta = node('p', 'theatre-meta'), heading = node('h2'), creator = node('p', 'theatre-creator');
@@ -118,7 +119,10 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
     const option = node('option', '', tr(`sort.${value}`, label)); option.value = value; order.append(option);
   }
   refinements.append(search, collection, language, order); toolbar.append(refinements, facets, catalogActions);
-  const grid = node('div', 'theatre-grid'), empty = node('p', 'theatre-empty', tr('empty', 'No films match this selection. Try All or clear your search.'));
+  const grid = node('div', 'theatre-grid'), empty = node('div', 'theatre-empty');
+  const searchArchive = button(tr('searchArchives', 'Search the archives'), 'search-archives');
+  empty.append(node('p', '', tr('empty', 'No films match this selection.')),
+    button(tr('clearFilters', 'Clear film filters'), 'clear-filters'), searchArchive);
   const more = button(tr('moreFilms', 'Show more films'), 'more', 'button button--ghost theatre-more');
   const fetching = node('p', 'theatre-loading', tr('loadingFilms', 'Loading the film catalog…'));
   fetching.setAttribute('role', 'status');
@@ -166,15 +170,15 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
       link(tr('browseArchive', 'Browse on Archive.org ↗'), guide.sourceUrl), link(guide.curator, guide.curatorUrl)); guideGrid.append(item);
   });
   archiveGuides.append(guideGrid);
-  const archiveCatalog = createTheatreArchive({ t: tr, titles, onReviewed(title) {
-    setMode('curated'); selectTitle(pool.find((entry) => entry.id === title.id)); stage.scrollIntoView({ block: 'start', behavior: 'instant' });
+  const archiveCatalog = createTheatreArchive({ t: tr, titles, loadTitles: async () => theatrePlayableTitles(titles, (await loadCatalog()).records), onReviewed(title, edition) {
+    setMode('curated'); selectTitle(title, { edition });
   } });
   function loadCatalog() {
-    return catalogRequest ??= loadTheatreJson('featured-research.json', { limit: 2_000_000, signal: events.signal })
-      .then(prepareFeatured).catch((error) => { catalogRequest = null; throw error; });
+    return catalogRequest ??= loadFeaturedCatalog({ signal: events.signal })
+      .catch((error) => { catalogRequest = null; throw error; });
   }
   const featuredCatalog = createTheatreFeatured({ t: tr, beforePlay, loadCatalog });
-  const tv = createTheatreTv({ t: tr, beforePlay });
+  const tv = createTheatreTv({ t: tr, beforePlay, loadCatalog });
   const opening = node('div', 'theatre-opening');
   const feature = node('div', 'theatre-feature'); feature.append(fetching, stage, credits);
   opening.append(feature, toolbar);
@@ -222,7 +226,9 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
     const visible = filterTheatre(pool, { ...state, favorites });
     randomize.disabled = !visible.some((title) => title.id !== selected?.id);
     dice.disabled = !pool.some((title) => title.id !== selected?.id);
-    count.textContent = visible.length === 1 ? tr('countOne', '1 film') : tr('count', '{count} films', { count: visible.length });
+    count.textContent = visible.length === pool.length
+      ? tr('filmSelectionCount', '{count} films in this selection', { count: visible.length })
+      : tr('matchingFilms', '{count} of {total} films', { count: visible.length, total: pool.length });
     filters.querySelectorAll('button').forEach((el) => {
       el.setAttribute('aria-pressed', String(el.dataset.filter === state.filter));
     });
@@ -247,6 +253,14 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
         imageCredit.className = 'theatre-image-credit';
         artwork.append(photo); card.append(artwork); wrapper.append(imageCredit);
         artworkMotion.add(artwork, photo, imageCredit, title);
+      } else if (active && mode === 'curated' && title.image) {
+        const artwork = node('span', 'theatre-card__art');
+        const credit = link('', title.image.sourceUrl); credit.className = 'theatre-image-credit'; credit.hidden = true;
+        artwork.append(createSourceImage(title, { className: 'theatre-card__image', onDisplay(art) {
+          setImageCredit(credit, art, imageLabel);
+          if (!art) { artwork.remove(); card.classList.add('theatre-card--text'); }
+        } }));
+        card.append(artwork); wrapper.append(credit);
       } else card.classList.add('theatre-card--text');
       card.append(label, saved);
       return wrapper;
@@ -254,21 +268,38 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
     grid.replaceChildren(...cards);
     more.hidden = mode !== 'curated' || visible.length <= shelfLimit;
     empty.hidden = mode !== 'curated' || cards.length > 0;
+    searchArchive.hidden = !state.query.trim();
+  }
+  function renderStageArt() {
+    cover?.remove();
+    cover = null;
+    video.removeAttribute('poster');
+    setImageCredit(coverCredit, null, imageLabel);
+    if (!selected) return;
+    titleCover.textContent = selected.title;
+    titleCover.hidden = Boolean(selected.artwork);
+    const art = selected.artwork;
+    if (art) {
+      cover = node('img', 'theatre-cover'); cover.alt = ''; cover.decoding = 'async';
+      cover.src = art.src; cover.width = art.width; cover.height = art.height;
+      setImageCredit(coverCredit, art, imageLabel);
+      video.poster = art.src;
+    } else if (active && mode === 'curated' && selected.image) {
+      const photo = createSourceImage(selected, { className: 'theatre-cover theatre-cover--source', lazy: false, onDisplay(displayed) {
+        if (photo !== cover) return;
+        setImageCredit(coverCredit, displayed, imageLabel);
+        if (displayed) video.poster = displayed.url;
+      } });
+      cover = photo;
+    }
+    if (cover) curtain.prepend(cover);
   }
   function renderSelection() {
     if (!selected) { stage.hidden = true; credits.hidden = true; return; }
     stage.hidden = false; credits.hidden = false;
     heading.textContent = selected.title;
+    renderStageArt();
     const art = selected.artwork;
-    cover.hidden = coverCredit.hidden = !art; titleCover.hidden = Boolean(art);
-    if (art) {
-      cover.src = art.src; cover.width = art.width; cover.height = art.height;
-      coverCredit.textContent = tr('imageCredit', 'Image: {credit}', { credit: art.credit });
-      coverCredit.href = art.sourceUrl;
-    } else {
-      cover.removeAttribute('src');
-      titleCover.textContent = selected.title;
-    }
     const edition = selected.editions[editionIndex];
     meta.textContent = [selected.year, theatreTime(edition.duration ?? selected.duration), selected.languages.map((code) => tr(`languages.${code}`, code)).join(', ')].filter(Boolean).join(' / ');
     creator.textContent = selected.creator; creator.hidden = !selected.creator;
@@ -297,6 +328,9 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
     if (selected.attribution) rights.append(node('p', 'theatre-attribution', selected.attribution));
     if (art) rights.append(node('p', '', tr('artworkNote', 'Cover image: {note}', { note: art.note })),
       link(tr('artworkSource', 'Image source'), art.sourceUrl), document.createTextNode(' · '), link(art.license, art.licenseUrl));
+    for (const image of [selected.image, selected.frame].filter(Boolean)) {
+      rights.append(link(imageLabel(image.credit), image.sourceUrl));
+    }
     for (const alternate of selected.artworks || []) {
       rights.append(node('p', '', alternate.note), link(alternate.credit, alternate.sourceUrl),
         document.createTextNode(' · '), link(alternate.license, alternate.licenseUrl));
@@ -329,10 +363,10 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
       if (!selected) selectTitle(randomTheatreTitle(pool), { keepPosition: true });
     }).finally(() => { openingRequest = null; });
   }
-  function selectTitle(next, { keepPosition = false } = {}) {
+  function selectTitle(next, { keepPosition = false, edition } = {}) {
     if (!next) return;
-    if (next.id !== selected?.id) {
-      player.clear(); selected = next; editionIndex = 0; renderSelection(); renderShelf();
+    if (next.id !== selected?.id || (edition !== undefined && editionIndex !== edition)) {
+      player.clear(); selected = next; editionIndex = edition ?? 0; renderSelection(); renderShelf();
     }
     if (!keepPosition) {
       heading.tabIndex = -1; heading.focus({ preventScroll: true }); stage.scrollIntoView({ block: 'start', behavior: 'instant' });
@@ -341,9 +375,10 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
   function setMode(next) {
     if (creditDialog.open) creditDialog.close();
     mode = next; const curated = mode === 'curated';
+    lead.hidden = !curated;
     player.setActive(active && curated);
     [opening, grid, archiveGuides, storageNote].forEach((element) => { element.hidden = !curated; });
-    if (curated) { loadOpening(); renderShelf(); }
+    if (curated) { loadOpening(); renderStageArt(); renderShelf(); }
     else { empty.hidden = true; more.hidden = true; }
     curatedMode.setAttribute('aria-pressed', String(curated));
     featuredMode.setAttribute('aria-pressed', String(mode === 'featured'));
@@ -361,6 +396,18 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
       case 'close-credits': creditDialog.close(); break;
       case 'curated-mode': setMode('curated'); break;
       case 'archive-mode': setMode('archive'); break;
+      case 'search-archives':
+        archiveCatalog.searchAll(state.query.trim());
+        setMode('archive');
+        archiveMode.focus();
+        break;
+      case 'clear-filters':
+        state.query = search.value = '';
+        state.language = language.value = '';
+        state.filter = 'all'; state.collection = []; collection.value = '';
+        shelfLimit = SHELF_PAGE_SIZE;
+        renderShelf(); search.focus();
+        break;
       case 'featured-mode': setMode('featured'); break;
       case 'tv-mode': setMode('tv'); break;
       case 'select': {
@@ -434,10 +481,11 @@ export function createTheatreView({ t, beforePlay, titles = THEATRE_TITLES } = {
       selectTitle(title);
     },
     setActive(value) {
+      if (active === value) return;
       active = value;
       if (!value && creditDialog.open) creditDialog.close();
       player.setActive(value && mode === 'curated'); artworkMotion.setActive(value && mode === 'curated');
-      if (value && mode === 'curated') loadOpening();
+      if (value && mode === 'curated') { loadOpening(); renderStageArt(); renderShelf(); }
       archiveCatalog.setActive(value && mode === 'archive'); featuredCatalog.setActive(value && mode === 'featured');
       tv.setActive(value && mode === 'tv');
     },

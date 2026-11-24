@@ -40,6 +40,15 @@ class DirectoryTests(unittest.TestCase):
         self.assertEqual(records[0]["genres"], ["horror", "science-fiction"])
         self.assertEqual(records[0]["rights"]["status"], "public-domain-us")
 
+    def test_recording_categories_follow_archive_collections_and_subjects(self):
+        tape = indexer.normalize_recording({"identifier": "quiz", "title": "Studio recording", "collection": ["gameshows", "vhsvault", "fav-film_noir"]})
+        self.assertEqual(tape["genres"], ["game-shows", "vhs"])
+        self.assertEqual(tape["kind"], "recording")
+        cartoon = indexer.normalize_recording({"identifier": "short", "title": "Studio short", "collection": "animationandcartoons"})
+        self.assertIn("animation", cartoon["genres"])
+        unsorted = indexer.normalize_recording({"identifier": "unknown", "title": "Copy 2", "collection": ["opensource_movies", "fav-gameshows"]})
+        self.assertEqual(unsorted["genres"], ["unclassified"])
+
     def test_missing_directory_fails_instead_of_empty_publication(self):
         for parser in (indexer.parse_oc, indexer.parse_pdm):
             with self.assertRaises(ValueError):

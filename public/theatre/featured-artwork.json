@@ -1,0 +1,3952 @@
+{
+  "schemaVersion": 1,
+  "works": {
+    "1999-ad": {
+      "edition": "https://archive.org/download/1999-AD-1967-/1999-a-d-1967-10mbps.mp4",
+      "image": {
+        "url": "https://archive.org/download/1999-AD-1967-/1999-AD-1967-.thumbs/1999-a-d-1967-10mbps_000954.jpg",
+        "sourceUrl": "https://archive.org/details/1999-AD-1967-",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "20000-leagues-1916": {
+      "edition": "https://archive.org/download/20000LeaguesUndertheSea/20000_Leagues_Under_the_Sea_512kb.mp4",
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Poster_-_20%2C000_Leagues_under_the_Sea_%281916%29.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Poster_-_20,000_Leagues_under_the_Sea_(1916).jpg",
+        "credit": "Universal Film Manufacturing Company",
+        "kind": "poster",
+        "width": 219,
+        "height": 300
+      },
+      "frame": {
+        "url": "https://archive.org/download/20000LeaguesUndertheSea/20000LeaguesUndertheSea.thumbs/20000_Leagues_Under_the_Sea_002280.jpg",
+        "sourceUrl": "https://archive.org/details/20000LeaguesUndertheSea",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "a-bucket-of-blood": {
+      "edition": "https://archive.org/download/ABucketofBlood/Bucket_1959_512kb.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/A_Bucket_of_Blood_%281959_film_poster%29.png/500px-A_Bucket_of_Blood_%281959_film_poster%29.png",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:A_Bucket_of_Blood_(1959_film_poster).png",
+        "credit": "American International Pictures",
+        "kind": "poster",
+        "width": 500,
+        "height": 759
+      },
+      "frame": {
+        "url": "https://archive.org/download/ABucketofBlood/ABucketofBlood.thumbs/Bucket_1959_001500.jpg",
+        "sourceUrl": "https://archive.org/details/ABucketofBlood",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "a-case-of-spring-fever": {
+      "edition": "https://archive.org/download/CaseofSp1940/CaseofSp1940.mp4",
+      "image": {
+        "url": "https://archive.org/download/CaseofSp1940/CaseofSp1940.thumbs/CaseofSp1940_000180.jpg",
+        "sourceUrl": "https://archive.org/details/CaseofSp1940",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "a-challenge-to-democracy": {
+      "edition": "https://archive.org/download/Challeng1944/Challeng1944.mp4",
+      "image": {
+        "url": "https://archive.org/download/Challeng1944/Challeng1944.thumbs/Challeng1944_000420.jpg",
+        "sourceUrl": "https://archive.org/details/Challeng1944",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "a-child-went-forth": {
+      "edition": "https://archive.org/download/ChildWen1942/ChildWen1942.mp4",
+      "image": {
+        "url": "https://archive.org/download/ChildWen1942/ChildWen1942.thumbs/ChildWen1942_000480.jpg",
+        "sourceUrl": "https://archive.org/details/ChildWen1942",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "a-coach-for-cinderella": {
+      "edition": "https://archive.org/download/Coachfor1936/Coachfor1936.mp4",
+      "image": {
+        "url": "https://archive.org/download/Coachfor1936/Coachfor1936.thumbs/Coachfor1936_000210.jpg",
+        "sourceUrl": "https://archive.org/details/Coachfor1936",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "a-date-with-your-family": {
+      "edition": "https://archive.org/download/DateWith1950/DateWith1950.mp4",
+      "image": {
+        "url": "https://archive.org/download/DateWith1950/DateWith1950.thumbs/DateWith1950_000240.jpg",
+        "sourceUrl": "https://archive.org/details/DateWith1950",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "a-day-called-x": {
+      "edition": "https://archive.org/download/ADayCalledx/DayCalledX_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/ADayCalledx/ADayCalledx.thumbs/DayCalledX_000600.jpg",
+        "sourceUrl": "https://archive.org/details/ADayCalledx",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "a-day-in-the-death-of-donny-b": {
+      "edition": "https://archive.org/download/DayInTheDeathofDonny/DayIntheDeathofDonny.mp4",
+      "image": {
+        "url": "https://archive.org/download/DayInTheDeathofDonny/DayInTheDeathofDonny.thumbs/DayIntheDeathofDonny_000120.jpg",
+        "sourceUrl": "https://archive.org/details/DayInTheDeathofDonny",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "a-day-of-thanksgiving": {
+      "edition": "https://archive.org/download/DayofTha1951/DayofTha1951.mp4",
+      "image": {
+        "url": "https://archive.org/download/DayofTha1951/DayofTha1951.thumbs/DayofTha1951_000270.jpg",
+        "sourceUrl": "https://archive.org/details/DayofTha1951",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "a-is-for-atom": {
+      "edition": "https://archive.org/download/isforAto1953/isforAto1953.mp4",
+      "image": {
+        "url": "https://archive.org/download/isforAto1953/isforAto1953.thumbs/isforAto1953_000240.jpg",
+        "sourceUrl": "https://archive.org/details/isforAto1953",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "a-page-of-madness": {
+      "edition": "https://archive.org/download/a.-page.-of.-madness.-1926/A%20Page%20Of%20Madness%20%281926%29/A.Page.Of.Madness.1926.mp4",
+      "image": {
+        "url": "https://archive.org/download/a.-page.-of.-madness.-1926/a.-page.-of.-madness.-1926.thumbs/A%20Page%20Of%20Madness%20%281926%29/A.Page.Of.Madness.1926_002580.jpg",
+        "sourceUrl": "https://archive.org/details/a.-page.-of.-madness.-1926",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 554
+      }
+    },
+    "a-short-vision": {
+      "edition": "https://archive.org/download/a-short-vision-1956-bfi-national-archive/A%20Short%20Vision%20%281956%29%20_%20BFI%20National%20Archive.mp4",
+      "image": {
+        "url": "https://archive.org/download/a-short-vision-1956-bfi-national-archive/a-short-vision-1956-bfi-national-archive.thumbs/A%20Short%20Vision%20%281956%29%20_%20BFI%20National%20Archive_000237.jpg",
+        "sourceUrl": "https://archive.org/details/a-short-vision-1956-bfi-national-archive",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 636,
+        "height": 480
+      }
+    },
+    "a-word-to-the-wives": {
+      "edition": "https://archive.org/download/Wordtoth1955/Wordtoth1955.mp4",
+      "image": {
+        "url": "https://archive.org/download/Wordtoth1955/Wordtoth1955.thumbs/Wordtoth1955_000300.jpg",
+        "sourceUrl": "https://archive.org/details/Wordtoth1955",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "about-bananas": {
+      "edition": "https://archive.org/download/AboutBan1935/AboutBan1935.mp4",
+      "image": {
+        "url": "https://archive.org/download/AboutBan1935/AboutBan1935.thumbs/AboutBan1935_000240.jpg",
+        "sourceUrl": "https://archive.org/details/AboutBan1935",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "about-fallout": {
+      "edition": "https://archive.org/download/AboutFal1963/AboutFal1963.mp4",
+      "image": {
+        "url": "https://archive.org/download/AboutFal1963/AboutFal1963.thumbs/AboutFal1963_000540.jpg",
+        "sourceUrl": "https://archive.org/details/AboutFal1963",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "aelita": {
+      "edition": "https://archive.org/download/AelitaQueenOfMarsoriginalVersion/AelitaQueenOfMarsoriginalVersion.mp4",
+      "image": {
+        "url": "https://archive.org/download/AelitaQueenOfMarsoriginalVersion/AelitaQueenOfMarsoriginalVersion.thumbs/AelitaQueenOfMarsoriginalVersion_002550.jpg",
+        "sourceUrl": "https://archive.org/details/AelitaQueenOfMarsoriginalVersion",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "all-about-polymorphics": {
+      "edition": "https://archive.org/download/AllAboutPolymorphics/AllAboutPolymorphics.mp4",
+      "image": {
+        "url": "https://archive.org/download/AllAboutPolymorphics/AllAboutPolymorphics.thumbs/AllAboutPolymorphics_000120.jpg",
+        "sourceUrl": "https://archive.org/details/AllAboutPolymorphics",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "american-look": {
+      "edition": "https://archive.org/download/American1958/American1958.mp4",
+      "image": {
+        "url": "https://archive.org/download/American1958/American1958.thumbs/American1958_000270.jpg",
+        "sourceUrl": "https://archive.org/details/American1958",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "anemic-cinema": {
+      "edition": "https://archive.org/download/anemicCinema1926/AnemicCinema1926marcelDuchamp.mp4",
+      "image": {
+        "url": "https://archive.org/download/anemicCinema1926/anemicCinema1926.thumbs/AnemicCinema1926marcelDuchamp_000147.jpg",
+        "sourceUrl": "https://archive.org/details/anemicCinema1926",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "angels-flight": {
+      "edition": "https://archive.org/download/0872_Angels_Flight_05_32_34_00/0872_Angels_Flight_05_32_34_00.mp4",
+      "image": {
+        "url": "https://archive.org/download/0872_Angels_Flight_05_32_34_00/0872_Angels_Flight_05_32_34_00.thumbs/0872_Angels_Flight_05_32_34_00_000465.jpg",
+        "sourceUrl": "https://archive.org/details/0872_Angels_Flight_05_32_34_00",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "ansel-adams-photographer": {
+      "edition": "https://archive.org/download/AnselAdamsPhotographer/AnselAdamsPhotographer.mp4",
+      "image": {
+        "url": "https://archive.org/download/AnselAdamsPhotographer/AnselAdamsPhotographer.thumbs/AnselAdamsPhotographer_000450.jpg",
+        "sourceUrl": "https://archive.org/details/AnselAdamsPhotographer",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "are-you-ready-for-marriage": {
+      "edition": "https://archive.org/download/AreYouRe1950/AreYouRe1950.mp4",
+      "image": {
+        "url": "https://archive.org/download/AreYouRe1950/AreYouRe1950.thumbs/AreYouRe1950_000360.jpg",
+        "sourceUrl": "https://archive.org/details/AreYouRe1950",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "arrivee-train-ciotat": {
+      "edition": "https://archive.org/download/arrival-of-a-train-at-la-ciotat-1895-animation-mp-4/Arrival%20of%20a%20Train%20at%20La%20Ciotat%201895%20animation%20mp4.mp4",
+      "image": {
+        "url": "https://archive.org/download/arrival-of-a-train-at-la-ciotat-1895-animation-mp-4/arrival-of-a-train-at-la-ciotat-1895-animation-mp-4.thumbs/Arrival%20of%20a%20Train%20at%20La%20Ciotat%201895%20animation%20mp4_000016.jpg",
+        "sourceUrl": "https://archive.org/details/arrival-of-a-train-at-la-ciotat-1895-animation-mp-4",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "as-boys-grow": {
+      "edition": "https://archive.org/download/AsBoysGr1957/AsBoysGr1957.mp4",
+      "image": {
+        "url": "https://archive.org/download/AsBoysGr1957/AsBoysGr1957.thumbs/AsBoysGr1957_000360.jpg",
+        "sourceUrl": "https://archive.org/details/AsBoysGr1957",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "atomic-alert": {
+      "edition": "https://archive.org/download/AtomicAl1951/AtomicAl1951.mp4",
+      "image": {
+        "url": "https://archive.org/download/AtomicAl1951/AtomicAl1951.thumbs/AtomicAl1951_000240.jpg",
+        "sourceUrl": "https://archive.org/details/AtomicAl1951",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "autobiography-of-a-jeep": {
+      "edition": "https://archive.org/download/autobiography_of_a_jeep/autobiography_of_a_jeep.mp4",
+      "image": {
+        "url": "https://archive.org/download/autobiography_of_a_jeep/autobiography_of_a_jeep.thumbs/autobiography_of_a_jeep_000210.jpg",
+        "sourceUrl": "https://archive.org/details/autobiography_of_a_jeep",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "ballet-mecanique": {
+      "edition": "https://archive.org/download/BalletMecanique_1924_Man_Ray_Fernand_Leger_Dudley_Murphy_DADA_Visual_Poetry/Ballet%2520Mecanique%2520%281924%29-SD.mp4",
+      "image": {
+        "url": "https://archive.org/download/BalletMecanique_1924_Man_Ray_Fernand_Leger_Dudley_Murphy_DADA_Visual_Poetry/BalletMecanique_1924_Man_Ray_Fernand_Leger_Dudley_Murphy_DADA_Visual_Poetry.thumbs/Ballet%2520Mecanique%2520%281924%29-SD_000195.jpg",
+        "sourceUrl": "https://archive.org/details/BalletMecanique_1924_Man_Ray_Fernand_Leger_Dudley_Murphy_DADA_Visual_Poetry",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "battle-of-san-pietro": {
+      "edition": "https://archive.org/download/battle_of_san_pietro/battle_of_san_pietro_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/battle_of_san_pietro/battle_of_san_pietro.thumbs/battle_of_san_pietro_000720.jpg",
+        "sourceUrl": "https://archive.org/details/battle_of_san_pietro",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "battleship-potemkin": {
+      "edition": "https://archive.org/download/BattleshipPotemkin/Battleship_Potemkin_512kb.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Vintage_Potemkin.jpg/500px-Vintage_Potemkin.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Vintage_Potemkin.jpg",
+        "credit": "Wikimedia Commons",
+        "kind": "poster",
+        "width": 500,
+        "height": 706
+      },
+      "frame": {
+        "url": "https://archive.org/download/BattleshipPotemkin/BattleshipPotemkin.thumbs/Battleship_Potemkin_001140.jpg",
+        "sourceUrl": "https://archive.org/details/BattleshipPotemkin",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "beat-the-devil": {
+      "edition": "https://archive.org/download/BeatTheDevil1953/BeatTheDevil1954.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Beat-the-devil-movie-poster-1953.jpg/500px-Beat-the-devil-movie-poster-1953.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Beat-the-devil-movie-poster-1953.jpg",
+        "credit": "Romulus Films / Santana Pictures Corporation",
+        "kind": "poster",
+        "width": 500,
+        "height": 737
+      },
+      "frame": {
+        "url": "https://archive.org/download/BeatTheDevil1953/BeatTheDevil1953.thumbs/BeatTheDevil1954_002040.jpg",
+        "sourceUrl": "https://archive.org/details/BeatTheDevil1953",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "black-and-tan": {
+      "edition": "https://archive.org/download/black-and-tan_1929/black-and-tan_1929.ia.mp4",
+      "image": {
+        "url": "https://archive.org/download/black-and-tan_1929/black-and-tan_1929.thumbs/black-and-tan_1929_000300.jpg",
+        "sourceUrl": "https://archive.org/details/black-and-tan_1929",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 540
+      }
+    },
+    "blood-and-sand": {
+      "edition": "https://archive.org/download/BLOODANDSAND1922RudolphValentinoNitaNaldiLilaLee/BLOOD%20AND%20SAND%20%281922%29%20--%20Rudolph%20Valentino%2C%20Nita%20Naldi%2C%20Lila%20Lee.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Poster_-_Blood_and_Sand_%281922%29_05.jpg/500px-Poster_-_Blood_and_Sand_%281922%29_05.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Poster_-_Blood_and_Sand_(1922)_05.jpg",
+        "credit": "Employee(s) of Paramount Pictures",
+        "kind": "poster",
+        "width": 500,
+        "height": 826
+      },
+      "frame": {
+        "url": "https://archive.org/download/BLOODANDSAND1922RudolphValentinoNitaNaldiLilaLee/BLOODANDSAND1922RudolphValentinoNitaNaldiLilaLee.thumbs/BLOOD%20AND%20SAND%20%281922%29%20--%20Rudolph%20Valentino%2C%20Nita%20Naldi%2C%20Lila%20Lee_003990.jpg",
+        "sourceUrl": "https://archive.org/details/BLOODANDSAND1922RudolphValentinoNitaNaldiLilaLee",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "blood-of-a-poet": {
+      "edition": "https://archive.org/download/le-sang-dun-poete-aka-the-blood-of-a-poet_1930/le-sang-dun-poete-aka-the-blood-of-a-poet_1930.ia.mp4",
+      "image": {
+        "url": "https://archive.org/download/le-sang-dun-poete-aka-the-blood-of-a-poet_1930/le-sang-dun-poete-aka-the-blood-of-a-poet_1930.thumbs/le-sang-dun-poete-aka-the-blood-of-a-poet_1930_002694.jpg",
+        "sourceUrl": "https://archive.org/details/le-sang-dun-poete-aka-the-blood-of-a-poet_1930",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 640,
+        "height": 480
+      }
+    },
+    "boys-beware": {
+      "edition": "https://archive.org/download/boys_beware/boys_beware.mp4",
+      "image": {
+        "url": "https://archive.org/download/boys_beware/boys_beware.thumbs/boys_beware_000240.jpg",
+        "sourceUrl": "https://archive.org/details/boys_beware",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "brain-that-wouldnt-die": {
+      "edition": "https://archive.org/download/brain_that_wouldnt_die/brain_that_wouldnt_die.mp4",
+      "image": {
+        "url": "https://archive.org/download/brain_that_wouldnt_die/brain_that_wouldnt_die.thumbs/brain_that_wouldnt_die_001080.jpg",
+        "sourceUrl": "https://archive.org/details/brain_that_wouldnt_die",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "bride-of-the-monster": {
+      "edition": "https://archive.org/download/bride-of-the-monster-1955/Bride%20Of%20The%20Monster%201955.mp4",
+      "image": {
+        "url": "https://archive.org/download/bride-of-the-monster-1955/bride-of-the-monster-1955.thumbs/Bride%20Of%20The%20Monster%201955_002514.jpg",
+        "sourceUrl": "https://archive.org/details/bride-of-the-monster-1955",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "brink-of-disaster": {
+      "edition": "https://archive.org/download/0003_Brink_of_Disaster_01_00_45_00/0003_Brink_of_Disaster_S00085_01_00_45_00_3mb.mp4",
+      "image": {
+        "url": "https://archive.org/download/0003_Brink_of_Disaster_01_00_45_00/0003_Brink_of_Disaster_01_00_45_00.thumbs/0003_Brink_of_Disaster_S00085_01_00_45_00_3mb_001074.jpg",
+        "sourceUrl": "https://archive.org/details/0003_Brink_of_Disaster_01_00_45_00",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "building-the-golden-gate-bridge": {
+      "edition": "https://archive.org/download/0808_Building_the_Golden_Gate_Bridge_05_01_00_00/0808_Building_the_Golden_Gate_Bridge_05_01_00_00_3mb.mp4",
+      "image": {
+        "url": "https://archive.org/download/0808_Building_the_Golden_Gate_Bridge_05_01_00_00/0808_Building_the_Golden_Gate_Bridge_05_01_00_00.thumbs/0808_Building_the_Golden_Gate_Bridge_05_01_00_00_3mb_000954.jpg",
+        "sourceUrl": "https://archive.org/details/0808_Building_the_Golden_Gate_Bridge_05_01_00_00",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "cabinet-dr-caligari": {
+      "edition": "https://archive.org/download/TheCabinetOfDr.Caligari1920FULLMOVIE/The%20Cabinet%20of%20Dr.%20Caligari%20%281920%29%20FULL%20MOVIE.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/The_Cabinet_of_Doctor_Caligari_Movie_poster.jpg/500px-The_Cabinet_of_Doctor_Caligari_Movie_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Cabinet_of_Doctor_Caligari_Movie_poster.jpg",
+        "credit": "Lionel S. Reiss",
+        "kind": "poster",
+        "width": 500,
+        "height": 746
+      },
+      "frame": {
+        "url": "https://archive.org/download/TheCabinetOfDr.Caligari1920FULLMOVIE/TheCabinetOfDr.Caligari1920FULLMOVIE.thumbs/The%20Cabinet%20of%20Dr.%20Caligari%20%281920%29%20FULL%20MOVIE_002694.jpg",
+        "sourceUrl": "https://archive.org/details/TheCabinetOfDr.Caligari1920FULLMOVIE",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "cameramans-revenge": {
+      "edition": "https://archive.org/download/TheCameramansRevenge/TheCameramansRevenge.mp4",
+      "image": {
+        "url": "https://archive.org/download/TheCameramansRevenge/TheCameramansRevenge.thumbs/TheCameramansRevenge_000300.jpg",
+        "sourceUrl": "https://archive.org/details/TheCameramansRevenge",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "can-dialectics-break-bricks": {
+      "edition": "https://archive.org/download/ladialectiquepeutellecasserdesbriquesversioncouleurineditesubtitleshd720p/_La%20Dialectique%20Peut-Elle%20Casser%20Des%20Briques%20__%20-%20version%20couleur%20in%C3%A9dite%20%5B%2BSubtitles%5D%20-%20HD%20720p.mp4",
+      "image": {
+        "url": "https://archive.org/download/ladialectiquepeutellecasserdesbriquesversioncouleurineditesubtitleshd720p/ladialectiquepeutellecasserdesbriquesversioncouleurineditesubtitleshd720p.thumbs/_La%20Dialectique%20Peut-Elle%20Casser%20Des%20Briques%20__%20-%20version%20couleur%20in%C3%A9dite%20%5B%2BSubtitles%5D%20-%20HD%20720p_001857.jpg",
+        "sourceUrl": "https://archive.org/details/ladialectiquepeutellecasserdesbriquesversioncouleurineditesubtitleshd720p",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "carnival-of-souls": {
+      "edition": "https://archive.org/download/CarnivalOfSouls720p1962/CarnivalOfSouls720p.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Carnival_of_Souls_%281962_one-sheet_poster%29.jpg/500px-Carnival_of_Souls_%281962_one-sheet_poster%29.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Carnival_of_Souls_(1962_one-sheet_poster).jpg",
+        "credit": "Illustration by F. Germain. Published by Herts-Lion International Corp.",
+        "kind": "poster",
+        "width": 500,
+        "height": 772
+      },
+      "frame": {
+        "url": "https://archive.org/download/CarnivalOfSouls720p1962/CarnivalOfSouls720p1962.thumbs/CarnivalOfSouls720p_001794.jpg",
+        "sourceUrl": "https://archive.org/details/CarnivalOfSouls720p1962",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "cat-and-the-canary": {
+      "edition": "https://archive.org/download/The_Cat_and_the_Canary/The_Cat_and_the_Canary.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Poster_for_The_Cat_and_the_Canary_%281927%29_04.jpg/500px-Poster_for_The_Cat_and_the_Canary_%281927%29_04.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Poster_for_The_Cat_and_the_Canary_(1927)_04.jpg",
+        "credit": "Employee(s) of Universal Pictures",
+        "kind": "poster",
+        "width": 500,
+        "height": 637
+      },
+      "frame": {
+        "url": "https://archive.org/download/The_Cat_and_the_Canary/The_Cat_and_the_Canary.thumbs/The_Cat_and_the_Canary_003060.jpg",
+        "sourceUrl": "https://archive.org/details/The_Cat_and_the_Canary",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "century-21-calling": {
+      "edition": "https://archive.org/download/Century21964/Century21964.mp4",
+      "image": {
+        "url": "https://archive.org/download/Century21964/Century21964.thumbs/Century21964_000330.jpg",
+        "sourceUrl": "https://archive.org/details/Century21964",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "chang-wilderness": {
+      "edition": "https://archive.org/download/chang-a-drama-of-the-wilderness_1927/chang-a-drama-of-the-wilderness_1927.ia.mp4",
+      "image": {
+        "url": "https://archive.org/download/chang-a-drama-of-the-wilderness_1927/chang-a-drama-of-the-wilderness_1927.thumbs/chang-a-drama-of-the-wilderness_1927_001555.jpg",
+        "sourceUrl": "https://archive.org/details/chang-a-drama-of-the-wilderness_1927",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 640,
+        "height": 480
+      }
+    },
+    "charade-1963": {
+      "edition": "https://archive.org/download/charade-1963-cary-grant-audrey-hepburn-walter-matthau-1080p-reup/Charade%20%281963%29%20%5B720p%20Blu-Ray%20Rip%5D.ia.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fd/Charade_%281963_poster%29.jpg/500px-Charade_%281963_poster%29.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Charade_(1963_poster).jpg",
+        "credit": "\"Copyright © 1963 by Universal Pictures Co., Inc.\"",
+        "kind": "poster",
+        "width": 500,
+        "height": 770
+      },
+      "frame": {
+        "url": "https://archive.org/download/charade-1963-cary-grant-audrey-hepburn-walter-matthau-1080p-reup/charade-1963-cary-grant-audrey-hepburn-walter-matthau-1080p-reup.thumbs/Charade%20%281963%29%20%5B720p%20Blu-Ray%20Rip%5D_004140.jpg",
+        "sourceUrl": "https://archive.org/details/charade-1963-cary-grant-audrey-hepburn-walter-matthau-1080p-reup",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "cheating-1952": {
+      "edition": "https://archive.org/download/Cheating1952/Cheating1952.mp4",
+      "image": {
+        "url": "https://archive.org/download/Cheating1952/Cheating1952.thumbs/Cheating1952_000420.jpg",
+        "sourceUrl": "https://archive.org/details/Cheating1952",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "china-roots-of-madness": {
+      "edition": "https://archive.org/download/gov.archives.arc.616322/gov.archives.arc.616322_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/gov.archives.arc.616322/gov.archives.arc.616322.thumbs/gov.archives.arc.616322_001800.jpg",
+        "sourceUrl": "https://archive.org/details/gov.archives.arc.616322",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "combat-fatigue-insomnia": {
+      "edition": "https://archive.org/download/CombatFa1945/CombatFa1945.mp4",
+      "image": {
+        "url": "https://archive.org/download/CombatFa1945/CombatFa1945.thumbs/CombatFa1945_000420.jpg",
+        "sourceUrl": "https://archive.org/details/CombatFa1945",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "communications-primer": {
+      "edition": "https://archive.org/download/communications_primer/communications_primer.mp4",
+      "image": {
+        "url": "https://archive.org/download/communications_primer/communications_primer.thumbs/communications_primer_000480.jpg",
+        "sourceUrl": "https://archive.org/details/communications_primer",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "communism-1952": {
+      "edition": "https://archive.org/download/Communis1952/Communis1952.mp4",
+      "image": {
+        "url": "https://archive.org/download/Communis1952/Communis1952.thumbs/Communis1952_000390.jpg",
+        "sourceUrl": "https://archive.org/details/Communis1952",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "coney-island-1940": {
+      "edition": "https://archive.org/download/ConeyIsl1940/ConeyIsl1940.mp4",
+      "image": {
+        "url": "https://archive.org/download/ConeyIsl1940/ConeyIsl1940.thumbs/ConeyIsl1940_000210.jpg",
+        "sourceUrl": "https://archive.org/details/ConeyIsl1940",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "cops-1922": {
+      "edition": "https://archive.org/download/Cops1922/Cops-v2.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/Cops_1922_poster.jpg/500px-Cops_1922_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cops_1922_poster.jpg",
+        "credit": "Wikimedia Commons",
+        "kind": "poster",
+        "width": 500,
+        "height": 747
+      },
+      "frame": {
+        "url": "https://archive.org/download/Cops1922/Cops1922.thumbs/Cops-v2_000414.jpg",
+        "sourceUrl": "https://archive.org/details/Cops1922",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "curious-alice": {
+      "edition": "https://archive.org/download/511-50/511-50.mp4",
+      "image": {
+        "url": "https://archive.org/download/511-50/511-50.thumbs/511-50_000268.jpg",
+        "sourceUrl": "https://archive.org/details/511-50",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 480,
+        "height": 360
+      }
+    },
+    "death-mills": {
+      "edition": "https://archive.org/download/DeathMills/DeathMills_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/DeathMills/DeathMills.thumbs/DeathMills_000480.jpg",
+        "sourceUrl": "https://archive.org/details/DeathMills",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "degenerate-art": {
+      "edition": "https://archive.org/download/degenerate-art-1992/Degenerate%20Art%20%281992%29.ia.mp4",
+      "image": {
+        "url": "https://archive.org/download/degenerate-art-1992/degenerate-art-1992.thumbs/Degenerate%20Art%20%281992%29_002214.jpg",
+        "sourceUrl": "https://archive.org/details/degenerate-art-1992",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 640,
+        "height": 480
+      }
+    },
+    "dementia-daughter-of-horror": {
+      "edition": "https://archive.org/download/DementiaDaughterOfHorror1955/daughter-of-horror_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/DementiaDaughterOfHorror1955/DementiaDaughterOfHorror1955.thumbs/daughter-of-horror_001260.jpg",
+        "sourceUrl": "https://archive.org/details/DementiaDaughterOfHorror1955",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "design-for-dreaming": {
+      "edition": "https://archive.org/download/Designfo1956/Designfo1956.mp4",
+      "image": {
+        "url": "https://archive.org/download/Designfo1956/Designfo1956.thumbs/Designfo1956_000210.jpg",
+        "sourceUrl": "https://archive.org/details/Designfo1956",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "despotism": {
+      "edition": "https://archive.org/download/Despotis1946/Despotis1946.mp4",
+      "image": {
+        "url": "https://archive.org/download/Despotis1946/Despotis1946.thumbs/Despotis1946_000240.jpg",
+        "sourceUrl": "https://archive.org/details/Despotis1946",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "destination-earth": {
+      "edition": "https://archive.org/download/4050_Destination_Earth_01_47_33_28/4050_Destination_Earth_01_47_33_28.mp4",
+      "image": {
+        "url": "https://archive.org/download/4050_Destination_Earth_01_47_33_28/4050_Destination_Earth_01_47_33_28.thumbs/4050_Destination_Earth_01_47_33_28_000225.jpg",
+        "sourceUrl": "https://archive.org/details/4050_Destination_Earth_01_47_33_28",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "detour-1945": {
+      "edition": "https://archive.org/download/detour1945HD/Detour.1945.1080p.BluRay.x264-%5BYTS.AM%5D.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Detour_%28poster%29.jpg/500px-Detour_%28poster%29.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Detour_(poster).jpg",
+        "credit": "Producers Releasing Corporation",
+        "kind": "poster",
+        "width": 500,
+        "height": 752
+      },
+      "frame": {
+        "url": "https://archive.org/download/detour1945HD/detour1945HD.thumbs/Detour.1945.1080p.BluRay.x264-%5BYTS.AM%5D_002520.jpg",
+        "sourceUrl": "https://archive.org/details/detour1945HD",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 524
+      }
+    },
+    "detroit-city-on-the-move": {
+      "edition": "https://archive.org/download/DetroitC1965/DetroitC1965.mp4",
+      "image": {
+        "url": "https://archive.org/download/DetroitC1965/DetroitC1965.thumbs/DetroitC1965_000420.jpg",
+        "sourceUrl": "https://archive.org/details/DetroitC1965",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "dimensions-of-dialogue": {
+      "edition": "https://archive.org/download/dimensions-of-dialogue-jan-svankmajer-l-g-gp-wpra-g/Dimensions%20of%20Dialogue%20%28Jan%20Svankmajer%29%20%5BL-gGpWpra-g%5D.mp4",
+      "image": {
+        "url": "https://archive.org/download/dimensions-of-dialogue-jan-svankmajer-l-g-gp-wpra-g/dimensions-of-dialogue-jan-svankmajer-l-g-gp-wpra-g.thumbs/Dimensions%20of%20Dialogue%20%28Jan%20Svankmajer%29%20%5BL-gGpWpra-g%5D_000270.jpg",
+        "sourceUrl": "https://archive.org/details/dimensions-of-dialogue-jan-svankmajer-l-g-gp-wpra-g",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 400
+      }
+    },
+    "doa-1950": {
+      "edition": "https://archive.org/download/thoseguysontheradio_gmail_Doa/doa_1949.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/D.O.A._%281950_poster%29.jpg/500px-D.O.A._%281950_poster%29.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:D.O.A._(1950_poster).jpg",
+        "credit": "\"Copyright 1950 – United Artists Corporation.\"",
+        "kind": "poster",
+        "width": 500,
+        "height": 757
+      },
+      "frame": {
+        "url": "https://archive.org/download/thoseguysontheradio_gmail_Doa/thoseguysontheradio_gmail_Doa.thumbs/doa_1949_001890.jpg",
+        "sourceUrl": "https://archive.org/details/thoseguysontheradio_gmail_Doa",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "docks-of-new-york": {
+      "edition": "https://archive.org/download/the-docks-of-new-york/The%20Docks%20of%20New%20York.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/The_Docks_of_New_York_%281928_poster%29.jpg/500px-The_Docks_of_New_York_%281928_poster%29.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Docks_of_New_York_(1928_poster).jpg",
+        "credit": "Distributed by Paramount Pictures.",
+        "kind": "poster",
+        "width": 500,
+        "height": 790
+      },
+      "frame": {
+        "url": "https://archive.org/download/the-docks-of-new-york/the-docks-of-new-york.thumbs/The%20Docks%20of%20New%20York_001194.jpg",
+        "sourceUrl": "https://archive.org/details/the-docks-of-new-york",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "dont-be-a-sucker": {
+      "edition": "https://archive.org/download/war-dept-ef-6-dont-be-a-sucker-1947/War%20Dept%20EF-6%20-%20Don%27t%20Be%20A%20Sucker%20%281947%29.ia.mp4",
+      "image": {
+        "url": "https://archive.org/download/war-dept-ef-6-dont-be-a-sucker-1947/war-dept-ef-6-dont-be-a-sucker-1947.thumbs/War%20Dept%20EF-6%20-%20Don%27t%20Be%20A%20Sucker%20%281947%29_000415.jpg",
+        "sourceUrl": "https://archive.org/details/war-dept-ef-6-dont-be-a-sucker-1947",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 320,
+        "height": 240
+      }
+    },
+    "dreams-that-money-can-buy": {
+      "edition": "https://archive.org/download/dreams-that-money-can-buy/dreams-that-money-can-buy.mp4",
+      "image": {
+        "url": "https://film-makerscoop.com/public/upload/works/desktop/599c5c88da7ba.jpg",
+        "sourceUrl": "https://film-makerscoop.com/catalogue/hans-richter-dreams-that-money-can-buy",
+        "credit": "The Film-Makers’ Cooperative",
+        "kind": "frame",
+        "width": 1000,
+        "height": 750
+      }
+    },
+    "drug-addiction-1951": {
+      "edition": "https://archive.org/download/DrugAddi1951/DrugAddi1951.mp4",
+      "image": {
+        "url": "https://archive.org/download/DrugAddi1951/DrugAddi1951.thumbs/DrugAddi1951_000480.jpg",
+        "sourceUrl": "https://archive.org/details/DrugAddi1951",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "drugs-in-our-culture": {
+      "edition": "https://archive.org/download/drugs_in_our_culture/drugs_in_our_culture.mp4",
+      "image": {
+        "url": "https://archive.org/download/drugs_in_our_culture/drugs_in_our_culture.thumbs/drugs_in_our_culture_000660.jpg",
+        "sourceUrl": "https://archive.org/details/drugs_in_our_culture",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "duck-and-cover": {
+      "edition": "https://archive.org/download/gov.ntis.ava11109vnb1/ava11109vnb1.mp4",
+      "image": {
+        "url": "https://archive.org/download/gov.ntis.ava11109vnb1/gov.ntis.ava11109vnb1.thumbs/ava11109vnb1_000210.jpg",
+        "sourceUrl": "https://archive.org/details/gov.ntis.ava11109vnb1",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "eagle-has-landed-apollo-11": {
+      "edition": "https://archive.org/download/gov.archives.arc.45017/gov.archives.arc.45017_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/gov.archives.arc.45017/gov.archives.arc.45017.thumbs/gov.archives.arc.45017_000420.jpg",
+        "sourceUrl": "https://archive.org/details/gov.archives.arc.45017",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "earth-1930": {
+      "edition": "https://archive.org/download/earth_1930/earth_1930.ia.mp4",
+      "image": {
+        "url": "https://archive.org/download/earth_1930/earth_1930.thumbs/earth_1930_001800.jpg",
+        "sourceUrl": "https://archive.org/details/earth_1930",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 534
+      }
+    },
+    "easy-street": {
+      "edition": "https://archive.org/download/EasyStreet1917/Easy-Street-v2.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7c/CC_Easy_Street_1917.JPG/500px-CC_Easy_Street_1917.JPG",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:CC_Easy_Street_1917.JPG",
+        "credit": "Mutual Films",
+        "kind": "poster",
+        "width": 500,
+        "height": 741
+      },
+      "frame": {
+        "url": "https://archive.org/download/EasyStreet1917/EasyStreet1917.thumbs/Easy-Street-v2_000534.jpg",
+        "sourceUrl": "https://archive.org/details/EasyStreet1917",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "eisenhower-campaign-spots": {
+      "edition": "https://archive.org/download/Eisenhow1952/Eisenhow1952.mp4",
+      "image": {
+        "url": "https://archive.org/download/Eisenhow1952/Eisenhow1952.thumbs/Eisenhow1952_000025.jpg",
+        "sourceUrl": "https://archive.org/details/Eisenhow1952",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "entr-acte": {
+      "edition": "https://archive.org/download/silent-entracte/Entr%27acte.mp4",
+      "image": {
+        "url": "https://archive.org/download/silent-entracte/silent-entracte.thumbs/Entr%27acte_000475.jpg",
+        "sourceUrl": "https://archive.org/details/silent-entracte",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 592,
+        "height": 432
+      }
+    },
+    "experiments-revival-organisms": {
+      "edition": "https://archive.org/download/Experime1940/Experime1940.mp4",
+      "image": {
+        "url": "https://archive.org/download/Experime1940/Experime1940.thumbs/Experime1940_000300.jpg",
+        "sourceUrl": "https://archive.org/details/Experime1940",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "fall-house-of-usher": {
+      "edition": "https://archive.org/download/FallOfTheHouseOfUsher1928short/FallOfTheHouseOfUsher1928short.mp4",
+      "image": {
+        "url": "https://archive.org/download/FallOfTheHouseOfUsher1928short/FallOfTheHouseOfUsher1928short.thumbs/FallOfTheHouseOfUsher1928short_000420.jpg",
+        "sourceUrl": "https://archive.org/details/FallOfTheHouseOfUsher1928short",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "fantasmagorie": {
+      "edition": "https://archive.org/download/silent-fantasmagorie-aka-a-fantasy/Fantasmagorie%20AKA%20A%20Fantasy.mp4",
+      "image": {
+        "url": "https://archive.org/download/silent-fantasmagorie-aka-a-fantasy/silent-fantasmagorie-aka-a-fantasy.thumbs/Fantasmagorie%20AKA%20A%20Fantasy_000029.jpg",
+        "sourceUrl": "https://archive.org/details/silent-fantasmagorie-aka-a-fantasy",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 640,
+        "height": 480
+      }
+    },
+    "faust-1926": {
+      "edition": "https://archive.org/download/faust.-1926/Faust.1926.ia.mp4",
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Faust-1926-Poster-MGM.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faust-1926-Poster-MGM.jpg",
+        "credit": "Metro-Goldwyn-Mayer, UFA",
+        "kind": "poster",
+        "width": 395,
+        "height": 600
+      },
+      "frame": {
+        "url": "https://archive.org/download/faust.-1926/faust.-1926.thumbs/Faust.1926_003895.jpg",
+        "sourceUrl": "https://archive.org/details/faust.-1926",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 536
+      }
+    },
+    "feline-follies": {
+      "edition": "https://archive.org/download/silent-feline-follies/Feline%20Follies.mp4",
+      "image": {
+        "url": "https://archive.org/download/silent-feline-follies/silent-feline-follies.thumbs/Feline%20Follies_000151.jpg",
+        "sourceUrl": "https://archive.org/details/silent-feline-follies",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 582,
+        "height": 424
+      }
+    },
+    "finding-his-voice": {
+      "edition": "https://archive.org/download/FindingH1929/FindingH1929.mp4",
+      "image": {
+        "url": "https://archive.org/download/FindingH1929/FindingH1929.thumbs/FindingH1929_000240.jpg",
+        "sourceUrl": "https://archive.org/details/FindingH1929",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "five-minutes-to-live": {
+      "edition": "https://archive.org/download/Five_Minutes_To_Live.avi/Five_Minutes_to_Live.mp4",
+      "image": {
+        "url": "https://archive.org/download/Five_Minutes_To_Live.avi/Five_Minutes_To_Live.avi.thumbs/Five_Minutes_to_Live_001680.jpg",
+        "sourceUrl": "https://archive.org/details/Five_Minutes_To_Live.avi",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "frames-of-reference": {
+      "edition": "https://archive.org/download/frames_of_reference/frames_of_reference_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/frames_of_reference/frames_of_reference.thumbs/frames_of_reference_000600.jpg",
+        "sourceUrl": "https://archive.org/details/frames_of_reference",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "frankenstein-1910": {
+      "edition": "https://archive.org/download/FrankensteinfullMovie/Frankenstein1910.mp4",
+      "image": {
+        "url": "https://archive.org/download/FrankensteinfullMovie/FrankensteinfullMovie.thumbs/Frankenstein1910_000300.jpg",
+        "sourceUrl": "https://archive.org/details/FrankensteinfullMovie",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "freedom-highway": {
+      "edition": "https://archive.org/download/0686_Freedom_Highway/0686_Freedom_Highway_08_01_03_00_3mb.mp4",
+      "image": {
+        "url": "https://archive.org/download/0686_Freedom_Highway/0686_Freedom_Highway.thumbs/0686_Freedom_Highway_08_01_03_00_3mb_001254.jpg",
+        "sourceUrl": "https://archive.org/details/0686_Freedom_Highway",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "freedom-river": {
+      "edition": "https://archive.org/download/freedom_river_orson_welles/freedom_river_1971_orson_welles_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/freedom_river_orson_welles/freedom_river_orson_welles.thumbs/freedom_river_1971_orson_welles_000150.jpg",
+        "sourceUrl": "https://archive.org/details/freedom_river_orson_welles",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "gertie-the-dinosaur": {
+      "edition": "https://archive.org/download/silent-gertie-the-dinosaur/Gertie%20the%20Dinosaur.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Gertie_the_Dinosaur_poster.jpg/500px-Gertie_the_Dinosaur_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Gertie_the_Dinosaur_poster.jpg",
+        "credit": "unknown (Box Office Attraction Co.)",
+        "kind": "poster",
+        "width": 500,
+        "height": 752
+      },
+      "frame": {
+        "url": "https://archive.org/download/silent-gertie-the-dinosaur/silent-gertie-the-dinosaur.thumbs/Gertie%20the%20Dinosaur_000273.jpg",
+        "sourceUrl": "https://archive.org/details/silent-gertie-the-dinosaur",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 640,
+        "height": 512
+      }
+    },
+    "ghosts-before-breakfast": {
+      "edition": "https://archive.org/download/vormittagsspuk-aka-ghosts-before-breakfast_1928/vormittagsspuk-aka-ghosts-before-breakfast_1928.ia.mp4",
+      "image": {
+        "url": "https://archive.org/download/vormittagsspuk-aka-ghosts-before-breakfast_1928/vormittagsspuk-aka-ghosts-before-breakfast_1928.thumbs/vormittagsspuk-aka-ghosts-before-breakfast_1928_000208.jpg",
+        "sourceUrl": "https://archive.org/details/vormittagsspuk-aka-ghosts-before-breakfast_1928",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 624,
+        "height": 480
+      }
+    },
+    "gilbreth-original-films": {
+      "edition": "https://archive.org/download/0809_Original_Films_of_Frank_B_Gilbreth_02_12_34_00/0809_Original_Films_of_Frank_B_Gilbreth_02_12_34_00.mp4",
+      "image": {
+        "url": "https://archive.org/download/0809_Original_Films_of_Frank_B_Gilbreth_02_12_34_00/0809_Original_Films_of_Frank_B_Gilbreth_02_12_34_00.thumbs/0809_Original_Films_of_Frank_B_Gilbreth_02_12_34_00_000750.jpg",
+        "sourceUrl": "https://archive.org/details/0809_Original_Films_of_Frank_B_Gilbreth_02_12_34_00",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "girls-beware": {
+      "edition": "https://archive.org/download/girls_beware/girls_beware.mp4",
+      "image": {
+        "url": "https://archive.org/download/girls_beware/girls_beware.thumbs/girls_beware_000240.jpg",
+        "sourceUrl": "https://archive.org/details/girls_beware",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "glass-harmonica": {
+      "edition": "https://archive.org/download/glass-harmonica-russian-animation/Glass%20Harmonica%20%28Russian%20Animation%29.mp4",
+      "image": {
+        "url": "https://archive.org/download/glass-harmonica-russian-animation/glass-harmonica-russian-animation.thumbs/Glass%20Harmonica%20%28Russian%20Animation%29_000474.jpg",
+        "sourceUrl": "https://archive.org/details/glass-harmonica-russian-animation",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "gossip-1953": {
+      "edition": "https://archive.org/download/Gossip1953/Gossip1953.mp4",
+      "image": {
+        "url": "https://archive.org/download/Gossip1953/Gossip1953.thumbs/Gossip1953_000360.jpg",
+        "sourceUrl": "https://archive.org/details/Gossip1953",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "grass-1925": {
+      "edition": "https://archive.org/download/grass-1925/Grass1925.mp4",
+      "image": {
+        "url": "https://archive.org/download/grass-1925/grass-1925.thumbs/Grass1925_001614.jpg",
+        "sourceUrl": "https://archive.org/details/grass-1925",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 384,
+        "height": 288
+      }
+    },
+    "great-train-robbery": {
+      "edition": "https://archive.org/download/TheGreatTrainRobbery_555/TheGreatTrainRobbery_512kb.mp4",
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/5/51/The_Great_Train_Robbery%2C_Edwin_S._Porter%2C_Edison_Films%2C_1903_Poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Great_Train_Robbery,_Edwin_S._Porter,_Edison_Films,_1903_Poster.jpg",
+        "credit": "Edison Films · Wikimedia Commons",
+        "kind": "publicity",
+        "width": 325,
+        "height": 522
+      },
+      "frame": {
+        "url": "https://archive.org/download/TheGreatTrainRobbery_555/TheGreatTrainRobbery_555.thumbs/TheGreatTrainRobbery_000180.jpg",
+        "sourceUrl": "https://archive.org/details/TheGreatTrainRobbery_555",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "greed": {
+      "edition": "https://archive.org/download/greed1924/greed.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Greed_1924_poster.jpg/500px-Greed_1924_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Greed_1924_poster.jpg",
+        "credit": "Wikimedia Commons",
+        "kind": "poster",
+        "width": 500,
+        "height": 673
+      },
+      "frame": {
+        "url": "https://archive.org/download/greed1924/greed1924.thumbs/greed_002340.jpg",
+        "sourceUrl": "https://archive.org/details/greed1924",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "greenwich-village-sunday": {
+      "edition": "https://archive.org/download/Greenwic1960/Greenwic1960.mp4",
+      "image": {
+        "url": "https://archive.org/download/Greenwic1960/Greenwic1960.thumbs/Greenwic1960_000270.jpg",
+        "sourceUrl": "https://archive.org/details/Greenwic1960",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "gumbasia": {
+      "edition": "https://archive.org/download/Gumbasia/Gumbasia_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/Gumbasia/Gumbasia.thumbs/Gumbasia_000060.jpg",
+        "sourceUrl": "https://archive.org/details/Gumbasia",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "habit-patterns": {
+      "edition": "https://archive.org/download/HabitPat1954/HabitPat1954.mp4",
+      "image": {
+        "url": "https://archive.org/download/HabitPat1954/HabitPat1954.thumbs/HabitPat1954_000330.jpg",
+        "sourceUrl": "https://archive.org/details/HabitPat1954",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "harakiri-1919": {
+      "edition": "https://archive.org/download/Harakiri1919fritzLang/Harakiri1919_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/Harakiri1919fritzLang/Harakiri1919fritzLang.thumbs/Harakiri1919_001380.jpg",
+        "sourceUrl": "https://archive.org/details/Harakiri1919fritzLang",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "hardware-wars": {
+      "edition": "https://archive.org/download/HardwareWars/HardwareWars.mp4",
+      "image": {
+        "url": "https://archive.org/download/HardwareWars/HardwareWars.thumbs/HardwareWars_000297.jpg",
+        "sourceUrl": "https://archive.org/details/HardwareWars",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "haxan": {
+      "edition": "https://archive.org/download/Haxan_tinted_and_subtitled/Haxan_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/Haxan_tinted_and_subtitled/Haxan_tinted_and_subtitled.thumbs/Haxan_003840.jpg",
+        "sourceUrl": "https://archive.org/details/Haxan_tinted_and_subtitled",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "he-walked-by-night": {
+      "edition": "https://archive.org/download/He_Walked_By_Night.avi/He_Walked_By_Night.mp4",
+      "image": {
+        "url": "https://archive.org/download/He_Walked_By_Night.avi/He_Walked_By_Night.avi.thumbs/He_Walked_By_Night_002880.jpg",
+        "sourceUrl": "https://archive.org/details/He_Walked_By_Night.avi",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "hells-hinges": {
+      "edition": "https://archive.org/download/HELLSHINGES1916WilliamS.Hart/HELL%2527S%20HINGES%20%281916%29%20--%20William%20S.%20Hart.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/Hell%27s_Hinges.jpg/500px-Hell%27s_Hinges.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Hell%27s_Hinges.jpg",
+        "credit": "Triangle Distributing Corporation",
+        "kind": "poster",
+        "width": 500,
+        "height": 747
+      },
+      "frame": {
+        "url": "https://archive.org/download/HELLSHINGES1916WilliamS.Hart/HELLSHINGES1916WilliamS.Hart.thumbs/HELL%2527S%20HINGES%20%281916%29%20--%20William%20S.%20Hart_001230.jpg",
+        "sourceUrl": "https://archive.org/details/HELLSHINGES1916WilliamS.Hart",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "hemp-for-victory": {
+      "edition": "https://archive.org/download/Hemp_for_victory_1942/Hemp_for_victory_1942.mp4",
+      "image": {
+        "url": "https://archive.org/download/Hemp_for_victory_1942/Hemp_for_victory_1942.thumbs/Hemp_for_victory_1942_000008.jpg",
+        "sourceUrl": "https://archive.org/details/Hemp_for_victory_1942",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "hindenburg-explodes": {
+      "edition": "https://archive.org/download/hindenberg_explodes/hindenberg_explodes.mp4",
+      "image": {
+        "url": "https://archive.org/download/hindenberg_explodes/hindenberg_explodes.thumbs/hindenberg_explodes_000120.jpg",
+        "sourceUrl": "https://archive.org/details/hindenberg_explodes",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "hired-1940": {
+      "edition": "https://archive.org/download/Hired1940/Hired1940.mp4",
+      "image": {
+        "url": "https://archive.org/download/Hired1940/Hired1940.thumbs/Hired1940_000420.jpg",
+        "sourceUrl": "https://archive.org/details/Hired1940",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "house-on-haunted-hill": {
+      "edition": "https://archive.org/download/House_On_Haunted_Hill.avi/The_House_on_Haunted_Hill.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/House_on_Haunted_Hill.jpg/500px-House_on_Haunted_Hill.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:House_on_Haunted_Hill.jpg",
+        "credit": "Reynold Brown",
+        "kind": "poster",
+        "width": 500,
+        "height": 795
+      },
+      "frame": {
+        "url": "https://archive.org/download/House_On_Haunted_Hill.avi/House_On_Haunted_Hill.avi.thumbs/The_House_on_Haunted_Hill_002760.jpg",
+        "sourceUrl": "https://archive.org/details/House_On_Haunted_Hill.avi",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "how-a-mosquito-operates": {
+      "edition": "https://archive.org/download/silent-how-a-mosquito-operates/How%20a%20Mosquito%20Operates.mp4",
+      "image": {
+        "url": "https://archive.org/download/silent-how-a-mosquito-operates/silent-how-a-mosquito-operates.thumbs/How%20a%20Mosquito%20Operates_000148.jpg",
+        "sourceUrl": "https://archive.org/details/silent-how-a-mosquito-operates",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 672,
+        "height": 528
+      }
+    },
+    "how-much-affection": {
+      "edition": "https://archive.org/download/HowMuchA1958/HowMuchA1958.mp4",
+      "image": {
+        "url": "https://archive.org/download/HowMuchA1958/HowMuchA1958.thumbs/HowMuchA1958_000480.jpg",
+        "sourceUrl": "https://archive.org/details/HowMuchA1958",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "how-to-use-the-dial-phone": {
+      "edition": "https://archive.org/download/HowtoUse1927/HowtoUse1927.mp4",
+      "image": {
+        "url": "https://archive.org/download/HowtoUse1927/HowtoUse1927.thumbs/HowtoUse1927_000150.jpg",
+        "sourceUrl": "https://archive.org/details/HowtoUse1927",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "humorous-phases": {
+      "edition": "https://archive.org/download/silent-humorous-phases-of-funny-faces/Humorous%20Phases%20of%20Funny%20Faces.mp4",
+      "image": {
+        "url": "https://archive.org/download/silent-humorous-phases-of-funny-faces/silent-humorous-phases-of-funny-faces.thumbs/Humorous%20Phases%20of%20Funny%20Faces_000118.jpg",
+        "sourceUrl": "https://archive.org/details/silent-humorous-phases-of-funny-faces",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 592,
+        "height": 448
+      }
+    },
+    "hunchback-notre-dame": {
+      "edition": "https://archive.org/download/The_Hunchback_of_Notre_Dame/The_Hunchback_of_Notre_Dame_512kb.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/The_Hunchback_of_Notre_Dame_%28theatrical_poster%2C_1923%29.jpg/500px-The_Hunchback_of_Notre_Dame_%28theatrical_poster%2C_1923%29.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Hunchback_of_Notre_Dame_(theatrical_poster,_1923).jpg",
+        "credit": "Universal Pictures",
+        "kind": "poster",
+        "width": 500,
+        "height": 785
+      },
+      "frame": {
+        "url": "https://archive.org/download/The_Hunchback_of_Notre_Dame/The_Hunchback_of_Notre_Dame.thumbs/The_Hunchback_of_Notre_Dame_003660.jpg",
+        "sourceUrl": "https://archive.org/details/The_Hunchback_of_Notre_Dame",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "i-want-to-be-a-secretary": {
+      "edition": "https://archive.org/download/IWanttoB1941/IWanttoB1941.mp4",
+      "image": {
+        "url": "https://archive.org/download/IWanttoB1941/IWanttoB1941.thumbs/IWanttoB1941_000360.jpg",
+        "sourceUrl": "https://archive.org/details/IWanttoB1941",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "if-you-love-this-planet": {
+      "edition": "https://archive.org/download/motionpicture0043/motionpicture0043.mp4",
+      "image": {
+        "url": "https://archive.org/download/motionpicture0043/motionpicture0043.thumbs/motionpicture0043_000957.jpg",
+        "sourceUrl": "https://archive.org/details/motionpicture0043",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 640,
+        "height": 480
+      }
+    },
+    "impossible-voyage": {
+      "edition": "https://archive.org/download/The_Impossible_Voyage/The_Impossible_Voyage.mp4",
+      "image": {
+        "url": "https://archive.org/download/The_Impossible_Voyage/The_Impossible_Voyage.thumbs/The_Impossible_Voyage_000720.jpg",
+        "sourceUrl": "https://archive.org/details/The_Impossible_Voyage",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "in-my-merry-oldsmobile": {
+      "edition": "https://archive.org/download/InMyMerr1932/InMyMerr1932.mp4",
+      "image": {
+        "url": "https://archive.org/download/InMyMerr1932/InMyMerr1932.thumbs/InMyMerr1932_000240.jpg",
+        "sourceUrl": "https://archive.org/details/InMyMerr1932",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "intolerance": {
+      "edition": "https://archive.org/download/Intolerance/Intolerance_512kb.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Intolerance_%28film%29.jpg/500px-Intolerance_%28film%29.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Intolerance_(film).jpg",
+        "credit": "Wikimedia Commons",
+        "kind": "poster",
+        "width": 500,
+        "height": 743
+      },
+      "frame": {
+        "url": "https://archive.org/download/Intolerance/Intolerance.thumbs/Intolerance_004020.jpg",
+        "sourceUrl": "https://archive.org/details/Intolerance",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "japanese-relocation": {
+      "edition": "https://archive.org/download/Japanese1943/Japanese1943.mp4",
+      "image": {
+        "url": "https://archive.org/download/Japanese1943/Japanese1943.thumbs/Japanese1943_000210.jpg",
+        "sourceUrl": "https://archive.org/details/Japanese1943",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "judex-1963": {
+      "edition": "https://archive.org/download/Judex1963/Judex1963.mp4",
+      "image": {
+        "url": "https://archive.org/download/Judex1963/Judex1963.thumbs/Judex1963_002154.jpg",
+        "sourceUrl": "https://archive.org/details/Judex1963",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "just-imagine": {
+      "edition": "https://archive.org/download/JustImagine_201701/Just%20Imagine.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Just_Imagine_lobby_card.jpg/500px-Just_Imagine_lobby_card.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Just_Imagine_lobby_card.jpg",
+        "credit": "Fox Film Corporation · Wikimedia Commons",
+        "kind": "publicity",
+        "width": 500,
+        "height": 388
+      },
+      "frame": {
+        "url": "https://archive.org/download/JustImagine_201701/JustImagine_201701.thumbs/Just%20Imagine_003954.jpg",
+        "sourceUrl": "https://archive.org/details/JustImagine_201701",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "kansas-city-confidential": {
+      "edition": "https://archive.org/download/KansasCityConfidential720p/KansasCityConfidential1952-720p.mp4",
+      "image": {
+        "url": "https://archive.org/download/KansasCityConfidential720p/KansasCityConfidential720p.thumbs/KansasCityConfidential1952-720p_002274.jpg",
+        "sourceUrl": "https://archive.org/details/KansasCityConfidential720p",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "kino-eye": {
+      "edition": "https://archive.org/download/kino-eye-1924-by-dziga-vertov/Kino.Eye.1924.1080p.BluRay.x264-%5BYTS.LT%5D.mp4",
+      "image": {
+        "url": "https://archive.org/download/kino-eye-1924-by-dziga-vertov/kino-eye-1924-by-dziga-vertov.thumbs/Kino.Eye.1924.1080p.BluRay.x264-%5BYTS.LT%5D_001799.jpg",
+        "sourceUrl": "https://archive.org/details/kino-eye-1924-by-dziga-vertov",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 568
+      }
+    },
+    "l-age-d-or": {
+      "edition": "https://archive.org/download/l-age-d-or-fr-extras/L.Age.D.Or.1930.1080p.BluRay.x264-CiNEFiLE.mp4",
+      "image": {
+        "url": "https://archive.org/download/l-age-d-or-fr-extras/l-age-d-or-fr-extras.thumbs/L.Age.D.Or.1930.1080p.BluRay.x264-CiNEFiLE_001434.jpg",
+        "sourceUrl": "https://archive.org/details/l-age-d-or-fr-extras",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 608
+      }
+    },
+    "l-inferno": {
+      "edition": "https://archive.org/download/Linferno1911/L%27inferno%20%281911%29.mp4",
+      "image": {
+        "url": "https://archive.org/download/Linferno1911/Linferno1911.thumbs/L%27inferno%20%281911%29_001410.jpg",
+        "sourceUrl": "https://archive.org/details/Linferno1911",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "land-of-head-hunters": {
+      "edition": "https://archive.org/download/in_the_land_of_the_head_hunters/In.The.Land.Of.The.Head.Hunters.1914.720p.BluRay.x264-RedBlade.mp4",
+      "image": {
+        "url": "https://archive.org/download/in_the_land_of_the_head_hunters/in_the_land_of_the_head_hunters.thumbs/In.The.Land.Of.The.Head.Hunters.1914.720p.BluRay.x264-RedBlade_001500.jpg",
+        "sourceUrl": "https://archive.org/details/in_the_land_of_the_head_hunters",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "last-clear-chance": {
+      "edition": "https://archive.org/download/Last_Clear_Chance_The/0845_Last_Clear_Chance_The_08_29_26_00_3mb.mp4",
+      "image": {
+        "url": "https://archive.org/download/Last_Clear_Chance_The/Last_Clear_Chance_The.thumbs/0845_Last_Clear_Chance_The_08_29_26_00_3mb_000954.jpg",
+        "sourceUrl": "https://archive.org/details/Last_Clear_Chance_The",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "leave-it-to-roll-oh": {
+      "edition": "https://archive.org/download/LeaveItt1940/LeaveItt1940.mp4",
+      "image": {
+        "url": "https://archive.org/download/LeaveItt1940/LeaveItt1940.thumbs/LeaveItt1940_000210.jpg",
+        "sourceUrl": "https://archive.org/details/LeaveItt1940",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "let-there-be-light": {
+      "edition": "https://archive.org/download/gov.ntis.ava04168vnb1/ava04168vnb1_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/gov.ntis.ava04168vnb1/gov.ntis.ava04168vnb1.thumbs/ava04168vnb1_001320.jpg",
+        "sourceUrl": "https://archive.org/details/gov.ntis.ava04168vnb1",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "little-shop-of-horrors": {
+      "edition": "https://archive.org/download/Little_ShopOf_Horrors.avi/The_Little_Shop_of_Horrors.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/The_Little_Shop_of_Horrors_%281960%29_-_Half-Sheet_poster.webp/500px-The_Little_Shop_of_Horrors_%281960%29_-_Half-Sheet_poster.webp",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Little_Shop_of_Horrors_(1960)_-_Half-Sheet_poster.webp",
+        "credit": "International Screen Service Corp.",
+        "kind": "poster",
+        "width": 500,
+        "height": 392
+      },
+      "frame": {
+        "url": "https://archive.org/download/Little_ShopOf_Horrors.avi/Little_ShopOf_Horrors.avi.thumbs/The_Little_Shop_of_Horrors_002640.jpg",
+        "sourceUrl": "https://archive.org/details/Little_ShopOf_Horrors.avi",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "lost-landscapes-of-detroit": {
+      "edition": "https://archive.org/download/LostLandscapesOfDetroit2010/LostLandscapesofDetroit2010.mp4",
+      "image": {
+        "url": "https://archive.org/download/LostLandscapesOfDetroit2010/LostLandscapesOfDetroit2010.thumbs/LostLandscapesofDetroit2010_001500.jpg",
+        "sourceUrl": "https://archive.org/details/LostLandscapesOfDetroit2010",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "m-1931": {
+      "edition": "https://archive.org/download/fritz-langs-m-1931-restored-movie-720p-hd/fritz%20lang%27s%20m-1931-restored%20movie-720p-hd.mp4",
+      "image": {
+        "url": "https://archive.org/download/fritz-langs-m-1931-restored-movie-720p-hd/fritz-langs-m-1931-restored-movie-720p-hd.thumbs/fritz%20lang%27s%20m-1931-restored%20movie-720p-hd_002514.jpg",
+        "sourceUrl": "https://archive.org/details/fritz-langs-m-1931-restored-movie-720p-hd",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "maintaining-classroom-discipline": {
+      "edition": "https://archive.org/download/Maintain1947/Maintain1947.mp4",
+      "image": {
+        "url": "https://archive.org/download/Maintain1947/Maintain1947.thumbs/Maintain1947_000300.jpg",
+        "sourceUrl": "https://archive.org/details/Maintain1947",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "make-mine-freedom": {
+      "edition": "https://archive.org/download/MakeMine1948/MakeMine1948.mp4",
+      "image": {
+        "url": "https://archive.org/download/MakeMine1948/MakeMine1948.thumbs/MakeMine1948_000210.jpg",
+        "sourceUrl": "https://archive.org/details/MakeMine1948",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "man-with-a-movie-camera": {
+      "edition": "https://archive.org/download/ChelovekskinoapparatomManWithAMovieCamera/Chelovek_s_kino-apparatom_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/ChelovekskinoapparatomManWithAMovieCamera/ChelovekskinoapparatomManWithAMovieCamera.thumbs/Chelovek_s_kino-apparatom_001500.jpg",
+        "sourceUrl": "https://archive.org/details/ChelovekskinoapparatomManWithAMovieCamera",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "manhatta": {
+      "edition": "https://archive.org/download/silent-manhatta/Manhatta.mp4",
+      "image": {
+        "url": "https://archive.org/download/silent-manhatta/silent-manhatta.thumbs/Manhatta_000212.jpg",
+        "sourceUrl": "https://archive.org/details/silent-manhatta",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 624,
+        "height": 480
+      }
+    },
+    "maniac-1934": {
+      "edition": "https://archive.org/download/Maniac/Maniac.mp4",
+      "image": {
+        "url": "https://archive.org/download/Maniac/Maniac.thumbs/Maniac_001860.jpg",
+        "sourceUrl": "https://archive.org/details/Maniac",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "manos-hands-of-fate": {
+      "edition": "https://archive.org/download/y-2-mate.is-manos-the-hands-of-fate-1966-horror-full-length-film-d-3-lbzla-0-v-3/Y2Mate.is%20-%20Manos%20The%20Hands%20of%20Fate%C2%A0%281966%29%20%20Horror%20%20Full%20Length%20Film-D3LBZLA0V3k-1080p-1629341030447.ia.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/Manos_The_Hands_of_Fate_poster_HQ.jpg/500px-Manos_The_Hands_of_Fate_poster_HQ.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Manos_The_Hands_of_Fate_poster_HQ.jpg",
+        "credit": "Emerson Film Enterprises",
+        "kind": "poster",
+        "width": 500,
+        "height": 750
+      },
+      "frame": {
+        "url": "https://archive.org/download/y-2-mate.is-manos-the-hands-of-fate-1966-horror-full-length-film-d-3-lbzla-0-v-3/y-2-mate.is-manos-the-hands-of-fate-1966-horror-full-length-film-d-3-lbzla-0-v-3.thumbs/Y2Mate.is%20-%20Manos%20The%20Hands%20of%20Fate%C2%A0%281966%29%20%20Horror%20%20Full%20Length%20Film-D3LBZLA0V3k-1080p-1629341030447_002517.jpg",
+        "sourceUrl": "https://archive.org/details/y-2-mate.is-manos-the-hands-of-fate-1966-horror-full-length-film-d-3-lbzla-0-v-3",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "marihuana-1936": {
+      "edition": "https://archive.org/download/Marihuana-the_Devils_Weed/Marihuana.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Marihuana_1_%281936%29.jpg/500px-Marihuana_1_%281936%29.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Marihuana_1_(1936).jpg",
+        "credit": "Roadshow Attractions",
+        "kind": "poster",
+        "width": 500,
+        "height": 653
+      },
+      "frame": {
+        "url": "https://archive.org/download/Marihuana-the_Devils_Weed/Marihuana-the_Devils_Weed.thumbs/Marihuana_002100.jpg",
+        "sourceUrl": "https://archive.org/details/Marihuana-the_Devils_Weed",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "mark-of-zorro": {
+      "edition": "https://archive.org/download/vidzo/The-Mark-of-Zorro-v2.mp4",
+      "image": {
+        "url": "https://archive.org/download/vidzo/vidzo.thumbs/The-Mark-of-Zorro-v2_002454.jpg",
+        "sourceUrl": "https://archive.org/details/vidzo",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "master-hands": {
+      "edition": "https://archive.org/download/masterhandscomplete4kh264/Master_Hands_complete_4K_h264.mp4",
+      "image": {
+        "url": "https://archive.org/download/masterhandscomplete4kh264/masterhandscomplete4kh264.thumbs/Master_Hands_complete_4K_h264_001135.jpg",
+        "sourceUrl": "https://archive.org/details/masterhandscomplete4kh264",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 540
+      }
+    },
+    "meet-king-joe": {
+      "edition": "https://archive.org/download/4050_Meet_King_Joe_01_19_26_08/4050_Meet_King_Joe_01_19_26_08.mp4",
+      "image": {
+        "url": "https://archive.org/download/4050_Meet_King_Joe_01_19_26_08/4050_Meet_King_Joe_01_19_26_08.thumbs/4050_Meet_King_Joe_01_19_26_08_000345.jpg",
+        "sourceUrl": "https://archive.org/details/4050_Meet_King_Joe_01_19_26_08",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "memory-of-the-camps": {
+      "edition": "https://archive.org/download/FrontlineMemoryoftheCamps/Frontline.S03E18.Memory.of.the.Camps.1985.VHSRip.AAC2.0.x264-rattera.mp4",
+      "image": {
+        "url": "https://archive.org/download/FrontlineMemoryoftheCamps/FrontlineMemoryoftheCamps.thumbs/Frontline.S03E18.Memory.of.the.Camps.1985.VHSRip.AAC2.0.x264-rattera_001320.jpg",
+        "sourceUrl": "https://archive.org/details/FrontlineMemoryoftheCamps",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 640,
+        "height": 480
+      }
+    },
+    "menilmontant": {
+      "edition": "https://archive.org/download/menilmontant1924-25/Menilmontant1924-25.mp4",
+      "image": {
+        "url": "https://archive.org/download/menilmontant1924-25/menilmontant1924-25.thumbs/Menilmontant1924-25_000834.jpg",
+        "sourceUrl": "https://archive.org/details/menilmontant1924-25",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "mental-hospital": {
+      "edition": "https://archive.org/download/mental_hospital/mental_hospital.mp4",
+      "image": {
+        "url": "https://archive.org/download/mental_hospital/mental_hospital.thumbs/mental_hospital_000480.jpg",
+        "sourceUrl": "https://archive.org/details/mental_hospital",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "meshes-of-the-afternoon": {
+      "edition": "https://archive.org/download/Meshes_Of_The_Afternoon_Maya_Deren/Meshes_of_the_Afternoon_Maya_Deren.mp4",
+      "image": {
+        "url": "https://archive.org/download/Meshes_Of_The_Afternoon_Maya_Deren/Meshes_Of_The_Afternoon_Maya_Deren.thumbs/Meshes_of_the_Afternoon_Maya_Deren_000207.jpg",
+        "sourceUrl": "https://archive.org/details/Meshes_Of_The_Afternoon_Maya_Deren",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "metamorphosis-mr-samsa": {
+      "edition": "https://archive.org/download/caroline-leaf-the-metamorphosis-/Caroline%20Leaf%20-%20The%20Metamorphosis%20of%20Mr%20Samsa%20%281977%29.mp4",
+      "image": {
+        "url": "https://archive.org/download/caroline-leaf-the-metamorphosis-/caroline-leaf-the-metamorphosis-.thumbs/Caroline%20Leaf%20-%20The%20Metamorphosis%20of%20Mr%20Samsa%20%281977%29_000208.jpg",
+        "sourceUrl": "https://archive.org/details/caroline-leaf-the-metamorphosis-",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 640,
+        "height": 360
+      }
+    },
+    "metropolis": {
+      "edition": "https://archive.org/download/metropolis-1927-bdrip-1080p-x-265-dts-hd-ma-5.1-d-0ct-0r-lew-sev/Metropolis%201927%20BDrip%201080p%20x265%20DTS-HD%20MA%205.1%20D0ct0rLew%5BSEV%5D.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/1927_Boris_Bilinski_%281900-1948%29_Plakat_f%C3%BCr_den_Film_Metropolis%2C_Staatliche_Museen_zu_Berlin.jpg/500px-1927_Boris_Bilinski_%281900-1948%29_Plakat_f%C3%BCr_den_Film_Metropolis%2C_Staatliche_Museen_zu_Berlin.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:1927_Boris_Bilinski_(1900-1948)_Plakat_f%C3%BCr_den_Film_Metropolis,_Staatliche_Museen_zu_Berlin.jpg",
+        "credit": "Boris Konstantinovitch Bilinsky (1900–1948)",
+        "kind": "poster",
+        "width": 500,
+        "height": 370
+      },
+      "frame": {
+        "url": "https://archive.org/download/metropolis-1927-bdrip-1080p-x-265-dts-hd-ma-5.1-d-0ct-0r-lew-sev/metropolis-1927-bdrip-1080p-x-265-dts-hd-ma-5.1-d-0ct-0r-lew-sev.thumbs/Metropolis%201927%20BDrip%201080p%20x265%20DTS-HD%20MA%205.1%20D0ct0rLew%5BSEV%5D_005517.jpg",
+        "sourceUrl": "https://archive.org/details/metropolis-1927-bdrip-1080p-x-265-dts-hd-ma-5.1-d-0ct-0r-lew-sev",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "mickey-mouse-in-vietnam": {
+      "edition": "https://archive.org/download/mmiv-1968-4k-16mm/MMIV1968.ia.mp4",
+      "image": {
+        "url": "https://archive.org/download/mmiv-1968-4k-16mm/mmiv-1968-4k-16mm.thumbs/MMIV1968_000040.jpg",
+        "sourceUrl": "https://archive.org/details/mmiv-1968-4k-16mm",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 540
+      }
+    },
+    "middleton-family-worlds-fair": {
+      "edition": "https://archive.org/download/middleton_family_worlds_fair_1939/middleton_family_at_the_worlds_fair_1939.mp4",
+      "image": {
+        "url": "https://archive.org/download/middleton_family_worlds_fair_1939/middleton_family_worlds_fair_1939.thumbs/middleton_family_at_the_worlds_fair_1939_001260.jpg",
+        "sourceUrl": "https://archive.org/details/middleton_family_worlds_fair_1939",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "molly-grows-up": {
+      "edition": "https://archive.org/download/MollyGro1953/MollyGro1953.mp4",
+      "image": {
+        "url": "https://archive.org/download/MollyGro1953/MollyGro1953.thumbs/MollyGro1953_000330.jpg",
+        "sourceUrl": "https://archive.org/details/MollyGro1953",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "moon-travel": {
+      "edition": "https://archive.org/download/0491_Moon_Travel_01_30_24_00/0491_Moon_Travel_01_30_24_00.mp4",
+      "image": {
+        "url": "https://archive.org/download/0491_Moon_Travel_01_30_24_00/0491_Moon_Travel_01_30_24_00.thumbs/0491_Moon_Travel_01_30_24_00_000195.jpg",
+        "sourceUrl": "https://archive.org/details/0491_Moon_Travel_01_30_24_00",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "musketeers-pig-alley": {
+      "edition": "https://archive.org/download/12TheMusketeersOfPigAlley/12%20The%20Musketeers%20of%20Pig%20Alley.ia.mp4",
+      "image": {
+        "url": "https://archive.org/download/12TheMusketeersOfPigAlley/12TheMusketeersOfPigAlley.thumbs/12%20The%20Musketeers%20of%20Pig%20Alley_000090.jpg",
+        "sourceUrl": "https://archive.org/details/12TheMusketeersOfPigAlley",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "my-japan": {
+      "edition": "https://archive.org/download/MyJapan1945/MyJapan1945.mp4",
+      "image": {
+        "url": "https://archive.org/download/MyJapan1945/MyJapan1945.thumbs/MyJapan1945_000360.jpg",
+        "sourceUrl": "https://archive.org/details/MyJapan1945",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "nanook-of-the-north": {
+      "edition": "https://archive.org/download/NanookOfTheNorth-HD/nanook%20of%20the%20north.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Nanook_of_the_north.jpg/500px-Nanook_of_the_north.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Nanook_of_the_north.jpg",
+        "credit": "Robert J. Flannery / Pathe Pictures",
+        "kind": "poster",
+        "width": 500,
+        "height": 745
+      },
+      "frame": {
+        "url": "https://archive.org/download/NanookOfTheNorth-HD/NanookOfTheNorth-HD.thumbs/nanook%20of%20the%20north_002874.jpg",
+        "sourceUrl": "https://archive.org/details/NanookOfTheNorth-HD",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "night-of-the-living-dead": {
+      "edition": "https://archive.org/download/NightOfTheLivingDead1968-Restored/Notld1968Restoration-desktop.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a7/Night_Of_The_Living_Dead_%281968%29_-_Poster.jpg/500px-Night_Of_The_Living_Dead_%281968%29_-_Poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Night_Of_The_Living_Dead_(1968)_-_Poster.jpg",
+        "credit": "Wikimedia Commons",
+        "kind": "poster",
+        "width": 500,
+        "height": 719
+      },
+      "frame": {
+        "url": "https://archive.org/download/NightOfTheLivingDead1968-Restored/NightOfTheLivingDead1968-Restored.thumbs/Notld1968Restoration-desktop_002214.jpg",
+        "sourceUrl": "https://archive.org/details/NightOfTheLivingDead1968-Restored",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "night-on-bald-mountain": {
+      "edition": "https://archive.org/download/nightonbaldmountain/nightonbaldmountain/nightonbaldmountain.mp4",
+      "image": {
+        "url": "https://archive.org/download/nightonbaldmountain/nightonbaldmountain.thumbs/nightonbaldmountain/nightonbaldmountain_000195.jpg",
+        "sourceUrl": "https://archive.org/details/nightonbaldmountain",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "no-maps-for-these-territories": {
+      "edition": "https://archive.org/download/NoMapsForTheseTerritories/NoMapsForTheseTerritories.mp4",
+      "image": {
+        "url": "https://archive.org/download/NoMapsForTheseTerritories/NoMapsForTheseTerritories.thumbs/NoMapsForTheseTerritories_001974.jpg",
+        "sourceUrl": "https://archive.org/details/NoMapsForTheseTerritories",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "nosferatu": {
+      "edition": "https://archive.org/download/Nosferatu1922HD/Nosferatu%20%281922%29%20HD.mp4",
+      "image": {
+        "url": "https://archive.org/download/Nosferatu1922HD/Nosferatu1922HD.thumbs/Nosferatu%20%281922%29%20HD_001494.jpg",
+        "sourceUrl": "https://archive.org/details/Nosferatu1922HD",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "on-guard-story-of-sage": {
+      "edition": "https://archive.org/download/OnGuard1956/OnGuard1956.mp4",
+      "image": {
+        "url": "https://archive.org/download/OnGuard1956/OnGuard1956.thumbs/OnGuard1956_000270.jpg",
+        "sourceUrl": "https://archive.org/details/OnGuard1956",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "one-got-fat": {
+      "edition": "https://archive.org/download/OneGotFa1963/OneGotFa1963.mp4",
+      "image": {
+        "url": "https://archive.org/download/OneGotFa1963/OneGotFa1963.thumbs/OneGotFa1963_000330.jpg",
+        "sourceUrl": "https://archive.org/details/OneGotFa1963",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "one-week": {
+      "edition": "https://archive.org/download/OneWeek/One_Week_512kb.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Buster_keaton_one_week_poster.jpg/500px-Buster_keaton_one_week_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Buster_keaton_one_week_poster.jpg",
+        "credit": "Metro Pictures",
+        "kind": "poster",
+        "width": 500,
+        "height": 751
+      },
+      "frame": {
+        "url": "https://archive.org/download/OneWeek/OneWeek.thumbs/One_Week_000480.jpg",
+        "sourceUrl": "https://archive.org/details/OneWeek",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "one-world-or-none": {
+      "edition": "https://archive.org/download/0995_One_World_or_None_01_35_20_16/0995_One_World_or_None_01_35_20_16_3mb.mp4",
+      "image": {
+        "url": "https://archive.org/download/0995_One_World_or_None_01_35_20_16/0995_One_World_or_None_01_35_20_16.thumbs/0995_One_World_or_None_01_35_20_16_3mb_000207.jpg",
+        "sourceUrl": "https://archive.org/details/0995_One_World_or_None_01_35_20_16",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "operation-cue": {
+      "edition": "https://archive.org/download/Operatio1955/Operatio1955.mp4",
+      "image": {
+        "url": "https://archive.org/download/Operatio1955/Operatio1955.thumbs/Operatio1955_000360.jpg",
+        "sourceUrl": "https://archive.org/details/Operatio1955",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "opium-destruction-sf": {
+      "edition": "https://archive.org/download/OpiumDes1914/OpiumDes1914.mp4",
+      "image": {
+        "url": "https://archive.org/download/OpiumDes1914/OpiumDes1914.thumbs/OpiumDes1914_000060.jpg",
+        "sourceUrl": "https://archive.org/details/OpiumDes1914",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "our-cities-must-fight": {
+      "edition": "https://archive.org/download/OurCitie1951/OurCitie1951.mp4",
+      "image": {
+        "url": "https://archive.org/download/OurCitie1951/OurCitie1951.thumbs/OurCitie1951_000210.jpg",
+        "sourceUrl": "https://archive.org/details/OurCitie1951",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "our-enemy-the-japanese": {
+      "edition": "https://archive.org/download/OurEnemy1943/OurEnemy1943.mp4",
+      "image": {
+        "url": "https://archive.org/download/OurEnemy1943/OurEnemy1943.thumbs/OurEnemy1943_000480.jpg",
+        "sourceUrl": "https://archive.org/details/OurEnemy1943",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "our-hospitality": {
+      "edition": "https://archive.org/download/our-hospitality-keaton-and-blystone-1923-high-quality-1080p-db-1-iz-urnfr-m/Our_Hospitality_Keaton_and_Blystone_1923_High_Quality_1080p-db1IzURNfrM.ia.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Our_Hospitality_%281923%29_Poster.jpg/500px-Our_Hospitality_%281923%29_Poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Our_Hospitality_(1923)_Poster.jpg",
+        "credit": "Metro Pictures",
+        "kind": "poster",
+        "width": 500,
+        "height": 685
+      },
+      "frame": {
+        "url": "https://archive.org/download/our-hospitality-keaton-and-blystone-1923-high-quality-1080p-db-1-iz-urnfr-m/our-hospitality-keaton-and-blystone-1923-high-quality-1080p-db-1-iz-urnfr-m.thumbs/Our_Hospitality_Keaton_and_Blystone_1923_High_Quality_1080p-db1IzURNfrM_001735.jpg",
+        "sourceUrl": "https://archive.org/details/our-hospitality-keaton-and-blystone-1923-high-quality-1080p-db-1-iz-urnfr-m",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 540
+      }
+    },
+    "palmour-street": {
+      "edition": "https://archive.org/download/PalmourS1957/PalmourS1957.mp4",
+      "image": {
+        "url": "https://archive.org/download/PalmourS1957/PalmourS1957.thumbs/PalmourS1957_000540.jpg",
+        "sourceUrl": "https://archive.org/details/PalmourS1957",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "passion-jeanne-darc": {
+      "edition": "https://archive.org/download/the-passion-of-joan-of-arc/The%20Passion%20of%20Joan%20of%20Arc.ia.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/The_Passion_of_Joan_of_Arc_%281928%29_English_Poster.png/500px-The_Passion_of_Joan_of_Arc_%281928%29_English_Poster.png",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Passion_of_Joan_of_Arc_(1928)_English_Poster.png",
+        "credit": "Eloquent Press · N. Morgillo",
+        "kind": "poster",
+        "width": 500,
+        "height": 781
+      },
+      "frame": {
+        "url": "https://archive.org/download/the-passion-of-joan-of-arc/the-passion-of-joan-of-arc.thumbs/The%20Passion%20of%20Joan%20of%20Arc_001856.jpg",
+        "sourceUrl": "https://archive.org/details/the-passion-of-joan-of-arc",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 376
+      }
+    },
+    "perversion-for-profit": {
+      "edition": "https://archive.org/download/0694_Perversion_for_Profit/0694_Perversion_for_Profit_05_00_53_00_3mb.mp4",
+      "image": {
+        "url": "https://archive.org/download/0694_Perversion_for_Profit/0694_Perversion_for_Profit.thumbs/0694_Perversion_for_Profit_05_00_53_00_3mb_001134.jpg",
+        "sourceUrl": "https://archive.org/details/0694_Perversion_for_Profit",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "phantom-of-the-opera": {
+      "edition": "https://archive.org/download/ThePhantomoftheOpera/Phantom_of_the_Opera_512kb.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/53/Phantom_of_the_opera_1925_poster.jpg/500px-Phantom_of_the_opera_1925_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Phantom_of_the_opera_1925_poster.jpg",
+        "credit": "Universal Pictures",
+        "kind": "poster",
+        "width": 500,
+        "height": 792
+      },
+      "frame": {
+        "url": "https://archive.org/download/ThePhantomoftheOpera/ThePhantomoftheOpera.thumbs/Phantom_of_the_Opera_002400.jpg",
+        "sourceUrl": "https://archive.org/details/ThePhantomoftheOpera",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "plan-9-from-outer-space": {
+      "edition": "https://archive.org/download/plan-94-k/Plan94K.ia.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Plan_nine_from_outer_space.jpg/500px-Plan_nine_from_outer_space.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Plan_nine_from_outer_space.jpg",
+        "credit": "Distributors Corporation of America",
+        "kind": "poster",
+        "width": 500,
+        "height": 777
+      },
+      "frame": {
+        "url": "https://archive.org/download/plan-94-k/plan-94-k.thumbs/Plan94K_002877.jpg",
+        "sourceUrl": "https://archive.org/details/plan-94-k",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 540
+      }
+    },
+    "plow-that-broke-the-plains": {
+      "edition": "https://archive.org/download/gov.archives.arc.13595/gov.archives.arc.13595_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/gov.archives.arc.13595/gov.archives.arc.13595.thumbs/gov.archives.arc.13595_000600.jpg",
+        "sourceUrl": "https://archive.org/details/gov.archives.arc.13595",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "poor-cinderella": {
+      "edition": "https://archive.org/download/poor-cinderella-1934/Poor%20Cinderella%20%281934%29.mp4",
+      "image": {
+        "url": "https://archive.org/download/poor-cinderella-1934/poor-cinderella-1934.thumbs/Poor%20Cinderella%20%281934%29_000240.jpg",
+        "sourceUrl": "https://archive.org/details/poor-cinderella-1934",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 632,
+        "height": 480
+      }
+    },
+    "poverty-in-rural-america": {
+      "edition": "https://archive.org/download/0223PovertyInRuralAmerica/0223_Poverty_in_Rural_America.mp4",
+      "image": {
+        "url": "https://archive.org/download/0223PovertyInRuralAmerica/0223PovertyInRuralAmerica.thumbs/0223_Poverty_in_Rural_America_000654.jpg",
+        "sourceUrl": "https://archive.org/details/0223PovertyInRuralAmerica",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "powers-of-ten": {
+      "edition": "https://archive.org/download/powers-of-tentm-1977_202202/Powers%20of%20Ten%E2%84%A2%20%281977%29.ia.mp4",
+      "image": {
+        "url": "https://archive.org/download/powers-of-tentm-1977_202202/powers-of-tentm-1977_202202.thumbs/Powers%20of%20Ten%E2%84%A2%20%281977%29_000333.jpg",
+        "sourceUrl": "https://archive.org/details/powers-of-tentm-1977_202202",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "princess-iron-fan": {
+      "edition": "https://archive.org/download/princess_iron_fan/princess_iron_fan.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/Princess_Iron_Fan_Poster.webp/500px-Princess_Iron_Fan_Poster.webp",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Princess_Iron_Fan_Poster.webp",
+        "credit": "United China Film Company",
+        "kind": "poster",
+        "width": 500,
+        "height": 680
+      },
+      "frame": {
+        "url": "https://archive.org/download/princess_iron_fan/princess_iron_fan.thumbs/princess_iron_fan_001680.jpg",
+        "sourceUrl": "https://archive.org/details/princess_iron_fan",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "private-life-of-a-cat": {
+      "edition": "https://archive.org/download/PrivateL1947/PrivateL1947_256kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/PrivateL1947/PrivateL1947.thumbs/PrivateL1947_256kb_000834.jpg",
+        "sourceUrl": "https://archive.org/details/PrivateL1947",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "private-snafu": {
+      "edition": "https://archive.org/download/booby_traps/booby_traps_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/booby_traps/booby_traps.thumbs/booby_traps_000090.jpg",
+        "sourceUrl": "https://archive.org/details/booby_traps",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "quasi-at-the-quackadero": {
+      "edition": "https://archive.org/download/quasi-at-the-quackadero/Quasi%20at%20the%20Quackadero.ia.mp4",
+      "image": {
+        "url": "https://archive.org/download/quasi-at-the-quackadero/quasi-at-the-quackadero.thumbs/Quasi%20at%20the%20Quackadero_000241.jpg",
+        "sourceUrl": "https://archive.org/details/quasi-at-the-quackadero",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 640,
+        "height": 480
+      }
+    },
+    "red-chinese-battle-plan": {
+      "edition": "https://archive.org/download/RedChine1964/RedChine1964.mp4",
+      "image": {
+        "url": "https://archive.org/download/RedChine1964/RedChine1964.thumbs/RedChine1964_000600.jpg",
+        "sourceUrl": "https://archive.org/details/RedChine1964",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "red-nightmare": {
+      "edition": "https://archive.org/download/RedNightmare/RedNightmare.mp4",
+      "image": {
+        "url": "https://archive.org/download/RedNightmare/RedNightmare.thumbs/RedNightmare_000654.jpg",
+        "sourceUrl": "https://archive.org/details/RedNightmare",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "reefer-madness": {
+      "edition": "https://archive.org/download/reefer_madness_ipod/reefer_madness1938.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Reefer_Madness_%281936%29.jpg/500px-Reefer_Madness_%281936%29.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Reefer_Madness_(1936).jpg",
+        "credit": "Motion Picture Ventures",
+        "kind": "poster",
+        "width": 500,
+        "height": 730
+      },
+      "frame": {
+        "url": "https://archive.org/download/reefer_madness_ipod/reefer_madness_ipod.thumbs/reefer_madness1938_001560.jpg",
+        "sourceUrl": "https://archive.org/details/reefer_madness_ipod",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "regeneration-1915": {
+      "edition": "https://archive.org/download/silent-the-regeneration/The%20Regeneration.ia.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/Regeneration_1915_poster.jpg/500px-Regeneration_1915_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Regeneration_1915_poster.jpg",
+        "credit": "Fox Film Corporation",
+        "kind": "poster",
+        "width": 500,
+        "height": 715
+      },
+      "frame": {
+        "url": "https://archive.org/download/silent-the-regeneration/silent-the-regeneration.thumbs/The%20Regeneration_002636.jpg",
+        "sourceUrl": "https://archive.org/details/silent-the-regeneration",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 636,
+        "height": 468
+      }
+    },
+    "road-to-the-stars": {
+      "edition": "https://archive.org/download/road-to-the-stars-1957-480p-25fps-h-264-128kbit-aac/Road%20To%20The%20Stars%20%281957%29%20%28480p_25fps_H264-128kbit_AAC%29.ia.mp4",
+      "image": {
+        "url": "https://archive.org/download/road-to-the-stars-1957-480p-25fps-h-264-128kbit-aac/road-to-the-stars-1957-480p-25fps-h-264-128kbit-aac.thumbs/Road%20To%20The%20Stars%20%281957%29%20%28480p_25fps_H264-128kbit_AAC%29_001136.jpg",
+        "sourceUrl": "https://archive.org/details/road-to-the-stars-1957-480p-25fps-h-264-128kbit-aac",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 640,
+        "height": 480
+      }
+    },
+    "ror-rocket-on-rotor": {
+      "edition": "https://archive.org/download/ror_rocket_on_rotor/ror_rocket_on_rotor_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/ror_rocket_on_rotor/ror_rocket_on_rotor.thumbs/ror_rocket_on_rotor_000360.jpg",
+        "sourceUrl": "https://archive.org/details/ror_rocket_on_rotor",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "safety-last": {
+      "edition": "https://archive.org/download/silent-safety-last/Safety%20Last%21.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Safety_last_poster.jpg/500px-Safety_last_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Safety_last_poster.jpg",
+        "credit": "Wikimedia Commons",
+        "kind": "poster",
+        "width": 500,
+        "height": 968
+      },
+      "frame": {
+        "url": "https://archive.org/download/silent-safety-last/silent-safety-last.thumbs/Safety%20Last%21_001677.jpg",
+        "sourceUrl": "https://archive.org/details/silent-safety-last",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 522
+      }
+    },
+    "salt-of-the-earth": {
+      "edition": "https://archive.org/download/clacinonl_SaltOfTheEarth/salt_of_the_earth.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Salt_of_the_Earth_%281954_film_poster%29.jpg/500px-Salt_of_the_Earth_%281954_film_poster%29.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Salt_of_the_Earth_(1954_film_poster).jpg",
+        "credit": "Independent Productions",
+        "kind": "poster",
+        "width": 500,
+        "height": 641
+      },
+      "frame": {
+        "url": "https://archive.org/download/clacinonl_SaltOfTheEarth/clacinonl_SaltOfTheEarth.thumbs/salt_of_the_earth_003360.jpg",
+        "sourceUrl": "https://archive.org/details/clacinonl_SaltOfTheEarth",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "santa-claus-conquers-martians": {
+      "edition": "https://archive.org/download/y-2-mate.is-santa-claus-conquers-the-martians-1964-adventure-comedy-sci-fi-chris/Y2Mate.is%20-%20Santa%20Claus%20Conquers%20the%20Martians%20%281964%29%20Adventure%2C%20Comedy%2C%20Sci-Fi%2C%20Christmas%20Movie-L4SZyeUGSM4-1080p-1639926880939.ia.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Santa_Claus_Conquers_the_Martians_1.jpg/500px-Santa_Claus_Conquers_the_Martians_1.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Santa_Claus_Conquers_the_Martians_1.jpg",
+        "credit": "Wikimedia Commons",
+        "kind": "poster",
+        "width": 500,
+        "height": 755
+      },
+      "frame": {
+        "url": "https://archive.org/download/y-2-mate.is-santa-claus-conquers-the-martians-1964-adventure-comedy-sci-fi-chris/y-2-mate.is-santa-claus-conquers-the-martians-1964-adventure-comedy-sci-fi-chris.thumbs/Y2Mate.is%20-%20Santa%20Claus%20Conquers%20the%20Martians%20%281964%29%20Adventure%2C%20Comedy%2C%20Sci-Fi%2C%20Christmas%20Movie-L4SZyeUGSM4-1080p-1639926880939_001854.jpg",
+        "sourceUrl": "https://archive.org/details/y-2-mate.is-santa-claus-conquers-the-martians-1964-adventure-comedy-sci-fi-chris",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 540
+      }
+    },
+    "scarlet-street": {
+      "edition": "https://archive.org/download/Scarlet.Street.194517/ScarletStreet1945.mp4",
+      "image": {
+        "url": "https://archive.org/download/Scarlet.Street.194517/Scarlet.Street.194517.thumbs/ScarletStreet1945_002334.jpg",
+        "sourceUrl": "https://archive.org/details/Scarlet.Street.194517",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "seashell-and-clergyman": {
+      "edition": "https://archive.org/download/la-coquille-et-le-clergyman-1928_202507/La%20Coquille%20et%20le%20Clergyman%20%281928%29.mp4",
+      "image": {
+        "url": "https://archive.org/download/la-coquille-et-le-clergyman-1928_202507/la-coquille-et-le-clergyman-1928_202507.thumbs/La%20Coquille%20et%20le%20Clergyman%20%281928%29_000898.jpg",
+        "sourceUrl": "https://archive.org/details/la-coquille-et-le-clergyman-1928_202507",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 540
+      }
+    },
+    "seduction-of-the-innocent": {
+      "edition": "https://archive.org/download/Seduction_of_the_Innocent/0811_Seduction_of_the_Innocent_03_45_13_00_3mb.mp4",
+      "image": {
+        "url": "https://archive.org/download/Seduction_of_the_Innocent/Seduction_of_the_Innocent.thumbs/0811_Seduction_of_the_Innocent_03_45_13_00_3mb_000147.jpg",
+        "sourceUrl": "https://archive.org/details/Seduction_of_the_Innocent",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "self-preservation-atomic-attack": {
+      "edition": "https://archive.org/download/preserve/preserve.mp4",
+      "image": {
+        "url": "https://archive.org/download/preserve/preserve.thumbs/preserve_000420.jpg",
+        "sourceUrl": "https://archive.org/details/preserve",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "shake-hands-with-danger": {
+      "edition": "https://archive.org/download/ShakeHan1970/ShakeHan1970.mp4",
+      "image": {
+        "url": "https://archive.org/download/ShakeHan1970/ShakeHan1970.thumbs/ShakeHan1970_000540.jpg",
+        "sourceUrl": "https://archive.org/details/ShakeHan1970",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "she-shoulda-said-no": {
+      "edition": "https://archive.org/download/SheShouldaSaidNo/SheShouldaSaidNo.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/She_Shoulda_Said_No%21.jpg/500px-She_Shoulda_Said_No%21.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:She_Shoulda_Said_No!.jpg",
+        "credit": "Hygienic Productions",
+        "kind": "poster",
+        "width": 500,
+        "height": 625
+      },
+      "frame": {
+        "url": "https://archive.org/download/SheShouldaSaidNo/SheShouldaSaidNo.thumbs/SheShouldaSaidNo_001554.jpg",
+        "sourceUrl": "https://archive.org/details/SheShouldaSaidNo",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "sherlock-jr": {
+      "edition": "https://archive.org/download/sherlock.-jr..-1924.1080p.-blu-ray.x-264-yts.-am/Sherlock.Jr..1924.1080p.BluRay.x264-%5BYTS.AM%5D.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c1/Sherlock_jr_poster.jpg/500px-Sherlock_jr_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Sherlock_jr_poster.jpg",
+        "credit": "Wikimedia Commons",
+        "kind": "poster",
+        "width": 500,
+        "height": 788
+      },
+      "frame": {
+        "url": "https://archive.org/download/sherlock.-jr..-1924.1080p.-blu-ray.x-264-yts.-am/sherlock.-jr..-1924.1080p.-blu-ray.x-264-yts.-am.thumbs/Sherlock.Jr..1924.1080p.BluRay.x264-%5BYTS.AM%5D_001022.jpg",
+        "sourceUrl": "https://archive.org/details/sherlock.-jr..-1924.1080p.-blu-ray.x-264-yts.-am",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 542
+      }
+    },
+    "shoes-1916": {
+      "edition": "https://archive.org/download/1916-shoes/1916-Shoes.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Shoes_1916_poster.jpg/500px-Shoes_1916_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Shoes_1916_poster.jpg",
+        "credit": "Burton Rice",
+        "kind": "publicity",
+        "width": 500,
+        "height": 680
+      },
+      "frame": {
+        "url": "https://archive.org/download/1916-shoes/1916-shoes.thumbs/1916-Shoes_001075.jpg",
+        "sourceUrl": "https://archive.org/details/1916-shoes",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 540
+      }
+    },
+    "shy-guy": {
+      "edition": "https://archive.org/download/ShyGuy1947/ShyGuy1947.mp4",
+      "image": {
+        "url": "https://archive.org/download/ShyGuy1947/ShyGuy1947.thumbs/ShyGuy1947_000300.jpg",
+        "sourceUrl": "https://archive.org/details/ShyGuy1947",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "signal-30": {
+      "edition": "https://archive.org/download/Signal301959/Signal301959.mp4",
+      "image": {
+        "url": "https://archive.org/download/Signal301959/Signal301959.thumbs/Signal301959_000300.jpg",
+        "sourceUrl": "https://archive.org/details/Signal301959",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "sinking-of-the-lusitania": {
+      "edition": "https://archive.org/download/Sinking_of_the_Lusitania/SinkingOfTheLusitania_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/Sinking_of_the_Lusitania/Sinking_of_the_Lusitania.thumbs/SinkingOfTheLusitania_000150.jpg",
+        "sourceUrl": "https://archive.org/details/Sinking_of_the_Lusitania",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "skateboard-sense": {
+      "edition": "https://archive.org/download/skateboard_sense/skateboard_sense.mp4",
+      "image": {
+        "url": "https://archive.org/download/skateboard_sense/skateboard_sense.thumbs/skateboard_sense_000210.jpg",
+        "sourceUrl": "https://archive.org/details/skateboard_sense",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "smiling-madame-beudet": {
+      "edition": "https://archive.org/download/ptp_la-souriante-madame-_germaine-dulac_avi_xvid_640x460_4999/Germaine%20Dulac%20-%20The%20Smiling%20Madame%20Beudet%20%5B1923%5D/La%20souriante%20madame%20Beudet%20-%201923.mp4",
+      "image": {
+        "url": "https://archive.org/download/ptp_la-souriante-madame-_germaine-dulac_avi_xvid_640x460_4999/ptp_la-souriante-madame-_germaine-dulac_avi_xvid_640x460_4999.thumbs/Germaine%20Dulac%20-%20The%20Smiling%20Madame%20Beudet%20%5B1923%5D/La%20souriante%20madame%20Beudet%20-%201923_000570.jpg",
+        "sourceUrl": "https://archive.org/details/ptp_la-souriante-madame-_germaine-dulac_avi_xvid_640x460_4999",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "snow-white-betty-boop": {
+      "edition": "https://archive.org/download/bb_snow_white/bb_snow_white_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/bb_snow_white/bb_snow_white.thumbs/bb_snow_white_000150.jpg",
+        "sourceUrl": "https://archive.org/details/bb_snow_white",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "social-class-in-america": {
+      "edition": "https://archive.org/download/SocialCl1957/SocialCl1957.mp4",
+      "image": {
+        "url": "https://archive.org/download/SocialCl1957/SocialCl1957.thumbs/SocialCl1957_000330.jpg",
+        "sourceUrl": "https://archive.org/details/SocialCl1957",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "social-sex-attitudes": {
+      "edition": "https://archive.org/download/SocialSe1953/SocialSe1953.mp4",
+      "image": {
+        "url": "https://archive.org/download/SocialSe1953/SocialSe1953.thumbs/SocialSe1953_000840.jpg",
+        "sourceUrl": "https://archive.org/details/SocialSe1953",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "soviet-toys": {
+      "edition": "https://archive.org/download/DzigaVertovSovietToys1924/Dziga%20Vertov%20%20Soviet%20Toys%20%281924%29.mp4",
+      "image": {
+        "url": "https://archive.org/download/DzigaVertovSovietToys1924/DzigaVertovSovietToys1924.thumbs/Dziga%20Vertov%20%20Soviet%20Toys%20%281924%29_000405.jpg",
+        "sourceUrl": "https://archive.org/details/DzigaVertovSovietToys1924",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "spider-baby": {
+      "edition": "https://archive.org/download/spider.-baby.-or.-the.-maddest.-story.-ever.-told.-1967/Spider%20Baby%20Or%20The%20Maddest%20Story%20Ever%20Told%20%281967%29/mp4/Spider.Baby.Or.The.Maddest.Story.Ever.Told.1967.mp4",
+      "image": {
+        "url": "https://archive.org/download/spider.-baby.-or.-the.-maddest.-story.-ever.-told.-1967/spider.-baby.-or.-the.-maddest.-story.-ever.-told.-1967.thumbs/Spider%20Baby%20Or%20The%20Maddest%20Story%20Ever%20Told%20%281967%29/mp4/Spider.Baby.Or.The.Maddest.Story.Ever.Told.1967_001320.jpg",
+        "sourceUrl": "https://archive.org/details/spider.-baby.-or.-the.-maddest.-story.-ever.-told.-1967",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 432
+      }
+    },
+    "st-louis-blues-1929": {
+      "edition": "https://archive.org/download/st-louis-blues-1929/st-louis-blues-1929.ia.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ce/St._Louis_Blues_%28poster_for_1929_film%29.jpg/500px-St._Louis_Blues_%28poster_for_1929_film%29.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:St._Louis_Blues_(poster_for_1929_film).jpg",
+        "credit": "Unknown artistUnknown artist",
+        "kind": "poster",
+        "width": 500,
+        "height": 725
+      },
+      "frame": {
+        "url": "https://archive.org/download/st-louis-blues-1929/st-louis-blues-1929.thumbs/st-louis-blues-1929_000355.jpg",
+        "sourceUrl": "https://archive.org/details/st-louis-blues-1929",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 540
+      }
+    },
+    "steamboat-bill-jr": {
+      "edition": "https://archive.org/download/steamboat-bill-jr.-reisner-1928-high-quality-1080p-h-2r-np-17ccf-u/Steamboat_Bill_Jr._Reisner_1928_High_Quality_1080p-H2rNP17ccfU.ia.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Steamboat_Bill%2C_Jr._%28United_Artists%2C_1928%29._Pressbook_02.jpg/500px-Steamboat_Bill%2C_Jr._%28United_Artists%2C_1928%29._Pressbook_02.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Steamboat_Bill,_Jr._(United_Artists,_1928)._Pressbook_02.jpg",
+        "credit": "United Artists",
+        "kind": "publicity",
+        "width": 500,
+        "height": 649
+      },
+      "frame": {
+        "url": "https://archive.org/download/steamboat-bill-jr.-reisner-1928-high-quality-1080p-h-2r-np-17ccf-u/steamboat-bill-jr.-reisner-1928-high-quality-1080p-h-2r-np-17ccf-u.thumbs/Steamboat_Bill_Jr._Reisner_1928_High_Quality_1080p-H2rNP17ccfU_001614.jpg",
+        "sourceUrl": "https://archive.org/details/steamboat-bill-jr.-reisner-1928-high-quality-1080p-h-2r-np-17ccf-u",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 546
+      }
+    },
+    "steamboat-willie": {
+      "edition": "https://archive.org/download/steamboat-willie_1928/steamboat-willie_1928.ia.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Steamboat_Willie_1928_Poster.png/500px-Steamboat_Willie_1928_Poster.png",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Steamboat_Willie_1928_Poster.png",
+        "credit": "Walt Disney / Ub Iwerks",
+        "kind": "poster",
+        "width": 500,
+        "height": 730
+      },
+      "frame": {
+        "url": "https://archive.org/download/steamboat-willie_1928/steamboat-willie_1928.thumbs/steamboat-willie_1928_000177.jpg",
+        "sourceUrl": "https://archive.org/details/steamboat-willie_1928",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 598
+      }
+    },
+    "steel-a-symphony-of-industry": {
+      "edition": "https://archive.org/download/SteelASy1936/SteelASy1936.mp4",
+      "image": {
+        "url": "https://archive.org/download/SteelASy1936/SteelASy1936.thumbs/SteelASy1936_000420.jpg",
+        "sourceUrl": "https://archive.org/details/SteelASy1936",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "story-kelly-gang": {
+      "edition": "https://archive.org/download/TheStoryOfTheKellyGang/TheStoryOfTheKellyGang.mp4",
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/0/03/The_Story_of_the_Kelly_Gang_-_Poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Story_of_the_Kelly_Gang_-_Poster.jpg",
+        "credit": "Wikimedia Commons",
+        "kind": "poster",
+        "width": 480,
+        "height": 1180
+      },
+      "frame": {
+        "url": "https://archive.org/download/TheStoryOfTheKellyGang/TheStoryOfTheKellyGang.thumbs/TheStoryOfTheKellyGang_000750.jpg",
+        "sourceUrl": "https://archive.org/details/TheStoryOfTheKellyGang",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "strange-love-martha-ivers": {
+      "edition": "https://archive.org/download/Martha_Ivers/Martha_Ivers.mp4",
+      "image": {
+        "url": "https://archive.org/download/Martha_Ivers/Martha_Ivers.thumbs/Martha_Ivers_004229.jpg",
+        "sourceUrl": "https://archive.org/details/Martha_Ivers",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "styling-and-the-experimental-car": {
+      "edition": "https://archive.org/download/styling_and_the_experimental_car/styling_and_the_experimental_car.mp4",
+      "image": {
+        "url": "https://archive.org/download/styling_and_the_experimental_car/styling_and_the_experimental_car.thumbs/styling_and_the_experimental_car_000360.jpg",
+        "sourceUrl": "https://archive.org/details/styling_and_the_experimental_car",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "suddenly-1954": {
+      "edition": "https://archive.org/download/suddenly/suddenly.mp4",
+      "image": {
+        "url": "https://archive.org/download/suddenly/suddenly.thumbs/suddenly_001740.jpg",
+        "sourceUrl": "https://archive.org/details/suddenly",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "sunrise-song-two-humans": {
+      "edition": "https://archive.org/download/sunrise.-a.-song.-of.-two.-humans.-1927.720p.-blu-ray.x-264-hdclub-public-hd/Sunrise.A.Song.Of.Two.Humans.1927.720p.BluRay.x264-HDCLUB%20%5BPublicHD%5D.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Sunrise_-_A_Song_of_Two_Humans.jpg/500px-Sunrise_-_A_Song_of_Two_Humans.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Sunrise_-_A_Song_of_Two_Humans.jpg",
+        "credit": "Breve Storia del Cinema",
+        "kind": "poster",
+        "width": 500,
+        "height": 787
+      },
+      "frame": {
+        "url": "https://archive.org/download/sunrise.-a.-song.-of.-two.-humans.-1927.720p.-blu-ray.x-264-hdclub-public-hd/sunrise.-a.-song.-of.-two.-humans.-1927.720p.-blu-ray.x-264-hdclub-public-hd.thumbs/Sunrise.A.Song.Of.Two.Humans.1927.720p.BluRay.x264-HDCLUB%20%5BPublicHD%5D_003474.jpg",
+        "sourceUrl": "https://archive.org/details/sunrise.-a.-song.-of.-two.-humans.-1927.720p.-blu-ray.x-264-hdclub-public-hd",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 600
+      }
+    },
+    "superman-mechanical-monsters": {
+      "edition": "https://archive.org/download/superman_the_mechanical_monsters/superman_the_mechanical_monsters_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/superman_the_mechanical_monsters/superman_the_mechanical_monsters.thumbs/superman_the_mechanical_monsters_000240.jpg",
+        "sourceUrl": "https://archive.org/details/superman_the_mechanical_monsters",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "supervising-women-workers": {
+      "edition": "https://archive.org/download/Supervis1944/Supervis1944.mp4",
+      "image": {
+        "url": "https://archive.org/download/Supervis1944/Supervis1944.thumbs/Supervis1944_000240.jpg",
+        "sourceUrl": "https://archive.org/details/Supervis1944",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "survival-under-atomic-attack": {
+      "edition": "https://archive.org/download/Survival1951/Survival1951.mp4",
+      "image": {
+        "url": "https://archive.org/download/Survival1951/Survival1951.thumbs/Survival1951_000330.jpg",
+        "sourceUrl": "https://archive.org/details/Survival1951",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "symbol-of-the-unconquered": {
+      "edition": "https://archive.org/download/silent-the-symbol-of-the-unconquered/The%20Symbol%20of%20the%20Unconquered.mp4",
+      "image": {
+        "url": "https://archive.org/download/silent-the-symbol-of-the-unconquered/silent-the-symbol-of-the-unconquered.thumbs/The%20Symbol%20of%20the%20Unconquered_001375.jpg",
+        "sourceUrl": "https://archive.org/details/silent-the-symbol-of-the-unconquered",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 540
+      }
+    },
+    "symptoms-in-schizophrenia": {
+      "edition": "https://archive.org/download/Symptoms1940/Symptoms1940.mp4",
+      "image": {
+        "url": "https://archive.org/download/Symptoms1940/Symptoms1940.thumbs/Symptoms1940_000300.jpg",
+        "sourceUrl": "https://archive.org/details/Symptoms1940",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "tacoma-narrows-bridge-collapse": {
+      "edition": "https://archive.org/download/Tacoma-Narrows_Bridge_Collapse/2096_Tacoma-Narrows_Bridge_Collapse_03_11_13_15_3mb.mp4",
+      "image": {
+        "url": "https://archive.org/download/Tacoma-Narrows_Bridge_Collapse/Tacoma-Narrows_Bridge_Collapse.thumbs/2096_Tacoma-Narrows_Bridge_Collapse_03_11_13_15_3mb_000087.jpg",
+        "sourceUrl": "https://archive.org/details/Tacoma-Narrows_Bridge_Collapse",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "television-commercials-50s-60s": {
+      "edition": "https://archive.org/download/Televisi1960/Televisi1960.mp4",
+      "image": {
+        "url": "https://archive.org/download/Televisi1960/Televisi1960.thumbs/Televisi1960_000600.jpg",
+        "sourceUrl": "https://archive.org/details/Televisi1960",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "ten-days-that-shook-the-world": {
+      "edition": "https://archive.org/download/october-ten-days-that-shook-the-world_1928/october-ten-days-that-shook-the-world_1928.ia.mp4",
+      "image": {
+        "url": "https://archive.org/download/october-ten-days-that-shook-the-world_1928/october-ten-days-that-shook-the-world_1928.thumbs/october-ten-days-that-shook-the-world_1928_004200.jpg",
+        "sourceUrl": "https://archive.org/details/october-ten-days-that-shook-the-world_1928",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 548
+      }
+    },
+    "terror-of-tiny-town": {
+      "edition": "https://archive.org/download/TheTerrorOfTinyTown1938_802/terroroftinytown.mp4",
+      "image": {
+        "url": "https://archive.org/download/TheTerrorOfTinyTown1938_802/TheTerrorOfTinyTown1938_802.thumbs/terroroftinytown_001380.jpg",
+        "sourceUrl": "https://archive.org/details/TheTerrorOfTinyTown1938_802",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "testament-of-dr-mabuse": {
+      "edition": "https://archive.org/download/the-testament-of-dr-mabuse-restored-720p-hd/the%20testament%20of%20dr%20mabuse-restored-720p-hd.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/Le_testament_du_docteur_Mabuse.jpg/500px-Le_testament_du_docteur_Mabuse.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Le_testament_du_docteur_Mabuse.jpg",
+        "credit": "Wikimedia Commons",
+        "kind": "poster",
+        "width": 500,
+        "height": 780
+      },
+      "frame": {
+        "url": "https://archive.org/download/the-testament-of-dr-mabuse-restored-720p-hd/the-testament-of-dr-mabuse-restored-720p-hd.thumbs/the%20testament%20of%20dr%20mabuse-restored-720p-hd_002754.jpg",
+        "sourceUrl": "https://archive.org/details/the-testament-of-dr-mabuse-restored-720p-hd",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "the-bat-whispers": {
+      "edition": "https://archive.org/download/the-bat-whispers-1930/The%20Bat%20Whispers%20%281930%29.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Batwhispers.jpg/500px-Batwhispers.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Batwhispers.jpg",
+        "credit": "Hap Hadley",
+        "kind": "poster",
+        "width": 500,
+        "height": 733
+      },
+      "frame": {
+        "url": "https://archive.org/download/the-bat-whispers-1930/the-bat-whispers-1930.thumbs/The%20Bat%20Whispers%20%281930%29_001314.jpg",
+        "sourceUrl": "https://archive.org/details/the-bat-whispers-1930",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "the-battle-of-midway": {
+      "edition": "https://archive.org/download/the_battle_of_midway/the_battle_of_midway.mp4",
+      "image": {
+        "url": "https://archive.org/download/the_battle_of_midway/the_battle_of_midway.thumbs/the_battle_of_midway_000660.jpg",
+        "sourceUrl": "https://archive.org/details/the_battle_of_midway",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-big-bounce": {
+      "edition": "https://archive.org/download/BigBounc1960/BigBounc1960.mp4",
+      "image": {
+        "url": "https://archive.org/download/BigBounc1960/BigBounc1960.thumbs/BigBounc1960_000540.jpg",
+        "sourceUrl": "https://archive.org/details/BigBounc1960",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-big-combo": {
+      "edition": "https://archive.org/download/the-big-combo-pnm/The.Big.Combo.1955.INTERNAL.1080p.BluRay.X264-AMIABLE.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bc/The_Big_Combo_poster.jpg/500px-The_Big_Combo_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Big_Combo_poster.jpg",
+        "credit": "Employee(s) of Allied Artists",
+        "kind": "poster",
+        "width": 500,
+        "height": 769
+      },
+      "frame": {
+        "url": "https://archive.org/download/the-big-combo-pnm/the-big-combo-pnm.thumbs/The.Big.Combo.1955.INTERNAL.1080p.BluRay.X264-AMIABLE_003182.jpg",
+        "sourceUrl": "https://archive.org/details/the-big-combo-pnm",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "the-big-trail": {
+      "edition": "https://archive.org/download/the-big-trail_1930/the-big-trail_1930.ia.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/The_Big_Trail_%281930_film_poster%29.jpg/500px-The_Big_Trail_%281930_film_poster%29.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Big_Trail_(1930_film_poster).jpg",
+        "credit": "Distributed by Fox Film Corporation.",
+        "kind": "poster",
+        "width": 500,
+        "height": 679
+      },
+      "frame": {
+        "url": "https://archive.org/download/the-big-trail_1930/the-big-trail_1930.thumbs/the-big-trail_1930_004260.jpg",
+        "sourceUrl": "https://archive.org/details/the-big-trail_1930",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 344
+      }
+    },
+    "the-bronze-buckaroo": {
+      "edition": "https://archive.org/download/bronze_buckaroo/the_bronze_buckaroo.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fd/The_Bronze_Buckaroo_movie_poster.jpg/500px-The_Bronze_Buckaroo_movie_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Bronze_Buckaroo_movie_poster.jpg",
+        "credit": "Richard C. Kahn / Jed Buell",
+        "kind": "poster",
+        "width": 500,
+        "height": 720
+      },
+      "frame": {
+        "url": "https://archive.org/download/bronze_buckaroo/bronze_buckaroo.thumbs/the_bronze_buckaroo_001260.jpg",
+        "sourceUrl": "https://archive.org/details/bronze_buckaroo",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-chicken-of-tomorrow": {
+      "edition": "https://archive.org/download/Chickeno1948/Chickeno1948.mp4",
+      "image": {
+        "url": "https://archive.org/download/Chickeno1948/Chickeno1948.thumbs/Chickeno1948_000600.jpg",
+        "sourceUrl": "https://archive.org/details/Chickeno1948",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-children-must-learn": {
+      "edition": "https://archive.org/download/Children1940/Children1940.mp4",
+      "image": {
+        "url": "https://archive.org/download/Children1940/Children1940.thumbs/Children1940_000300.jpg",
+        "sourceUrl": "https://archive.org/details/Children1940",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-city-1939": {
+      "edition": "https://archive.org/download/TheCity_201505/The%20City.mp4",
+      "image": {
+        "url": "https://archive.org/download/TheCity_201505/TheCity_201505.thumbs/The%20City_001170.jpg",
+        "sourceUrl": "https://archive.org/details/TheCity_201505",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-critic-1963": {
+      "edition": "https://archive.org/download/thecritic_20170601/thecritic_20170601.mp4",
+      "image": {
+        "url": "https://archive.org/download/thecritic_20170601/thecritic_20170601.thumbs/thecritic_20170601_000117.jpg",
+        "sourceUrl": "https://archive.org/details/thecritic_20170601",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-cut-ups": {
+      "edition": "https://archive.org/download/youtube-Uq_hztHJCM4/The_Cut_Ups_1966_William_S._Burroughs-Uq_hztHJCM4.mp4",
+      "image": {
+        "url": "https://archive.org/download/youtube-Uq_hztHJCM4/youtube-Uq_hztHJCM4.thumbs/The_Cut_Ups_1966_William_S._Burroughs-Uq_hztHJCM4_000474.jpg",
+        "sourceUrl": "https://archive.org/details/youtube-Uq_hztHJCM4",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-dover-boys": {
+      "edition": "https://archive.org/download/the-dover-boys-at-pimento-university-or-the-rivals-of-roquefort-hall/The%20Dover%20Boys%20at%20Pimento%20University%20or%20The%20Rivals%20of%20Roquefort%20Hall.mp4",
+      "image": {
+        "url": "https://archive.org/download/the-dover-boys-at-pimento-university-or-the-rivals-of-roquefort-hall/the-dover-boys-at-pimento-university-or-the-rivals-of-roquefort-hall.thumbs/The%20Dover%20Boys%20at%20Pimento%20University%20or%20The%20Rivals%20of%20Roquefort%20Hall_000207.jpg",
+        "sourceUrl": "https://archive.org/details/the-dover-boys-at-pimento-university-or-the-rivals-of-roquefort-hall",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 640,
+        "height": 480
+      }
+    },
+    "the-duke-is-tops": {
+      "edition": "https://archive.org/download/TheDukeisTops/TheDukeisTops.mp4",
+      "image": {
+        "url": "https://archive.org/download/TheDukeisTops/TheDukeisTops.thumbs/TheDukeisTops_002760.jpg",
+        "sourceUrl": "https://archive.org/details/TheDukeisTops",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-emperor-jones": {
+      "edition": "https://archive.org/download/TheEmpererJones/TheEmpererJones.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/The_Emperor_Jones_%281933_film_poster%29.jpg/500px-The_Emperor_Jones_%281933_film_poster%29.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Emperor_Jones_(1933_film_poster).jpg",
+        "credit": "United Artists",
+        "kind": "poster",
+        "width": 500,
+        "height": 750
+      },
+      "frame": {
+        "url": "https://archive.org/download/TheEmpererJones/TheEmpererJones.thumbs/TheEmpererJones_001140.jpg",
+        "sourceUrl": "https://archive.org/details/TheEmpererJones",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-freshman": {
+      "edition": "https://archive.org/download/silent-the-freshman/The%20Freshman.mp4",
+      "image": {
+        "url": "https://archive.org/download/silent-the-freshman/silent-the-freshman.thumbs/The%20Freshman_001734.jpg",
+        "sourceUrl": "https://archive.org/details/silent-the-freshman",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "the-general": {
+      "edition": "https://archive.org/download/the-general-keaton-and-bruckman-1926-high-quality-1080p-t-o-p-swu-fc/The_General_Keaton_and_Bruckman_1926_High_Quality_1080p-T_O-pSwu-fc.ia.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/The_General_%281926%29_-_Movie_Poster_2.png/500px-The_General_%281926%29_-_Movie_Poster_2.png",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_General_(1926)_-_Movie_Poster_2.png",
+        "credit": "United Artists Corporation",
+        "kind": "poster",
+        "width": 500,
+        "height": 732
+      },
+      "frame": {
+        "url": "https://archive.org/download/the-general-keaton-and-bruckman-1926-high-quality-1080p-t-o-p-swu-fc/the-general-keaton-and-bruckman-1926-high-quality-1080p-t-o-p-swu-fc.thumbs/The_General_Keaton_and_Bruckman_1926_High_Quality_1080p-T_O-pSwu-fc_001794.jpg",
+        "sourceUrl": "https://archive.org/details/the-general-keaton-and-bruckman-1926-high-quality-1080p-t-o-p-swu-fc",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 548
+      }
+    },
+    "the-gold-rush": {
+      "edition": "https://archive.org/download/the-gold-rush-film-1925/The-Gold-Rush-1925.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/Gold_rush_poster.jpg/500px-Gold_rush_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Gold_rush_poster.jpg",
+        "credit": "Charles Chaplin Productions / United Artists",
+        "kind": "poster",
+        "width": 500,
+        "height": 658
+      },
+      "frame": {
+        "url": "https://archive.org/download/the-gold-rush-film-1925/the-gold-rush-film-1925.thumbs/The-Gold-Rush-1925_001974.jpg",
+        "sourceUrl": "https://archive.org/details/the-gold-rush-film-1925",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 540
+      }
+    },
+    "the-golem": {
+      "edition": "https://archive.org/download/the-golem-how-he-came-into-the-world-full-movie-restored-720p-hd/the%20golem%20how%20he%20came%20into%20the%20world-full%20movie-restored-720p-hd.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/The_Golem_-_How_He_Came_into_the_World_%281920%29_poster.jpg/500px-The_Golem_-_How_He_Came_into_the_World_%281920%29_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Golem_-_How_He_Came_into_the_World_(1920)_poster.jpg",
+        "credit": "Hans Poelzig",
+        "kind": "poster",
+        "width": 500,
+        "height": 378
+      },
+      "frame": {
+        "url": "https://archive.org/download/the-golem-how-he-came-into-the-world-full-movie-restored-720p-hd/the-golem-how-he-came-into-the-world-full-movie-restored-720p-hd.thumbs/the%20golem%20how%20he%20came%20into%20the%20world-full%20movie-restored-720p-hd_003115.jpg",
+        "sourceUrl": "https://archive.org/details/the-golem-how-he-came-into-the-world-full-movie-restored-720p-hd",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "the-hitch-hiker": {
+      "edition": "https://archive.org/download/hitchhiker_201605/hitchhiker.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/The_Hitch-Hiker_%281953_poster%29.jpeg/500px-The_Hitch-Hiker_%281953_poster%29.jpeg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Hitch-Hiker_(1953_poster).jpeg",
+        "credit": "RKO Radio Pictures",
+        "kind": "poster",
+        "width": 500,
+        "height": 746
+      },
+      "frame": {
+        "url": "https://archive.org/download/hitchhiker_201605/hitchhiker_201605.thumbs/hitchhiker_001614.jpg",
+        "sourceUrl": "https://archive.org/details/hitchhiker_201605",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-home-economics-story": {
+      "edition": "https://archive.org/download/0159_Home_Economics_Story_The_E00036_01_16_28_00/0159_Home_Economics_Story_The_E00036_01_16_28_00.mp4",
+      "image": {
+        "url": "https://archive.org/download/0159_Home_Economics_Story_The_E00036_01_16_28_00/0159_Home_Economics_Story_The_E00036_01_16_28_00.thumbs/0159_Home_Economics_Story_The_E00036_01_16_28_00_000570.jpg",
+        "sourceUrl": "https://archive.org/details/0159_Home_Economics_Story_The_E00036_01_16_28_00",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-house-i-live-in": {
+      "edition": "https://archive.org/download/TheHouseILiveIn/TheHouseILiveIn_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/TheHouseILiveIn/TheHouseILiveIn.thumbs/TheHouseILiveIn_000240.jpg",
+        "sourceUrl": "https://archive.org/details/TheHouseILiveIn",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-immigrant": {
+      "edition": "https://archive.org/download/CC_1917_06_17_TheImmigrant/CC_1917_06_17_TheImmigrant_512kb.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/CC_The_Immigrant_1917.JPG/500px-CC_The_Immigrant_1917.JPG",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:CC_The_Immigrant_1917.JPG",
+        "credit": "Mutual Film",
+        "kind": "poster",
+        "width": 500,
+        "height": 773
+      },
+      "frame": {
+        "url": "https://archive.org/download/CC_1917_06_17_TheImmigrant/CC_1917_06_17_TheImmigrant.thumbs/CC_1917_06_17_TheImmigrant_000300.jpg",
+        "sourceUrl": "https://archive.org/details/CC_1917_06_17_TheImmigrant",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-incredible-machine": {
+      "edition": "https://archive.org/download/0767_Incredible_Machine_The_20_26_47_00/0767_Incredible_Machine_The_20_26_47_00_3mb.mp4",
+      "image": {
+        "url": "https://archive.org/download/0767_Incredible_Machine_The_20_26_47_00/0767_Incredible_Machine_The_20_26_47_00.thumbs/0767_Incredible_Machine_The_20_26_47_00_3mb_000327.jpg",
+        "sourceUrl": "https://archive.org/details/0767_Incredible_Machine_The_20_26_47_00",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-information-machine": {
+      "edition": "https://archive.org/download/InformationM/InformationM.mp4",
+      "image": {
+        "url": "https://archive.org/download/InformationM/InformationM.thumbs/InformationM_000360.jpg",
+        "sourceUrl": "https://archive.org/details/InformationM",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-iron-horse": {
+      "edition": "https://archive.org/download/the-iron-horse-1924-john-ford/The%20Iron%20Horse%201924%20John%20Ford.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Iron_Horse_Poster.jpg/500px-Iron_Horse_Poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Iron_Horse_Poster.jpg",
+        "credit": "Wikimedia Commons",
+        "kind": "poster",
+        "width": 500,
+        "height": 732
+      },
+      "frame": {
+        "url": "https://archive.org/download/the-iron-horse-1924-john-ford/the-iron-horse-1924-john-ford.thumbs/The%20Iron%20Horse%201924%20John%20Ford_003415.jpg",
+        "sourceUrl": "https://archive.org/details/the-iron-horse-1924-john-ford",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 540
+      }
+    },
+    "the-italian-1915": {
+      "edition": "https://archive.org/download/silent-the-italian/The%20Italian.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6c/TheItalian-moviepamphlet-1915.jpg/500px-TheItalian-moviepamphlet-1915.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:TheItalian-moviepamphlet-1915.jpg",
+        "credit": "Paramount Pictures",
+        "kind": "publicity",
+        "width": 500,
+        "height": 774
+      },
+      "frame": {
+        "url": "https://archive.org/download/silent-the-italian/silent-the-italian.thumbs/The%20Italian_001676.jpg",
+        "sourceUrl": "https://archive.org/details/silent-the-italian",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 540
+      }
+    },
+    "the-kid": {
+      "edition": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d1/The_Kid_%281921%29_by_Charlie_Chaplin.webm/The_Kid_%281921%29_by_Charlie_Chaplin.webm.480p.vp9.webm",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/The_Kid_%281921%29_poster.jpg/500px-The_Kid_%281921%29_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Kid_(1921)_poster.jpg",
+        "credit": "First National",
+        "kind": "poster",
+        "width": 500,
+        "height": 738
+      },
+      "frame": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/The_Kid_%281921%29_by_Charlie_Chaplin.webm/500px--The_Kid_%281921%29_by_Charlie_Chaplin.webm.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Kid_(1921)_by_Charlie_Chaplin.webm",
+        "credit": "Charlie Chaplin · Wikimedia Commons",
+        "kind": "frame",
+        "width": 500,
+        "height": 281
+      }
+    },
+    "the-last-laugh": {
+      "edition": "https://archive.org/download/the-last-laugh-restored-720p-hd/the%20last%20laugh-restored-720p-hd.mp4",
+      "image": {
+        "url": "https://archive.org/download/the-last-laugh-restored-720p-hd/the-last-laugh-restored-720p-hd.thumbs/the%20last%20laugh-restored-720p-hd_002034.jpg",
+        "sourceUrl": "https://archive.org/details/the-last-laugh-restored-720p-hd",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 406
+      }
+    },
+    "the-last-man-on-earth": {
+      "edition": "https://archive.org/download/the-last-man-on-earth-1964_20251031/The%20Last%20Man%20on%20Earth%20-%201964/The%20Last%20Man%20on%20Earth%20-%201964.ia.mp4",
+      "image": {
+        "url": "https://archive.org/download/the-last-man-on-earth-1964_20251031/the-last-man-on-earth-1964_20251031.thumbs/The%20Last%20Man%20on%20Earth%20-%201964/The%20Last%20Man%20on%20Earth%20-%201964_001976.jpg",
+        "sourceUrl": "https://archive.org/details/the-last-man-on-earth-1964_20251031",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 310
+      }
+    },
+    "the-lodger": {
+      "edition": "https://archive.org/download/TheLodgerAStoryOfTheLondonFog_579/TheLodger-AStoryOfTheLondonFog1927AlfredHitchcock_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/TheLodgerAStoryOfTheLondonFog_579/TheLodgerAStoryOfTheLondonFog_579.thumbs/TheLodger-AStoryOfTheLondonFog1927AlfredHitchcock_002580.jpg",
+        "sourceUrl": "https://archive.org/details/TheLodgerAStoryOfTheLondonFog_579",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-lost-world": {
+      "edition": "https://archive.org/download/lost_world/lost_world.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/The_Lost_World_%281925%29_-_film_poster.jpg/500px-The_Lost_World_%281925%29_-_film_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Lost_World_(1925)_-_film_poster.jpg",
+        "credit": "First National Pictures",
+        "kind": "poster",
+        "width": 500,
+        "height": 636
+      },
+      "frame": {
+        "url": "https://archive.org/download/lost_world/lost_world.thumbs/lost_world_001560.jpg",
+        "sourceUrl": "https://archive.org/details/lost_world",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-man-who-laughs": {
+      "edition": "https://archive.org/download/the-man-who-laughs-1928-1080p-blu-ray-x-265-ghost/The%20Man%20Who%20Laughs%20%281928%29%20%281080p%20BluRay%20x265%20Ghost%29.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/The-man-who-laughs-movie-poster-1928.jpg/500px-The-man-who-laughs-movie-poster-1928.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The-man-who-laughs-movie-poster-1928.jpg",
+        "credit": "Universal Pictures",
+        "kind": "poster",
+        "width": 500,
+        "height": 798
+      },
+      "frame": {
+        "url": "https://archive.org/download/the-man-who-laughs-1928-1080p-blu-ray-x-265-ghost/the-man-who-laughs-1928-1080p-blu-ray-x-265-ghost.thumbs/The%20Man%20Who%20Laughs%20%281928%29%20%281080p%20BluRay%20x265%20Ghost%29_001734.jpg",
+        "sourceUrl": "https://archive.org/details/the-man-who-laughs-1928-1080p-blu-ray-x-265-ghost",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 600
+      }
+    },
+    "the-march-1964": {
+      "edition": "https://archive.org/download/gov.archives.arc.49737/gov.archives.arc.49737_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/gov.archives.arc.49737/gov.archives.arc.49737.thumbs/gov.archives.arc.49737_000480.jpg",
+        "sourceUrl": "https://archive.org/details/gov.archives.arc.49737",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-mascot": {
+      "edition": "https://archive.org/download/The_Mascot_Complete/mascot_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/The_Mascot_Complete/The_Mascot_Complete.thumbs/mascot_000960.jpg",
+        "sourceUrl": "https://archive.org/details/The_Mascot_Complete",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-naked-kiss": {
+      "edition": "https://archive.org/download/thenakedkiss1964_202002/The%20Naked%20Kiss%20%281964%2C%20USA%29%20Featuring%20Constance%20Towers%2C%20Anthony%20Eisley%2C%20Virginia%20Grey-%20Neo-Noir%20Movie.mp4",
+      "image": {
+        "url": "https://archive.org/download/thenakedkiss1964_202002/thenakedkiss1964_202002.thumbs/The%20Naked%20Kiss%20%281964%2C%20USA%29%20Featuring%20Constance%20Towers%2C%20Anthony%20Eisley%2C%20Virginia%20Grey-%20Neo-Noir%20Movie_002035.jpg",
+        "sourceUrl": "https://archive.org/details/thenakedkiss1964_202002",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 576,
+        "height": 336
+      }
+    },
+    "the-penalty": {
+      "edition": "https://archive.org/download/ThePenalty/The_Penalty_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/ThePenalty/ThePenalty.thumbs/The_Penalty_002100.jpg",
+        "sourceUrl": "https://archive.org/details/ThePenalty",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-plantation-system": {
+      "edition": "https://archive.org/download/Plantati1950/Plantati1950.mp4",
+      "image": {
+        "url": "https://archive.org/download/Plantati1950/Plantati1950.thumbs/Plantati1950_000240.jpg",
+        "sourceUrl": "https://archive.org/details/Plantati1950",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-relaxed-wife": {
+      "edition": "https://archive.org/download/RelaxedW1957/RelaxedW1957.mp4",
+      "image": {
+        "url": "https://archive.org/download/RelaxedW1957/RelaxedW1957.thumbs/RelaxedW1957_000300.jpg",
+        "sourceUrl": "https://archive.org/details/RelaxedW1957",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-sealed-room": {
+      "edition": "https://archive.org/download/DWGriffithsTheSealedRoom1909/DWGriffithsTheSealedRoom1909.mp4",
+      "image": {
+        "url": "https://archive.org/download/DWGriffithsTheSealedRoom1909/DWGriffithsTheSealedRoom1909.thumbs/DWGriffithsTheSealedRoom1909_000298.jpg",
+        "sourceUrl": "https://archive.org/details/DWGriffithsTheSealedRoom1909",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-skeleton-dance": {
+      "edition": "https://archive.org/download/the-skeleton-dance_1929/the-skeleton-dance_1929.ia.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6c/The_Skeleton_Dance_poster.jpg/500px-The_Skeleton_Dance_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Skeleton_Dance_poster.jpg",
+        "credit": "Wikimedia Commons",
+        "kind": "poster",
+        "width": 500,
+        "height": 710
+      },
+      "frame": {
+        "url": "https://archive.org/download/the-skeleton-dance_1929/the-skeleton-dance_1929.thumbs/the-skeleton-dance_1929_000125.jpg",
+        "sourceUrl": "https://archive.org/details/the-skeleton-dance_1929",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 532
+      }
+    },
+    "the-snob": {
+      "edition": "https://archive.org/download/SnobThe1958/SnobThe1958.mp4",
+      "image": {
+        "url": "https://archive.org/download/SnobThe1958/SnobThe1958.thumbs/SnobThe1958_000300.jpg",
+        "sourceUrl": "https://archive.org/details/SnobThe1958",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-spanish-earth": {
+      "edition": "https://archive.org/download/the-spanish-earth-1937/The%20Spanish%20Earth%201937%20vo%20Orson%20Welles.mp4",
+      "image": {
+        "url": "https://archive.org/download/the-spanish-earth-1937/the_spanish_earth_ivens_1937.jpg",
+        "sourceUrl": "https://archive.org/details/the-spanish-earth-1937",
+        "credit": "Internet Archive",
+        "kind": "publicity",
+        "width": 382,
+        "height": 500
+      },
+      "frame": {
+        "url": "https://archive.org/download/the-spanish-earth-1937/the-spanish-earth-1937.thumbs/The%20Spanish%20Earth%201937%20vo%20Orson%20Welles_001195.jpg",
+        "sourceUrl": "https://archive.org/details/the-spanish-earth-1937",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 490,
+        "height": 360
+      }
+    },
+    "the-story-of-menstruation": {
+      "edition": "https://archive.org/download/som45345435/som45345435.mp4",
+      "image": {
+        "url": "https://archive.org/download/som45345435/som45345435.thumbs/som45345435_000387.jpg",
+        "sourceUrl": "https://archive.org/details/som45345435",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-stranger-1946": {
+      "edition": "https://archive.org/download/TheStranger720p/TheStranger720p.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/The_Stranger_%281946_film_poster%29.jpg/500px-The_Stranger_%281946_film_poster%29.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Stranger_(1946_film_poster).jpg",
+        "credit": "RKO Radio Pictures",
+        "kind": "poster",
+        "width": 500,
+        "height": 750
+      },
+      "frame": {
+        "url": "https://archive.org/download/TheStranger720p/TheStranger720p.thumbs/TheStranger720p_001494.jpg",
+        "sourceUrl": "https://archive.org/details/TheStranger720p",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-terrible-truth": {
+      "edition": "https://archive.org/download/Terrible1951/Terrible1951.mp4",
+      "image": {
+        "url": "https://archive.org/download/Terrible1951/Terrible1951.thumbs/Terrible1951_000360.jpg",
+        "sourceUrl": "https://archive.org/details/Terrible1951",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "the-unknown": {
+      "edition": "https://archive.org/download/the-unknown-1927-full-length/The%20Unknown%20%281927%29%20%28Full%20Length%29.mp4",
+      "image": {
+        "url": "https://archive.org/download/the-unknown-1927-full-length/the-unknown-1927-full-length.thumbs/The%20Unknown%20%281927%29%20%28Full%20Length%29_001554.jpg",
+        "sourceUrl": "https://archive.org/details/the-unknown-1927-full-length",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 548
+      }
+    },
+    "the-wasp-woman": {
+      "edition": "https://archive.org/download/the-wasp-woman-1959_202503/The%20Wasp%20Woman%201959.ia.mp4",
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/a/a0/The_Wasp_Woman_-_poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Wasp_Woman_-_poster.jpg",
+        "credit": "The Film Group, Inc.",
+        "kind": "publicity",
+        "width": 500,
+        "height": 386
+      },
+      "frame": {
+        "url": "https://archive.org/download/the-wasp-woman-1959_202503/the-wasp-woman-1959_202503.thumbs/The%20Wasp%20Woman%201959_001380.jpg",
+        "sourceUrl": "https://archive.org/details/the-wasp-woman-1959_202503",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 390
+      }
+    },
+    "thief-of-bagdad": {
+      "edition": "https://archive.org/download/vidtb/vidtb.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/Fairbanks_Thief_of_Bagdad_1924_Miner_Co_Poster.jpg/500px-Fairbanks_Thief_of_Bagdad_1924_Miner_Co_Poster.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Fairbanks_Thief_of_Bagdad_1924_Miner_Co_Poster.jpg",
+        "credit": "H. C. Miner Litho Co.",
+        "kind": "poster",
+        "width": 500,
+        "height": 747
+      },
+      "frame": {
+        "url": "https://archive.org/download/vidtb/vidtb.thumbs/vidtb_003474.jpg",
+        "sourceUrl": "https://archive.org/details/vidtb",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "things-to-come": {
+      "edition": "https://archive.org/download/things_to_come_ipod/thingstocome.mp4",
+      "image": {
+        "url": "https://archive.org/download/things_to_come_ipod/things_to_come_ipod.thumbs/thingstocome_003480.jpg",
+        "sourceUrl": "https://archive.org/details/things_to_come_ipod",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "third-avenue-el": {
+      "edition": "https://archive.org/download/ThirdAve1950/ThirdAve1950.mp4",
+      "image": {
+        "url": "https://archive.org/download/ThirdAve1950/ThirdAve1950.thumbs/ThirdAve1950_000240.jpg",
+        "sourceUrl": "https://archive.org/details/ThirdAve1950",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "this-is-coffee": {
+      "edition": "https://archive.org/download/ThisisCo1961/ThisisCo1961.mp4",
+      "image": {
+        "url": "https://archive.org/download/ThisisCo1961/ThisisCo1961.thumbs/ThisisCo1961_000300.jpg",
+        "sourceUrl": "https://archive.org/details/ThisisCo1961",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "this-is-marshall-mcluhan": {
+      "edition": "https://archive.org/download/thisismarshallmcluhanthemediumisthemessage/thisismarshallmcluhanthemediumisthemessagereel1/thisismarshallmcluhanthemediumisthemessagereel2.mp4",
+      "image": {
+        "url": "https://archive.org/download/thisismarshallmcluhanthemediumisthemessage/thisismarshallmcluhanthemediumisthemessage.thumbs/thisismarshallmcluhanthemediumisthemessagereel1/thisismarshallmcluhanthemediumisthemessagereel2_000630.jpg",
+        "sourceUrl": "https://archive.org/details/thisismarshallmcluhanthemediumisthemessage",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "to-new-horizons": {
+      "edition": "https://archive.org/download/ToNewHor1940/ToNewHor1940.mp4",
+      "image": {
+        "url": "https://archive.org/download/ToNewHor1940/ToNewHor1940.thumbs/ToNewHor1940_000540.jpg",
+        "sourceUrl": "https://archive.org/details/ToNewHor1940",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "toll-of-the-sea": {
+      "edition": "https://archive.org/download/TheTollOfTheSeanovember261922/TheTollOfTheSeachesterM.Franklin1922.mp4",
+      "image": {
+        "url": "https://archive.org/download/TheTollOfTheSeanovember261922/TheTollOfTheSeanovember261922.thumbs/TheTollOfTheSeachesterM.Franklin1922_001974.jpg",
+        "sourceUrl": "https://archive.org/details/TheTollOfTheSeanovember261922",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "too-late-for-tears": {
+      "edition": "https://archive.org/download/too.-late.for.-tears.-1949.-br-rip.-en-sub.x-264-mulvacoded/Too.Late.for.Tears.1949.BrRip.EN-SUB.x264-%5BMULVAcoded%5D.mp4",
+      "image": {
+        "url": "https://archive.org/download/too.-late.for.-tears.-1949.-br-rip.-en-sub.x-264-mulvacoded/too.-late.for.-tears.-1949.-br-rip.-en-sub.x-264-mulvacoded.thumbs/Too.Late.for.Tears.1949.BrRip.EN-SUB.x264-%5BMULVAcoded%5D_002282.jpg",
+        "sourceUrl": "https://archive.org/details/too.-late.for.-tears.-1949.-br-rip.-en-sub.x-264-mulvacoded",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 522
+      }
+    },
+    "toute-la-memoire-du-monde": {
+      "edition": "https://archive.org/download/toute-la-memoire-du-monde-alain-resnais-1956-subs-cont./Toute%20la%20m%C3%A9moire%20du%20monde%20-%20Alain%20Resnais%2C%201956%20%28subs%20cont.%29.mp4",
+      "image": {
+        "url": "https://archive.org/download/toute-la-memoire-du-monde-alain-resnais-1956-subs-cont./toute-la-memoire-du-monde-alain-resnais-1956-subs-cont..thumbs/Toute%20la%20m%C3%A9moire%20du%20monde%20-%20Alain%20Resnais%2C%201956%20%28subs%20cont.%29_000474.jpg",
+        "sourceUrl": "https://archive.org/details/toute-la-memoire-du-monde-alain-resnais-1956-subs-cont.",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 524
+      }
+    },
+    "trip-down-market-street": {
+      "edition": "https://archive.org/download/MarketStreet19064KScan20181016/Market_Street_1906_4K_scan_20181016.mp4",
+      "image": {
+        "url": "https://archive.org/download/MarketStreet19064KScan20181016/MarketStreet19064KScan20181016.thumbs/Market_Street_1906_4K_scan_20181016_000267.jpg",
+        "sourceUrl": "https://archive.org/details/MarketStreet19064KScan20181016",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "trip-to-the-moon": {
+      "edition": "https://archive.org/download/ATripToTheMoon20Fps/TripToTheMoon20Fps.mp4",
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Trip-to-moon-1902.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Trip-to-moon-1902.jpg",
+        "credit": "Georges Méliès",
+        "kind": "poster",
+        "width": 260,
+        "height": 273
+      },
+      "frame": {
+        "url": "https://archive.org/download/ATripToTheMoon20Fps/ATripToTheMoon20Fps.thumbs/TripToTheMoon20Fps_000270.jpg",
+        "sourceUrl": "https://archive.org/details/ATripToTheMoon20Fps",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "tumbleweeds": {
+      "edition": "https://archive.org/download/TUMBLEWEEDS1925WilliamS.HartBarbaraBedford/TUMBLEWEEDS%20%281925%29%20--%20William%20S.%20Hart%2C%20Barbara%20Bedford.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/19/Tumbleweeds_lobby_card_1925.jpg/500px-Tumbleweeds_lobby_card_1925.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Tumbleweeds_lobby_card_1925.jpg",
+        "credit": "United Artists",
+        "kind": "publicity",
+        "width": 500,
+        "height": 411
+      },
+      "frame": {
+        "url": "https://archive.org/download/TUMBLEWEEDS1925WilliamS.HartBarbaraBedford/TUMBLEWEEDS1925WilliamS.HartBarbaraBedford.thumbs/TUMBLEWEEDS%20%281925%29%20--%20William%20S.%20Hart%2C%20Barbara%20Bedford_000070.jpg",
+        "sourceUrl": "https://archive.org/details/TUMBLEWEEDS1925WilliamS.HartBarbaraBedford",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "twin-peaks-tunnel": {
+      "edition": "https://archive.org/download/TwinPeak1917/TwinPeak1917.mp4",
+      "image": {
+        "url": "https://archive.org/download/TwinPeak1917/TwinPeak1917.thumbs/TwinPeak1917_000240.jpg",
+        "sourceUrl": "https://archive.org/details/TwinPeak1917",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "un-chien-andalou": {
+      "edition": "https://archive.org/download/un-chien-andalou__1929-film__luis_bunuel/Un%20Chien%20Andalou%20-%20%281929%29%20-%20%281080p%20-%20x265%29.mp4",
+      "image": {
+        "url": "https://archive.org/download/un-chien-andalou__1929-film__luis_bunuel/un-chien-andalou__1929-film__luis_bunuel.thumbs/Un%20Chien%20Andalou%20-%20%281929%29%20-%20%281080p%20-%20x265%29_000362.jpg",
+        "sourceUrl": "https://archive.org/details/un-chien-andalou__1929-film__luis_bunuel",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 536
+      }
+    },
+    "underworld-1927": {
+      "edition": "https://archive.org/download/1927-underworld-la-ley-del-hampa-josef-von-sternberg-intertitulos-en-ingles/1927%20-%20Underworld%20-%20La%20ley%20del%20hampa%20-%20Josef%20von%20Sternberg%20-%20Intert%C3%ADtulos%20en%20ingl%C3%A9s.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Underworld_film_poster_1927.jpg/500px-Underworld_film_poster_1927.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Underworld_film_poster_1927.jpg",
+        "credit": "Wikimedia Commons",
+        "kind": "poster",
+        "width": 500,
+        "height": 769
+      },
+      "frame": {
+        "url": "https://archive.org/download/1927-underworld-la-ley-del-hampa-josef-von-sternberg-intertitulos-en-ingles/1927-underworld-la-ley-del-hampa-josef-von-sternberg-intertitulos-en-ingles.thumbs/1927%20-%20Underworld%20-%20La%20ley%20del%20hampa%20-%20Josef%20von%20Sternberg%20-%20Intert%C3%ADtulos%20en%20ingl%C3%A9s_002994.jpg",
+        "sourceUrl": "https://archive.org/details/1927-underworld-la-ley-del-hampa-josef-von-sternberg-intertitulos-en-ingles",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 640,
+        "height": 480
+      }
+    },
+    "universe-1960": {
+      "edition": "https://archive.org/download/universe-1960_202110/Universe%20%281960%29.ia.mp4",
+      "image": {
+        "url": "https://archive.org/download/universe-1960_202110/universe-1960_202110.thumbs/Universe%20%281960%29_000415.jpg",
+        "sourceUrl": "https://archive.org/details/universe-1960_202110",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 540
+      }
+    },
+    "valley-town": {
+      "edition": "https://archive.org/download/ValleyTo1940/ValleyTo1940.mp4",
+      "image": {
+        "url": "https://archive.org/download/ValleyTo1940/ValleyTo1940.thumbs/ValleyTo1940_000540.jpg",
+        "sourceUrl": "https://archive.org/details/ValleyTo1940",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "vampyr": {
+      "edition": "https://archive.org/download/Vampyr1932/NVEExport.mp4",
+      "image": {
+        "url": "https://archive.org/download/Vampyr1932/Vampyr1932.thumbs/NVEExport_002690.jpg",
+        "sourceUrl": "https://archive.org/details/Vampyr1932",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "visit-to-picasso": {
+      "edition": "https://archive.org/download/VisitToPicasso/Afana_visit_to_picasso_512kb1.mp4",
+      "image": {
+        "url": "https://d32gva8s8jjsl4.cloudfront.net/img/p/1/0/9/7/0/10970-photogramme_large.jpg",
+        "sourceUrl": "https://www.lacinetek.com/be-en/film/visit-to-picasso-paul-haesaerts-vod",
+        "credit": "LaCinetek",
+        "kind": "frame",
+        "width": 588,
+        "height": 353
+      }
+    },
+    "voyage-prehistoric-planet": {
+      "edition": "https://archive.org/download/VoyagetothePlanetofPrehistoricWomen/VoyagetothePlanetofPrehistoricWomen.mp4",
+      "image": {
+        "url": "https://archive.org/download/VoyagetothePlanetofPrehistoricWomen/VoyagetothePlanetofPrehistoricWomen.thumbs/VoyagetothePlanetofPrehistoricWomen_001800.jpg",
+        "sourceUrl": "https://archive.org/details/VoyagetothePlanetofPrehistoricWomen",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "wattstax": {
+      "edition": "https://archive.org/download/WattstaxFullDocumentary1973SubttulosEspaaol/Wattstax%20-%20Full%20Documentary%20%281973%29%20-%20subt%C3%ADtulos%20espa%C3%B1ol.mp4",
+      "image": {
+        "url": "https://archive.org/download/WattstaxFullDocumentary1973SubttulosEspaaol/WattstaxFullDocumentary1973SubttulosEspaaol.thumbs/Wattstax%20-%20Full%20Documentary%20%281973%29%20-%20subt%C3%ADtulos%20espa%C3%B1ol_003654.jpg",
+        "sourceUrl": "https://archive.org/details/WattstaxFullDocumentary1973SubttulosEspaaol",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "what-about-prejudice": {
+      "edition": "https://archive.org/download/WhatAbou1959/WhatAbou1959.mp4",
+      "image": {
+        "url": "https://archive.org/download/WhatAbou1959/WhatAbou1959.thumbs/WhatAbou1959_000420.jpg",
+        "sourceUrl": "https://archive.org/details/WhatAbou1959",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "what-you-should-know-biological-warfare": {
+      "edition": "https://archive.org/download/WhatYouS1952/WhatYouS1952.mp4",
+      "image": {
+        "url": "https://archive.org/download/WhatYouS1952/WhatYouS1952.thumbs/WhatYouS1952_000180.jpg",
+        "sourceUrl": "https://archive.org/details/WhatYouS1952",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "white-zombie": {
+      "edition": "https://archive.org/download/white_zombie/white_zombie.mp4",
+      "image": {
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Poster_-_White_Zombie_01.jpg/500px-Poster_-_White_Zombie_01.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Poster_-_White_Zombie_01.jpg",
+        "credit": "Unknown, possibly employee(s) of United Artists",
+        "kind": "poster",
+        "width": 500,
+        "height": 733
+      },
+      "frame": {
+        "url": "https://archive.org/download/white_zombie/white_zombie.thumbs/white_zombie_001500.jpg",
+        "sourceUrl": "https://archive.org/details/white_zombie",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "whos-out-there": {
+      "edition": "https://archive.org/download/gov.archives.arc.649442/gov.archives.arc.649442_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/gov.archives.arc.649442/gov.archives.arc.649442.thumbs/gov.archives.arc.649442_000660.jpg",
+        "sourceUrl": "https://archive.org/details/gov.archives.arc.649442",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "why-man-creates": {
+      "edition": "https://archive.org/download/why-man-creates/Why%20Man%20Creates%20%20%20Oscar%20Winning%20Short.ia.mp4",
+      "image": {
+        "url": "https://archive.org/download/why-man-creates/why-man-creates.thumbs/Why%20Man%20Creates%20%20%20Oscar%20Winning%20Short_000537.jpg",
+        "sourceUrl": "https://archive.org/details/why-man-creates",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 624,
+        "height": 480
+      }
+    },
+    "woman-on-the-run": {
+      "edition": "https://archive.org/download/Woman_on_the_Run/Woman_on_the_Run_512kb.mp4",
+      "image": {
+        "url": "https://archive.org/download/Woman_on_the_Run/Woman_on_the_Run.thumbs/Woman_on_the_Run_001740.jpg",
+        "sourceUrl": "https://archive.org/details/Woman_on_the_Run",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "world-of-buckminster-fuller": {
+      "edition": "https://archive.org/download/World-of-B-Fuller-1971/The%20World%20of%20Buckminster%20Fuller%20%281971%29.mp4",
+      "image": {
+        "url": "https://archive.org/download/World-of-B-Fuller-1971/World-of-B-Fuller-1971.thumbs/The%20World%20of%20Buckminster%20Fuller%20%281971%29_001254.jpg",
+        "sourceUrl": "https://archive.org/details/World-of-B-Fuller-1971",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "your-chance-to-live-technological-failures": {
+      "edition": "https://archive.org/download/your_chance_to_live_tech/your_chance_to_live_tech.mp4",
+      "image": {
+        "url": "https://archive.org/download/your_chance_to_live_tech/your_chance_to_live_tech.thumbs/your_chance_to_live_tech_000270.jpg",
+        "sourceUrl": "https://archive.org/details/your_chance_to_live_tech",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 160,
+        "height": 110
+      }
+    },
+    "zero-de-conduite": {
+      "edition": "https://archive.org/download/ZeroDeConduite.1933/Zero.For.Conduct.1933.1080p.BluRay.x264-%5BYTS.LT%5D.mp4",
+      "image": {
+        "url": "https://archive.org/download/ZeroDeConduite.1933/zerodeconduite1933.jpeg",
+        "sourceUrl": "https://archive.org/details/ZeroDeConduite.1933",
+        "credit": "Internet Archive",
+        "kind": "poster",
+        "width": 958,
+        "height": 1280
+      },
+      "frame": {
+        "url": "https://archive.org/download/ZeroDeConduite.1933/ZeroDeConduite.1933.thumbs/Zero.For.Conduct.1933.1080p.BluRay.x264-%5BYTS.LT%5D_001803.jpg",
+        "sourceUrl": "https://archive.org/details/ZeroDeConduite.1933",
+        "credit": "Internet Archive",
+        "kind": "frame",
+        "width": 720,
+        "height": 604
+      }
+    }
+  }
+}

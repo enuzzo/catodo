@@ -1,4 +1,5 @@
 import { FILM_EDITORIAL } from './theatre-editorial.js';
+import { loadTheatreJson } from './theatre-json.js';
 
 /** Source declarations and technical playback availability are separate facts. */
 export function featuredLink(value) {
@@ -15,6 +16,15 @@ export function featuredMedia(value) {
     && /\.(mp4|webm|mov)$/i.test(url.pathname) ? safe : null;
 }
 
+function sourceImage(image) {
+  const url = featuredLink(image?.url);
+  const sourceUrl = featuredLink(image?.sourceUrl);
+  if (!url || !sourceUrl || !image.credit) return null;
+  const host = new URL(url).host;
+  if (!['archive.org', 'upload.wikimedia.org', 'thumb.wikimedia.org', 'film-makerscoop.com', 'd32gva8s8jjsl4.cloudfront.net'].includes(host)) return null;
+  return { url, sourceUrl, credit: image.credit, kind: image.kind, width: image.width, height: image.height };
+}
+
 export function featuredPlaybackTitle(record) {
   if (!record?.editions?.length) return null;
   return { id: `featured:${record.id}`, title: record.title, decision: 'usable', editions: record.editions };
@@ -27,7 +37,15 @@ export function featuredReportUrl(record) {
   return url.href;
 }
 
-export function prepareFeatured(payload) {
+export async function loadFeaturedCatalog(options = {}) {
+  const [catalog, artwork] = await Promise.all([
+    loadTheatreJson('featured-research.json', { ...options, limit: 2_000_000 }),
+    loadTheatreJson('featured-artwork.json', { ...options, limit: 500_000 }).catch(() => null),
+  ]);
+  return prepareFeatured(catalog, artwork);
+}
+
+export function prepareFeatured(payload, artwork) {
   if (payload?.schemaVersion !== 2 || payload.kind !== 'editorial-playback' || !Array.isArray(payload.records)
     || payload.records.length > 1000 || !Array.isArray(payload.collections)) throw new Error('Invalid Featured catalog');
   const seen = new Set();
@@ -41,6 +59,8 @@ export function prepareFeatured(payload) {
       return { url, sourceUrl, label: edition.label, duration: edition.duration, audio: edition.audio };
     });
     if (!editions.length || editions.length > 8) throw new Error('Missing Featured edition');
+    const entry = artwork?.schemaVersion === 1 && artwork.works?.[record.id];
+    const matchingArt = entry?.edition === editions[0].url ? entry : null;
     return { id: record.id, rank: record.rank, title: record.title, year: record.year,
       editions, attribution: record.attribution, license: record.license, licenseUrl: featuredLink(record.licenseUrl),
       creators: record.creators, genres: record.genres, languages: record.languages, collections: record.collections,
@@ -48,8 +68,7 @@ export function prepareFeatured(payload) {
       sourceUrl: featuredLink(record.sourceUrl), editionNote: record.editionNote,
       rightsStatus: record.rightsStatus, rightsNote: record.rightsNote,
       rightsSources: (record.rightsSources || []).map(featuredLink).filter(Boolean),
-      image: record.image && featuredLink(record.image.url) && featuredLink(record.image.sourceUrl)
-        ? { url: featuredLink(record.image.url), sourceUrl: featuredLink(record.image.sourceUrl), credit: record.image.credit } : null };
+      image: sourceImage(matchingArt?.image) || sourceImage(record.image), frame: sourceImage(matchingArt?.frame) };
   });
   return { records, collections: payload.collections };
 }

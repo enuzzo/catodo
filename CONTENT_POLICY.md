@@ -29,7 +29,7 @@ Review the specific edition, soundtrack, restoration and subtitles; distinguish
 territorial public domain from an applicable license. Keep the source, exact
 license, requested attribution and edition notes visible beside the player.
 
-External media starts only after source consent. Noncommercial and NoDerivatives
+External film playback starts only after source consent. Noncommercial and NoDerivatives
 conditions apply where recorded; preserve original credits and do not trim or
 replace soundtracks. The initial implementation is for the existing private,
 noncommercial installation. A later commercial distribution requires a fresh
@@ -59,9 +59,8 @@ edition’s source and credits and pauses on exit.
 
 Do not redistribute the directories' editorial descriptions or film files.
 Unreviewed entries show factual context and link to the source's synopsis and
-edition notes. Source thumbnails are remote, credited and requested only after
-the viewer enables source images; these discovery images are not copied into
-CATODO's licensed local artwork collection. An unavailable image uses a text
+edition notes. Archive cards load credited thumbnails from the source as they
+approach the viewport. An unavailable image uses a text
 fallback. Directory public-domain claims remain qualified by their stated
 territory, including Public Domain Movies' U.S. scope.
 
@@ -78,7 +77,7 @@ remain accessible in each detail dialog, with a prefilled GitHub report link.
 The project is noncommercial and aims to celebrate artists and film history.
 Credits and any applicable fair-use argument do not create a blanket license.
 Credible claims can result in correction or removal of an edition. Source images
-remain remote, credited and opt-in; they are not copied into licensed local art.
+are displayed automatically from their credited hosts when browsing Featured.
 
 ## Logos and programme data
 

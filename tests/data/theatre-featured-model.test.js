@@ -2,8 +2,30 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { prepareFeatured, selectFeatured, featuredLink, featuredMedia, featuredPlaybackTitle, featuredReportUrl } from '../../src/data/theatre-featured-model.js';
+import { theatrePlayableTitles } from '../../src/data/theatre-model.js';
 const raw = JSON.parse(readFileSync(new URL('../../public/theatre/featured-research.json', import.meta.url)));
 const data = prepareFeatured(raw);
+
+test('every Featured work keeps its credited frame in the Films opening and shuffle pool', () => {
+  const art = JSON.parse(readFileSync(new URL('../../public/theatre/featured-artwork.json', import.meta.url)));
+  assert.deepEqual(Object.keys(art.works).sort(), data.records.map((r) => r.id).sort());
+  const pool = theatrePlayableTitles([], prepareFeatured(raw, art).records);
+  for (const film of pool) {
+    assert.equal(art.works[film.editorialId].edition, film.editions[0].url);
+    assert.ok(['poster', 'publicity', 'frame'].includes(film.image.kind), film.id);
+    const still = film.frame || film.image;
+    assert.equal(still.kind, 'frame', film.id);
+    for (const image of [film.image, still]) {
+      assert.ok(image.width > 0 && image.height > 0 && image.credit && featuredLink(image.sourceUrl), film.id);
+    }
+  }
+  const film = raw.records[0], changed = structuredClone(art);
+  changed.works[film.id].edition = 'https://archive.org/download/another/edition.mp4';
+  assert.equal(prepareFeatured(raw, changed).records[0].image.url, film.image.url);
+  changed.works[film.id].edition = film.editions[0].url;
+  changed.works[film.id].image.url = 'https://unexpected.example/photo.jpg';
+  assert.equal(prepareFeatured(raw, changed).records[0].image.url, film.image.url);
+});
 
 test('all 305 works have playable source editions without claiming worldwide clearance', () => {
   assert.equal(data.records.length, 305); assert.equal(data.collections.length, 12);

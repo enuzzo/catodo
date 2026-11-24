@@ -8,6 +8,8 @@ export function theatrePlayableTitles(curated, featured = []) {
   const playable = featured.map((record) => ({
     ...featuredPlaybackTitle(record),
     editorialId: record.id,
+    image: record.image,
+    frame: record.frame,
     year: record.year,
     duration: record.editions[0].duration,
     synopsis: record.synopsis,

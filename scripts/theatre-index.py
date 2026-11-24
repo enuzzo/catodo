@@ -32,7 +32,26 @@ RECORDING_CATEGORIES = {
     "retro-technology": r"\b(?:computerchronicles|computersandtechvideos|computer chronicles|retrocomputing|video games?|gaming|computers?)\b",
     "music-performance": r"\b(?:concerts?|music|performances?|musicians?|bands?)\b",
     "home-movies": r"\b(?:home[ -]?movies?|amateur films?|family (?:film|footage)|travelogue)\b",
-    "public-information": r"\b(?:prelinger|educational|instructional|civil defen[cs]e|public service|training films?)\b",
+    "public-information": r"\b(?:prelinger|educational|instructional|civil defen[cs]e|public service|training (?:films?|videos?))\b",
+    "game-shows": r"\b(?:game shows?|quiz shows?|wheel of fortune|the price is right)\b",
+    "advertising": r"\b(?:infomercials?|teleshopping|paid program(?:me|ming)?s?)\b",
+    "tokusatsu": r"\btokusatsu\b",
+}
+# These are Internet Archive collection identifiers, independent of discovery channels.
+RECORDING_COLLECTIONS = {
+    "animation": {"animationandcartoons", "more_animation", "classic_cartoons", "vintage_cartoons",
+                  "saturdaymorningcartoons", "anime", "anime_miscellaneous"},
+    "noir": {"film_noir"},
+    "comedy": {"comedy_films"},
+    "advertising": {"vhscommercials", "classic_tv_commercials", "classic_tv_commercials_emperor"},
+    "game-shows": {"gameshows", "gameshows_miscellaneous"},
+    "community-tv": {"community_media", "access_humboldt", "wcca_tv", "mendocoasttv", "doubleacs"},
+    "news-public-affairs": {"newsandpublicaffairs"},
+    "vhs": {"vhsvault", "vhstvshows", "vhscommercials", "vhskids", "vhsmovies", "vhsinstructionals",
+            "vhsmisc", "vhssports", "digitizedfromvhs"},
+    "children-tv": {"childrenstelevision"},
+    "public-information": {"vhsinstructionals"},
+    "music-performance": {"musictelevision", "musicvideobin"},
 }
 GENRES = {
     "horror": r"\bhorror\b|\bterror\b",
@@ -354,8 +373,12 @@ def normalize_recording(item):
     context = " ".join(str(value).replace("_", " ") for field in ("title", "genre", "subject", "collection")
                        for value in values(item.get(field)) if not str(value).startswith("fav-"))
     tags = {key for key, pattern in RECORDING_CATEGORIES.items() if re.search(pattern, clean(context, 5000), re.I)}
+    collections = {str(name).casefold() for name in values(item.get("collection"))}
+    tags.update(key for key, members in RECORDING_COLLECTIONS.items() if collections & members)
+    if any(re.search(r"\banime\b", str(subject), re.I) for subject in values(item.get("subject"))):
+        tags.add("animation")
     record["genres"] = sorted(tags.union(record["genres"]) - {"unclassified"}) or ["unclassified"]
-    if record["kind"] == "film" and tags & {"broadcast-history", "home-movies"}:
+    if record["kind"] == "film" and tags & {"broadcast-history", "home-movies", "game-shows", "community-tv", "children-tv"}:
         record["kind"] = "recording"
     return record
 

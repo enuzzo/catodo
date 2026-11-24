@@ -11,7 +11,10 @@ export const ARCHIVE_GENRES = {
   'comedy-drama': 'Comedy & drama collections', 'noir-horror-thriller': 'Noir, horror & thriller collections',
   'martial-arts': 'Martial arts', 'broadcast-history': 'Broadcast recordings',
   'retro-technology': 'Retro technology', 'music-performance': 'Music & performance',
-  'home-movies': 'Home movies', 'public-information': 'Public information films', unclassified: 'Not categorized',
+  'home-movies': 'Home movies', 'public-information': 'Public information films',
+  'game-shows': 'Game shows & quizzes', advertising: 'Advertising & infomercials', 'community-tv': 'Community television',
+  'news-public-affairs': 'News & public affairs', vhs: 'VHS tapes', 'children-tv': 'Children’s television',
+  tokusatsu: 'Tokusatsu', unclassified: 'Not categorized',
 };
 const plain = (value, limit = 240) => String(value ?? '').replace(/[\u0000-\u001f\u202a-\u202e\u2066-\u2069]/g, ' ').slice(0, limit);
 const imageHosts = new Set(['publicdomainmovies.info', 'www.publicdomainmovies.info', 'i0.wp.com', 'i1.wp.com', 'i2.wp.com', 'i.ytimg.com']);
@@ -63,9 +66,12 @@ export function prepareArchiveIndex(data, reviewedTitles = [], recordings = []) 
     || data.manifest.sources.some((source) => !Object.hasOwn(ARCHIVE_PROVIDERS, source.id) || !safeArchiveLink(source.url) || !Number.isSafeInteger(data.manifest.sourceCounts?.[source.id]))) throw new Error('Invalid archive manifest');
   const reviewed = new Map();
   for (const title of reviewedTitles.filter((item) => item.decision === 'usable')) {
-    for (const edition of title.editions) {
+    for (const [editionIndex, edition] of title.editions.entries()) {
       const url = new URL(edition.url);
-      if (url.hostname === 'archive.org' && url.pathname.startsWith('/download/')) reviewed.set(decodeURIComponent(url.pathname.split('/')[2]), title);
+      if (url.hostname !== 'archive.org' || !url.pathname.startsWith('/download/')) continue;
+      const archiveId = decodeURIComponent(url.pathname.split('/')[2]);
+      if (!reviewed.has(archiveId)) reviewed.set(archiveId, { title, editionIndex });
+      else if (reviewed.get(archiveId)?.title.id !== title.id) reviewed.set(archiveId, null);
     }
   }
   const ids = new Set();
@@ -85,7 +91,9 @@ export function prepareArchiveIndex(data, reviewedTitles = [], recordings = []) 
     if (!record.genres.length) record.genres = ['unclassified'];
     if (typeof raw.archiveId === 'string' && /^[A-Za-z0-9_.-]{1,200}$/.test(raw.archiveId)) record.archiveId = raw.archiveId;
     if (Number.isFinite(raw.rating?.value) && raw.rating.value > 0 && raw.rating.value <= 5 && Number.isSafeInteger(raw.rating.count) && raw.rating.count > 0) record.rating = raw.rating;
-    record.reviewed = reviewed.get(record.archiveId);
+    const match = reviewed.get(record.archiveId);
+    record.reviewed = match?.title;
+    if (match) record.editionIndex = match.editionIndex;
     return record;
   }
   const records = data.records.map(prepareRecord);
@@ -122,6 +130,7 @@ export function selectArchivePage(records, state = {}) {
   const found = records.filter((record) => {
     if (state.genre && !record.genres.includes(state.genre)) return false;
     if (state.source && !record.sources.some((source) => source.provider === state.source)) return false;
+    if (state.playableOnly && !record.reviewed) return false;
     if (state.rights === 'reviewed' ? !record.reviewed : state.rights && record.rights.status !== state.rights) return false;
     if (state.kind && record.kind !== state.kind) return false;
     if (state.decade && (state.decade === 'unknown' ? record.year !== null : Math.floor(record.year / 10) * 10 !== Number(state.decade))) return false;

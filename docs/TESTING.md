@@ -65,7 +65,7 @@ viewport and playback fixture with the result. [November UI review](work/2026-11
 ## Home alignment and favorite limits
 
 Import the synthetic playlist through the real app and save 20 favorites. Home
-must show six random suggestions and 18 favorites; More must open all 20 in the
+must show nine random suggestions and 18 favorites; More must open all 20 in the
 favorite Library, then disappear when the total returns to 18. Refreshing random
 suggestions must preserve the preview video node and source. Compare preview
 and suggestion-grid top/bottom edges on wide layouts, including long channel
@@ -163,10 +163,10 @@ layout; switching to/from Explore archives must hide/show the whole opening.
 
 `tests/data/theatre-featured-model.test.js` checks all 305 records, complete
 pagination, composed filters, unknown-year ordering, corrected source identities
-and collection assignments, media host/scheme boundaries, required editions and
+and collection assignments, a credited frame for each current edition, optional cover fallbacks, media host/scheme boundaries, required editions and
 safe exact-work GitHub report links. Rights status is separate from availability.
 Rendered QA covers 1600×900, 1254×784, 773×601 and 390×844 in light/dark mode:
-search + collection, sorting, page changes, image opt-in, modal containment and
+search + collection, sorting, page changes, automatic covers on first visit and with the former image preference set to off, an unavailable poster falling back to its credited frame, archive cover links by pointer and keyboard, modal containment and
 X/backdrop/Escape/focus restoration, all three browsing modes, retained video
 identity, no movie requests before Play, card/detail Play, decoded moving frames,
 muted start, volume preservation across credits, fullscreen, pause on navigation,

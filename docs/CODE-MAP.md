@@ -64,7 +64,7 @@ media dependency.
 
 - `src/ui/theatre.js`: persistent shelf/player, consent, filters, credits and QR.
 - `src/ui/theatre-artwork.js`: visibility-aware local artwork galleries and motion lifecycle.
-- `src/ui/theatre-archive.js`, `src/data/theatre-archive-model.js`: lazy discovery index, source-image consent, filtering/ranking/pagination and exact reviewed-edition links.
+- `src/ui/theatre-archive.js`, `src/data/theatre-archive-model.js`: lazy discovery index, credited source thumbnails, filtering/ranking/pagination and exact reviewed-edition links.
 - `scripts/theatre-index.py`, `scripts/compress-theatre-index.mjs`: reproducible public-directory snapshot and build-time gzip; parser/model fixtures in `tests/data/theatre-archive-model.test.js` and `tests/data/theatre-index-parser.py`.
 - `scripts/theatre-index.py --recordings`: exact Archive item lookup and CATODO recording categories. `theatre-json.js` loads the local snapshots.
 - `src/ui/theatre-tv.js`, `src/data/theatre-tv-model.js`: CATODO TV controls, persistent player, shuffle and exact match against enabled Featured editions.

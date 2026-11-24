@@ -1,5 +1,5 @@
 export const HOME_FAVORITES_LIMIT = 18;
-export const HOME_SUGGESTIONS_LIMIT = 6;
+export const HOME_SUGGESTIONS_LIMIT = 9;
 
 export function needsFirstPlaylist(snapshot) {
   const sync = snapshot?.installationSync;

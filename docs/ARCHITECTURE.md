@@ -1,6 +1,6 @@
 # CATODO architecture
 
-This document is the maintainer map for CATODO 2.16.0. It describes the runtime
+This document is the maintainer map for CATODO 2.17.0. It describes the runtime
 boundaries, the data flow, and the invariants that should survive future UI and
 feature work. For task-to-file navigation use [CODE-MAP.md](CODE-MAP.md); for
 focused checks use [TESTING.md](TESTING.md). For operational procedures and
@@ -214,12 +214,12 @@ truth. Remember watch history on `playing`, not on `tuned`.
 
 ### Home shelf layout
 
-`ui/home-selection.js` owns the six-suggestion and 18-favorite display limits.
+`ui/home-selection.js` owns the nine-suggestion and 18-favorite display limits.
 `app.js` passes a bounded favorite list plus its full count; `ui/markup.js` uses
 that count to show More only above the cap. More reuses the existing navigation
 to Library with the favorites filter and cleared search/category/language filters.
 The headline and random-suggestions heading share a grid row above the preview
-and suggestion cards, whose outer edges stretch together. Narrow layouts stack
+and suggestion cards, whose outer edges stretch together. On wide screens the preview sets the height and the suggestions divide it into three rows. Narrow layouts stack
 these areas and reflow all displayed favorites; CSS does not hide extra favorites.
 Refreshing suggestions updates tiles without replacing or retuning the Live Anchor.
 
@@ -340,7 +340,7 @@ client validates the schema, source URLs, identifiers and response size before
 publishing the result. A failed load offers Retry and leaves the reviewed shelf
 available. It never modifies IndexedDB, installation state or film admission.
 
-`theatre-archive-model.js` combines accent-insensitive search, source/category,
+`theatre-archive-model.js` combines accent-insensitive search, playback availability, source/category,
 declared rights, entry type, decade and Archive rating/review-count filters. It
 sorts before selecting 24 cards, so filters cover the full index. Weighted rating
 is `(stars × reviews + 35) / (reviews + 10)`; this is a heuristic using Archive's
@@ -348,12 +348,11 @@ review count, which can include text-only reviews, not IMDb or an exact count of
 star votes. Missing reviews stay missing. Entry type and genre are inferred from
 source metadata; unknown categories remain browsable.
 
-Source images are opt-in for the current component visit. Remote images use
-lazy loading, allowlisted hosts, no referrer and an error fallback; no animation,
-GIF, media extraction or thumbnail proxy is involved. Existing reviewed local
-artwork can appear without external image consent. Only an exact Archive item
-reference present in a usable Theatre edition offers Open reviewed film; that
-action selects the existing film without autoplay or bypassing source consent.
+Explore archives renders credited thumbnails as the viewer browses a results page. Remote images use
+lazy loading, allowlisted hosts, no referrer and a text fallback. Existing reviewed local
+artwork takes precedence. The primary action on each card covers the image and title. An unambiguous Archive item shared with an enabled film edition opens that edition in Theatre and awaits Play. Other entries link to the named directory or Archive page in a new tab. License and image credits have their own links.
+
+Films, Featured and CATODO TV display the poster for the selected work automatically. The same-origin `featured-artwork.json` register binds credited images to the exact Featured edition URL. A cover can fall back to a still and then to the film title. A failed artwork-register request leaves the film catalog usable. Original local artwork remains available immediately.
 
 `scripts/theatre-index.py` follows Archive's cursor search API through exhaustion
 and parses the two public directory pages. It retains factual titles, years,
@@ -366,7 +365,7 @@ The archive view merges the same-origin `theatre/archive-recordings.json` by
 exact Archive item ID. The supplemental snapshot provides Archive metadata
 and CATODO categories inferred from titles, subjects and collections. The
 main archive remains browsable if the supplemental snapshot fails, with Retry
-available. Text-only browsing fetches local data.
+available. The catalog data comes from CATODO and remote thumbnails come from their credited hosts.
 
 `theatre-editorial.js` owns the opening orders and original notes for films and
 Archive discoveries. Films lazily joins the original 29 selections and the
@@ -551,7 +550,7 @@ in `src/data/theatre-featured-editions.json`. It exports source media URLs but n
 movie bytes or private paths. `theatre-featured-model.js` validates bounded HTTPS
 Archive/Commons editions independently of source rights declarations.
 `theatre-featured.js` lazily loads the versioned
-feed, filters and paginates 24 records, and keeps image consent session-local.
+feed, filters and paginates 24 records, and loads artwork as the cards approach the viewport.
 Featured details use a native dialog with a scrollable body, 60px vertical margins
 and X/backdrop/Escape dismissal. Curated/Featured/archive switches retain the
 existing video elements and pause playback through the existing active-view gate.

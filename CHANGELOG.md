@@ -10,6 +10,17 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 ## [Unreleased]
 
+## [2.17.0] - 2026-11-24
+
+### ✨ Added
+
+- Each of the 305 Featured films has a credited still. Films and Featured show the historical cover or film frame automatically, including after a roll of the die. Archive thumbnails appear as you browse. Film playback starts on Play.
+
+### 🛠 Changed
+
+- Live shows nine random channels in the same desktop preview height. Archive covers and titles open their matching Theatre edition or the named source. The Films counter identifies the film selection separately from the larger archive index.
+- Empty film searches can continue in the archives with the same words. **Available in Theatre** filters the archive by playback destination. Archive collections now identify material such as game shows, infomercials, community television and VHS tapes.
+
 ## [2.16.0] - 2026-11-23
 
 ### ✨ Added
@@ -311,7 +322,8 @@ The emoji are navigation, not confetti: `✨` new things, `🛠` changed things,
 
 - Killed the unrestricted proxy and moved the entire application behind the server-side login boundary. A television app does not need to moonlight as an open relay.
 
-[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.16.0...HEAD
+[Unreleased]: https://github.com/enuzzo/catodo/compare/v2.17.0...HEAD
+[2.17.0]: https://github.com/enuzzo/catodo/compare/v2.16.0...v2.17.0
 [2.16.0]: https://github.com/enuzzo/catodo/compare/v2.15.0...v2.16.0
 [2.15.0]: https://github.com/enuzzo/catodo/compare/v2.14.0...v2.15.0
 [2.14.0]: https://github.com/enuzzo/catodo/compare/v2.13.0...v2.14.0

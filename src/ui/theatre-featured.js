@@ -1,6 +1,6 @@
-import { loadTheatreJson } from '../data/theatre-json.js';
-import { prepareFeatured, selectFeatured, featuredReportUrl } from '../data/theatre-featured-model.js';
+import { loadFeaturedCatalog, selectFeatured, featuredReportUrl } from '../data/theatre-featured-model.js';
 import { createFeaturedPlayer } from './theatre-featured-player.js';
+import { createSourceImage, setImageCredit } from './theatre-source-image.js';
 
 /** Complete editorial selection and explicit-click playback from credited sources. */
 export function createTheatreFeatured({ t, beforePlay, loadCatalog, fetchImpl = (...args) => fetch(...args) }) {
@@ -11,7 +11,7 @@ export function createTheatreFeatured({ t, beforePlay, loadCatalog, fetchImpl = 
   const root = node('section', 'theatre-featured'); root.hidden = true;
   root.setAttribute('aria-label', tr('title', 'Featured'));
   const events = new AbortController();
-  let data, loading, active = false, imagesAllowed = false, opener, debounce;
+  let data, loading, active = false, opener, debounce;
   const state = { query: '', collection: '', genre: '', language: '', sort: 'editorial', page: 1 };
   const header = node('div', 'theatre-featured-header');
   const heading = node('h2', '', tr('heading', 'A different kind of movie night.'));
@@ -35,11 +35,10 @@ export function createTheatreFeatured({ t, beforePlay, loadCatalog, fetchImpl = 
   tools.append(collection, genre, language, sort);
   const meta = node('div', 'theatre-featured-meta');
   const results = node('p', 'theatre-archive-results'); results.setAttribute('role', 'status');
-  const images = button(tr('showImages', 'Show source images')); images.setAttribute('aria-pressed', 'false');
   const reset = button(tr('reset', 'Reset filters'));
-  meta.append(results, images, reset); meta.hidden = true;
+  meta.append(results, reset); meta.hidden = true;
   const collectionNote = node('p', 'theatre-featured-collection-note'); collectionNote.hidden = true;
-  const note = node('p', 'theatre-archive-note', tr('sourceNote', 'Play films here from their credited sources. Availability varies by source and territory. Source images load only when enabled.'));
+  const note = node('p', 'theatre-archive-note', tr('sourceNote', 'Film availability varies by source and territory.'));
   const grid = node('div', 'theatre-grid theatre-featured-grid');
   const empty = node('p', 'theatre-empty', tr('empty', 'No films match. Try another collection or reset the filters.')); empty.hidden = true;
   const pagination = node('nav', 'theatre-archive-pagination'); pagination.setAttribute('aria-label', tr('pages', 'Featured pages')); pagination.hidden = true;
@@ -59,14 +58,14 @@ export function createTheatreFeatured({ t, beforePlay, loadCatalog, fetchImpl = 
     return play;
   }
 
-  function cover(record) {
+  function cover(record, credit) {
     const art = node('div', 'theatre-featured-art');
     art.dataset.tone = String(record.rank % 5);
     art.append(node('span', 'theatre-featured-year', record.year || '—'), node('span', 'theatre-featured-art-title', record.title));
-    if (imagesAllowed && active && record.image) {
-      const photo = node('img'); photo.alt = ''; photo.loading = 'lazy'; photo.decoding = 'async'; photo.referrerPolicy = 'no-referrer'; photo.src = record.image.url;
-      photo.addEventListener('load', () => photo.classList.add('is-ready'), { once: true });
-      photo.addEventListener('error', () => photo.remove(), { once: true }); art.append(photo);
+    if (record.image) {
+      art.append(createSourceImage(record, { onDisplay(displayed) {
+        setImageCredit(credit, displayed, (name) => tr('imageCredit', 'Image: {credit}', { credit: name }));
+      } }));
     }
     return art;
   }
@@ -86,8 +85,8 @@ export function createTheatreFeatured({ t, beforePlay, loadCatalog, fetchImpl = 
     copy.append(rights);
     copy.append(node('p', 'theatre-featured-mission', tr('mission', 'CATODO is a noncommercial project celebrating filmmakers and film history. Rights remain with their respective holders. Contact us to correct credits, report playback issues or request removal.')),
       link(tr('report', 'Report an issue or rights concern on GitHub ↗'), featuredReportUrl(record)));
-    const visual = node('div', 'theatre-featured-detail-art'); visual.append(cover(record));
-    if (imagesAllowed && record.image) visual.append(link(tr('imageCredit', 'Image: {credit}', { credit: record.image.credit }), record.image.sourceUrl));
+    const credit = link('', ''); credit.hidden = true;
+    const visual = node('div', 'theatre-featured-detail-art'); visual.append(cover(record, credit), credit);
     body.replaceChildren(visual, copy); dialog.showModal(); body.scrollTop = 0;
   }
   function card(record) {
@@ -95,15 +94,16 @@ export function createTheatreFeatured({ t, beforePlay, loadCatalog, fetchImpl = 
     const open = button('', 'theatre-featured-card-open'); open.setAttribute('aria-label', tr('detailsFor', 'Read about {title}', { title: record.title }));
     const copy = node('div', 'theatre-featured-card-copy');
     copy.append(node('p', 'theatre-card__year', `${record.year || '—'} / ${record.genres.slice(0, 2).map((g) => t(`filters.${g}`, g)).join(' · ')}`), node('h3', '', record.title), node('p', 'theatre-card__creator', record.creators.join(' · ')), node('p', 'theatre-featured-hook', record.hook || record.synopsis));
-    open.append(cover(record), copy); open.addEventListener('click', () => show(record, open), { signal: events.signal });
+    const credit = link('', ''); credit.hidden = true;
+    open.append(cover(record, credit), copy); open.addEventListener('click', () => show(record, open));
     const footer = node('div', 'theatre-featured-card-footer');
     footer.append(playButton(record));
     if (record.sourceUrl) footer.append(link(tr('source', 'Source ↗'), record.sourceUrl));
-    if (imagesAllowed && record.image) footer.append(link(tr('imageCredit', 'Image: {credit}', { credit: record.image.credit }), record.image.sourceUrl));
+    footer.append(credit);
     item.append(open, footer); return item;
   }
   function render() {
-    if (!data) return;
+    if (!data || !active) return;
     const selected = selectFeatured(data.records, state); state.page = selected.page;
     results.textContent = tr('results', '{count} selections · {page} / {pages}', { count: selected.total, page: selected.page, pages: selected.pages });
     collectionNote.textContent = data.collections.find((c) => c.id === state.collection)?.description || ''; collectionNote.hidden = !collectionNote.textContent;
@@ -116,7 +116,7 @@ export function createTheatreFeatured({ t, beforePlay, loadCatalog, fetchImpl = 
     status.textContent = tr('loading', 'Loading the Featured selection…'); retry.hidden = true;
     loading = (async () => {
       try {
-        data = loadCatalog ? await loadCatalog() : prepareFeatured(await loadTheatreJson('featured-research.json', { fetchImpl, limit: 2_000_000, signal: events.signal }));
+        data = loadCatalog ? await loadCatalog() : await loadFeaturedCatalog({ fetchImpl, signal: events.signal });
         const add = (el, value, label) => { const option = node('option', '', label); option.value = value; el.append(option); };
         data.collections.forEach((c) => add(collection, c.id, c.title));
         [...new Set(data.records.flatMap((r) => r.genres))].sort().forEach((g) => add(genre, g, t(`filters.${g}`, g.charAt(0).toUpperCase() + g.slice(1))));
@@ -127,7 +127,6 @@ export function createTheatreFeatured({ t, beforePlay, loadCatalog, fetchImpl = 
     })(); return loading;
   }
   search.addEventListener('input', () => { clearTimeout(debounce); debounce = setTimeout(() => { state.query = search.value; state.page = 1; render(); }, 160); }, { signal: events.signal });
-  images.addEventListener('click', () => { imagesAllowed = !imagesAllowed; images.setAttribute('aria-pressed', String(imagesAllowed)); images.textContent = imagesAllowed ? tr('hideImages', 'Hide source images') : tr('showImages', 'Show source images'); render(); }, { signal: events.signal });
   reset.addEventListener('click', () => { clearTimeout(debounce); Object.assign(state, { query: '', collection: '', genre: '', language: '', sort: 'editorial', page: 1 }); search.value = ''; Object.entries(selects).forEach(([key, el]) => { el.value = state[key]; }); render(); }, { signal: events.signal });
   function go(delta) { state.page += delta; render(); tools.scrollIntoView({ block: 'start', behavior: 'instant' }); }
   previous.addEventListener('click', () => go(-1), { signal: events.signal }); next.addEventListener('click', () => go(1), { signal: events.signal });

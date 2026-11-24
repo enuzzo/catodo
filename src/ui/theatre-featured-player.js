@@ -1,6 +1,7 @@
 import { TheatrePlayer } from '../player/theatre-player.js';
 import { featuredPlaybackTitle } from '../data/theatre-featured-model.js';
 import { theatreTime } from '../data/theatre-model.js';
+import { createVideoPoster } from './theatre-source-image.js';
 
 /** One persistent video for Featured; shelf filtering and credits never retune it. */
 export function createFeaturedPlayer({ t, beforePlay, onDetails }) {
@@ -13,6 +14,8 @@ export function createFeaturedPlayer({ t, beforePlay, onDetails }) {
   const info = node('div', 'theatre-featured-player-info'), title = node('h2'), meta = node('p', 'theatre-meta');
   const controls = node('div', 'theatre-controls');
   const status = node('p', 'theatre-status'); status.setAttribute('role', 'status');
+  const credit = node('a', 'theatre-link'); credit.target = '_blank'; credit.rel = 'noopener noreferrer'; credit.hidden = true;
+  const setPoster = createVideoPoster(video, credit, (name) => t('imageCredit', 'Image: {credit}', { credit: name }));
   let record, editionIndex = 0;
   const player = new TheatrePlayer({ video, beforePlay, onState(snapshot) {
     toggle.textContent = snapshot.playing ? t('pause', 'Pause') : t('play', 'Play film');
@@ -25,6 +28,7 @@ export function createFeaturedPlayer({ t, beforePlay, onDetails }) {
     if (!featuredPlaybackTitle(next)) return false;
     if (record?.id !== next.id) { player.clear(); editionIndex = 0; }
     record = next; root.hidden = false;
+    setPoster(record);
     title.textContent = record.title; video.setAttribute('aria-label', `${t('playerLabel', 'Featured film player')}: ${record.title}`);
     meta.textContent = [record.year, record.creators.join(' · '), theatreTime(record.editions[editionIndex].duration)].filter(Boolean).join(' / ');
     editions.replaceChildren(...record.editions.map((edition, index) => { const option = node('option', '', edition.label); option.value = index; return option; }));
@@ -42,6 +46,8 @@ export function createFeaturedPlayer({ t, beforePlay, onDetails }) {
   const close = button('closePlayer', 'Close player', () => { player.clear(); root.hidden = true; });
   const editions = node('select', 'theatre-select'); editions.setAttribute('aria-label', t('edition', 'Featured edition'));
   editions.addEventListener('change', () => { editionIndex = Number(editions.value); player.clear(); start(record); }, { signal: events.signal });
-  controls.append(toggle, mute, fullscreen, details, close); info.append(title, meta, editions, controls, status); root.append(video, info);
-  return { root, video, player, play: start, setActive(value) { player.setActive(value); }, destroy() { events.abort(); player.destroy(); } };
+  controls.append(toggle, mute, fullscreen, details, close); info.append(title, meta, editions, controls, credit, status); root.append(video, info);
+  return { root, video, player, play: start,
+    setActive(value) { player.setActive(value); setPoster(value && !root.hidden ? record : null); },
+    destroy() { setPoster(null); events.abort(); player.destroy(); } };
 }

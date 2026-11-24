@@ -34,7 +34,7 @@ import {
 import { multiviewTelemetry, singleTelemetry, nativeMediaTelemetry } from "./ui/telemetry-model.js";
 import { advanceConnection, connectionView, startConnection } from "./ui/connection-model.js";
 import { resolvePlayerReturnView } from "./ui/view-mode.js";
-import { HOME_FAVORITES_LIMIT, needsFirstPlaylist, selectInitialHomeChannel } from "./ui/home-selection.js";
+import { HOME_FAVORITES_LIMIT, HOME_SUGGESTIONS_LIMIT, needsFirstPlaylist, selectInitialHomeChannel } from "./ui/home-selection.js";
 import { favoriteGuidePlan } from "./ui/favorite-guide-model.js";
 import { guideScanCandidates, hasMappedGuide } from "./ui/country-guide-model.js";
 import { defaultMultiviewPresetState, deleteMultiviewPreset, findMultiviewPreset, renameMultiviewPreset } from "./ui/multiview-preset-model.js";
@@ -350,9 +350,11 @@ function refreshWorldMix() {
   }
   const groups = shuffled([...byCountry.values()]);
   const selected = [];
-  while (selected.length < 10 && groups.some((group) => group.length)) {
+  // One spare keeps the grid full when the current preview is in the mix.
+  const sampleSize = HOME_SUGGESTIONS_LIMIT + 1;
+  while (selected.length < sampleSize && groups.some((group) => group.length)) {
     for (const group of groups) {
-      if (group.length && selected.length < 10) selected.push(group.shift());
+      if (group.length && selected.length < sampleSize) selected.push(group.shift());
     }
   }
   state.worldMixIds = selected.map(channelId);

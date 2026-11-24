@@ -1,10 +1,11 @@
 import { prepareArchiveRecordings } from '../data/theatre-archive-model.js';
-import { featuredPlaybackTitle, prepareFeatured } from '../data/theatre-featured-model.js';
+import { featuredPlaybackTitle, loadFeaturedCatalog } from '../data/theatre-featured-model.js';
 import { loadTheatreJson } from '../data/theatre-json.js';
 import { shuffleTvPrograms, theatreTvPrograms } from '../data/theatre-tv-model.js';
 import { TheatrePlayer } from '../player/theatre-player.js';
+import { createVideoPoster } from './theatre-source-image.js';
 
-export function createTheatreTv({ t, beforePlay }) {
+export function createTheatreTv({ t, beforePlay, loadCatalog }) {
   const tr = (key, fallback, vars) => t(`tv.${key}`, fallback, vars);
   const events = new AbortController();
   const eventOptions = { signal: events.signal };
@@ -69,7 +70,9 @@ export function createTheatreTv({ t, beforePlay }) {
 
   const details = node('details', 'catodo-tv-details'); details.hidden = true;
   const credits = node('div', 'catodo-tv-credits');
-  details.append(node('summary', '', tr('credits', 'Source & credits')), credits);
+  const imageCredit = node('a', 'theatre-link'); imageCredit.target = '_blank'; imageCredit.rel = 'noopener noreferrer'; imageCredit.hidden = true;
+  const setPoster = createVideoPoster(video, imageCredit, (name) => t('imageCredit', 'Image: {credit}', { credit: name }));
+  details.append(node('summary', '', tr('credits', 'Source & credits')), credits, imageCredit);
   root.append(screen, controls, status, details);
 
   let order = [], cursor = -1, current = null, loading = null;
@@ -89,6 +92,7 @@ export function createTheatreTv({ t, beforePlay }) {
     cursor = (cursor + delta + order.length) % order.length;
     current = order[cursor];
     const { record, editionIndex } = current;
+    setPoster(record);
     const edition = record.editions[editionIndex];
     programTitle.textContent = record.title;
     meta.textContent = [record.year || '', record.creators.join(' · ')].filter(Boolean).join(' · ');
@@ -113,7 +117,7 @@ export function createTheatreTv({ t, beforePlay }) {
     start.disabled = true;
     intro.textContent = tr('loading', 'Loading the channel…');
     loading = Promise.all([
-      loadTheatreJson('featured-research.json', { ...options, limit: 2_000_000 }).then(prepareFeatured),
+      loadCatalog ? loadCatalog() : loadFeaturedCatalog(options),
       loadTheatreJson('archive-recordings.json', { ...options, limit: 10_000_000, compressed }).then(prepareArchiveRecordings),
     ]).then(([featured, recordings]) => {
       order = shuffleTvPrograms(theatreTvPrograms(featured.records, recordings.records));
@@ -142,7 +146,7 @@ export function createTheatreTv({ t, beforePlay }) {
 
   return {
     root, video, player,
-    setActive(active) { root.hidden = !active; player.setActive(active); if (active) load(); },
-    destroy() { events.abort(); player.destroy(); },
+    setActive(active) { root.hidden = !active; player.setActive(active); setPoster(active ? current?.record : null); if (active) load(); },
+    destroy() { setPoster(null); events.abort(); player.destroy(); },
   };
 }

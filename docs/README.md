@@ -21,6 +21,7 @@ requirement to read this entire directory before editing a file.
 
 ## Current work and release evidence
 
+- [Film artwork, archive card navigation and Live layout](work/2026-11-24-theatre-and-live.md) records edition matching, preview sources and browser verification.
 - [Astra UI review and eight original palettes](work/2026-11-23-astra-ui-review.md) covers first use, compact Theatre, accessible colors and playback checks for 2.16.0.
 - [CATODO TV and editorial discovery](work/2026-11-23-catodo-tv.md) records the catalog and Theatre changes in 2.15.0.
 - [Featured playback release](work/2026-09-22-featured-playback.md): in-app Play for all 305 works, corrected editions, source reports and playback verification.

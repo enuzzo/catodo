@@ -10,6 +10,16 @@ import { THEATRE_TITLES } from '../../src/data/theatre-catalog.js';
 const entry = (id, extras = {}) => ({ id, title: 'Café mystery', year: 1940, genres: ['horror'], sources: [{ provider: 'archive', url: `https://archive.org/details/${id}` }], ...extras });
 const fixture = (records) => ({ manifest: { schema: 1, records: records.length, generatedAt: '2026-09-22T12:00:00Z', sourceCounts: { archive: records.length }, sources: [{ id: 'archive', url: 'https://archive.org/details/feature_films' }] }, records });
 
+test('archive card links select the matching edition and leave shared items at their source', () => {
+  const media = (item, file) => ({ url: `https://archive.org/download/${item}/${file}.mp4` });
+  const film = { id: 'a', decision: 'usable', editions: [media('first', 'a'), media('second', 'a'), media('anthology', 'a')] };
+  const other = { id: 'b', decision: 'usable', editions: [media('anthology', 'b')] };
+  const { records } = prepareArchiveIndex(fixture(['second', 'anthology'].map((id) => entry(id, { archiveId: id }))), [film, other]);
+  assert.equal(records[0].reviewed.id, film.id);
+  assert.equal(records[0].editionIndex, 1);
+  assert.equal(records[1].reviewed, undefined);
+});
+
 test('directory extraction handles nested markup, categories and rights safely', () => {
   const result = spawnSync('python3', ['-B', 'tests/data/theatre-index-parser.py'], { encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr || result.error?.message);
@@ -21,6 +31,8 @@ test('only an exact approved edition links discovery to playback', () => {
   assert.equal(records[0].reviewed.id, 'reviewed');
   assert.equal(records[1].reviewed, undefined);
   assert.equal(selectArchivePage(records, { rights: 'reviewed' }).total, 1);
+  assert.equal(selectArchivePage(records, { playableOnly: true }).total, 1);
+  assert.equal(selectArchivePage(records, { playableOnly: true, rights: 'cc' }).total, 0);
 });
 
 test('untrusted links and image hosts cannot escape the source allowlist', () => {
